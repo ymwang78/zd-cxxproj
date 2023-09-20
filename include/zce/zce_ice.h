@@ -1,0 +1,234 @@
+/* ***************************************************************
+//  rv_ice   version:  1.0  date: 18/12/2009 
+//  -------------------------------------------------------------
+//  Yongming Wang(wangym@gmail.com)
+//  -------------------------------------------------------------
+//  Copyright (C) 2009 - All Rights Reserved
+// ***************************************************************
+// 存放ICE相关可重用类和函数
+// **************************************************************/
+#ifndef __rv_ice_h__
+#define __rv_ice_h__
+
+//#include <zce/zce_methodreq.h>
+#include <Ice/Handle.h>
+#include <IceUtil/Shared.h>
+#include <Ice/Exception.h>
+#include <Ice/LocalException.h>
+
+#include <zce/zce_smartptr.h>
+#include <zce/zce_task.h>
+#include <set>
+
+class zce_task_queue;
+
+namespace zce
+{
+    class rvice_task_base
+    {
+    public:
+        int enqueue(const zce_smartptr<zce_task_queue>& tskdeque_ctx, const char* name = "rvice_task_base");
+        virtual void rvice_execute() = 0;
+    };
+
+    class rvice_task : public zce_task
+    {
+        IceUtil::Handle<IceUtil::Shared> ice_ptr_;
+
+    public:
+        rvice_task(const IceUtil::Handle<IceUtil::Shared>& ptr, const char* name);
+        virtual void call(void);
+    };
+    typedef zce_smartptr<rvice_task> rvice_task_ptr;
+
+    template <typename CALLBACK_CTX, typename BASE, typename ARG0_TYPE, typename ARG1_TYPE>
+    class rvice_task_impl : public BASE, public rvice_task_base
+    {
+        CALLBACK_CTX cbctx_;
+        int result_;
+        ARG0_TYPE arg0_;
+        ARG1_TYPE arg1_;
+        const char* desc_;
+    public:
+        rvice_task_impl(const CALLBACK_CTX& ctx, const ARG1_TYPE& arg1, const char* desc)
+            :cbctx_(ctx), arg1_(arg1), desc_(desc), result_(0)
+        {
+            ZCE_ASSERT(ctx != 0);
+        }
+
+        ~rvice_task_impl()
+        {
+        }
+
+        virtual void ice_response()
+        {
+            result_ = 0;
+            this->enqueue(cbctx_->get_tskdeque(), desc_);
+        }
+
+        virtual void ice_response(::Ice::Int result)
+        {
+            result_ = result;
+            this->enqueue(cbctx_->get_tskdeque(), desc_);
+        }
+
+        virtual void ice_response(::Ice::Int result, ARG0_TYPE arg0)
+        {
+            result_ = result;
+            arg0_ = arg0;
+            this->enqueue(cbctx_->get_tskdeque(), desc_);
+        }
+
+        virtual void ice_response(::Ice::Int result, const ARG0_TYPE& arg0)
+        {
+            result_ = result;
+            arg0_ = arg0;
+            this->enqueue(cbctx_->get_tskdeque(), desc_);
+        }
+
+        virtual void ice_exception(const ::Ice::Exception& ex)
+        {
+            //ZCE_ERROR((ZLOG_ERROR, "rvice_task_impl(%s) exception %s\n", desc_, ex.what()));
+            result_ = 0x80010004; /*ERV_ERRO_CMN_UNAVAILSERVICE*/
+            this->enqueue(cbctx_->get_tskdeque(), desc_);
+        }
+
+        virtual void rvice_execute()
+        {
+            //ZCE_ERROR((ZLOG_TRACE, "rvice_task_impl(%s) succeed 0x%x", desc_, result_));
+            cbctx_->rvice_execute(result_, arg0_, arg1_);
+        }
+    };
+
+    template <typename CALLBACK_CTX, typename BASE, typename ARG0_TYPE, typename ARG1_TYPE, typename ARG_TYPE>
+    class rvice_task_impl_2 : public BASE, public rvice_task_base
+    {
+        CALLBACK_CTX cbctx_;
+        int result_;
+        ARG0_TYPE arg0_;
+        ARG1_TYPE arg1_;
+        ARG_TYPE arg_;
+        const char* desc_;
+    public:
+        rvice_task_impl_2(const CALLBACK_CTX& ctx, const ARG_TYPE& arg, const char* desc = 0)
+            :cbctx_(ctx), arg_(arg), desc_(desc), result_(0)
+        {
+            ZCE_ASSERT(ctx != 0);
+        }
+
+        ~rvice_task_impl_2()
+        {
+        }
+
+        virtual void ice_response()
+        {
+            result_ = 0;
+            this->enqueue(cbctx_->get_tskdeque());
+        }
+
+        virtual void ice_response(::Ice::Int result)
+        {
+            result_ = result;
+            this->enqueue(cbctx_->get_tskdeque());
+        }
+
+        virtual void ice_response(::Ice::Int result, ARG0_TYPE arg0, ARG1_TYPE arg1)
+        {
+            result_ = result;
+            arg0_ = arg0;
+            arg1_ = arg1;
+            this->enqueue(cbctx_->get_tskdeque());
+        }
+
+        virtual void ice_response(::Ice::Int result, ARG0_TYPE arg0, const ARG1_TYPE& arg1)
+        {
+            result_ = result;
+            arg0_ = arg0;
+            arg1_ = arg1;
+            this->enqueue(cbctx_->get_tskdeque());
+        }
+
+        virtual void ice_response(::Ice::Int result, const ARG0_TYPE& arg0, ARG1_TYPE arg1)
+        {
+            result_ = result;
+            arg0_ = arg0;
+            arg1_ = arg1;
+            this->enqueue(cbctx_->get_tskdeque());
+        }
+
+        virtual void ice_response(::Ice::Int result, const ARG0_TYPE& arg0, const ARG1_TYPE& arg1)
+        {
+            result_ = result;
+            arg0_ = arg0;
+            arg1_ = arg1;
+            this->enqueue(cbctx_->get_tskdeque());
+        }
+
+        virtual void ice_exception(const ::Ice::Exception& ex)
+        {
+            //ZCE_ERROR((ZLOG_ERROR, "rvice_task_impl(%s) exception %s\n", desc_, ex.what()));
+            result_ = 0x80010004; /*ERV_ERRO_CMN_UNAVAILSERVICE*/
+            this->enqueue(cbctx_->get_tskdeque());
+        }
+
+        virtual void rvice_execute()
+        {
+            //ZCE_ERROR((ZLOG_TRACE, "rvice_task_impl(%s) succeed %d\n", desc_, result_));
+            cbctx_->rvice_execute(result_, arg0_, arg1_, arg_);
+        }
+    };
+
+    template <typename BASE, typename ARG0_TYPE = int>
+    class rvice_task_oneway : public BASE
+    {
+        virtual void ice_response()
+        {
+        }
+
+        virtual void ice_response(::Ice::Int result)
+        {
+            ZCE_DEBUG((ZLOG_DEBUG, "result:0x%x", result));
+        }
+
+        virtual void ice_response(::Ice::Int result, ARG0_TYPE arg0)
+        {
+            ZCE_DEBUG((ZLOG_DEBUG, "result:0x%x", result));
+        }
+
+        virtual void ice_response(::Ice::Int result, const ARG0_TYPE& arg0)
+        {
+            ZCE_DEBUG((ZLOG_DEBUG, "result:0x%x", result));
+        }
+
+        virtual void ice_exception(const ::Ice::Exception& ex)
+        {
+            ZCE_DEBUG((ZLOG_DEBUG, "result:%s", ex.what()));
+        }
+    };
+
+    class rv_ipclass
+    {
+        struct route_entry {
+            unsigned netaddr;
+            unsigned netmask;
+            unsigned short mask;
+            unsigned short ipclass;
+            bool operator<(const route_entry& rhs) const;
+        };
+
+        std::set<route_entry> rt_set_;
+    public:
+        int load_ipclass(const char* fname, int ipclass);
+        unsigned get_ipclass(unsigned ip);
+    };
+
+    std::string get_ice_local_address(const Ice::Current& cur);
+    std::string get_ice_local_ip(const Ice::Current& cur);
+    unsigned short get_ice_local_port(const Ice::Current& cur);
+
+    std::string get_ice_remote_address(const Ice::Current& cur);
+    std::string get_ice_remote_ip(const Ice::Current& cur);
+    unsigned short get_ice_remote_port(const Ice::Current& cur);
+}
+
+#endif // __rv_ice_h__
