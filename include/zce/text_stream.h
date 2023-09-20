@@ -3,6 +3,7 @@
 #include <zce/zce_config.h>
 #include <zce/zce_smartptr.h>
 #include <map>
+#include <functional>
 
 /************************************************************************/
 /* Comparator for case-insensitive comparison in STL assos. containers  */
