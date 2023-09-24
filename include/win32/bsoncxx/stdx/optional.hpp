@@ -28,9 +28,10 @@ namespace bsoncxx {
 BSONCXX_INLINE_NAMESPACE_BEGIN
 namespace stdx {
 
-using ::core::optional;
-using ::core::nullopt;
 using ::core::make_optional;
+using ::core::nullopt;
+using ::core::nullopt_t;
+using ::core::optional;
 
 }  // namespace stdx
 BSONCXX_INLINE_NAMESPACE_END
@@ -40,6 +41,7 @@ BSONCXX_INLINE_NAMESPACE_END
 
 #include <boost/none.hpp>
 #include <boost/optional/optional.hpp>
+#include <boost/optional/optional_io.hpp>
 
 namespace bsoncxx {
 BSONCXX_INLINE_NAMESPACE_BEGIN
@@ -64,9 +66,10 @@ namespace bsoncxx {
 BSONCXX_INLINE_NAMESPACE_BEGIN
 namespace stdx {
 
-using ::std::experimental::optional;
-using ::std::experimental::nullopt;
 using ::std::experimental::make_optional;
+using ::std::experimental::nullopt;
+using ::std::experimental::nullopt_t;
+using ::std::experimental::optional;
 
 }  // namespace stdx
 BSONCXX_INLINE_NAMESPACE_END
@@ -80,9 +83,10 @@ namespace bsoncxx {
 BSONCXX_INLINE_NAMESPACE_BEGIN
 namespace stdx {
 
-using ::std::optional;
-using ::std::nullopt;
 using ::std::make_optional;
+using ::std::nullopt;
+using ::std::nullopt_t;
+using ::std::optional;
 
 }  // namespace stdx
 BSONCXX_INLINE_NAMESPACE_END

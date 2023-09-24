@@ -35,7 +35,7 @@ class client;
 /// For interoperability with other MongoDB drivers, the minimum and maximum number of connections
 /// in the pool is configured using the 'minPoolSize' and 'maxPoolSize' connection string options.
 ///
-/// @see https://docs.mongodb.com/master/reference/connection-string/#connection-string-options
+/// @see https://docs.mongodb.com/manual/reference/connection-string/#connection-string-options
 ///
 /// @remark When connecting to a replica set, it is @b much more efficient to use a pool as opposed
 /// to manually constructing @c client objects. The pool will use a single background thread per
@@ -110,6 +110,8 @@ class MONGOCXX_API pool {
     stdx::optional<entry> try_acquire();
 
    private:
+    friend class options::auto_encryption;
+
     MONGOCXX_PRIVATE void _release(client* client);
 
     class MONGOCXX_PRIVATE impl;

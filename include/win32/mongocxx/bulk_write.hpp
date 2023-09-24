@@ -37,26 +37,11 @@ class collection;
 /// method. Options that you would typically specify for individual write operations (such as write
 /// concern) are instead specified for the aggregate operation.
 ///
-/// @see https://docs.mongodb.com/master/core/crud/
-/// @see https://docs.mongodb.com/master/core/bulk-write-operations/
+/// @see https://docs.mongodb.com/manual/core/crud/
+/// @see https://docs.mongodb.com/manual/core/bulk-write-operations/
 ///
 class MONGOCXX_API bulk_write {
    public:
-    struct deprecated_tag {};
-    ///
-    /// Initializes a new bulk operation to be executed against a mongocxx::collection.
-    ///
-    /// @param options
-    ///   Optional arguments; see mongocxx::options::bulk_write.
-    ///
-    /// @deprecated
-    ///   Bulk writes created with this constructor will not inherit write concerns from the
-    ///   collection, database, or client. mongocxx::collection::create_bulk_write should be
-    ///   used instead.
-    ///
-    MONGOCXX_DEPRECATED explicit bulk_write(options::bulk_write options = {});
-    explicit bulk_write(deprecated_tag, options::bulk_write options = {});
-
     ///
     /// Move constructs a bulk write operation.
     ///
@@ -103,7 +88,7 @@ class MONGOCXX_API bulk_write {
     ///
     /// @return The optional result of the bulk operation execution, a result::bulk_write.
     ///
-    /// @see https://docs.mongodb.com/master/core/bulk-write-operations/
+    /// @see https://docs.mongodb.com/manual/core/bulk-write-operations/
     ///
     stdx::optional<result::bulk_write> execute() const;
 

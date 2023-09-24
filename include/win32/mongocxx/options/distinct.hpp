@@ -20,6 +20,7 @@
 
 #include <bsoncxx/document/view_or_value.hpp>
 #include <bsoncxx/stdx/optional.hpp>
+#include <bsoncxx/types/bson_value/view_or_value.hpp>
 #include <mongocxx/read_preference.hpp>
 
 #include <mongocxx/config/prelude.hpp>
@@ -43,7 +44,7 @@ class MONGOCXX_API distinct {
     ///   A reference to the object on which this member function is being called.  This facilitates
     ///   method chaining.
     ///
-    /// @see https://docs.mongodb.com/master/reference/command/distinct/
+    /// @see https://docs.mongodb.com/manual/reference/command/distinct/
     ///
     distinct& collation(bsoncxx::document::view_or_value collation);
 
@@ -53,7 +54,7 @@ class MONGOCXX_API distinct {
     /// @return
     ///   The current collation.
     ///
-    /// @see https://docs.mongodb.com/master/reference/command/distinct/
+    /// @see https://docs.mongodb.com/manual/reference/command/distinct/
     ///
     const stdx::optional<bsoncxx::document::view_or_value>& collation() const;
 
@@ -67,7 +68,7 @@ class MONGOCXX_API distinct {
     ///   A reference to the object on which this member function is being called.  This facilitates
     ///   method chaining.
     ///
-    /// @see https://docs.mongodb.com/master/reference/command/distinct/
+    /// @see https://docs.mongodb.com/manual/reference/command/distinct/
     ///
     distinct& max_time(std::chrono::milliseconds max_time);
 
@@ -76,9 +77,32 @@ class MONGOCXX_API distinct {
     ///
     /// @return The current max time (in milliseconds).
     ///
-    /// @see https://docs.mongodb.com/master/reference/command/distinct/
+    /// @see https://docs.mongodb.com/manual/reference/command/distinct/
     ///
     const stdx::optional<std::chrono::milliseconds>& max_time() const;
+
+    ///
+    /// Sets the comment for this operation.
+    ///
+    /// @param comment
+    ///   The new comment.
+    ///
+    /// @return
+    ///   A reference to the object on which this member function is being called.  This facilitates
+    ///   method chaining.
+    ///
+    /// @see https://docs.mongodb.com/manual/reference/command/distinct/
+    ///
+    distinct& comment(bsoncxx::types::bson_value::view_or_value comment);
+
+    ///
+    /// The current comment for this operation.
+    ///
+    /// @return The current comment
+    ///
+    /// @see https://docs.mongodb.com/manual/reference/command/distinct/
+    ///
+    const stdx::optional<bsoncxx::types::bson_value::view_or_value>& comment() const;
 
     ///
     /// Sets the read_preference for this operation.
@@ -90,7 +114,7 @@ class MONGOCXX_API distinct {
     ///   A reference to the object on which this member function is being called.  This facilitates
     ///   method chaining.
     ///
-    /// @see https://docs.mongodb.com/master/reference/command/distinct/
+    /// @see https://docs.mongodb.com/manual/reference/command/distinct/
     ///
     distinct& read_preference(class read_preference rp);
 
@@ -99,17 +123,15 @@ class MONGOCXX_API distinct {
     ///
     /// @return the current read_preference.
     ///
-    /// @see https://docs.mongodb.com/master/reference/command/distinct/
+    /// @see https://docs.mongodb.com/manual/reference/command/distinct/
     ///
     const stdx::optional<class read_preference>& read_preference() const;
 
    private:
     stdx::optional<bsoncxx::document::view_or_value> _collation;
     stdx::optional<std::chrono::milliseconds> _max_time;
+    stdx::optional<bsoncxx::types::bson_value::view_or_value> _comment;
     stdx::optional<class read_preference> _read_preference;
-
-    friend MONGOCXX_API bool MONGOCXX_CALL operator==(const distinct&, const distinct&);
-    friend MONGOCXX_API bool MONGOCXX_CALL operator!=(const distinct&, const distinct&);
 };
 
 }  // namespace options

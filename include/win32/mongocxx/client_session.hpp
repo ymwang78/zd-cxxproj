@@ -14,6 +14,7 @@
 
 #pragma once
 
+#include <functional>
 #include <memory>
 
 #include <bsoncxx/document/view.hpp>
@@ -28,7 +29,8 @@ MONGOCXX_INLINE_NAMESPACE_BEGIN
 class client;
 
 ///
-/// Use a session for a sequence of operations, optionally with causal consistency.
+/// Use a session for a sequence of operations, optionally with either causal consistency
+/// or snapshots.
 ///
 /// Note that client_session is not thread-safe. See
 /// https://mongodb.github.io/mongo-cxx-driver/mongocxx-v3/thread-safety/ for more details.
@@ -37,6 +39,14 @@ class client;
 ///
 class MONGOCXX_API client_session {
    public:
+    enum class transaction_state {
+        k_transaction_none,
+        k_transaction_starting,
+        k_transaction_in_progress,
+        k_transaction_committed,
+        k_transaction_aborted,
+    };
+
     ///
     /// Move constructs a session.
     ///
@@ -87,6 +97,22 @@ class MONGOCXX_API client_session {
     bsoncxx::types::b_timestamp operation_time() const noexcept;
 
     ///
+    /// Get the server_id the session is pinned to. The server_id is zero if the session is not
+    /// pinned to a server.
+    ///
+    std::uint32_t server_id() const noexcept;
+
+    ///
+    /// Returns the current transaction state for this session.
+    ///
+    transaction_state get_transaction_state() const noexcept;
+
+    ///
+    /// Returns whether or not this session is dirty.
+    ///
+    bool get_dirty() const noexcept;
+
+    ///
     /// Advance the cluster time for a session. Has an effect only if the new cluster time is
     /// greater than the session's current cluster time.
     ///
@@ -105,6 +131,59 @@ class MONGOCXX_API client_session {
     /// causally consistent with the last operation in the other session.
     ///
     void advance_operation_time(const bsoncxx::types::b_timestamp& operation_time);
+
+    ///
+    /// Starts a transaction on the current client session.
+    ///
+    /// @param transaction_opts (optional)
+    ///    The options to use in the transaction.
+    ///
+    /// @throws mongocxx::operation_exception if the options are misconfigured, if there are network
+    /// or other transient failures, or if there are other errors such as a session with a
+    /// transaction already in progress.
+    ///
+    void start_transaction(const stdx::optional<options::transaction>& transaction_opts = {});
+
+    ///
+    /// Commits a transaction on the current client session.
+    ///
+    /// @throws mongocxx::operation_exception if the options are misconfigured, if there are network
+    /// or other transient failures, or if there are other errors such as a session with no
+    /// transaction in progress.
+    ///
+    void commit_transaction();
+
+    ///
+    /// Aborts a transaction on the current client session.
+    ///
+    /// @throws mongocxx::operation_exception if the options are misconfigured or if there are
+    /// other errors such as a session with no transaction in progress.
+    ///
+    void abort_transaction();
+
+    ///
+    /// Helper to run a user-provided callback within a transaction.
+    ///
+    /// This method will start a new transaction on this client session,
+    /// run the callback, then commit the transaction. If it cannot commit
+    /// the transaction, the entire sequence may be retried, and the callback
+    /// may be run multiple times.
+    ///
+    /// If the user callback calls driver methods that run operations against the
+    /// server that can throw an operation_exception (ex: collection::insert_one),
+    /// the user callback should allow those exceptions to propagate up the stack
+    /// so they can be caught and processed by the with_transaction helper.
+    ///
+    /// @param cb
+    ///   The callback to run inside of a transaction.
+    /// @param opts (optional)
+    ///   The options to use to run the transaction.
+    ///
+    /// @throws mongocxx::operation_exception if there are errors completing the
+    /// transaction.
+    ///
+    using with_transaction_cb = std::function<void MONGOCXX_CALL(client_session*)>;
+    void with_transaction(with_transaction_cb cb, options::transaction opts = {});
 
    private:
     friend class bulk_write;

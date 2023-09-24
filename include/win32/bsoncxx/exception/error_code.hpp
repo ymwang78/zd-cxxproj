@@ -85,10 +85,18 @@ enum class error_code : std::int32_t {
     /// Failed to complete appending a BSON document to a BSON document or array.
     k_cannot_end_appending_document,
 
+    /// Invalid binary subtype.
+    k_invalid_binary_subtype,
+
+    /// Invalid type.
+    k_invalid_bson_type_id,
+
 /// A value failed to append.
 #define BSONCXX_ENUM(name, value) k_cannot_append_##name,
 #include <bsoncxx/enums/type.hpp>
 #undef BSONCXX_ENUM
+    k_cannot_append_utf8 = k_cannot_append_string,
+    k_need_element_type_k_utf8 = k_need_element_type_k_string,
     // Add new constant string message to error_code.cpp as well!
 };
 
@@ -102,8 +110,8 @@ BSONCXX_API const std::error_category& BSONCXX_CALL error_category();
 ///
 /// Translate a bsoncxx::error_code into a std::error_code.
 ///
-/// @param an error from bsoncxx
-/// @return an error_code
+/// @param error An error from bsoncxx
+/// @return An error_code
 ///
 BSONCXX_INLINE std::error_code make_error_code(error_code error) {
     return {static_cast<int>(error), error_category()};

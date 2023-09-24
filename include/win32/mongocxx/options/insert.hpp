@@ -16,6 +16,7 @@
 
 #include <bsoncxx/document/view.hpp>
 #include <bsoncxx/stdx/optional.hpp>
+#include <bsoncxx/types/bson_value/view_or_value.hpp>
 #include <mongocxx/stdx.hpp>
 #include <mongocxx/write_concern.hpp>
 
@@ -60,7 +61,7 @@ class MONGOCXX_API insert {
     /// @param wc
     ///   The new write_concern.
     ///
-    /// @see https://docs.mongodb.com/master/core/write-concern/
+    /// @see https://docs.mongodb.com/manual/core/write-concern/
     ///
     /// @return
     ///   A reference to the object on which this member function is being called.  This facilitates
@@ -73,7 +74,7 @@ class MONGOCXX_API insert {
     ///
     /// @return The current write_concern.
     ///
-    /// @see https://docs.mongodb.com/master/core/write-concern/
+    /// @see https://docs.mongodb.com/manual/core/write-concern/
     ///
     const stdx::optional<class write_concern>& write_concern() const;
 
@@ -92,7 +93,7 @@ class MONGOCXX_API insert {
     ///   A reference to the object on which this member function is being called.  This facilitates
     ///   method chaining.
     ///
-    /// @see https://docs.mongodb.com/master/reference/command/insert/
+    /// @see https://docs.mongodb.com/manual/reference/command/insert/
     ///
     insert& ordered(bool ordered);
 
@@ -101,17 +102,38 @@ class MONGOCXX_API insert {
     ///
     /// @return The current ordered value.
     ///
-    /// @see https://docs.mongodb.com/master/reference/command/insert/
+    /// @see https://docs.mongodb.com/manual/reference/command/insert/
     ///
     const stdx::optional<bool>& ordered() const;
+
+    ///
+    /// Sets the comment for this operation.
+    ///
+    /// @param comment
+    ///   The new comment.
+    ///
+    /// @see https://docs.mongodb.com/manual/reference/command/insert/
+    ///
+    /// @return
+    ///   A reference to the object on which this member function is being called.  This facilitates
+    ///   method chaining.
+    ///
+    insert& comment(bsoncxx::types::bson_value::view_or_value comment);
+
+    ///
+    /// The current comment for this operation.
+    ///
+    /// @return The current comment.
+    ///
+    /// @see https://docs.mongodb.com/manual/reference/command/insert/
+    ///
+    const stdx::optional<bsoncxx::types::bson_value::view_or_value>& comment() const;
 
    private:
     stdx::optional<class write_concern> _write_concern;
     stdx::optional<bool> _ordered;
     stdx::optional<bool> _bypass_document_validation;
-
-    friend MONGOCXX_API bool MONGOCXX_CALL operator==(const insert&, const insert&);
-    friend MONGOCXX_API bool MONGOCXX_CALL operator!=(const insert&, const insert&);
+    stdx::optional<bsoncxx::types::bson_value::view_or_value> _comment;
 };
 
 }  // namespace options

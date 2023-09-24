@@ -19,6 +19,8 @@
 
 #include <bsoncxx/document/view_or_value.hpp>
 #include <bsoncxx/stdx/optional.hpp>
+#include <bsoncxx/types/bson_value/view_or_value.hpp>
+#include <mongocxx/hint.hpp>
 #include <mongocxx/write_concern.hpp>
 
 #include <mongocxx/config/prelude.hpp>
@@ -41,7 +43,7 @@ class MONGOCXX_API find_one_and_delete {
     ///   A reference to the object on which this member function is being called.  This facilitates
     ///   method chaining.
     ///
-    /// @see https://docs.mongodb.com/master/reference/command/findAndModify/
+    /// @see https://docs.mongodb.com/manual/reference/command/findAndModify/
     ///
     find_one_and_delete& collation(bsoncxx::document::view_or_value collation);
 
@@ -51,7 +53,7 @@ class MONGOCXX_API find_one_and_delete {
     /// @return
     ///   The current collation.
     ///
-    /// @see https://docs.mongodb.com/master/reference/command/findAndModify/
+    /// @see https://docs.mongodb.com/manual/reference/command/findAndModify/
     ///
     const stdx::optional<bsoncxx::document::view_or_value>& collation() const;
 
@@ -65,7 +67,7 @@ class MONGOCXX_API find_one_and_delete {
     ///   A reference to the object on which this member function is being called.  This facilitates
     ///   method chaining.
     ///
-    /// @see https://docs.mongodb.com/master/reference/command/findAndModify/
+    /// @see https://docs.mongodb.com/manual/reference/command/findAndModify/
     ///
     find_one_and_delete& max_time(std::chrono::milliseconds max_time);
 
@@ -74,7 +76,7 @@ class MONGOCXX_API find_one_and_delete {
     ///
     /// @return the current max time (in milliseconds).
     ///
-    /// @see https://docs.mongodb.com/master/reference/command/findAndModify/
+    /// @see https://docs.mongodb.com/manual/reference/command/findAndModify/
     ///
     const stdx::optional<std::chrono::milliseconds>& max_time() const;
 
@@ -88,7 +90,7 @@ class MONGOCXX_API find_one_and_delete {
     ///   A reference to the object on which this member function is being called.  This facilitates
     ///   method chaining.
     ///
-    /// @see https://docs.mongodb.com/master/reference/command/findAndModify/
+    /// @see https://docs.mongodb.com/manual/reference/command/findAndModify/
     ///
     find_one_and_delete& projection(bsoncxx::document::view_or_value projection);
 
@@ -97,7 +99,7 @@ class MONGOCXX_API find_one_and_delete {
     ///
     /// @return The current projection.
     ///
-    /// @see https://docs.mongodb.com/master/reference/command/findAndModify/
+    /// @see https://docs.mongodb.com/manual/reference/command/findAndModify/
     ///
     const stdx::optional<bsoncxx::document::view_or_value>& projection() const;
 
@@ -114,7 +116,7 @@ class MONGOCXX_API find_one_and_delete {
     ///   A reference to the object on which this member function is being called.  This facilitates
     ///   method chaining.
     ///
-    /// @see https://docs.mongodb.com/master/reference/command/findAndModify/
+    /// @see https://docs.mongodb.com/manual/reference/command/findAndModify/
     ///
     find_one_and_delete& sort(bsoncxx::document::view_or_value ordering);
 
@@ -123,7 +125,7 @@ class MONGOCXX_API find_one_and_delete {
     ///
     /// @return The current sort ordering.
     ///
-    /// @see https://docs.mongodb.com/master/reference/command/findAndModify/
+    /// @see https://docs.mongodb.com/manual/reference/command/findAndModify/
     ///
     const stdx::optional<bsoncxx::document::view_or_value>& sort() const;
 
@@ -138,7 +140,7 @@ class MONGOCXX_API find_one_and_delete {
     ///   method chaining.
     ///
     /// @see
-    ///   https://docs.mongodb.com/master/reference/command/findAndModify/
+    ///   https://docs.mongodb.com/manual/reference/command/findAndModify/
     ///
     find_one_and_delete& write_concern(mongocxx::write_concern write_concern);
 
@@ -149,9 +151,71 @@ class MONGOCXX_API find_one_and_delete {
     ///   The current write concern.
     ///
     /// @see
-    ///   https://docs.mongodb.com/master/reference/command/findAndModify/
+    ///   https://docs.mongodb.com/manual/reference/command/findAndModify/
     ///
     const stdx::optional<mongocxx::write_concern>& write_concern() const;
+
+    ///
+    /// Sets the index to use for this operation.
+    ///
+    /// @note if the server already has a cached shape for this query, it may
+    /// ignore a hint.
+    ///
+    /// @param index_hint
+    ///   Object representing the index to use.
+    ///
+    /// @return
+    ///   A reference to the object on which this member function is being called.  This facilitates
+    ///   method chaining.
+    ///
+    find_one_and_delete& hint(class hint index_hint);
+
+    ///
+    /// Gets the current hint.
+    ///
+    /// @return The current hint, if one is set.
+    ///
+    const stdx::optional<class hint>& hint() const;
+
+    ///
+    /// Set the value of the let option.
+    ///
+    /// @param let
+    ///   The new let option.
+    ///
+    /// @return
+    ///   A reference to the object on which this member function is being called.  This facilitates
+    ///   method chaining.
+    ///
+    find_one_and_delete& let(bsoncxx::document::view_or_value let);
+
+    ///
+    /// Gets the current value of the let option.
+    ///
+    /// @return
+    ///  The current let option.
+    ///
+    const stdx::optional<bsoncxx::document::view_or_value> let() const;
+
+    ///
+    /// Set the value of the comment option.
+    ///
+    /// @param comment
+    ///   The new comment option.
+    ///
+    /// @return
+    ///   A reference to the object on which this member function is being called.  This facilitates
+    ///   method chaining.
+    ///
+    find_one_and_delete& comment(bsoncxx::types::bson_value::view_or_value comment);
+
+    ///
+    /// Gets the current value of the comment option.
+    ///
+    /// @return
+    ///  The current comment option.
+    ///
+    const stdx::optional<bsoncxx::types::bson_value::view_or_value> comment() const;
 
    private:
     stdx::optional<bsoncxx::document::view_or_value> _collation;
@@ -159,11 +223,9 @@ class MONGOCXX_API find_one_and_delete {
     stdx::optional<bsoncxx::document::view_or_value> _projection;
     stdx::optional<bsoncxx::document::view_or_value> _ordering;
     stdx::optional<mongocxx::write_concern> _write_concern;
-
-    friend MONGOCXX_API bool MONGOCXX_CALL operator==(const find_one_and_delete&,
-                                                      const find_one_and_delete&);
-    friend MONGOCXX_API bool MONGOCXX_CALL operator!=(const find_one_and_delete&,
-                                                      const find_one_and_delete&);
+    stdx::optional<class hint> _hint;
+    stdx::optional<bsoncxx::document::view_or_value> _let;
+    stdx::optional<bsoncxx::types::bson_value::view_or_value> _comment;
 };
 
 }  // namespace options

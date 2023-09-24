@@ -43,7 +43,7 @@ class MONGOCXX_API index_view {
     ///   method chaining.
     ///
     /// @see
-    ///   https://docs.mongodb.com/master/reference/command/findAndModify/
+    ///   https://docs.mongodb.com/manual/reference/command/findAndModify/
     ///
     index_view& max_time(std::chrono::milliseconds max_time);
 
@@ -54,7 +54,7 @@ class MONGOCXX_API index_view {
     ///   The current max allowed running time (in milliseconds).
     ///
     /// @see
-    ///   https://docs.mongodb.com/master/reference/command/findAndModify/
+    ///   https://docs.mongodb.com/manual/reference/command/findAndModify/
     ///
     const bsoncxx::stdx::optional<std::chrono::milliseconds>& max_time() const;
 
@@ -69,7 +69,7 @@ class MONGOCXX_API index_view {
     ///   method chaining.
     ///
     /// @see
-    ///   https://docs.mongodb.com/master/reference/command/findAndModify/
+    ///   https://docs.mongodb.com/manual/reference/command/findAndModify/
     ///
     index_view& write_concern(mongocxx::write_concern write_concern);
 
@@ -80,13 +80,65 @@ class MONGOCXX_API index_view {
     ///   The current write concern.
     ///
     /// @see
-    ///   https://docs.mongodb.com/master/reference/command/findAndModify/
+    ///   https://docs.mongodb.com/manual/reference/command/findAndModify/
     ///
     const bsoncxx::stdx::optional<mongocxx::write_concern>& write_concern() const;
+
+    ///
+    /// Sets the commit quorum for this operation.
+    ///
+    /// This option may only be used with MongoDB version 4.4 or later.
+    ///
+    /// @param commit_quorum
+    ///   Integer representing the minimum number of data-bearing voting replica set members (i.e.
+    ///   commit quorum), including the primary, that must report a successful index build before
+    ///   the primary marks the indexes as ready. A value of @c 0 disables quorum-voting behavior.
+    ///
+    /// @return
+    ///   A reference to the object on which this member function is being called. This facilitates
+    ///   method chaining.
+    ///
+    /// @see
+    ///   https://docs.mongodb.com/manual/reference/command/createIndexes
+    ///
+    index_view& commit_quorum(std::int32_t commit_quorum);
+
+    ///
+    /// Sets the commit quorum for this operation.
+    ///
+    /// This option may only be used with MongoDB version 4.4 or later.
+    ///
+    /// @param commit_quorum
+    ///   String representing the minimum number of data-bearing voting replica set members (i.e.
+    ///   commit quorum), including the primary, that must report a successful index build before
+    ///   the primary marks the indexes as ready.
+    ///
+    /// @return
+    ///   A reference to the object on which this member function is being called. This facilitates
+    ///   method chaining.
+    ///
+    /// @see
+    ///   https://docs.mongodb.com/manual/reference/command/createIndexes
+    ///
+    index_view& commit_quorum(std::string commit_quorum);
+
+    ///
+    /// Gets the current commitQuorum setting.
+    ///
+    /// This option may only be used with MongoDB version 4.4 or later.
+    ///
+    /// @return
+    ///   The current commitQuorum setting.
+    ///
+    /// @see
+    ///   https://docs.mongodb.com/manual/reference/command/createIndexes
+    ///
+    const stdx::optional<bsoncxx::document::value> commit_quorum() const;
 
    private:
     bsoncxx::stdx::optional<std::chrono::milliseconds> _max_time;
     bsoncxx::stdx::optional<mongocxx::write_concern> _write_concern;
+    bsoncxx::stdx::optional<bsoncxx::document::value> _commit_quorum;
 };
 
 }  // namespace options

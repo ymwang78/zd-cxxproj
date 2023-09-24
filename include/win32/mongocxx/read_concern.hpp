@@ -16,8 +16,10 @@
 
 #include <memory>
 
+#include <bsoncxx/document/value.hpp>
 #include <bsoncxx/stdx/optional.hpp>
 #include <bsoncxx/stdx/string_view.hpp>
+#include <mongocxx/options/transaction.hpp>
 #include <mongocxx/stdx.hpp>
 
 #include <mongocxx/config/prelude.hpp>
@@ -47,14 +49,14 @@ class uri;
 /// a single document. Note that writes must be made with majority write concern in order for reads
 /// to be linearizable.
 ///
-/// @see https://docs.mongodb.com/master/reference/read-concern/
+/// @see https://docs.mongodb.com/manual/reference/read-concern/
 ///
 class MONGOCXX_API read_concern {
    public:
     ///
     /// A class to represent the read concern level.
     ///
-    /// @see https://docs.mongodb.com/master/reference/read-concern/#read-concern-levels
+    /// @see https://docs.mongodb.com/manual/reference/read-concern/#read-concern-levels
     ///
     enum class level {
         k_local,
@@ -62,6 +64,8 @@ class MONGOCXX_API read_concern {
         k_linearizable,
         k_server_default,
         k_unknown,
+        k_available,
+        k_snapshot
     };
 
     ///
@@ -141,10 +145,20 @@ class MONGOCXX_API read_concern {
     ///
     stdx::string_view acknowledge_string() const;
 
+    ///
+    /// Gets the document form of this read_concern.
+    ///
+    /// @return
+    ///   Document representation of this read_concern.
+    ///
+    bsoncxx::document::value to_document() const;
+
    private:
     friend client;
     friend collection;
     friend database;
+    /// \relates mongocxx::options::transaction
+    friend mongocxx::options::transaction;
     friend uri;
 
     ///

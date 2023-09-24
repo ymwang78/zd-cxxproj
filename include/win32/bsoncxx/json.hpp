@@ -16,6 +16,7 @@
 
 #include <string>
 
+#include <bsoncxx/array/view.hpp>
 #include <bsoncxx/document/value.hpp>
 #include <bsoncxx/document/view.hpp>
 #include <bsoncxx/stdx/optional.hpp>
@@ -46,6 +47,8 @@ enum class ExtendedJsonMode : std::uint8_t {
 ///
 /// @param view
 ///   A valid BSON document.
+/// @param mode
+///   An optional JSON representation mode.
 ///
 /// @throws bsoncxx::exception with error details if the conversion failed.
 ///
@@ -54,17 +57,36 @@ enum class ExtendedJsonMode : std::uint8_t {
 BSONCXX_API std::string BSONCXX_CALL to_json(document::view view,
                                              ExtendedJsonMode mode = ExtendedJsonMode::k_legacy);
 
+BSONCXX_API std::string BSONCXX_CALL to_json(array::view view,
+                                             ExtendedJsonMode mode = ExtendedJsonMode::k_legacy);
+
 ///
-/// Constructs a new document::value from the provided JSON text
+/// Constructs a new document::value from the provided JSON text.
 ///
 /// @param 'json'
-///  A string_view into a JSON document
+///  A string_view into a JSON document.
 ///
 /// @returns A document::value if conversion worked.
 ///
 /// @throws bsoncxx::exception with error details if the conversion failed.
 ///
 BSONCXX_API document::value BSONCXX_CALL from_json(stdx::string_view json);
+
+///
+/// Constructs a new document::value from the provided JSON text. This is the UDL version of
+/// from_json().
+///
+/// @param 'json'
+///  A string into a JSON document.
+///
+/// @param 'len'
+///  The length of the JSON string. This is calculated automatically upon use of the UDL.
+///
+/// @returns A document::value if conversion worked.
+///
+/// @throws bsoncxx::exception with error details if the conversion failed.
+///
+BSONCXX_API document::value BSONCXX_CALL operator"" _bson(const char* json, size_t len);
 
 BSONCXX_INLINE_NAMESPACE_END
 }  // namespace bsoncxx

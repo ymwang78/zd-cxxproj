@@ -1,4 +1,4 @@
-// Copyright 2015 MongoDB Inc.
+// Copyright 2015-present MongoDB Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,6 +14,7 @@
 
 #pragma once
 
+#include <cstdint>
 #include <system_error>
 
 #include <mongocxx/config/prelude.hpp>
@@ -86,6 +87,12 @@ enum class error_code : std::int32_t {
 
     /// A failure attempting to pass a mongocxx::client_session to a method.
     k_invalid_session,
+
+    /// A moved-from mongocxx::options::transaction object has been used.
+    k_invalid_transaction_options_object,
+
+    // A resource (server API handle, etc.) could not be created:
+    k_create_resource_fail,
 
     // Add new constant string message to error_code.cpp as well!
 };

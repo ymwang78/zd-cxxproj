@@ -33,38 +33,16 @@ BSONCXX_INLINE_NAMESPACE_BEGIN
 /// @note we use 'oid' to refer to this concrete class. We use 'ObjectId' to refer
 /// to the BSON type.
 ///
-/// @see https://docs.mongodb.com/master/reference/object-id/
+/// @see https://docs.mongodb.com/manual/reference/object-id/
 ///
 class BSONCXX_API oid {
    public:
+    static constexpr std::size_t k_oid_length = 12;
+
     ///
     /// Constructs an oid and initializes it to a newly generated ObjectId.
     ///
     oid();
-
-    struct init_tag_t {};
-
-    // TODO(MSVC): Ideally this would be constexpr, but VS2015U1 can't
-    // handle it.
-    //
-    // See https://connect.microsoft.com/VisualStudio/feedback/details/2092790
-    //
-    BSONCXX_DEPRECATED static const init_tag_t init_tag;
-
-    ///
-    /// Constructs an oid and initializes it to a newly generated ObjectId.
-    ///
-    /// @deprecated
-    ///   This constructor for bsoncxx::oid is still supported but deprecated.
-    ///
-    /// @param tag
-    ///   A bsoncxx::oid::init_tag used to dispatch this overload.
-    ///
-    BSONCXX_DEPRECATED explicit oid(init_tag_t tag);
-
-    struct init_tag_t_deprecated {};
-    static const init_tag_t_deprecated init_tag_deprecated;
-    explicit oid(init_tag_t_deprecated);
 
     ///
     /// Constructs an oid initializes it to the contents of the provided buffer.
@@ -72,9 +50,9 @@ class BSONCXX_API oid {
     /// @param bytes
     ///   A pointer a buffer containing a valid ObjectId.
     /// @param len
-    ///   The length of the buffer. Should be 12.
+    ///   The length of the buffer. Should be equal to oid::size().
     ///
-    /// @throws bsoncxx::exception if the length is not 12.
+    /// @throws bsoncxx::exception if the length is not equal to oid::size().
     ///
     explicit oid(const char* bytes, std::size_t len);
 
@@ -97,6 +75,15 @@ class BSONCXX_API oid {
     std::string to_string() const;
 
     ///
+    /// Returns the number of bytes in this ObjectId.
+    ///
+    /// @return The length of this oid's buffer.
+    ///
+    static std::size_t size() {
+        return k_oid_length;
+    }
+
+    ///
     /// @{
     ///
     /// Relational operators for OIDs
@@ -112,17 +99,6 @@ class BSONCXX_API oid {
     ///
     /// @}
     ///
-
-    ///
-    /// Conversion operator that indicates that the oid is initialized.
-    ///
-    /// @deprecated
-    ///   Uninitialized oids can no longer be created so this function will always return True.
-    ///
-    /// @return True
-    ///
-    BSONCXX_DEPRECATED explicit operator bool() const;
-    bool operator_bool_deprecated() const;
 
     ///
     /// Extracts the timestamp portion of the underlying ObjectId.
@@ -141,7 +117,7 @@ class BSONCXX_API oid {
    private:
     friend BSONCXX_PRIVATE int oid_compare(const oid& lhs, const oid& rhs);
 
-    std::array<char, 12> _bytes;
+    std::array<char, k_oid_length> _bytes;
 };
 
 BSONCXX_INLINE_NAMESPACE_END

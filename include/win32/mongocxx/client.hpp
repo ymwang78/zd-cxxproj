@@ -19,6 +19,7 @@
 #include <mongocxx/client_session.hpp>
 #include <mongocxx/database.hpp>
 #include <mongocxx/options/client.hpp>
+#include <mongocxx/options/client_encryption.hpp>
 #include <mongocxx/options/client_session.hpp>
 #include <mongocxx/read_concern.hpp>
 #include <mongocxx/read_preference.hpp>
@@ -111,7 +112,7 @@ class MONGOCXX_API client {
     /// @param rc
     ///   The new @c read_concern
     ///
-    /// @see https://docs.mongodb.com/master/reference/read-concern/
+    /// @see https://docs.mongodb.com/manual/reference/read-concern/
     ///
     MONGOCXX_DEPRECATED void read_concern(class read_concern rc);
     void read_concern_deprecated(class read_concern rc);
@@ -137,7 +138,7 @@ class MONGOCXX_API client {
     /// @param rp
     ///   The new @c read_preference
     ///
-    /// @see https://docs.mongodb.com/master/core/read-preference/
+    /// @see https://docs.mongodb.com/manual/core/read-preference/
     ///
     MONGOCXX_DEPRECATED void read_preference(class read_preference rp);
     void read_preference_deprecated(class read_preference rp);
@@ -147,7 +148,7 @@ class MONGOCXX_API client {
     ///
     /// @return The current @c read_preference
     ///
-    /// @see https://docs.mongodb.com/master/core/read-preference/
+    /// @see https://docs.mongodb.com/manual/core/read-preference/
     ///
     class read_preference read_preference() const;
 
@@ -221,7 +222,7 @@ class MONGOCXX_API client {
     ///
     /// @throws mongocxx::operation_exception if the underlying 'listDatabases' command fails.
     ///
-    /// @see https://docs.mongodb.com/master/reference/command/listDatabases
+    /// @see https://docs.mongodb.com/manual/reference/command/listDatabases
     ///
     cursor list_databases() const;
 
@@ -239,9 +240,84 @@ class MONGOCXX_API client {
     ///
     /// @throws mongocxx::operation_exception if the underlying 'listDatabases' command fails.
     ///
-    /// @see https://docs.mongodb.com/master/reference/command/listDatabases
+    /// @see https://docs.mongodb.com/manual/reference/command/listDatabases
     ///
     cursor list_databases(const client_session& session) const;
+
+    ///
+    /// Enumerates the databases in the client.
+    ///
+    /// @param opts
+    ///   Options passed directly to the 'listDatabases' command.
+    ///
+    /// @return A mongocxx::cursor containing a BSON document for each
+    ///   database. Each document contains a name field with the database
+    ///   name, a sizeOnDisk field with the total size of the database file on
+    ///   disk in bytes, and an empty field specifying whether the database
+    ///   has any data.
+    ///
+    /// @throws mongocxx::operation_exception if the underlying 'listDatabases' command fails.
+    ///
+    /// @see https://docs.mongodb.com/manual/reference/command/listDatabases
+    ///
+    cursor list_databases(const bsoncxx::document::view_or_value opts) const;
+
+    ///
+    /// Enumerates the databases in the client.
+    ///
+    /// @param session
+    ///   The mongocxx::client_session with which to perform the aggregation.
+    ///
+    /// @param opts
+    ///   Options passed directly to the 'listDatabases' command.
+    ///
+    /// @return A mongocxx::cursor containing a BSON document for each
+    ///   database. Each document contains a name field with the database
+    ///   name, a sizeOnDisk field with the total size of the database file on
+    ///   disk in bytes, and an empty field specifying whether the database
+    ///   has any data.
+    ///
+    /// @throws mongocxx::operation_exception if the underlying 'listDatabases' command fails.
+    ///
+    /// @see https://docs.mongodb.com/manual/reference/command/listDatabases
+    ///
+    cursor list_databases(const client_session& session,
+                          const bsoncxx::document::view_or_value opts) const;
+
+    ///
+    /// Queries the MongoDB server for a list of known databases.
+    ///
+    /// @param filter
+    ///   An optional query expression to filter the returned database names.
+    ///
+    /// @return std::vector<std::string> containing the database names.
+    ///
+    /// @throws mongocxx::operation_exception if the underlying 'listDatabases'
+    /// command fails.
+    ///
+    /// @see https://docs.mongodb.com/manual/reference/command/listDatabases
+    ///
+    std::vector<std::string> list_database_names(
+        const bsoncxx::document::view_or_value filter = {}) const;
+
+    ///
+    /// Queries the MongoDB server for a list of known databases.
+    ///
+    /// @param session
+    ///   The mongocxx::client_session with which to perform the aggregation.
+    ///
+    /// @param filter
+    ///   An optional query expression to filter the returned database names.
+    ///
+    /// @return std::vector<std::string> containing the database names.
+    ///
+    /// @throws mongocxx::operation_exception if the underlying 'listDatabases'
+    /// command fails.
+    ///
+    /// @see https://docs.mongodb.com/manual/reference/command/listDatabases
+    ///
+    std::vector<std::string> list_database_names(
+        const client_session& session, const bsoncxx::document::view_or_value filter = {}) const;
 
     ///
     /// @}
@@ -258,18 +334,106 @@ class MONGOCXX_API client {
     ///
     client_session start_session(const options::client_session& options = {});
 
+    ///
+    /// @{
+    ///
+    /// Gets a change stream on this client with an empty pipeline.
+    /// Change streams are only supported with a "majority" read concern or no read concern.
+    ///
+    /// @param options
+    ///   The options to use when creating the change stream.
+    ///
+    /// @return
+    ///  A change stream on this client.
+    ///
+    /// @see https://docs.mongodb.com/manual/changeStreams/
+    ///
+    change_stream watch(const options::change_stream& options = {});
+
+    ///
+    /// @param session
+    ///   The mongocxx::client_session with which to perform the watch operation.
+    /// @param options
+    ///   The options to use when creating the change stream.
+    ///
+    /// @return
+    ///  A change stream on this client.
+    ///
+    /// @see https://docs.mongodb.com/manual/changeStreams/
+    ///
+    change_stream watch(const client_session& session, const options::change_stream& options = {});
+
+    ///
+    /// Gets a change stream on this client.
+    /// Change streams are only supported with a "majority" read concern or no read concern.
+    ///
+    /// @param pipe
+    ///   The aggregation pipeline to be used on the change notifications.
+    ///   Only a subset of pipeline operations are supported for change streams. For more
+    ///   information see the change streams documentation.
+    /// @param options
+    ///   The options to use when creating the change stream.
+    ///
+    /// @return
+    ///  A change stream on this client.
+    ///
+    /// @see https://docs.mongodb.com/manual/changeStreams/
+    ///
+    change_stream watch(const pipeline& pipe, const options::change_stream& options = {});
+
+    ///
+    /// Gets a change stream on this client.
+    ///
+    /// @param session
+    ///   The mongocxx::client_session with which to perform the watch operation.
+    /// @param pipe
+    ///   The aggregation pipeline to be used on the change notifications.
+    /// @param options
+    ///   The options to use when creating the change stream.
+    ///
+    /// @return
+    ///  A change stream on this client.
+    ///
+    /// @see https://docs.mongodb.com/manual/changeStreams/
+    ///
+    change_stream watch(const client_session& session,
+                        const pipeline& pipe,
+                        const options::change_stream& options = {});
+
+    ///
+    /// @}
+    ///
+
+    ///
+    /// Prevents resource cleanup in the child process from interfering
+    /// with the parent process after forking.
+    ///
+    /// Clients should not be reused after forking. Call this method in the
+    /// child after forking to safely destroy the client. This method should
+    /// not be used with multi-threaded clients.
+    ///
+    /// This method causes the client to clear its session pool without sending
+    /// endSessions.  It also increments an internal generation counter on the
+    /// given client. After this method is called, cursors from
+    /// previous generations will not issue a killCursors command when
+    /// they are destroyed. Client sessions from previous generations
+    /// cannot be used and should be destroyed.
+    ///
+    void reset();
+
    private:
     friend class collection;
     friend class database;
     friend class pool;
     friend class client_session;
-
-#ifdef MONGOCXX_TESTING
-    // TODO: Port to C++ Driver's APM once it's implemented, CXX-1562.
-    friend MONGOCXX_API void* MONGOCXX_CALL client_t_from_client(client& client);
-#endif
+    friend class options::auto_encryption;
+    friend class options::client_encryption;
 
     MONGOCXX_PRIVATE explicit client(void* implementation);
+
+    MONGOCXX_PRIVATE change_stream _watch(const client_session* session,
+                                          const pipeline& pipe,
+                                          const options::change_stream& options);
 
     class MONGOCXX_PRIVATE impl;
 

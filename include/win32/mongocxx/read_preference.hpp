@@ -19,8 +19,10 @@
 #include <memory>
 #include <string>
 
+#include <bsoncxx/array/view_or_value.hpp>
 #include <bsoncxx/document/view_or_value.hpp>
 #include <bsoncxx/stdx/optional.hpp>
+#include <mongocxx/options/transaction.hpp>
 #include <mongocxx/stdx.hpp>
 
 #include <mongocxx/config/prelude.hpp>
@@ -32,6 +34,10 @@ class client;
 class collection;
 class database;
 class uri;
+
+namespace events {
+class topology_description;
+}
 
 ///
 /// Class representing a preference for how the driver routes read operations to members of a
@@ -52,7 +58,7 @@ class uri;
 /// in order to perform read operations on a direct connection to a secondary member of a replica
 /// set, you must set a read preference that allows reading from secondaries.
 ///
-/// @see https://docs.mongodb.com/master/core/read-preference/
+/// @see https://docs.mongodb.com/manual/core/read-preference/
 ///
 class MONGOCXX_API read_preference {
    public:
@@ -65,7 +71,7 @@ class MONGOCXX_API read_preference {
     /// replicate operations from the primary with some delay. Ensure that your application
     /// can tolerate stale data if you choose to use a non-primary mode.
     ///
-    /// @see https://docs.mongodb.com/master/core/read-preference/#read-preference-modes
+    /// @see https://docs.mongodb.com/manual/core/read-preference/#read-preference-modes
     ///
     enum class read_mode : std::uint8_t {
         ///
@@ -105,7 +111,7 @@ class MONGOCXX_API read_preference {
     /// Constructs a new read_preference.
     ///
     /// @param mode
-    ///   Sspecifies the read_mode.
+    ///   Specifies the read_mode.
     ///
     /// @deprecated The constructor with no arguments and the method mode() should be used.
     ///
@@ -120,7 +126,7 @@ class MONGOCXX_API read_preference {
     /// @param tags
     ///   A document representing tags to use for the read_preference.
     ///
-    /// @see https://docs.mongodb.com/master/core/read-preference/#tag-sets
+    /// @see https://docs.mongodb.com/manual/core/read-preference/#tag-sets
     ///
     /// @deprecated The tags() method should be used instead.
     ///
@@ -172,25 +178,39 @@ class MONGOCXX_API read_preference {
     read_mode mode() const;
 
     ///
-    /// Sets or updates the tags for this read_preference.
+    /// Sets or updates the tag set list for this read_preference.
     ///
     /// @param tags
-    ///   Document representing the tags.
+    ///   Document representing the tag set list.
     ///
-    /// @see https://docs.mongodb.com/master/core/read-preference/#tag-sets
+    /// @see https://www.mongodb.com/docs/manual/core/read-preference-tags/
     ///
     /// @return
     ///   A reference to the object on which this member function is being called.  This facilitates
     ///   method chaining.
     ///
-    read_preference& tags(bsoncxx::document::view_or_value tags);
+    read_preference& tags(bsoncxx::document::view_or_value tag_set_list);
 
     ///
-    /// Returns the current tags for this read_preference.
+    /// Sets or updates the tag set list for this read_preference.
     ///
-    /// @return The optionally set current tags.
+    /// @param tags
+    ///   Array of tag sets.
     ///
-    /// @see https://docs.mongodb.com/master/core/read-preference/#tag-sets
+    /// @see https://www.mongodb.com/docs/manual/core/read-preference-tags/
+    ///
+    /// @return
+    ///   A reference to the object on which this member function is being called.  This facilitates
+    ///   method chaining.
+    ///
+    read_preference& tags(bsoncxx::array::view_or_value tag_set_list);
+
+    ///
+    /// Sets or updates the tag set list for this read_preference.
+    ///
+    /// @return The optionally set current tag set list.
+    ///
+    /// @see https://www.mongodb.com/docs/manual/core/read-preference-tags/
     ///
     stdx::optional<bsoncxx::document::view> tags() const;
 
@@ -233,10 +253,41 @@ class MONGOCXX_API read_preference {
     ///
     stdx::optional<std::chrono::seconds> max_staleness() const;
 
+    ///
+    /// Sets the hedge document to be used for the read preference. Sharded clusters running MongoDB
+    /// 4.4 or later can dispatch read operations in parallel, returning the result from the fastest
+    /// host and cancelling the unfinished operations.
+    ///
+    /// This may be an empty document or a document of the form { enabled: &lt;boolean&gt; }.
+    ///
+    /// Hedged reads are automatically enabled in MongoDB 4.4+ when using a ``nearest`` read
+    /// preference. To explicitly enable or disable hedging, the ``hedge`` document must be
+    /// passed. An empty document uses server defaults to control hedging, but the ``enabled`` key
+    /// may be set to ``true`` or ``false`` to explicitly enable or disable hedged reads.
+    ///
+    /// @param hedge
+    ///   The hedge document to set. For example, the document { enabled: true }.
+    ///
+    /// @return A reference to the object on which this member function is being called. This
+    /// facilitates method chaining.
+    ///
+    read_preference& hedge(bsoncxx::document::view_or_value hedge);
+
+    ///
+    /// Gets the current hedge document to be used for the read preference.
+    ///
+    /// @return A hedge document if one was set.
+    ///
+    const stdx::optional<bsoncxx::document::view> hedge() const;
+
    private:
     friend client;
     friend collection;
     friend database;
+    /// \relates mongocxx::options::transaction
+    friend mongocxx::options::transaction;
+    /// \relates mongocxx::events::topology_description
+    friend mongocxx::events::topology_description;
     friend uri;
 
     ///

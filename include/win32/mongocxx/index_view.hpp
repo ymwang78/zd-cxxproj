@@ -29,6 +29,9 @@
 namespace mongocxx {
 MONGOCXX_INLINE_NAMESPACE_BEGIN
 
+///
+/// Class representing a MongoDB index view.
+///
 class MONGOCXX_API index_view {
    public:
     index_view(index_view&&) noexcept;
@@ -421,7 +424,7 @@ class MONGOCXX_API index_view {
     friend class collection;
     class MONGOCXX_PRIVATE impl;
 
-    MONGOCXX_PRIVATE index_view(void* coll);
+    MONGOCXX_PRIVATE index_view(void* coll, void* client);
 
     MONGOCXX_PRIVATE impl& _get_impl();
 

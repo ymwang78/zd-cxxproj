@@ -15,8 +15,6 @@
 #pragma once
 
 #include <algorithm>
-#include <cstdint>
-#include <memory>
 #include <string>
 
 #include <bsoncxx/builder/basic/array.hpp>
@@ -39,6 +37,7 @@
 #include <mongocxx/options/count.hpp>
 #include <mongocxx/options/delete.hpp>
 #include <mongocxx/options/distinct.hpp>
+#include <mongocxx/options/estimated_document_count.hpp>
 #include <mongocxx/options/find.hpp>
 #include <mongocxx/options/find_one_and_delete.hpp>
 #include <mongocxx/options/find_one_and_replace.hpp>
@@ -46,7 +45,9 @@
 #include <mongocxx/options/index.hpp>
 #include <mongocxx/options/index_view.hpp>
 #include <mongocxx/options/insert.hpp>
+#include <mongocxx/options/replace.hpp>
 #include <mongocxx/options/update.hpp>
+#include <mongocxx/pipeline.hpp>
 #include <mongocxx/read_concern.hpp>
 #include <mongocxx/read_preference.hpp>
 #include <mongocxx/result/bulk_write.hpp>
@@ -56,7 +57,6 @@
 #include <mongocxx/result/replace_one.hpp>
 #include <mongocxx/result/update.hpp>
 #include <mongocxx/write_concern.hpp>
-#include <mongocxx/pipeline.hpp>
 
 #include <mongocxx/config/prelude.hpp>
 
@@ -65,6 +65,7 @@ MONGOCXX_INLINE_NAMESPACE_BEGIN
 
 class client;
 class database;
+class client_encryption;
 
 ///
 /// Class representing server side document groupings within a MongoDB database.
@@ -81,6 +82,22 @@ class database;
 /// @endcode
 ///
 class MONGOCXX_API collection {
+    //
+    // Utility class supporting the convenience of {} meaning an empty bsoncxx::document.
+    //
+    // Users may not use this class directly.
+    //
+    // In places where driver methods take this class as a parameter, passing {} will
+    // translate to a default-constructed bsoncxx::document::view_or_value,
+    // regardless of other overloads taking other default-constructible types
+    // for that parameter. This class avoids compiler ambiguity with such overloads.
+    //
+    // See collection::update_one for an example of such overloads.
+    //
+    class _empty_doc_tag {
+        _empty_doc_tag() = default;
+    };
+
    public:
     ///
     /// Default constructs a collection object. The collection is
@@ -135,7 +152,7 @@ class MONGOCXX_API collection {
     /// the cursor throws mongocxx::query_exception when the returned cursor
     /// is iterated.
     ///
-    /// @see https://docs.mongodb.com/master/reference/command/aggregate/
+    /// @see https://docs.mongodb.com/manual/reference/command/aggregate/
     ///
     /// @note
     ///   In order to pass a read concern to this, you must use the
@@ -159,7 +176,7 @@ class MONGOCXX_API collection {
     /// the cursor throws mongocxx::query_exception when the returned cursor
     /// is iterated.
     ///
-    /// @see https://docs.mongodb.com/master/reference/command/aggregate/
+    /// @see https://docs.mongodb.com/manual/reference/command/aggregate/
     ///
     /// @note
     ///   In order to pass a read concern to this, you must use the
@@ -225,7 +242,7 @@ class MONGOCXX_API collection {
     ///   the writes.
     ///
     /// @see mongocxx::bulk_write
-    /// @see https://docs.mongodb.com/master/core/bulk-write-operations/
+    /// @see https://docs.mongodb.com/manual/core/bulk-write-operations/
     ///
     MONGOCXX_INLINE stdx::optional<result::bulk_write> write(
         const model::write& write, const options::bulk_write& options = options::bulk_write());
@@ -250,7 +267,7 @@ class MONGOCXX_API collection {
     ///   the writes.
     ///
     /// @see mongocxx::bulk_write
-    /// @see https://docs.mongodb.com/master/core/bulk-write-operations/
+    /// @see https://docs.mongodb.com/manual/core/bulk-write-operations/
     ///
     MONGOCXX_INLINE stdx::optional<result::bulk_write> write(
         const client_session& session,
@@ -281,7 +298,7 @@ class MONGOCXX_API collection {
     /// @throws mongocxx::bulk_write_exception when there are errors processing the writes.
     ///
     /// @see mongocxx::bulk_write
-    /// @see https://docs.mongodb.com/master/core/bulk-write-operations/
+    /// @see https://docs.mongodb.com/manual/core/bulk-write-operations/
     ///
     template <typename container_type>
     MONGOCXX_INLINE stdx::optional<result::bulk_write> bulk_write(
@@ -308,7 +325,7 @@ class MONGOCXX_API collection {
     /// @throws mongocxx::bulk_write_exception when there are errors processing the writes.
     ///
     /// @see mongocxx::bulk_write
-    /// @see https://docs.mongodb.com/master/core/bulk-write-operations/
+    /// @see https://docs.mongodb.com/manual/core/bulk-write-operations/
     ///
     template <typename container_type>
     MONGOCXX_INLINE stdx::optional<result::bulk_write> bulk_write(
@@ -341,7 +358,7 @@ class MONGOCXX_API collection {
     /// @throws mongocxx::bulk_write_exception when there are errors processing the writes.
     ///
     /// @see mongocxx::bulk_write
-    /// @see https://docs.mongodb.com/master/core/bulk-write-operations/
+    /// @see https://docs.mongodb.com/manual/core/bulk-write-operations/
     ///
     template <typename write_model_iterator_type>
     MONGOCXX_INLINE stdx::optional<result::bulk_write> bulk_write(
@@ -371,7 +388,7 @@ class MONGOCXX_API collection {
     /// @throws mongocxx::bulk_write_exception when there are errors processing the writes.
     ///
     /// @see mongocxx::bulk_write
-    /// @see https://docs.mongodb.com/master/core/bulk-write-operations/
+    /// @see https://docs.mongodb.com/manual/core/bulk-write-operations/
     ///
     template <typename write_model_iterator_type>
     MONGOCXX_INLINE stdx::optional<result::bulk_write> bulk_write(
@@ -382,24 +399,6 @@ class MONGOCXX_API collection {
     ///
     /// @}
     ///
-
-    ///
-    /// Sends a batch of writes represented by the bulk_write to the server.
-    ///
-    /// @deprecated Use mongocxx::bulk_write::execute instead.
-    ///
-    /// @param bulk_write
-    ///   A bulk write which contains multiple write operations.
-    ///
-    /// @return The optional result of the bulk operation execution, a result::bulk_write.
-    ///
-    /// @throws mongocxx::bulk_write_exception when there are errors processing the writes.
-    ///
-    /// @see https://docs.mongodb.com/master/core/bulk-write-operations/
-    ///
-    MONGOCXX_DEPRECATED stdx::optional<result::bulk_write> bulk_write(
-        const class bulk_write& bulk_write);
-    stdx::optional<result::bulk_write> bulk_write_deprecated(const class bulk_write& bulk_write);
 
     ///
     /// @{
@@ -415,10 +414,18 @@ class MONGOCXX_API collection {
     ///
     /// @throws mongocxx::query_exception if the count operation fails.
     ///
-    /// @see https://docs.mongodb.com/master/reference/command/count/
+    /// @note For a fast count of the total documents in a collection, see
+    /// estimated_document_count().
     ///
-    std::int64_t count(bsoncxx::document::view_or_value filter,
-                       const options::count& options = options::count());
+    /// @note Due to an oversight in MongoDB server versions 5.0.0 through 5.0.7, the `count`
+    /// command was not included in Stable API v1. Users of the Stable API with
+    /// estimatedDocumentCount are recommended to upgrade their server version to 5.0.8 or newer, or
+    /// set `apiStrict: false` to avoid encountering errors.
+    ///
+    /// @see mongocxx::estimated_document_count
+    ///
+    std::int64_t count_documents(bsoncxx::document::view_or_value filter,
+                                 const options::count& options = options::count());
 
     ///
     /// Counts the number of documents matching the provided filter.
@@ -434,12 +441,39 @@ class MONGOCXX_API collection {
     ///
     /// @throws mongocxx::query_exception if the count operation fails.
     ///
-    /// @see https://docs.mongodb.com/master/reference/command/count/
+    /// @note Due to an oversight in MongoDB server versions 5.0.0 through 5.0.7, the `count`
+    /// command was not included in Stable API v1. Users of the Stable API with
+    /// estimatedDocumentCount are recommended to upgrade their server version to 5.0.8 or newer, or
+    /// set `apiStrict: false` to avoid encountering errors.
     ///
-    std::int64_t count(const client_session& session,
-                       bsoncxx::document::view_or_value filter,
-                       const options::count& options = options::count());
+    /// @see mongocxx::estimated_document_count
+    ///
+    std::int64_t count_documents(const client_session& session,
+                                 bsoncxx::document::view_or_value filter,
+                                 const options::count& options = options::count());
+    ///
+    /// @}
+    ///
 
+    ///
+    /// @{
+    ///
+    /// Returns an estimate of the number of documents in the collection.
+    ///
+    /// @param options
+    ///   Optional arguments, see mongocxx::options::count.
+    ///
+    /// @return The count of the documents that matched the filter.
+    ///
+    /// @throws mongocxx::query_exception if the count operation fails.
+    ///
+    /// @note This function is implemented in terms of the count server command. See:
+    /// https://www.mongodb.com/docs/manual/reference/command/count/#behavior for more information.
+    ///
+    /// @see mongocxx::count_documents
+    ///
+    std::int64_t estimated_document_count(
+        const options::estimated_document_count& options = options::estimated_document_count());
     ///
     /// @}
     ///
@@ -460,7 +494,7 @@ class MONGOCXX_API collection {
     ///   mongocxx::operation_exception if index creation fails.
     ///
     /// @see
-    ///   https://docs.mongodb.com/master/reference/command/createIndexes/
+    ///   https://docs.mongodb.com/manual/reference/command/createIndexes/
     ///
     /// @note
     ///   Write concern supported only for MongoDB 3.4+.
@@ -486,7 +520,7 @@ class MONGOCXX_API collection {
     ///   mongocxx::operation_exception if index creation fails.
     ///
     /// @see
-    ///   https://docs.mongodb.com/master/reference/command/createIndexes/
+    ///   https://docs.mongodb.com/manual/reference/command/createIndexes/
     ///
     /// @note
     ///   Write concern supported only for MongoDB 3.4+.
@@ -517,7 +551,7 @@ class MONGOCXX_API collection {
     ///
     /// @throws mongocxx::bulk_write_exception if the delete fails.
     ///
-    /// @see https://docs.mongodb.com/master/reference/command/delete/
+    /// @see https://docs.mongodb.com/manual/reference/command/delete/
     ///
     stdx::optional<result::delete_result> delete_many(
         bsoncxx::document::view_or_value filter,
@@ -539,7 +573,7 @@ class MONGOCXX_API collection {
     ///
     /// @throws mongocxx::bulk_write_exception if the delete fails.
     ///
-    /// @see https://docs.mongodb.com/master/reference/command/delete/
+    /// @see https://docs.mongodb.com/manual/reference/command/delete/
     ///
     stdx::optional<result::delete_result> delete_many(
         const client_session& session,
@@ -566,7 +600,7 @@ class MONGOCXX_API collection {
     ///
     /// @throws mongocxx::bulk_write_exception if the delete fails.
     ///
-    /// @see https://docs.mongodb.com/master/reference/command/delete/
+    /// @see https://docs.mongodb.com/manual/reference/command/delete/
     ///
     stdx::optional<result::delete_result> delete_one(
         bsoncxx::document::view_or_value filter,
@@ -588,7 +622,7 @@ class MONGOCXX_API collection {
     ///
     /// @throws mongocxx::bulk_write_exception if the delete fails.
     ///
-    /// @see https://docs.mongodb.com/master/reference/command/delete/
+    /// @see https://docs.mongodb.com/manual/reference/command/delete/
     ///
     stdx::optional<result::delete_result> delete_one(
         const client_session& session,
@@ -615,7 +649,7 @@ class MONGOCXX_API collection {
     /// field.  If the operation fails, the cursor throws
     /// mongocxx::query_exception when the returned cursor is iterated.
 
-    /// @see https://docs.mongodb.com/master/reference/command/distinct/
+    /// @see https://docs.mongodb.com/manual/reference/command/distinct/
     ///
     cursor distinct(bsoncxx::string::view_or_value name,
                     bsoncxx::document::view_or_value filter,
@@ -637,7 +671,7 @@ class MONGOCXX_API collection {
     /// field.  If the operation fails, the cursor throws
     /// mongocxx::query_exception when the returned cursor is iterated.
 
-    /// @see https://docs.mongodb.com/master/reference/command/distinct/
+    /// @see https://docs.mongodb.com/manual/reference/command/distinct/
     ///
     cursor distinct(const client_session& session,
                     bsoncxx::string::view_or_value name,
@@ -661,12 +695,13 @@ class MONGOCXX_API collection {
     ///   mongocxx::operation_exception if the operation fails.
     ///
     /// @see
-    ///   https://docs.mongodb.com/master/reference/command/drop/
+    ///   https://docs.mongodb.com/manual/reference/command/drop/
     ///
     /// @note
     ///   Write concern supported only for MongoDB 3.4+.
     ///
-    void drop(const bsoncxx::stdx::optional<mongocxx::write_concern>& write_concern = {});
+    void drop(const bsoncxx::stdx::optional<mongocxx::write_concern>& write_concern = {},
+              bsoncxx::document::view_or_value collection_options = {});
 
     ///
     /// Drops this collection and all its contained documents from the database.
@@ -681,13 +716,14 @@ class MONGOCXX_API collection {
     ///   mongocxx::operation_exception if the operation fails.
     ///
     /// @see
-    ///   https://docs.mongodb.com/master/reference/command/drop/
+    ///   https://docs.mongodb.com/manual/reference/command/drop/
     ///
     /// @note
     ///   Write concern supported only for MongoDB 3.4+.
     ///
     void drop(const client_session& session,
-              const bsoncxx::stdx::optional<mongocxx::write_concern>& write_concern = {});
+              const bsoncxx::stdx::optional<mongocxx::write_concern>& write_concern = {},
+              bsoncxx::document::view_or_value collection_options = {});
 
     ///
     /// @}
@@ -710,7 +746,7 @@ class MONGOCXX_API collection {
     /// @throws mongocxx::logic_error if the options are invalid, or if the unsupported option
     /// modifiers "$query" or "$explain" are used.
     ///
-    /// @see https://docs.mongodb.com/master/core/read-operations-introduction/
+    /// @see https://docs.mongodb.com/manual/core/read-operations-introduction/
     ///
     cursor find(bsoncxx::document::view_or_value filter,
                 const options::find& options = options::find());
@@ -732,7 +768,7 @@ class MONGOCXX_API collection {
     /// @throws mongocxx::logic_error if the options are invalid, or if the unsupported option
     /// modifiers "$query" or "$explain" are used.
     ///
-    /// @see https://docs.mongodb.com/master/core/read-operations-introduction/
+    /// @see https://docs.mongodb.com/manual/core/read-operations-introduction/
     ///
     cursor find(const client_session& session,
                 bsoncxx::document::view_or_value filter,
@@ -752,7 +788,7 @@ class MONGOCXX_API collection {
     ///
     /// @throws mongocxx::query_exception if the operation fails.
     ///
-    /// @see https://docs.mongodb.com/master/core/read-operations-introduction/
+    /// @see https://docs.mongodb.com/manual/core/read-operations-introduction/
     ///
     stdx::optional<bsoncxx::document::value> find_one(
         bsoncxx::document::view_or_value filter, const options::find& options = options::find());
@@ -771,7 +807,7 @@ class MONGOCXX_API collection {
     ///
     /// @throws mongocxx::query_exception if the operation fails.
     ///
-    /// @see https://docs.mongodb.com/master/core/read-operations-introduction/
+    /// @see https://docs.mongodb.com/manual/core/read-operations-introduction/
     ///
     stdx::optional<bsoncxx::document::value> find_one(
         const client_session& session,
@@ -923,6 +959,56 @@ class MONGOCXX_API collection {
     /// Finds a single document matching the filter, updates it, and returns either the original
     /// or the newly-updated document.
     ///
+    /// @param filter
+    ///   Document view representing a document that should be updated.
+    /// @param update
+    ///   Pipeline representing the update to apply to a matching document.
+    /// @param options
+    ///   Optional arguments, see options::find_one_and_update.
+    ///
+    /// @return The original or updated document.
+    ///
+    /// @exception
+    ///   Throws mongocxx::logic_error if the collation option is specified and an unacknowledged
+    ///   write concern is used.
+    ///
+    /// @exception
+    ///   Throws mongocxx::write_exception if the operation fails.
+    ///
+    stdx::optional<bsoncxx::document::value> find_one_and_update(
+        bsoncxx::document::view_or_value filter,
+        const pipeline& update,
+        const options::find_one_and_update& options = options::find_one_and_update());
+
+    ///
+    /// Finds a single document matching the filter, updates it, and returns either the original
+    /// or the newly-updated document.
+    ///
+    /// @param filter
+    ///   Document view representing a document that should be updated.
+    /// @param update
+    ///   Supports the empty update {}.
+    /// @param options
+    ///   Optional arguments, see options::find_one_and_update.
+    ///
+    /// @return The original or updated document.
+    ///
+    /// @exception
+    ///   Throws mongocxx::logic_error if the collation option is specified and an unacknowledged
+    ///   write concern is used.
+    ///
+    /// @exception
+    ///   Throws mongocxx::write_exception if the operation fails.
+    ///
+    stdx::optional<bsoncxx::document::value> find_one_and_update(
+        bsoncxx::document::view_or_value filter,
+        std::initializer_list<_empty_doc_tag> update,
+        const options::find_one_and_update& options = options::find_one_and_update());
+
+    ///
+    /// Finds a single document matching the filter, updates it, and returns either the original
+    /// or the newly-updated document.
+    ///
     /// @param session
     ///   The mongocxx::client_session with which to perform the operation.
     /// @param filter
@@ -945,6 +1031,62 @@ class MONGOCXX_API collection {
         const client_session& session,
         bsoncxx::document::view_or_value filter,
         bsoncxx::document::view_or_value update,
+        const options::find_one_and_update& options = options::find_one_and_update());
+
+    ///
+    /// Finds a single document matching the filter, updates it, and returns either the original
+    /// or the newly-updated document.
+    ///
+    /// @param session
+    ///   The mongocxx::client_session with which to perform the operation.
+    /// @param filter
+    ///   Document view representing a document that should be updated.
+    /// @param update
+    ///   Pipeline representing the update to apply to a matching document.
+    /// @param options
+    ///   Optional arguments, see options::find_one_and_update.
+    ///
+    /// @return The original or updated document.
+    ///
+    /// @exception
+    ///   Throws mongocxx::logic_error if the collation option is specified and an unacknowledged
+    ///   write concern is used.
+    ///
+    /// @exception
+    ///   Throws mongocxx::write_exception if the operation fails.
+    ///
+    stdx::optional<bsoncxx::document::value> find_one_and_update(
+        const client_session& session,
+        bsoncxx::document::view_or_value filter,
+        const pipeline& update,
+        const options::find_one_and_update& options = options::find_one_and_update());
+
+    ///
+    /// Finds a single document matching the filter, updates it, and returns either the original
+    /// or the newly-updated document.
+    ///
+    /// @param session
+    ///   The mongocxx::client_session with which to perform the operation.
+    /// @param filter
+    ///   Document view representing a document that should be updated.
+    /// @param update
+    ///   Supports the empty update {}.
+    /// @param options
+    ///   Optional arguments, see options::find_one_and_update.
+    ///
+    /// @return The original or updated document.
+    ///
+    /// @exception
+    ///   Throws mongocxx::logic_error if the collation option is specified and an unacknowledged
+    ///   write concern is used.
+    ///
+    /// @exception
+    ///   Throws mongocxx::write_exception if the operation fails.
+    ///
+    stdx::optional<bsoncxx::document::value> find_one_and_update(
+        const client_session& session,
+        bsoncxx::document::view_or_value filter,
+        std::initializer_list<_empty_doc_tag> update,
         const options::find_one_and_update& options = options::find_one_and_update());
 
     ///
@@ -1119,7 +1261,7 @@ class MONGOCXX_API collection {
     ///
     /// @throws mongocxx::operation_exception if the operation fails.
     ///
-    /// @see https://docs.mongodb.com/master/reference/command/listIndexes/
+    /// @see https://docs.mongodb.com/manual/reference/command/listIndexes/
     ///
     cursor list_indexes() const;
 
@@ -1133,7 +1275,7 @@ class MONGOCXX_API collection {
     ///
     /// @throws mongocxx::operation_exception if the operation fails.
     ///
-    /// @see https://docs.mongodb.com/master/reference/command/listIndexes/
+    /// @see https://docs.mongodb.com/manual/reference/command/listIndexes/
     ///
     cursor list_indexes(const client_session& session) const;
 
@@ -1163,7 +1305,7 @@ class MONGOCXX_API collection {
     ///   mongocxx::operation_exception if the operation fails.
     ///
     /// @see
-    ///   https://docs.mongodb.com/master/reference/command/renameCollection/
+    ///   https://docs.mongodb.com/manual/reference/command/renameCollection/
     ///
     /// @note
     ///   Write concern supported only for MongoDB 3.4+.
@@ -1188,7 +1330,7 @@ class MONGOCXX_API collection {
     ///   mongocxx::operation_exception if the operation fails.
     ///
     /// @see
-    ///   https://docs.mongodb.com/master/reference/command/renameCollection/
+    ///   https://docs.mongodb.com/manual/reference/command/renameCollection/
     ///
     /// @note
     ///   Write concern supported only for MongoDB 3.4+.
@@ -1209,7 +1351,7 @@ class MONGOCXX_API collection {
     /// @param rc
     ///   The new @c read_concern
     ///
-    /// @see https://docs.mongodb.com/master/reference/read-concern/
+    /// @see https://docs.mongodb.com/manual/reference/read-concern/
     ///
     void read_concern(class read_concern rc);
 
@@ -1230,7 +1372,7 @@ class MONGOCXX_API collection {
     /// @param rp
     ///   The read_preference to set.
     ///
-    /// @see https://docs.mongodb.com/master/core/read-preference/
+    /// @see https://docs.mongodb.com/manual/core/read-preference/
     ///
     void read_preference(class read_preference rp);
 
@@ -1239,7 +1381,7 @@ class MONGOCXX_API collection {
     ///
     /// @return The current read_preference.
     ///
-    /// @see https://docs.mongodb.com/master/core/read-preference/
+    /// @see https://docs.mongodb.com/manual/core/read-preference/
     ///
     class read_preference read_preference() const;
 
@@ -1253,7 +1395,7 @@ class MONGOCXX_API collection {
     /// @param replacement
     ///   The replacement document.
     /// @param options
-    ///   Optional arguments, see options::update.
+    ///   Optional arguments, see options::replace.
     ///
     /// @return The optional result of attempting to replace a document.
     /// If the write concern is unacknowledged, the optional will be
@@ -1263,12 +1405,12 @@ class MONGOCXX_API collection {
     ///   mongocxx::logic_error if the replacement is invalid, or mongocxx::bulk_write_exception if
     ///   the operation fails.
     ///
-    /// @see https://docs.mongodb.com/master/reference/command/update/
+    /// @see https://docs.mongodb.com/manual/reference/command/update/
     ///
     stdx::optional<result::replace_one> replace_one(
         bsoncxx::document::view_or_value filter,
         bsoncxx::document::view_or_value replacement,
-        const options::update& options = options::update());
+        const options::replace& options = options::replace{});
 
     ///
     /// Replaces a single document matching the provided filter in this collection.
@@ -1280,7 +1422,7 @@ class MONGOCXX_API collection {
     /// @param replacement
     ///   The replacement document.
     /// @param options
-    ///   Optional arguments, see options::update.
+    ///   Optional arguments, see options::replace.
     ///
     /// @return The optional result of attempting to replace a document.
     /// If the write concern is unacknowledged, the optional will be
@@ -1290,17 +1432,13 @@ class MONGOCXX_API collection {
     ///   mongocxx::logic_error if the replacement is invalid, or mongocxx::bulk_write_exception if
     ///   the operation fails.
     ///
-    /// @see https://docs.mongodb.com/master/reference/command/update/
+    /// @see https://docs.mongodb.com/manual/reference/command/update/
     ///
     stdx::optional<result::replace_one> replace_one(
         const client_session& session,
         bsoncxx::document::view_or_value filter,
         bsoncxx::document::view_or_value replacement,
-        const options::update& options = options::update());
-
-    ///
-    /// @}
-    ///
+        const options::replace& options = options::replace{});
 
     ///
     /// @{
@@ -1322,10 +1460,58 @@ class MONGOCXX_API collection {
     ///   mongocxx::logic_error if the update is invalid, or mongocxx::bulk_write_exception if the
     ///   operation fails.
     ///
-    /// @see https://docs.mongodb.com/master/reference/command/update/
+    /// @see https://docs.mongodb.com/manual/reference/command/update/
     ///
     stdx::optional<result::update> update_many(bsoncxx::document::view_or_value filter,
                                                bsoncxx::document::view_or_value update,
+                                               const options::update& options = options::update());
+
+    ///
+    /// Updates multiple documents matching the provided filter in this collection.
+    ///
+    /// @param filter
+    ///   Document representing the match criteria.
+    /// @param update
+    ///   Pipeline representing the update to be applied to matching documents.
+    /// @param options
+    ///   Optional arguments, see options::update.
+    ///
+    /// @return The optional result of attempting to update multiple documents.
+    /// If the write concern is unacknowledged, the optional will be
+    /// disengaged.
+    ///
+    /// @throws
+    ///   mongocxx::logic_error if the update is invalid, or mongocxx::bulk_write_exception if the
+    ///   operation fails.
+    ///
+    /// @see https://docs.mongodb.com/manual/reference/command/update/
+    ///
+    stdx::optional<result::update> update_many(bsoncxx::document::view_or_value filter,
+                                               const pipeline& update,
+                                               const options::update& options = options::update());
+
+    ///
+    /// Updates multiple documents matching the provided filter in this collection.
+    ///
+    /// @param filter
+    ///   Document representing the match criteria.
+    /// @param update
+    ///   Supports the empty update {}.
+    /// @param options
+    ///   Optional arguments, see options::update.
+    ///
+    /// @return The optional result of attempting to update multiple documents.
+    /// If the write concern is unacknowledged, the optional will be
+    /// disengaged.
+    ///
+    /// @throws
+    ///   mongocxx::logic_error if the update is invalid, or mongocxx::bulk_write_exception if the
+    ///   operation fails.
+    ///
+    /// @see https://docs.mongodb.com/manual/reference/command/update/
+    ///
+    stdx::optional<result::update> update_many(bsoncxx::document::view_or_value filter,
+                                               std::initializer_list<_empty_doc_tag> update,
                                                const options::update& options = options::update());
 
     ///
@@ -1348,11 +1534,65 @@ class MONGOCXX_API collection {
     ///   mongocxx::logic_error if the update is invalid, or mongocxx::bulk_write_exception if the
     ///   operation fails.
     ///
-    /// @see https://docs.mongodb.com/master/reference/command/update/
+    /// @see https://docs.mongodb.com/manual/reference/command/update/
     ///
     stdx::optional<result::update> update_many(const client_session& session,
                                                bsoncxx::document::view_or_value filter,
                                                bsoncxx::document::view_or_value update,
+                                               const options::update& options = options::update());
+
+    ///
+    /// Updates multiple documents matching the provided filter in this collection.
+    ///
+    /// @param session
+    ///   The mongocxx::client_session with which to perform the update.
+    /// @param filter
+    ///   Document representing the match criteria.
+    /// @param update
+    ///   Pipeline representing the update to be applied to matching documents.
+    /// @param options
+    ///   Optional arguments, see options::update.
+    ///
+    /// @return The optional result of attempting to update multiple documents.
+    /// If the write concern is unacknowledged, the optional will be
+    /// disengaged.
+    ///
+    /// @throws
+    ///   mongocxx::logic_error if the update is invalid, or mongocxx::bulk_write_exception if the
+    ///   operation fails.
+    ///
+    /// @see https://docs.mongodb.com/manual/reference/command/update/
+    ///
+    stdx::optional<result::update> update_many(const client_session& session,
+                                               bsoncxx::document::view_or_value filter,
+                                               const pipeline& update,
+                                               const options::update& options = options::update());
+
+    ///
+    /// Updates multiple documents matching the provided filter in this collection.
+    ///
+    /// @param session
+    ///   The mongocxx::client_session with which to perform the update.
+    /// @param filter
+    ///   Document representing the match criteria.
+    /// @param update
+    ///   Supports the empty update {}.
+    /// @param options
+    ///   Optional arguments, see options::update.
+    ///
+    /// @return The optional result of attempting to update multiple documents.
+    /// If the write concern is unacknowledged, the optional will be
+    /// disengaged.
+    ///
+    /// @throws
+    ///   mongocxx::logic_error if the update is invalid, or mongocxx::bulk_write_exception if the
+    ///   operation fails.
+    ///
+    /// @see https://docs.mongodb.com/manual/reference/command/update/
+    ///
+    stdx::optional<result::update> update_many(const client_session& session,
+                                               bsoncxx::document::view_or_value filter,
+                                               std::initializer_list<_empty_doc_tag> update,
                                                const options::update& options = options::update());
 
     ///
@@ -1379,10 +1619,58 @@ class MONGOCXX_API collection {
     ///   mongocxx::logic_error if the update is invalid, or mongocxx::bulk_write_exception if the
     ///   operation fails.
     ///
-    /// @see https://docs.mongodb.com/master/reference/command/update/
+    /// @see https://docs.mongodb.com/manual/reference/command/update/
     ///
     stdx::optional<result::update> update_one(bsoncxx::document::view_or_value filter,
                                               bsoncxx::document::view_or_value update,
+                                              const options::update& options = options::update());
+
+    ///
+    /// Updates a single document matching the provided filter in this collection.
+    ///
+    /// @param filter
+    ///   Document representing the match criteria.
+    /// @param update
+    ///   Pipeline representing the update to be applied to a matching document.
+    /// @param options
+    ///   Optional arguments, see options::update.
+    ///
+    /// @return The optional result of attempting to update a document.
+    /// If the write concern is unacknowledged, the optional will be
+    /// disengaged.
+    ///
+    /// @throws
+    ///   mongocxx::logic_error if the update is invalid, or mongocxx::bulk_write_exception if the
+    ///   operation fails.
+    ///
+    /// @see https://docs.mongodb.com/manual/reference/command/update/
+    ///
+    stdx::optional<result::update> update_one(bsoncxx::document::view_or_value filter,
+                                              const pipeline& update,
+                                              const options::update& options = options::update());
+
+    ///
+    /// Updates a single document matching the provided filter in this collection.
+    ///
+    /// @param filter
+    ///   Document representing the match criteria.
+    /// @param update
+    ///   Supports the empty update {}.
+    /// @param options
+    ///   Optional arguments, see options::update.
+    ///
+    /// @return The optional result of attempting to update a document.
+    /// If the write concern is unacknowledged, the optional will be
+    /// disengaged.
+    ///
+    /// @throws
+    ///   mongocxx::logic_error if the update is invalid, or mongocxx::bulk_write_exception if the
+    ///   operation fails.
+    ///
+    /// @see https://docs.mongodb.com/manual/reference/command/update/
+    ///
+    stdx::optional<result::update> update_one(bsoncxx::document::view_or_value filter,
+                                              std::initializer_list<_empty_doc_tag> update,
                                               const options::update& options = options::update());
 
     ///
@@ -1405,11 +1693,65 @@ class MONGOCXX_API collection {
     ///   mongocxx::logic_error if the update is invalid, or mongocxx::bulk_write_exception if the
     ///   operation fails.
     ///
-    /// @see https://docs.mongodb.com/master/reference/command/update/
+    /// @see https://docs.mongodb.com/manual/reference/command/update/
     ///
     stdx::optional<result::update> update_one(const client_session& session,
                                               bsoncxx::document::view_or_value filter,
                                               bsoncxx::document::view_or_value update,
+                                              const options::update& options = options::update());
+
+    ///
+    /// Updates a single document matching the provided filter in this collection.
+    ///
+    /// @param session
+    ///   The mongocxx::client_session with which to perform the update.
+    /// @param filter
+    ///   Document representing the match criteria.
+    /// @param update
+    ///   Pipeline representing the update to be applied to a matching document.
+    /// @param options
+    ///   Optional arguments, see options::update.
+    ///
+    /// @return The optional result of attempting to update a document.
+    /// If the write concern is unacknowledged, the optional will be
+    /// disengaged.
+    ///
+    /// @throws
+    ///   mongocxx::logic_error if the update is invalid, or mongocxx::bulk_write_exception if the
+    ///   operation fails.
+    ///
+    /// @see https://docs.mongodb.com/manual/reference/command/update/
+    ///
+    stdx::optional<result::update> update_one(const client_session& session,
+                                              bsoncxx::document::view_or_value filter,
+                                              const pipeline& update,
+                                              const options::update& options = options::update());
+
+    ///
+    /// Updates a single document matching the provided filter in this collection.
+    ///
+    /// @param session
+    ///   The mongocxx::client_session with which to perform the update.
+    /// @param filter
+    ///   Document representing the match criteria.
+    /// @param update
+    ///   Supports the empty update {}.
+    /// @param options
+    ///   Optional arguments, see options::update.
+    ///
+    /// @return The optional result of attempting to update a document.
+    /// If the write concern is unacknowledged, the optional will be
+    /// disengaged.
+    ///
+    /// @throws
+    ///   mongocxx::logic_error if the update is invalid, or mongocxx::bulk_write_exception if the
+    ///   operation fails.
+    ///
+    /// @see https://docs.mongodb.com/manual/reference/command/update/
+    ///
+    stdx::optional<result::update> update_one(const client_session& session,
+                                              bsoncxx::document::view_or_value filter,
+                                              std::initializer_list<_empty_doc_tag> update,
                                               const options::update& options = options::update());
 
     ///
@@ -1507,8 +1849,9 @@ class MONGOCXX_API collection {
     ///
 
    private:
-    friend class bulk_write;
-    friend class database;
+    friend mongocxx::bulk_write;
+    friend mongocxx::database;
+    friend mongocxx::client_encryption;
 
     MONGOCXX_PRIVATE collection(const database& database,
                                 bsoncxx::string::view_or_value collection_name);
@@ -1522,6 +1865,10 @@ class MONGOCXX_API collection {
     MONGOCXX_PRIVATE std::int64_t _count(const client_session* session,
                                          bsoncxx::document::view_or_value filter,
                                          const options::count& options);
+
+    MONGOCXX_PRIVATE std::int64_t _count_documents(const client_session* session,
+                                                   bsoncxx::document::view_or_value filter,
+                                                   const options::count& options);
 
     MONGOCXX_PRIVATE bsoncxx::document::value _create_index(
         const client_session* session,
@@ -1546,7 +1893,8 @@ class MONGOCXX_API collection {
 
     MONGOCXX_PRIVATE void _drop(
         const client_session* session,
-        const bsoncxx::stdx::optional<mongocxx::write_concern>& write_concern);
+        const bsoncxx::stdx::optional<mongocxx::write_concern>& write_concern,
+        bsoncxx::document::view_or_value collection_options);
 
     MONGOCXX_PRIVATE cursor _find(const client_session* session,
                                   bsoncxx::document::view_or_value filter,
@@ -1587,9 +1935,14 @@ class MONGOCXX_API collection {
 
     MONGOCXX_PRIVATE stdx::optional<result::replace_one> _replace_one(
         const client_session* session,
+        const options::bulk_write& bulk_opts,
+        const model::replace_one& replace_op);
+
+    MONGOCXX_PRIVATE stdx::optional<result::replace_one> _replace_one(
+        const client_session* session,
         bsoncxx::document::view_or_value filter,
         bsoncxx::document::view_or_value replacement,
-        const options::update& options);
+        const options::replace& options);
 
     MONGOCXX_PRIVATE stdx::optional<result::update> _update_one(
         const client_session* session,

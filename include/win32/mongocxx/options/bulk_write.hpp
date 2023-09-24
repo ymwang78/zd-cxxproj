@@ -14,7 +14,9 @@
 
 #pragma once
 
+#include <bsoncxx/document/view_or_value.hpp>
 #include <bsoncxx/stdx/optional.hpp>
+#include <bsoncxx/types/bson_value/view_or_value.hpp>
 #include <mongocxx/write_concern.hpp>
 
 #include <mongocxx/config/prelude.hpp>
@@ -69,7 +71,7 @@ class MONGOCXX_API bulk_write {
     ///   A reference to the object on which this member function is being called.  This facilitates
     ///   method chaining.
     ///
-    /// @see https://docs.mongodb.com/master/core/write-concern/
+    /// @see https://docs.mongodb.com/manual/core/write-concern/
     ///
     bulk_write& write_concern(class write_concern wc);
 
@@ -79,7 +81,7 @@ class MONGOCXX_API bulk_write {
     /// @return
     ///   The current write_concern.
     ///
-    /// @see https://docs.mongodb.com/master/core/write-concern/
+    /// @see https://docs.mongodb.com/manual/core/write-concern/
     ///
     const stdx::optional<class write_concern>& write_concern() const;
 
@@ -103,13 +105,52 @@ class MONGOCXX_API bulk_write {
     ///
     const stdx::optional<bool> bypass_document_validation() const;
 
+    ///
+    /// Set the value of the let option.
+    ///
+    /// @param let
+    ///   The new let option.
+    ///
+    /// @return
+    ///   A reference to the object on which this member function is being called.  This facilitates
+    ///   method chaining.
+    ///
+    bulk_write& let(bsoncxx::document::view_or_value let);
+
+    ///
+    /// Gets the current value of the let option.
+    ///
+    /// @return
+    ///  The current let option.
+    ///
+    const stdx::optional<bsoncxx::document::view_or_value> let() const;
+
+    ///
+    /// Set the value of the comment option.
+    ///
+    /// @param comment
+    ///   The new comment option.
+    ///
+    /// @return
+    ///   A reference to the object on which this member function is being called.  This facilitates
+    ///   method chaining.
+    ///
+    bulk_write& comment(bsoncxx::types::bson_value::view_or_value comment);
+
+    ///
+    /// Gets the current value of the comment option.
+    ///
+    /// @return
+    ///  The current comment option.
+    ///
+    const stdx::optional<bsoncxx::types::bson_value::view_or_value> comment() const;
+
    private:
     bool _ordered;
     stdx::optional<class write_concern> _write_concern;
     stdx::optional<bool> _bypass_document_validation;
-
-    friend MONGOCXX_API bool MONGOCXX_CALL operator==(const bulk_write&, const bulk_write&);
-    friend MONGOCXX_API bool MONGOCXX_CALL operator!=(const bulk_write&, const bulk_write&);
+    stdx::optional<bsoncxx::document::view_or_value> _let;
+    stdx::optional<bsoncxx::types::bson_value::view_or_value> _comment;
 };
 
 }  // namespace options

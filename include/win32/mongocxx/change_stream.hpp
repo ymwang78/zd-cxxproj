@@ -24,10 +24,16 @@
 namespace mongocxx {
 MONGOCXX_INLINE_NAMESPACE_BEGIN
 
+class client;
 class collection;
+class database;
 
+///
+/// Class representing a MongoDB change stream.
+///
 class MONGOCXX_API change_stream {
    public:
+    /// A change stream iterator.
     class MONGOCXX_API iterator;
 
     ///
@@ -51,10 +57,10 @@ class MONGOCXX_API change_stream {
     /// available notification. The state of all iterators is tracked by the
     /// change_stream itself, so advancing one iterator advances all iterators.
     ///
-    /// change_stream::begin() and the increment operators are blocking operations.
-    /// They will not return until a notification is available, the max_await_time (from
-    /// the options::change_stream) milliseconds have elapsed, or a server
-    /// error is encountered.
+    /// change_stream::begin() and increment operators may block if the current batch of documents
+    /// is exhausted. They will not return until a notification is available, the max_await_time
+    /// (from the options::change_stream) milliseconds have elapsed, or a server error is
+    /// encountered.
     ///
     /// When change_stream.begin() == change_stream.end(), no notifications
     /// are available. Each call to change_stream.begin() checks again for
@@ -76,8 +82,35 @@ class MONGOCXX_API change_stream {
     ///
     iterator end() const;
 
+    ///
+    /// Returns a resume token for this change stream.
+    ///
+    /// If the change stream has not been iterated, and either resume_after or
+    /// start_after was specified in the options to this change stream, the
+    /// specified value will be returned by this method. If neither resume_after or
+    /// start_after was set on the options for this change stream, and it has
+    /// not been iterated, this method will return no token.
+    ///
+    /// Once this change stream has been iterated, this method will return the
+    /// resume token of the most recently returned document in the stream, or a
+    /// postBatchResumeToken if the current batch of documents has been exhausted.
+    ///
+    /// @see https://www.mongodb.com/docs/manual/changeStreams/#resume-tokens
+    ///
+    /// The returned document::view is valid for the lifetime of the stream and
+    /// its data may be updated if the change stream is iterated after this function.
+    /// The value may be copied to extend its lifetime or preserve the
+    /// current resume token.
+    ///
+    /// @return
+    ///   The token.
+    ///
+    bsoncxx::stdx::optional<bsoncxx::document::view> get_resume_token() const;
+
    private:
+    friend class client;
     friend class collection;
+    friend class database;
     friend class change_stream::iterator;
 
     MONGOCXX_PRIVATE change_stream(void* change_stream_ptr);
@@ -86,6 +119,9 @@ class MONGOCXX_API change_stream {
     std::unique_ptr<impl> _impl;
 };
 
+///
+/// Class representing a MongoDB change stream iterator.
+///
 class MONGOCXX_API change_stream::iterator {
    public:
     // Support input-iterator (caveat of post-increment returning void)
@@ -105,20 +141,29 @@ class MONGOCXX_API change_stream::iterator {
     ///
     /// Dereferences the view for the document currently being pointed to.
     ///
+    /// The returned document::view is valid until the iterator is incremented. The value may be
+    /// copied to extend its lifetime.
+    ///
     const bsoncxx::document::view& operator*() const;
 
     ///
     /// Accesses a member of the dereferenced document currently being pointed to.
+    ///
+    /// The returned document::view is valid until the iterator is incremented. The value may be
+    /// copied to extend its lifetime.
     ///
     const bsoncxx::document::view* operator->() const;
 
     ///
     /// Pre-increments the iterator to move to the next document.
     ///
-    /// change_stream::begin() and increment operators are blocking operations.
-    /// They will not return until a notification is available, the max_await_time (from
-    /// the options::change_stream) miliseconds have elapsed, or a server
-    /// error is encountered.
+    /// change_stream::begin() and increment operators may block if the current batch of documents
+    /// is exhausted. They will not return until a notification is available, the max_await_time
+    /// (from the options::change_stream) milliseconds have elapsed, or a server error is
+    /// encountered.
+    ///
+    /// If no notification is available, callers may call change_stream::begin() to check for more
+    /// notifications.
     ///
     /// @throws mongocxx::query_exception if the query failed
     ///
@@ -127,10 +172,13 @@ class MONGOCXX_API change_stream::iterator {
     ///
     /// Post-increments the iterator to move to the next document.
     ///
-    /// change_stream::begin() and increment operators are blocking operations.
-    /// They will not return until a notification is available, the max_await_time (from
-    /// the options::change_stream) miliseconds have elapsed, or a server
-    /// error is encountered.
+    /// change_stream::begin() and increment operators may block if the current batch of documents
+    /// is exhausted. They will not return until a notification is available, the max_await_time
+    /// (from the options::change_stream) milliseconds have elapsed, or a server error is
+    /// encountered.
+    ///
+    /// If no notification is available, callers may call change_stream::begin() to check for more
+    /// notifications.
     ///
     /// @throws mongocxx::query_exception if the query failed
     ///
