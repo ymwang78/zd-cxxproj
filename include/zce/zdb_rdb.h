@@ -316,4 +316,427 @@ private:
 };
 
 
+template <typename TKEY, typename T>
+struct zdb_object
+{
+	template <typename TVEC, typename TARG>
+	static int select_all_vec(const zce_smartptr<zdb_connection>& connptr, TVEC& vec, TARG arg)
+	{
+		const char* sql = T::select_all_sql(arg);
+		try
+		{
+			zce_smartptr<zdb_stmt> stmtptr(connptr->create_stmt(sql, false));
+			connptr->execute(stmtptr);
+			while (!stmtptr->eof())
+			{
+				T m;
+				m.extract(stmtptr);
+				vec.push_back(MOVE(m));
+			}
+			return (int)vec.size();
+		}
+		catch (const std::string& ex)
+		{
+			ZCE_ERROR((ZLOG_ERROR, "[%M][%T][%t] sql error: %s\n\t%s\n", sql, ex.c_str()));
+			connptr->close();
+		}
+		catch (...)
+		{
+			ZCE_ERROR((ZLOG_ERROR, "[%M][%T][%t] sql error: %s\n", sql));
+			connptr->close();
+		}
+		return -1;
+	};
+
+	template <typename TMAP, typename TARG>
+	static int select_all(const zce_smartptr<zdb_connection>& connptr, TMAP& dict, TARG arg)
+	{
+		const char* sql = T::select_all_sql(arg);
+		try
+		{
+			zce_smartptr<zdb_stmt> stmtptr(connptr->create_stmt(sql, false));
+			connptr->execute(stmtptr);
+			while (!stmtptr->eof())
+			{
+				T m;
+				m.extract(stmtptr);
+				dict.insert(std::make_pair(m.key(), m));
+			}
+			return 0;
+		}
+		catch (const std::string& ex)
+		{
+			ZCE_ERROR((ZLOG_ERROR, "[%M][%T][%t] sql error: %s\n\t%s\n", sql, ex.c_str()));
+			connptr->close();
+		}
+		catch (...)
+		{
+			ZCE_ERROR((ZLOG_ERROR, "[%M][%T][%t] sql error: %s\n", sql));
+			connptr->close();
+		}
+		return -1;
+	};
+
+	template <typename TMAP, typename TARG>
+	static int select_all_ptr(const zce_smartptr<zdb_connection>& connptr, TMAP& dict, TARG arg)
+	{
+		const char* sql = T::select_all_sql(arg);
+		try
+		{
+			zce_smartptr<zdb_stmt> stmtptr(connptr->create_stmt(sql, false));
+			connptr->execute(stmtptr);
+			while (!stmtptr->eof())
+			{
+				zce_smartptr<T> m(new T);
+				m->extract(stmtptr);
+				dict.insert(std::make_pair(m->key(), m));
+			}
+			return 0;
+		}
+		catch (const std::string& ex)
+		{
+			ZCE_ERROR((ZLOG_ERROR, "[%M][%T][%t] sql error: %s\n\t%s\n", sql, ex.c_str()));
+			connptr->close();
+		}
+		catch (...)
+		{
+			ZCE_ERROR((ZLOG_ERROR, "[%M][%T][%t] sql error: %s\n", sql));
+			connptr->close();
+		}
+		return -1;
+	};
+
+	template<typename P, typename Q>
+	static int select_byprop_base(const zce_smartptr<zdb_connection>& connptr, std::vector<Q>& vec, const char* sql, const P& prop, bool isprc = false)
+	{
+		try
+		{
+			zce_smartptr<zdb_stmt> stmtptr(connptr->create_stmt(sql, true, isprc));
+			*stmtptr << prop;
+			connptr->execute(stmtptr);
+			while (!stmtptr->eof())
+			{
+				Q m;
+				extract(m, stmtptr);
+				vec.push_back(MOVE(m));
+			}
+			return (int)vec.size();
+		}
+		catch (const std::string& ex)
+		{
+			ZCE_ERROR((ZLOG_ERROR, "[%M][%T][%t] sql error: %s\n\t%s\n", sql, ex.c_str()));
+			connptr->close();
+		}
+		catch (...)
+		{
+			ZCE_ERROR((ZLOG_ERROR, "[%M][%T][%t] sql error: %s\n", sql));
+			connptr->close();
+		}
+		return -1;
+	};
+
+
+	template<typename P, typename Q>
+	static int select_byprop_base(const zce_smartptr<zdb_connection>& connptr, Q& m, const char* sql, const P& prop)
+	{
+		try
+		{
+			zce_smartptr<zdb_stmt> stmtptr(connptr->create_stmt(sql));
+			*stmtptr << prop;
+			connptr->execute(stmtptr);
+			if (!stmtptr->eof())
+			{
+				extract(m, stmtptr);
+				return 1;
+			}
+			return 0;
+		}
+		catch (const std::string& ex)
+		{
+			ZCE_ERROR((ZLOG_ERROR, "[%M][%T][%t] sql error: %s\n\t%s\n", sql, ex.c_str()));
+			connptr->close();
+		}
+		catch (...)
+		{
+			ZCE_ERROR((ZLOG_ERROR, "[%M][%T][%t] sql error: %s\n", sql));
+			connptr->close();
+		}
+		return -1;
+	};
+
+	template<typename P>
+	static int select_byprop(const zce_smartptr<zdb_connection>& connptr, std::vector<T>& vec, const char* sql, const P& prop)
+	{
+		try
+		{
+			zce_smartptr<zdb_stmt> stmtptr(connptr->create_stmt(sql));
+			*stmtptr << prop;
+			connptr->execute(stmtptr);
+			while (!stmtptr->eof())
+			{
+				T m;
+				m.extract(stmtptr);
+				vec.push_back(MOVE(m));
+			}
+			return (int)vec.size();
+		}
+		catch (const std::string& ex)
+		{
+			ZCE_ERROR((ZLOG_ERROR, "[%M][%T][%t] sql error: %s\n\t%s\n", sql, ex.c_str()));
+			connptr->close();
+		}
+		catch (...)
+		{
+			ZCE_ERROR((ZLOG_ERROR, "[%M][%T][%t] sql error: %s\n", sql));
+			connptr->close();
+		}
+		return -1;
+	};
+
+	template<typename P>
+	static int select_byprop(const zce_smartptr<zdb_connection>& connptr, T& m, const char* sql, const P& prop)
+	{
+		try
+		{
+			zce_smartptr<zdb_stmt> stmtptr(connptr->create_stmt(sql));
+			*stmtptr << prop;
+			connptr->execute(stmtptr);
+			if (!stmtptr->eof())
+			{
+				m.extract(stmtptr);
+				return 1;
+			}
+			return 0;
+		}
+		catch (const std::string& ex)
+		{
+			ZCE_ERROR((ZLOG_ERROR, "[%M][%T][%t] sql error: %s\n\t%s\n", sql, ex.c_str()));
+			connptr->close();
+		}
+		catch (...)
+		{
+			ZCE_ERROR((ZLOG_ERROR, "[%M][%T][%t] sql error: %s\n", sql));
+			connptr->close();
+		}
+		return -1;
+	};
+
+	template <typename TARG>
+	static int select_bykey(const zce_smartptr<zdb_connection>& connptr, T& m, const TKEY& key, TARG arg) {
+		const char* sql = m.select_bykey_sql(arg);
+		try {
+			if (connptr == 0)
+				return -1;
+			zce_smartptr<zdb_stmt> stmtptr;
+			int ret = connptr->create_stmt(stmtptr, sql, false);
+			if (ret < 0) return ret;
+			*stmtptr << key << zdb_stmt::endl;
+			while (stmtptr->end_row() > 0) {
+				m.extract(stmtptr);
+				return 1;
+			}
+			return 0;
+		}
+		catch (const std::string& ex) {
+			ZCE_ERROR((ZLOG_ERROR, "[%M][%T][%t] sql error: %s\n\t%s\n", sql, ex.c_str()));
+			connptr->close();
+		}
+		catch (...) {
+			ZCE_ERROR((ZLOG_ERROR, "[%M][%T][%t] sql error: %s\n", sql));
+			connptr->close();
+		}
+		return -1;
+	};
+
+	template <typename TARG>
+	static int select_bykey(const zce_smartptr<zdb_connection>& connptr, std::vector<T>& mvec, const TKEY& key, TARG arg, bool isprc = false)
+	{
+		const char* sql = T::select_bykey_sql(arg);
+		try
+		{
+			zce_smartptr<zdb_stmt> stmtptr(connptr->create_stmt(sql, true, isprc));
+			*stmtptr << key;
+			connptr->execute(stmtptr);
+			while (!stmtptr->eof())
+			{
+				mvec.push_back(T());
+				mvec[mvec.size() - 1].extract(stmtptr);
+			}
+			return (int)mvec.size();
+		}
+		catch (const std::string& ex)
+		{
+			ZCE_ERROR((ZLOG_ERROR, "[%M][%T][%t] sql error: %s\n\t%s\n", sql, ex.c_str()));
+			connptr->close();
+		}
+		catch (...)
+		{
+			ZCE_ERROR((ZLOG_ERROR, "[%M][%T][%t] sql error: %s\n", sql));
+			connptr->close();
+		}
+		return -1;
+	};
+
+	template<typename TARG>
+	static int insert(const zce_smartptr<zdb_connection>& connptr, T& m, TARG arg)
+	{
+		const char* sql = m.insert_sql(arg);
+		try
+		{
+			zce_smartptr<zdb_stmt> stmtptr(connptr->create_stmt(sql));
+			m.putinsertvars(stmtptr);
+			connptr->execute(stmtptr);
+			while (!stmtptr->eof())
+			{
+				connptr->skip_row(stmtptr);
+			}
+			return 0;
+		}
+		catch (const std::string& ex)
+		{
+			ZCE_ERROR((ZLOG_ERROR, "[%M][%T][%t] sql error: %s\n\t%s\n", sql, ex.c_str()));
+			connptr->close();
+		}
+		catch (...)
+		{
+			ZCE_ERROR((ZLOG_ERROR, "[%M][%T][%t] sql error: %s\n", sql));
+			connptr->close();
+		}
+		return -1;
+	}
+
+	template<typename TARG>
+	static int replace(const zce_smartptr<zdb_connection>& connptr, T& m, TARG arg)
+	{
+		const char* sql = m.replace_sql(arg);
+		try
+		{
+			zce_smartptr<zdb_stmt> stmtptr(connptr->create_stmt(sql));
+			m.putreplacevars(stmtptr);
+			connptr->execute(stmtptr);
+			while (!stmtptr->eof()) {
+				connptr->skip_row(stmtptr);
+			}
+			return 0;
+		}
+		catch (const std::string& ex)
+		{
+			ZCE_ERROR((ZLOG_ERROR, "[%M][%T][%t] sql error: %s\n\t%s\n", sql, ex.c_str()));
+			connptr->close();
+		}
+		catch (...)
+		{
+			ZCE_ERROR((ZLOG_ERROR, "[%M][%T][%t] sql error: %s\n", sql));
+			connptr->close();
+		}
+		return -1;
+	}
+
+	template<typename TARG>
+	static int update(const zce_smartptr<zdb_connection>& connptr, T& m, TARG arg)
+	{
+		const char* sql = m.update_sql(arg);
+		try
+		{
+			zce_smartptr<zdb_stmt> stmtptr(connptr->create_stmt(sql));
+			m.putupdatevars(stmtptr);
+			connptr->execute(stmtptr);
+			while (!stmtptr->eof()) {
+				connptr->skip_row(stmtptr);
+			}
+			return 0;
+		}
+		catch (const std::string& ex)
+		{
+			ZCE_ERROR((ZLOG_ERROR, "[%M][%T][%t] sql error: %s\n\t%s\n", sql, ex.c_str()));
+			connptr->close();
+		}
+		catch (...)
+		{
+			ZCE_ERROR((ZLOG_ERROR, "[%M][%T][%t] sql error: %s\n", sql));
+			connptr->close();
+		}
+		return -1;
+	}
+
+	static int remove(const zce_smartptr<zdb_connection>& connptr, T& m)
+	{
+		const char* sql = m.delete_sql();
+		try {
+			zce_smartptr<zdb_stmt> stmtptr(connptr->create_stmt(sql));
+			m.putdeletevars(stmtptr);
+			connptr->execute(stmtptr);
+			while (!stmtptr->eof()) {
+				connptr->skip_row(stmtptr);
+			}
+			return 0;
+		}
+		catch (const std::string& ex) {
+			ZCE_ERROR((ZLOG_ERROR, "[%M][%T][%t] sql error: %s\n\t%s\n", sql, ex.c_str()));
+			connptr->close();
+		}
+		catch (...) {
+			ZCE_ERROR((ZLOG_ERROR, "[%M][%T][%t] sql error: %s\n", sql));
+			connptr->close();
+		}
+		return -1;
+	}
+
+	static int execute(const zce_smartptr<zdb_connection>& connptr, T& m, const char* sql, bool isprc = false, void* ctx = 0)
+	{
+		try
+		{
+			zce_smartptr<zdb_stmt> stmtptr(connptr->create_stmt(sql, true, isprc));
+			m.putvars(stmtptr, sql, ctx);
+			connptr->execute(stmtptr);
+			while (!stmtptr->eof())
+			{
+				m.extract(stmtptr);
+				return 1;
+			}
+			return 0;
+		}
+		catch (const std::string& ex)
+		{
+			ZCE_ERROR((ZLOG_ERROR, "[%M][%T][%t] sql error: %s\n\t%s\n", sql, ex.c_str()));
+			connptr->close();
+		}
+		catch (...)
+		{
+			ZCE_ERROR((ZLOG_ERROR, "[%M][%T][%t] sql error: %s\n", sql));
+			connptr->close();
+		}
+		return -1;
+	}
+
+	template<typename TARG>
+	static int execute(const zce_smartptr<zdb_connection>& connptr, std::vector<T>& mvec, TARG prop, const char* sql, bool isprc = false, void* ctx = 0)
+	{
+		try
+		{
+			zce_smartptr<zdb_stmt> stmtptr(connptr->create_stmt(sql, true, isprc));
+			*stmtptr << prop;
+			connptr->execute(stmtptr);
+			while (!stmtptr->eof())
+			{
+				mvec.push_back(T());
+				mvec[mvec.size() - 1].extract(stmtptr);
+			}
+			return (int)mvec.size();
+		}
+		catch (const std::string& ex)
+		{
+			ZCE_ERROR((ZLOG_ERROR, "[%M][%T][%t] sql error: %s\n\t%s\n", sql, ex.c_str()));
+			connptr->close();
+		}
+		catch (...)
+		{
+			ZCE_ERROR((ZLOG_ERROR, "[%M][%T][%t] sql error: %s\n", sql));
+			connptr->close();
+		}
+		return -1;
+	}
+};
+
+
 #endif //__ZDB_RDB__H__

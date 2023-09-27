@@ -98,7 +98,7 @@ namespace zdp
 
         //////////////////////////////////////////////////////////////////////////
 
-        virtual void on_packet(const zdp_head&, const zce_dblock& plain_body, const zce_dblock& org_full);
+        virtual void on_packet(const zdp_head&, const zce_dblock& plain_body, const zce_dblock& org_full, const void* ctx);
 
         virtual void on_timeout(zdp_resctx* resctx);
 
