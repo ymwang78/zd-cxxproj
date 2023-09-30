@@ -45,6 +45,10 @@ public:
 
 	int try_queue_length(); //if locked return -1
 
+    void pause();
+
+    int resume();
+
     virtual void call();
 
     template<typename F>

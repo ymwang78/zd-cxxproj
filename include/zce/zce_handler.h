@@ -86,7 +86,7 @@ public:
 
     virtual void on_close();
 
-    virtual int  write(const zce_dblock& dblock, ERV_ISTREAM_WRITEOPT opt);
+    virtual int  write(const zce_dblock& dblock, ERV_ISTREAM_WRITEOPT opt = ERV_ISTREAM_DEFAULT);
 
     virtual void close();
 

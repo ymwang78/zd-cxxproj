@@ -92,7 +92,7 @@ namespace zdp
 
         virtual void on_read(zce_dblock& dblock_ptr, void*);
 
-        virtual int write(const zce_dblock& dblock_ptr, zce_istream::ERV_ISTREAM_WRITEOPT opt);
+        virtual int write(const zce_dblock& dblock_ptr, zce_istream::ERV_ISTREAM_WRITEOPT opt = zce_istream::ERV_ISTREAM_DEFAULT);
 
         virtual void close();
 

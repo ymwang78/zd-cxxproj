@@ -341,12 +341,12 @@ struct zdb_object
 		}
 		catch (const std::string& ex)
 		{
-			ZCE_ERROR((ZLOG_ERROR, "[%M][%T][%t] sql error: %s\n\t%s\n", sql, ex.c_str()));
+			ZCE_ERROR((ZLOG_ERROR, "sql error: %s\n\t%s\n", sql, ex.c_str()));
 			connptr->close();
 		}
 		catch (...)
 		{
-			ZCE_ERROR((ZLOG_ERROR, "[%M][%T][%t] sql error: %s\n", sql));
+			ZCE_ERROR((ZLOG_ERROR, "sql error: %s\n", sql));
 			connptr->close();
 		}
 		return -1;
@@ -370,11 +370,11 @@ struct zdb_object
 			return 0;
 		}
 		catch (const std::string& ex) {
-			ZCE_ERROR((ZLOG_ERROR, "[%M][%T][%t] sql error: %s\n\t%s\n", sql, ex.c_str()));
+			ZCE_ERROR((ZLOG_ERROR, "sql error: %s\n\t%s\n", sql, ex.c_str()));
 			connptr->close();
 		}
 		catch (...) {
-			ZCE_ERROR((ZLOG_ERROR, "[%M][%T][%t] sql error: %s\n", sql));
+			ZCE_ERROR((ZLOG_ERROR, "sql error: %s\n", sql));
 			connptr->close();
 		}
 		return -1;
@@ -397,11 +397,11 @@ struct zdb_object
 			return 0;
 		}
 		catch (const std::string& ex) {
-			ZCE_ERROR((ZLOG_ERROR, "[%M][%T][%t] sql error: %s\n\t%s\n", sql, ex.c_str()));
+			ZCE_ERROR((ZLOG_ERROR, "sql error: %s\n\t%s\n", sql, ex.c_str()));
 			connptr->close();
 		}
 		catch (...) {
-			ZCE_ERROR((ZLOG_ERROR, "[%M][%T][%t] sql error: %s\n", sql));
+			ZCE_ERROR((ZLOG_ERROR, "sql error: %s\n", sql));
 			connptr->close();
 		}
 		return -1;
@@ -427,12 +427,12 @@ struct zdb_object
 		}
 		catch (const std::string& ex)
 		{
-			ZCE_ERROR((ZLOG_ERROR, "[%M][%T][%t] sql error: %s\n\t%s\n", sql, ex.c_str()));
+			ZCE_ERROR((ZLOG_ERROR, "sql error: %s\n\t%s\n", sql, ex.c_str()));
 			connptr->close();
 		}
 		catch (...)
 		{
-			ZCE_ERROR((ZLOG_ERROR, "[%M][%T][%t] sql error: %s\n", sql));
+			ZCE_ERROR((ZLOG_ERROR, "sql error: %s\n", sql));
 			connptr->close();
 		}
 		return -1;
@@ -455,11 +455,11 @@ struct zdb_object
 			return 0;
 		}
 		catch (const std::string& ex) {
-			ZCE_ERROR((ZLOG_ERROR, "[%M][%T][%t] sql error: %s\n\t%s\n", sql, ex.c_str()));
+			ZCE_ERROR((ZLOG_ERROR, "sql error: %s\n\t%s\n", sql, ex.c_str()));
 			connptr->close();
 		}
 		catch (...) {
-			ZCE_ERROR((ZLOG_ERROR, "[%M][%T][%t] sql error: %s\n", sql));
+			ZCE_ERROR((ZLOG_ERROR, "sql error: %s\n", sql));
 			connptr->close();
 		}
 		return -1;
@@ -484,11 +484,11 @@ struct zdb_object
 			return (int)vec.size();
 		}
 		catch (const std::string& ex) {
-			ZCE_ERROR((ZLOG_ERROR, "[%M][%T][%t] sql error: %s\n\t%s\n", sql, ex.c_str()));
+			ZCE_ERROR((ZLOG_ERROR, "sql error: %s\n\t%s\n", sql, ex.c_str()));
 			connptr->close();
 		}
 		catch (...) {
-			ZCE_ERROR((ZLOG_ERROR, "[%M][%T][%t] sql error: %s\n", sql));
+			ZCE_ERROR((ZLOG_ERROR, "sql error: %s\n", sql));
 			connptr->close();
 		}
 		return -1;
@@ -511,11 +511,11 @@ struct zdb_object
 			return 0;
 		}
 		catch (const std::string& ex) {
-			ZCE_ERROR((ZLOG_ERROR, "[%M][%T][%t] sql error: %s\n\t%s\n", sql, ex.c_str()));
+			ZCE_ERROR((ZLOG_ERROR, "sql error: %s\n\t%s\n", sql, ex.c_str()));
 			connptr->close();
 		}
 		catch (...) {
-			ZCE_ERROR((ZLOG_ERROR, "[%M][%T][%t] sql error: %s\n", sql));
+			ZCE_ERROR((ZLOG_ERROR, "sql error: %s\n", sql));
 			connptr->close();
 		}
 		return -1;
@@ -538,11 +538,11 @@ struct zdb_object
 			return 0;
 		}
 		catch (const std::string& ex) {
-			ZCE_ERROR((ZLOG_ERROR, "[%M][%T][%t] sql error: %s\n\t%s\n", sql, ex.c_str()));
+			ZCE_ERROR((ZLOG_ERROR, "sql error: %s\n\t%s\n", sql, ex.c_str()));
 			connptr->close();
 		}
 		catch (...) {
-			ZCE_ERROR((ZLOG_ERROR, "[%M][%T][%t] sql error: %s\n", sql));
+			ZCE_ERROR((ZLOG_ERROR, "sql error: %s\n", sql));
 			connptr->close();
 		}
 		return -1;
@@ -568,12 +568,12 @@ struct zdb_object
 		}
 		catch (const std::string& ex)
 		{
-			ZCE_ERROR((ZLOG_ERROR, "[%M][%T][%t] sql error: %s\n\t%s\n", sql, ex.c_str()));
+			ZCE_ERROR((ZLOG_ERROR, "sql error: %s\n\t%s\n", sql, ex.c_str()));
 			connptr->close();
 		}
 		catch (...)
 		{
-			ZCE_ERROR((ZLOG_ERROR, "[%M][%T][%t] sql error: %s\n", sql));
+			ZCE_ERROR((ZLOG_ERROR, "sql error: %s\n", sql));
 			connptr->close();
 		}
 		return -1;
@@ -598,12 +598,12 @@ struct zdb_object
 		}
 		catch (const std::string& ex)
 		{
-			ZCE_ERROR((ZLOG_ERROR, "[%M][%T][%t] sql error: %s\n\t%s\n", sql, ex.c_str()));
+			ZCE_ERROR((ZLOG_ERROR, "sql error: %s\n\t%s\n", sql, ex.c_str()));
 			connptr->close();
 		}
 		catch (...)
 		{
-			ZCE_ERROR((ZLOG_ERROR, "[%M][%T][%t] sql error: %s\n", sql));
+			ZCE_ERROR((ZLOG_ERROR, "sql error: %s\n", sql));
 			connptr->close();
 		}
 		return -1;
@@ -628,12 +628,12 @@ struct zdb_object
 		}
 		catch (const std::string& ex)
 		{
-			ZCE_ERROR((ZLOG_ERROR, "[%M][%T][%t] sql error: %s\n\t%s\n", sql, ex.c_str()));
+			ZCE_ERROR((ZLOG_ERROR, "sql error: %s\n\t%s\n", sql, ex.c_str()));
 			connptr->close();
 		}
 		catch (...)
 		{
-			ZCE_ERROR((ZLOG_ERROR, "[%M][%T][%t] sql error: %s\n", sql));
+			ZCE_ERROR((ZLOG_ERROR, "sql error: %s\n", sql));
 			connptr->close();
 		}
 		return -1;
@@ -659,12 +659,12 @@ struct zdb_object
 		}
 		catch (const std::string& ex)
 		{
-			ZCE_ERROR((ZLOG_ERROR, "[%M][%T][%t] sql error: %s\n\t%s\n", sql, ex.c_str()));
+			ZCE_ERROR((ZLOG_ERROR, "sql error: %s\n\t%s\n", sql, ex.c_str()));
 			connptr->close();
 		}
 		catch (...)
 		{
-			ZCE_ERROR((ZLOG_ERROR, "[%M][%T][%t] sql error: %s\n", sql));
+			ZCE_ERROR((ZLOG_ERROR, "sql error: %s\n", sql));
 			connptr->close();
 		}
 		return -1;
@@ -687,11 +687,11 @@ struct zdb_object
 			return 0;
 		}
 		catch (const std::string& ex) {
-			ZCE_ERROR((ZLOG_ERROR, "[%M][%T][%t] sql error: %s\n\t%s\n", sql, ex.c_str()));
+			ZCE_ERROR((ZLOG_ERROR, "sql error: %s\n\t%s\n", sql, ex.c_str()));
 			connptr->close();
 		}
 		catch (...) {
-			ZCE_ERROR((ZLOG_ERROR, "[%M][%T][%t] sql error: %s\n", sql));
+			ZCE_ERROR((ZLOG_ERROR, "sql error: %s\n", sql));
 			connptr->close();
 		}
 		return -1;
@@ -716,12 +716,12 @@ struct zdb_object
 		}
 		catch (const std::string& ex)
 		{
-			ZCE_ERROR((ZLOG_ERROR, "[%M][%T][%t] sql error: %s\n\t%s\n", sql, ex.c_str()));
+			ZCE_ERROR((ZLOG_ERROR, "sql error: %s\n\t%s\n", sql, ex.c_str()));
 			connptr->close();
 		}
 		catch (...)
 		{
-			ZCE_ERROR((ZLOG_ERROR, "[%M][%T][%t] sql error: %s\n", sql));
+			ZCE_ERROR((ZLOG_ERROR, "sql error: %s\n", sql));
 			connptr->close();
 		}
 		return -1;
@@ -746,11 +746,11 @@ struct zdb_object
 			return (int)mvec.size();
 		}
 		catch (const std::string& ex) {
-			ZCE_ERROR((ZLOG_ERROR, "[%M][%T][%t] sql error: %s\n\t%s\n", sql, ex.c_str()));
+			ZCE_ERROR((ZLOG_ERROR, "sql error: %s\n\t%s\n", sql, ex.c_str()));
 			connptr->close();
 		}
 		catch (...) {
-			ZCE_ERROR((ZLOG_ERROR, "[%M][%T][%t] sql error: %s\n", sql));
+			ZCE_ERROR((ZLOG_ERROR, "sql error: %s\n", sql));
 			connptr->close();
 		}
 		return -1;
