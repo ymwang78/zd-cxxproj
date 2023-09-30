@@ -7,6 +7,7 @@
 #include <sstream>
 #include <vector>
 #include <string.h>
+#include <zce/zce_inc.h>
 
 #if __cplusplus < 201700L
 #   include <boost/version.hpp>
@@ -420,6 +421,7 @@ namespace zce
         return true;
     }
 
+    std::string ZCE_API utf8_strip(const char* input, size_t inputlen, size_t limitlen);
 }
 
 #endif //__ZCE_STRING__

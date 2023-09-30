@@ -96,8 +96,7 @@ public:
 public:
     explicit zce_smartptr(IMPL_CLASS* handler = 0)
     {
-        if (handler)
-        {
+        if (handler) {
             handler->__addref();
         }
         this->handler_ = handler;
@@ -256,6 +255,8 @@ class zce_smartptr_wrapper : public zce_smartptr_mtbase
 public:
     typedef zce_smartptr_wrapper<T> wrapper_t;
     typedef zce_smartptr<wrapper_t> smart_ptr;
+
+    zce_smartptr_wrapper() {};
 
     zce_smartptr_wrapper(const T& val)
     : val_(val) {

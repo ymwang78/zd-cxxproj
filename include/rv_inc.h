@@ -108,11 +108,11 @@ static bool _isfreepiuprop(int propid) {
 };
 
 static bool _is_ppiid(unsigned v){
-    return v >= 10000000 && v < 100000000;
+    return false;// v >= 10000000 && v < 100000000;
 }
 
 static bool _is_pptempiid(unsigned v){
-    return v >= 400000000;
+    return false;// v >= 400000000;
 }
 
 #endif //__rv_inc_h__

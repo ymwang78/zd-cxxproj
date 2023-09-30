@@ -32,6 +32,7 @@ public:
 
     struct none_ignoreidx { //will ingore index 
     };
+	static none_ignoreidx _none_ignoreidx;
 
     template<typename T0, 
         typename T1,
@@ -325,14 +326,17 @@ struct zdb_object
 		const char* sql = T::select_all_sql(arg);
 		try
 		{
-			zce_smartptr<zdb_stmt> stmtptr(connptr->create_stmt(sql, false));
-			connptr->execute(stmtptr);
-			while (!stmtptr->eof())
-			{
+			zce_smartptr<zdb_stmt> stmtptr;
+			int ret = connptr->create_stmt(stmtptr, sql, false);
+			if (ret < 0) return ret;
+			*stmtptr << zdb_stmt::endl;
+			while (stmtptr->get_row() > 0) {
+				//@todo check
 				T m;
 				m.extract(stmtptr);
-				vec.push_back(MOVE(m));
+				vec.push_back(std::move(m));
 			}
+
 			return (int)vec.size();
 		}
 		catch (const std::string& ex)
@@ -352,25 +356,24 @@ struct zdb_object
 	static int select_all(const zce_smartptr<zdb_connection>& connptr, TMAP& dict, TARG arg)
 	{
 		const char* sql = T::select_all_sql(arg);
-		try
-		{
-			zce_smartptr<zdb_stmt> stmtptr(connptr->create_stmt(sql, false));
-			connptr->execute(stmtptr);
-			while (!stmtptr->eof())
-			{
+		try {
+			zce_smartptr<zdb_stmt> stmtptr;
+			int ret = connptr->create_stmt(stmtptr, sql, false);
+			if (ret < 0) return ret;
+			*stmtptr << zdb_stmt::endl;
+			while (stmtptr->get_row() > 0) {
+				//@todo check
 				T m;
 				m.extract(stmtptr);
 				dict.insert(std::make_pair(m.key(), m));
 			}
 			return 0;
 		}
-		catch (const std::string& ex)
-		{
+		catch (const std::string& ex) {
 			ZCE_ERROR((ZLOG_ERROR, "[%M][%T][%t] sql error: %s\n\t%s\n", sql, ex.c_str()));
 			connptr->close();
 		}
-		catch (...)
-		{
+		catch (...) {
 			ZCE_ERROR((ZLOG_ERROR, "[%M][%T][%t] sql error: %s\n", sql));
 			connptr->close();
 		}
@@ -378,28 +381,26 @@ struct zdb_object
 	};
 
 	template <typename TMAP, typename TARG>
-	static int select_all_ptr(const zce_smartptr<zdb_connection>& connptr, TMAP& dict, TARG arg)
-	{
+	static int select_all_ptr(const zce_smartptr<zdb_connection>& connptr, TMAP& dict, TARG arg) {
 		const char* sql = T::select_all_sql(arg);
-		try
-		{
-			zce_smartptr<zdb_stmt> stmtptr(connptr->create_stmt(sql, false));
-			connptr->execute(stmtptr);
-			while (!stmtptr->eof())
-			{
+		try {
+			zce_smartptr<zdb_stmt> stmtptr;
+			int ret = connptr->create_stmt(stmtptr, sql, false);
+			if (ret < 0) return ret;
+			*stmtptr << zdb_stmt::endl;
+			while (stmtptr->get_row() > 0) {
+				//@todo check
 				zce_smartptr<T> m(new T);
 				m->extract(stmtptr);
 				dict.insert(std::make_pair(m->key(), m));
 			}
 			return 0;
 		}
-		catch (const std::string& ex)
-		{
+		catch (const std::string& ex) {
 			ZCE_ERROR((ZLOG_ERROR, "[%M][%T][%t] sql error: %s\n\t%s\n", sql, ex.c_str()));
 			connptr->close();
 		}
-		catch (...)
-		{
+		catch (...) {
 			ZCE_ERROR((ZLOG_ERROR, "[%M][%T][%t] sql error: %s\n", sql));
 			connptr->close();
 		}
@@ -411,15 +412,17 @@ struct zdb_object
 	{
 		try
 		{
-			zce_smartptr<zdb_stmt> stmtptr(connptr->create_stmt(sql, true, isprc));
-			*stmtptr << prop;
-			connptr->execute(stmtptr);
-			while (!stmtptr->eof())
-			{
+			zce_smartptr<zdb_stmt> stmtptr;
+			int ret = connptr->create_stmt(stmtptr, sql, false);
+			if (ret < 0) return ret;
+			*stmtptr << prop << zdb_stmt::endl;
+			while (stmtptr->get_row() > 0) {
+				//@todo check
 				Q m;
 				extract(m, stmtptr);
-				vec.push_back(MOVE(m));
+				vec.push_back(std::move(m));
 			}
+
 			return (int)vec.size();
 		}
 		catch (const std::string& ex)
@@ -439,25 +442,23 @@ struct zdb_object
 	template<typename P, typename Q>
 	static int select_byprop_base(const zce_smartptr<zdb_connection>& connptr, Q& m, const char* sql, const P& prop)
 	{
-		try
-		{
-			zce_smartptr<zdb_stmt> stmtptr(connptr->create_stmt(sql));
-			*stmtptr << prop;
-			connptr->execute(stmtptr);
-			if (!stmtptr->eof())
-			{
+		try {
+			zce_smartptr<zdb_stmt> stmtptr;
+			int ret = connptr->create_stmt(stmtptr, sql, false);
+			if (ret < 0) return ret;
+			*stmtptr << prop << zdb_stmt::endl;
+			while (stmtptr->get_row() > 0) {
+				//@todo check
 				extract(m, stmtptr);
 				return 1;
 			}
 			return 0;
 		}
-		catch (const std::string& ex)
-		{
+		catch (const std::string& ex) {
 			ZCE_ERROR((ZLOG_ERROR, "[%M][%T][%t] sql error: %s\n\t%s\n", sql, ex.c_str()));
 			connptr->close();
 		}
-		catch (...)
-		{
+		catch (...) {
 			ZCE_ERROR((ZLOG_ERROR, "[%M][%T][%t] sql error: %s\n", sql));
 			connptr->close();
 		}
@@ -467,26 +468,26 @@ struct zdb_object
 	template<typename P>
 	static int select_byprop(const zce_smartptr<zdb_connection>& connptr, std::vector<T>& vec, const char* sql, const P& prop)
 	{
-		try
-		{
-			zce_smartptr<zdb_stmt> stmtptr(connptr->create_stmt(sql));
-			*stmtptr << prop;
-			connptr->execute(stmtptr);
-			while (!stmtptr->eof())
-			{
+		try {
+			zce_smartptr<zdb_stmt> stmtptr;
+			int ret = connptr->create_stmt(stmtptr, sql, false);
+			if (ret < 0) return ret;
+			*stmtptr << prop << zdb_stmt::endl;
+			while (stmtptr->get_row() > 0) {
+				//@todo check
 				T m;
 				m.extract(stmtptr);
-				vec.push_back(MOVE(m));
+				vec.push_back(std::move(m));
+				return 1;
 			}
+
 			return (int)vec.size();
 		}
-		catch (const std::string& ex)
-		{
+		catch (const std::string& ex) {
 			ZCE_ERROR((ZLOG_ERROR, "[%M][%T][%t] sql error: %s\n\t%s\n", sql, ex.c_str()));
 			connptr->close();
 		}
-		catch (...)
-		{
+		catch (...) {
 			ZCE_ERROR((ZLOG_ERROR, "[%M][%T][%t] sql error: %s\n", sql));
 			connptr->close();
 		}
@@ -496,25 +497,24 @@ struct zdb_object
 	template<typename P>
 	static int select_byprop(const zce_smartptr<zdb_connection>& connptr, T& m, const char* sql, const P& prop)
 	{
-		try
-		{
-			zce_smartptr<zdb_stmt> stmtptr(connptr->create_stmt(sql));
-			*stmtptr << prop;
-			connptr->execute(stmtptr);
-			if (!stmtptr->eof())
-			{
+		try {
+			zce_smartptr<zdb_stmt> stmtptr;
+			int ret = connptr->create_stmt(stmtptr, sql, false);
+			if (ret < 0) return ret;
+			*stmtptr << prop << zdb_stmt::endl;
+			while (stmtptr->get_row() > 0) {
+				//@todo check
 				m.extract(stmtptr);
 				return 1;
 			}
+
 			return 0;
 		}
-		catch (const std::string& ex)
-		{
+		catch (const std::string& ex) {
 			ZCE_ERROR((ZLOG_ERROR, "[%M][%T][%t] sql error: %s\n\t%s\n", sql, ex.c_str()));
 			connptr->close();
 		}
-		catch (...)
-		{
+		catch (...) {
 			ZCE_ERROR((ZLOG_ERROR, "[%M][%T][%t] sql error: %s\n", sql));
 			connptr->close();
 		}
@@ -554,11 +554,13 @@ struct zdb_object
 		const char* sql = T::select_bykey_sql(arg);
 		try
 		{
-			zce_smartptr<zdb_stmt> stmtptr(connptr->create_stmt(sql, true, isprc));
-			*stmtptr << key;
-			connptr->execute(stmtptr);
-			while (!stmtptr->eof())
-			{
+			//@todo check isprc 
+			zce_smartptr<zdb_stmt> stmtptr;
+			int ret = connptr->create_stmt(stmtptr, sql, false);
+			if (ret < 0) return ret;
+			*stmtptr << key << zdb_stmt::endl;
+			while (stmtptr->get_row() > 0) {
+				//@todo check
 				mvec.push_back(T());
 				mvec[mvec.size() - 1].extract(stmtptr);
 			}
@@ -583,12 +585,14 @@ struct zdb_object
 		const char* sql = m.insert_sql(arg);
 		try
 		{
-			zce_smartptr<zdb_stmt> stmtptr(connptr->create_stmt(sql));
+			zce_smartptr<zdb_stmt> stmtptr;
+			int ret = connptr->create_stmt(stmtptr, sql, false);
+			if (ret < 0) return ret;
 			m.putinsertvars(stmtptr);
-			connptr->execute(stmtptr);
-			while (!stmtptr->eof())
-			{
-				connptr->skip_row(stmtptr);
+			*stmtptr << zdb_stmt::endl;
+			while (stmtptr->get_row() > 0) {
+				//@todo check
+				*stmtptr >> zdb_stmt::_none_ignoreidx;
 			}
 			return 0;
 		}
@@ -611,11 +615,14 @@ struct zdb_object
 		const char* sql = m.replace_sql(arg);
 		try
 		{
-			zce_smartptr<zdb_stmt> stmtptr(connptr->create_stmt(sql));
+			zce_smartptr<zdb_stmt> stmtptr;
+			int ret = connptr->create_stmt(stmtptr, sql, false);
+			if (ret < 0) return ret;
 			m.putreplacevars(stmtptr);
-			connptr->execute(stmtptr);
-			while (!stmtptr->eof()) {
-				connptr->skip_row(stmtptr);
+			*stmtptr << zdb_stmt::endl;
+			while (stmtptr->get_row() > 0) {
+				//@todo check
+				*stmtptr >> zdb_stmt::_none_ignoreidx;
 			}
 			return 0;
 		}
@@ -638,11 +645,15 @@ struct zdb_object
 		const char* sql = m.update_sql(arg);
 		try
 		{
-			zce_smartptr<zdb_stmt> stmtptr(connptr->create_stmt(sql));
+			zce_smartptr<zdb_stmt> stmtptr;
+			int ret = connptr->create_stmt(stmtptr, sql, false);
+			if (ret < 0) return ret;
 			m.putupdatevars(stmtptr);
-			connptr->execute(stmtptr);
-			while (!stmtptr->eof()) {
-				connptr->skip_row(stmtptr);
+			*stmtptr << zdb_stmt::endl;
+			while (stmtptr->end_row() > 0) {
+				//@todo check here, ubeda do nothing in skip row
+				//connptr->skip_row(stmtptr);
+				*stmtptr >> zdb_stmt::_none_ignoreidx;
 			}
 			return 0;
 		}
@@ -663,11 +674,15 @@ struct zdb_object
 	{
 		const char* sql = m.delete_sql();
 		try {
-			zce_smartptr<zdb_stmt> stmtptr(connptr->create_stmt(sql));
+			zce_smartptr<zdb_stmt> stmtptr;
+			int ret = connptr->create_stmt(stmtptr, sql, false);
+			if (ret < 0) return ret;
 			m.putdeletevars(stmtptr);
-			connptr->execute(stmtptr);
-			while (!stmtptr->eof()) {
-				connptr->skip_row(stmtptr);
+			*stmtptr << zdb_stmt::endl;
+			while (stmtptr->end_row() > 0) {
+				//@todo check here, ubeda do nothing in skip row
+				//connptr->skip_row(stmtptr);
+				*stmtptr >> zdb_stmt::_none_ignoreidx;
 			}
 			return 0;
 		}
@@ -686,11 +701,14 @@ struct zdb_object
 	{
 		try
 		{
-			zce_smartptr<zdb_stmt> stmtptr(connptr->create_stmt(sql, true, isprc));
+			//@todo check isprc 
+			zce_smartptr<zdb_stmt> stmtptr;
+			int ret = connptr->create_stmt(stmtptr, sql, false);
+			if (ret < 0) return ret;
 			m.putvars(stmtptr, sql, ctx);
-			connptr->execute(stmtptr);
-			while (!stmtptr->eof())
-			{
+			*stmtptr << zdb_stmt::endl;
+			while (stmtptr->get_row() > 0) {
+				//@todo check
 				m.extract(stmtptr);
 				return 1;
 			}
@@ -714,23 +732,24 @@ struct zdb_object
 	{
 		try
 		{
-			zce_smartptr<zdb_stmt> stmtptr(connptr->create_stmt(sql, true, isprc));
-			*stmtptr << prop;
-			connptr->execute(stmtptr);
-			while (!stmtptr->eof())
-			{
+			//@todo check isprc 
+			zce_smartptr<zdb_stmt> stmtptr;
+			int ret = connptr->create_stmt(stmtptr, sql, false);
+			if (ret < 0) return ret;
+			*stmtptr << prop << zdb_stmt::endl;
+			while (stmtptr->get_row() > 0) {
+				//@todo check
 				mvec.push_back(T());
 				mvec[mvec.size() - 1].extract(stmtptr);
 			}
+
 			return (int)mvec.size();
 		}
-		catch (const std::string& ex)
-		{
+		catch (const std::string& ex) {
 			ZCE_ERROR((ZLOG_ERROR, "[%M][%T][%t] sql error: %s\n\t%s\n", sql, ex.c_str()));
 			connptr->close();
 		}
-		catch (...)
-		{
+		catch (...) {
 			ZCE_ERROR((ZLOG_ERROR, "[%M][%T][%t] sql error: %s\n", sql));
 			connptr->close();
 		}

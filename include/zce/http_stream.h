@@ -34,7 +34,7 @@ std::string ZCE_API http_urldecode(const char* data, size_t len);
 
 int ZCE_API http_getpath_pos(const std::string& uri);
 
-int ZCE_API http_gzip(zce_byte* dest, size_t* destLen, zce_byte* source, size_t sourceLen, int level);
+int ZCE_API http_gzip(zce_byte* dest, size_t* destLen, const zce_byte* source, size_t sourceLen, int level);
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -135,11 +135,13 @@ public:
     virtual ~zce_http_stream();
 
     int  header_length()  const { return request_->header_length(); }
+
     int  body_length() { return request_->body_length(); }
     
     const std::string& get_x_forward_for() const;
 
     void proc_dblock(zce_dblock& dblock, void*);
+
 public:
 
     virtual void on_open(bool passive, const char* peerip, zce_uint16 peerport);
@@ -152,7 +154,7 @@ public:
 
     virtual void on_prepare_nextreq();
 
-	int write_ack(unsigned code, zce_byte* buf, size_t length, std::map<std::string, std::string>& paramdict);
+	int write_ack(unsigned code, const zce_byte* buf, size_t length, std::map<std::string, std::string>& paramdict);
 };
 
 ///////////////////////////////////////////////////////////////////////////////

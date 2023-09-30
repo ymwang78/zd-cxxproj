@@ -104,6 +104,8 @@ void ZCE_API zce_str2addrvec(std::vector<zce_addr_t>& tsock_vec, const std::stri
 
 std::string ZCE_API zce_to_hex(const unsigned char* p, size_t size);
 
+std::string ZCE_API zce_to_hex(const std::vector<zce_byte>& vec);
+
 std::vector<unsigned char> ZCE_API zce_from_hex(const std::string& in);
 
 std::string ZCE_API zce_md5sum(const char* fname);
