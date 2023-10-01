@@ -421,6 +421,10 @@ namespace zce
         return true;
     }
 
+    std::string ZCE_API format_time(const time_t& t, const char* format);
+
+    unsigned ZCE_API time_from_string(const char* buf, const char* format);
+
     std::string ZCE_API utf8_strip(const char* input, size_t inputlen, size_t limitlen);
 }
 

@@ -49,6 +49,8 @@ public:
 
     int resume();
 
+    void attach(const zce_smartptr<zce_task_queue>&);
+
     virtual void call();
 
     template<typename F>
