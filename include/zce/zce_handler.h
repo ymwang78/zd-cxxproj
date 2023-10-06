@@ -344,6 +344,11 @@ class ZCE_API zce_acceptor : public zce_smartptr_mtbase
 
     bool isclose_;
 
+    zce_atomic_long block_count_;
+    zce_mutex_rw block_lock_;
+    struct block_t { unsigned start_timet; unsigned end_timet; std::string reason; };
+    std::map<zce_sockaddr_t, block_t> block_dict_;
+
     int do_listen();
 
     void do_close();
@@ -365,6 +370,10 @@ public:
     void on_connect(int status);
 
     void on_close();
+
+    void block_remote(const zce_sockaddr_t& remote, unsigned end_timet, const std::string& reason);
+
+    void unblock_remote(const zce_sockaddr_t& remote);
 
     virtual zce_tcp* make_handler() = 0;
 };

@@ -63,7 +63,7 @@ namespace zdp
 
         zce_smartptr<zce_reactor> reactor_ptr_;
 
-        unsigned preserve_;
+        unsigned last_recv_tick_;
 
         zce_atomic_long seq_;
 
@@ -78,6 +78,8 @@ namespace zdp
         zdp_stream(const zce_smartptr<zce_reactor>& reactor_ptr, unsigned preserv = 0);
 
         ~zdp_stream();
+
+        unsigned last_recv_tick() const { return last_recv_tick_; }
 
         zce_uint32 next_seq();
 
@@ -110,10 +112,10 @@ namespace zdp
         int do_request(const zce_dblock& plain_body, int mstimeout = 0, void* ctx = 0);
 
         template<typename MSG_T>
-        int request(const MSG_T& msg, int mstimeout = 0, void* ctx = 0);
+        int request(const MSG_T& msg, int mstimeout = 0, void* ctx = 0, ERV_ZCE_COMPRESS cps = ZCE_COMPRESS_NONE);
 
         template<typename MSG_T>
-        int response(const MSG_T& msg, unsigned seq, zce_byte rev = 0);
+        int response(const MSG_T& msg, unsigned seq, zce_byte rev = 0, ERV_ZCE_COMPRESS cps = ZCE_COMPRESS_NONE);
     };
 
     int ZCE_API zdp_serialize_dblock(zce_dblock& dblock_ptr, zce_uint16 msgmid,
@@ -124,7 +126,8 @@ namespace zdp
     );
 
     template<typename T>
-    int zdp_serialize_struct(zce_dblock& dblock_ptr, const T& msg, zce_byte rev, int preserv = 0) {
+    int zdp_serialize_struct(zce_dblock& dblock_ptr, const T& msg, zce_byte rev, int preserv = 0)
+    {
         int ret = 0;
         int bodylen = zdp_body_length(msg, rev);
         ZCE_MBACQUIRE(dblock_ptr, preserv + bodylen);
@@ -149,7 +152,8 @@ namespace zdp
     }
 
     template<typename T>
-    int zdp_serialize_ie(zce_dblock& dblock_ptr, const T& msg, zce_byte rev, int preserv = 0) {
+    int zdp_serialize_ie(zce_dblock& dblock_ptr, const T& msg, zce_byte rev, int preserv = 0)
+    {
         int ret = 0;
         int bodylen = zdp_body_length(msg, rev);
         bodylen += zdp_ie_head_len(bodylen, rev);
@@ -180,7 +184,8 @@ namespace zdp
 #ifdef ZDP_GEP
         , zdp::zdp_head::gepex_t* gepexptr = 0
 #endif
-    ) {
+    ) 
+    {
 
         int bodylen = zdp_body_length(msg, rev);
         ZCE_MBACQUIRE(dblock_ptr, preserv + zdp_headlen(rev) + bodylen);
@@ -219,9 +224,10 @@ namespace zdp
     }
 
     template<typename MSG_T>
-    int zdp_stream::request(const MSG_T& msg, int mstimeout, void* ctx) {
+    int zdp_stream::request(const MSG_T& msg, int mstimeout, void* ctx, ERV_ZCE_COMPRESS cps)
+    {
         zce_dblock dblock_ptr;
-        int ret = zdp_serialize(dblock_ptr, 0, msg, 0, ZCE_COMPRESS_NONE, 32);
+        int ret = zdp_serialize(dblock_ptr, 0, msg, 0, cps, 32);
         ZCE_ASSERT(ret >= 0);
         if (ret < 0)
             return ret;
@@ -229,9 +235,10 @@ namespace zdp
     }
 
     template<typename MSG_T>
-    int zdp_stream::response(const MSG_T& msg, unsigned seq, zce_byte rev) {
+    int zdp_stream::response(const MSG_T& msg, unsigned seq, zce_byte rev, ERV_ZCE_COMPRESS cps)
+    {
         zce_dblock dblock_ptr;
-        int ret = zdp_serialize(dblock_ptr, seq, msg, rev, ZCE_COMPRESS_NONE, 32);
+        int ret = zdp_serialize(dblock_ptr, seq, msg, rev, cps, 32);
         ZCE_ASSERT(ret >= 0);
         if (ret < 0)
             return ret;
