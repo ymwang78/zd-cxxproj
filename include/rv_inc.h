@@ -36,7 +36,7 @@ typedef long long LONGLONG;
 
 #ifndef _WIN32
 #   if (FD_SETSIZE < 8192)
-#       warn FD_SETSIZE to small
+#       warning FD_SETSIZE maybe too small
 #   endif
 #endif
 
