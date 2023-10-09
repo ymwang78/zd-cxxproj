@@ -14,6 +14,7 @@
 
 #pragma once
 
+#include <cstdint>
 #include <system_error>
 
 #include <mongocxx/config/prelude.hpp>
@@ -22,7 +23,8 @@ namespace mongocxx {
 MONGOCXX_INLINE_NAMESPACE_BEGIN
 
 ///
-/// @todo document this enum and the values
+/// Enum representing the various errors types that can be returned from the server. As this list
+/// changes over time, this is just a placeholder for an Int32 error code value from the server.
 ///
 enum class server_error_code : std::int32_t {
     // Intentionally empty at this time!

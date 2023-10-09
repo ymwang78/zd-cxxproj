@@ -1,4 +1,4 @@
-// Copyright 2014 MongoDB Inc.
+// Copyright 2014-present MongoDB Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,9 +16,11 @@
 
 #include <memory>
 
-#include <bsoncxx/string/view_or_value.hpp>
+#include <mongocxx/client_session.hpp>
 #include <mongocxx/database.hpp>
 #include <mongocxx/options/client.hpp>
+#include <mongocxx/options/client_encryption.hpp>
+#include <mongocxx/options/client_session.hpp>
 #include <mongocxx/read_concern.hpp>
 #include <mongocxx/read_preference.hpp>
 #include <mongocxx/stdx.hpp>
@@ -33,6 +35,8 @@
 namespace mongocxx {
 MONGOCXX_INLINE_NAMESPACE_BEGIN
 
+class client_session;
+
 ///
 /// Class representing a client connection to MongoDB.
 ///
@@ -45,10 +49,12 @@ MONGOCXX_INLINE_NAMESPACE_BEGIN
 ///
 /// Example:
 /// @code
-///   mongocxx::client mongo_client;
-///   mongocxx::client mongo_client("mongodb://localhost:27017");
+///   mongocxx::client mongo_client{mongocxx::uri{}};
+///   mongocxx::client mongo_client{mongocxx::uri{"mongodb://localhost:27017"}};
 /// @endcode
 ///
+/// Note that client is not thread-safe. See
+/// https://mongodb.github.io/mongo-cxx-driver/mongocxx-v3/thread-safety/ for more details.
 class MONGOCXX_API client {
    public:
     ///
@@ -99,12 +105,17 @@ class MONGOCXX_API client {
     /// created by this client but do affect new ones as databases inherit the @c read_concern
     /// settings of their parent upon instantiation.
     ///
+    /// @deprecated
+    ///   This method is deprecated. Read concerns should be set either in the URI or directly on
+    ///   database or collection objects.
+    ///
     /// @param rc
     ///   The new @c read_concern
     ///
-    /// @see https://docs.mongodb.com/master/reference/read-concern/
+    /// @see https://www.mongodb.com/docs/manual/reference/read-concern/
     ///
-    void read_concern(class read_concern rc);
+    MONGOCXX_DEPRECATED void read_concern(class read_concern rc);
+    void read_concern_deprecated(class read_concern rc);
 
     ///
     /// Returns the current read concern for this client.
@@ -120,19 +131,24 @@ class MONGOCXX_API client {
     /// created by this client but do affect new ones as databases inherit the @c read_preference
     /// settings of their parent upon instantiation.
     ///
+    /// @deprecated
+    ///   This method is deprecated. Read preferences should be set either in the URI or directly on
+    ///   database or collection objects.
+    ///
     /// @param rp
     ///   The new @c read_preference
     ///
-    /// @see https://docs.mongodb.com/master/core/read-preference/
+    /// @see https://www.mongodb.com/docs/manual/core/read-preference/
     ///
-    void read_preference(class read_preference rp);
+    MONGOCXX_DEPRECATED void read_preference(class read_preference rp);
+    void read_preference_deprecated(class read_preference rp);
 
     ///
     /// Returns the current read preference for this client.
     ///
     /// @return The current @c read_preference
     ///
-    /// @see https://docs.mongodb.com/master/core/read-preference/
+    /// @see https://www.mongodb.com/docs/manual/core/read-preference/
     ///
     class read_preference read_preference() const;
 
@@ -150,10 +166,15 @@ class MONGOCXX_API client {
     /// that have come from this client but do affect new ones as databases will receive a copy of
     /// this client's @c write_concern upon instantiation.
     ///
+    /// @deprecated
+    ///   This method is deprecated. Write concerns should be set either in the URI or directly on
+    ///   database or collection objects.
+    ///
     /// @param wc
     ///   The new write concern
     ///
-    void write_concern(class write_concern wc);
+    MONGOCXX_DEPRECATED void write_concern(class write_concern wc);
+    void write_concern_deprecated(class write_concern wc);
 
     ///
     /// Returns the current write concern for this client.
@@ -189,6 +210,8 @@ class MONGOCXX_API client {
     MONGOCXX_INLINE class database operator[](bsoncxx::string::view_or_value name) const&& = delete;
 
     ///
+    /// @{
+    ///
     /// Enumerates the databases in the client.
     ///
     /// @return A mongocxx::cursor containing a BSON document for each
@@ -199,16 +222,218 @@ class MONGOCXX_API client {
     ///
     /// @throws mongocxx::operation_exception if the underlying 'listDatabases' command fails.
     ///
-    /// @see https://docs.mongodb.com/master/reference/command/listDatabases
+    /// @see https://www.mongodb.com/docs/manual/reference/command/listDatabases
     ///
     cursor list_databases() const;
+
+    ///
+    /// Enumerates the databases in the client.
+    ///
+    /// @param session
+    ///   The mongocxx::client_session with which to perform the aggregation.
+    ///
+    /// @return A mongocxx::cursor containing a BSON document for each
+    ///   database. Each document contains a name field with the database
+    ///   name, a sizeOnDisk field with the total size of the database file on
+    ///   disk in bytes, and an empty field specifying whether the database
+    ///   has any data.
+    ///
+    /// @throws mongocxx::operation_exception if the underlying 'listDatabases' command fails.
+    ///
+    /// @see https://www.mongodb.com/docs/manual/reference/command/listDatabases
+    ///
+    cursor list_databases(const client_session& session) const;
+
+    ///
+    /// Enumerates the databases in the client.
+    ///
+    /// @param opts
+    ///   Options passed directly to the 'listDatabases' command.
+    ///
+    /// @return A mongocxx::cursor containing a BSON document for each
+    ///   database. Each document contains a name field with the database
+    ///   name, a sizeOnDisk field with the total size of the database file on
+    ///   disk in bytes, and an empty field specifying whether the database
+    ///   has any data.
+    ///
+    /// @throws mongocxx::operation_exception if the underlying 'listDatabases' command fails.
+    ///
+    /// @see https://www.mongodb.com/docs/manual/reference/command/listDatabases
+    ///
+    cursor list_databases(const bsoncxx::document::view_or_value opts) const;
+
+    ///
+    /// Enumerates the databases in the client.
+    ///
+    /// @param session
+    ///   The mongocxx::client_session with which to perform the aggregation.
+    ///
+    /// @param opts
+    ///   Options passed directly to the 'listDatabases' command.
+    ///
+    /// @return A mongocxx::cursor containing a BSON document for each
+    ///   database. Each document contains a name field with the database
+    ///   name, a sizeOnDisk field with the total size of the database file on
+    ///   disk in bytes, and an empty field specifying whether the database
+    ///   has any data.
+    ///
+    /// @throws mongocxx::operation_exception if the underlying 'listDatabases' command fails.
+    ///
+    /// @see https://www.mongodb.com/docs/manual/reference/command/listDatabases
+    ///
+    cursor list_databases(const client_session& session,
+                          const bsoncxx::document::view_or_value opts) const;
+
+    ///
+    /// Queries the MongoDB server for a list of known databases.
+    ///
+    /// @param filter
+    ///   An optional query expression to filter the returned database names.
+    ///
+    /// @return std::vector<std::string> containing the database names.
+    ///
+    /// @throws mongocxx::operation_exception if the underlying 'listDatabases'
+    /// command fails.
+    ///
+    /// @see https://www.mongodb.com/docs/manual/reference/command/listDatabases
+    ///
+    std::vector<std::string> list_database_names(
+        const bsoncxx::document::view_or_value filter = {}) const;
+
+    ///
+    /// Queries the MongoDB server for a list of known databases.
+    ///
+    /// @param session
+    ///   The mongocxx::client_session with which to perform the aggregation.
+    ///
+    /// @param filter
+    ///   An optional query expression to filter the returned database names.
+    ///
+    /// @return std::vector<std::string> containing the database names.
+    ///
+    /// @throws mongocxx::operation_exception if the underlying 'listDatabases'
+    /// command fails.
+    ///
+    /// @see https://www.mongodb.com/docs/manual/reference/command/listDatabases
+    ///
+    std::vector<std::string> list_database_names(
+        const client_session& session, const bsoncxx::document::view_or_value filter = {}) const;
+
+    ///
+    /// @}
+    ///
+
+    ///
+    /// Create a client session for a sequence of operations.
+    ///
+    /// @return A client_session object. See `mongocxx::client_session` for more information.
+    ///
+    /// @throws mongocxx::operation_exception if the driver is not built with crypto support, if
+    /// options is misconfigured, or if the session is configured with options that the server does
+    /// not support.
+    ///
+    client_session start_session(const options::client_session& options = {});
+
+    ///
+    /// @{
+    ///
+    /// Gets a change stream on this client with an empty pipeline.
+    /// Change streams are only supported with a "majority" read concern or no read concern.
+    ///
+    /// @param options
+    ///   The options to use when creating the change stream.
+    ///
+    /// @return
+    ///  A change stream on this client.
+    ///
+    /// @see https://www.mongodb.com/docs/manual/changeStreams/
+    ///
+    change_stream watch(const options::change_stream& options = {});
+
+    ///
+    /// @param session
+    ///   The mongocxx::client_session with which to perform the watch operation.
+    /// @param options
+    ///   The options to use when creating the change stream.
+    ///
+    /// @return
+    ///  A change stream on this client.
+    ///
+    /// @see https://www.mongodb.com/docs/manual/changeStreams/
+    ///
+    change_stream watch(const client_session& session, const options::change_stream& options = {});
+
+    ///
+    /// Gets a change stream on this client.
+    /// Change streams are only supported with a "majority" read concern or no read concern.
+    ///
+    /// @param pipe
+    ///   The aggregation pipeline to be used on the change notifications.
+    ///   Only a subset of pipeline operations are supported for change streams. For more
+    ///   information see the change streams documentation.
+    /// @param options
+    ///   The options to use when creating the change stream.
+    ///
+    /// @return
+    ///  A change stream on this client.
+    ///
+    /// @see https://www.mongodb.com/docs/manual/changeStreams/
+    ///
+    change_stream watch(const pipeline& pipe, const options::change_stream& options = {});
+
+    ///
+    /// Gets a change stream on this client.
+    ///
+    /// @param session
+    ///   The mongocxx::client_session with which to perform the watch operation.
+    /// @param pipe
+    ///   The aggregation pipeline to be used on the change notifications.
+    /// @param options
+    ///   The options to use when creating the change stream.
+    ///
+    /// @return
+    ///  A change stream on this client.
+    ///
+    /// @see https://www.mongodb.com/docs/manual/changeStreams/
+    ///
+    change_stream watch(const client_session& session,
+                        const pipeline& pipe,
+                        const options::change_stream& options = {});
+
+    ///
+    /// @}
+    ///
+
+    ///
+    /// Prevents resource cleanup in the child process from interfering
+    /// with the parent process after forking.
+    ///
+    /// Clients should not be reused after forking. Call this method in the
+    /// child after forking to safely destroy the client. This method should
+    /// not be used with multi-threaded clients.
+    ///
+    /// This method causes the client to clear its session pool without sending
+    /// endSessions.  It also increments an internal generation counter on the
+    /// given client. After this method is called, cursors from
+    /// previous generations will not issue a killCursors command when
+    /// they are destroyed. Client sessions from previous generations
+    /// cannot be used and should be destroyed.
+    ///
+    void reset();
 
    private:
     friend class collection;
     friend class database;
     friend class pool;
+    friend class client_session;
+    friend class options::auto_encryption;
+    friend class options::client_encryption;
 
     MONGOCXX_PRIVATE explicit client(void* implementation);
+
+    MONGOCXX_PRIVATE change_stream _watch(const client_session* session,
+                                          const pipeline& pipe,
+                                          const options::change_stream& options);
 
     class MONGOCXX_PRIVATE impl;
 
@@ -218,7 +443,7 @@ class MONGOCXX_API client {
     std::unique_ptr<impl> _impl;
 };
 
-MONGOCXX_INLINE database client::operator[](bsoncxx::string::view_or_value name) const & {
+MONGOCXX_INLINE database client::operator[](bsoncxx::string::view_or_value name) const& {
     return database(name);
 }
 

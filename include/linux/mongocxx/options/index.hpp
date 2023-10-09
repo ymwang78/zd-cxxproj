@@ -17,7 +17,9 @@
 #include <chrono>
 #include <memory>
 
+#include <bsoncxx/document/value.hpp>
 #include <bsoncxx/document/view.hpp>
+#include <bsoncxx/document/view_or_value.hpp>
 #include <bsoncxx/stdx/optional.hpp>
 #include <bsoncxx/string/view_or_value.hpp>
 #include <mongocxx/stdx.hpp>
@@ -34,7 +36,7 @@ namespace options {
 ///
 /// Class representing the optional arguments to a MongoDB create index operation.
 ///
-/// @see https://docs.mongodb.com/master/reference/method/db.collection.createIndex/#options
+/// @see https://www.mongodb.com/docs/manual/reference/command/createIndexes
 ///
 class MONGOCXX_API index {
    public:
@@ -46,7 +48,7 @@ class MONGOCXX_API index {
         virtual ~base_storage_options();
 
        private:
-        friend collection;
+        friend class options::index;
         MONGOCXX_PRIVATE virtual int type() const = 0;
     };
 
@@ -87,7 +89,11 @@ class MONGOCXX_API index {
     /// @param background
     ///   Whether or not to build the index in the background.
     ///
-    /// @see https://docs.mongodb.com/master/tutorial/build-indexes-in-the-background/
+    /// @return
+    ///   A reference to the object on which this member function is being called.  This facilitates
+    ///   method chaining.
+    ///
+    /// @see https://www.mongodb.com/docs/manual/tutorial/build-indexes-in-the-background/
     ///
     index& background(bool background);
 
@@ -105,7 +111,11 @@ class MONGOCXX_API index {
     /// @param unique
     ///   Whether or not to create a unique index.
     ///
-    /// @see https://docs.mongodb.com/master/core/index-unique/
+    /// @return
+    ///   A reference to the object on which this member function is being called.  This facilitates
+    ///   method chaining.
+    ///
+    /// @see https://www.mongodb.com/docs/manual/core/index-unique/
     ///
     index& unique(bool unique);
 
@@ -117,10 +127,36 @@ class MONGOCXX_API index {
     const stdx::optional<bool>& unique() const;
 
     ///
+    /// Whether or not the index is hidden from the query planner. A hidden index is not evaluated
+    /// as part of query plan selection.
+    ///
+    /// @param hidden
+    ///   Whether or not to create a hidden index.
+    ///
+    /// @return
+    ///   A reference to the object on which this member function is being called.  This facilitates
+    ///   method chaining.
+    ///
+    /// @see https://www.mongodb.com/docs/manual/core/index-hidden/
+    ///
+    index& hidden(bool hidden);
+
+    ///
+    /// The current hidden setting.
+    ///
+    /// @return The current hidden.
+    ///
+    const stdx::optional<bool>& hidden() const;
+
+    ///
     /// The name of the index.
     ///
     /// @param name
     ///   The name of the index.
+    ///
+    /// @return
+    ///   A reference to the object on which this member function is being called.  This facilitates
+    ///   method chaining.
     ///
     index& name(bsoncxx::string::view_or_value name);
 
@@ -137,8 +173,12 @@ class MONGOCXX_API index {
     /// @param collation
     ///   The new collation.
     ///
+    /// @return
+    ///   A reference to the object on which this member function is being called.  This facilitates
+    ///   method chaining.
+    ///
     /// @see
-    ///   https://docs.mongodb.com/master/reference/collation/
+    ///   https://www.mongodb.com/docs/manual/reference/collation/
     ///
     index& collation(bsoncxx::document::view collation);
 
@@ -149,7 +189,7 @@ class MONGOCXX_API index {
     ///   The current collation.
     ///
     /// @see
-    ///   https://docs.mongodb.com/master/reference/collation/
+    ///   https://www.mongodb.com/docs/manual/reference/collation/
     ///
     const stdx::optional<bsoncxx::document::view>& collation() const;
 
@@ -160,7 +200,11 @@ class MONGOCXX_API index {
     /// @param sparse
     ///   Whether or not to create a sparse index.
     ///
-    /// @see https://docs.mongodb.com/master/core/index-sparse/
+    /// @return
+    ///   A reference to the object on which this member function is being called.  This facilitates
+    ///   method chaining.
+    ///
+    /// @see https://www.mongodb.com/docs/manual/core/index-sparse/
     ///
     index& sparse(bool sparse);
 
@@ -178,10 +222,18 @@ class MONGOCXX_API index {
     /// @param storage_options
     ///   The storage engine options for the index.
     ///
+    /// @return
+    ///   A reference to the object on which this member function is being called.  This facilitates
+    ///   method chaining.
+    ///
     index& storage_options(std::unique_ptr<base_storage_options> storage_options);
 
     ///
-    /// @todo document this method
+    /// Optionally used only in MongoDB 3.0.0 and higher. Specifies the WiredTiger-specific storage
+    /// engine options for the index.
+    ///
+    /// @param storage_options
+    ///   The storage engine options for the index.
     ///
     index& storage_options(std::unique_ptr<wiredtiger_storage_options> storage_options);
 
@@ -192,7 +244,11 @@ class MONGOCXX_API index {
     /// @param seconds
     ///   The amount of time, in seconds, to retain documents.
     ///
-    /// @see https://docs.mongodb.com/master/core/index-ttl/
+    /// @return
+    ///   A reference to the object on which this member function is being called.  This facilitates
+    ///   method chaining.
+    ///
+    /// @see https://www.mongodb.com/docs/manual/core/index-ttl/
     ///
     index& expire_after(std::chrono::seconds seconds);
 
@@ -206,8 +262,12 @@ class MONGOCXX_API index {
     ///
     /// Sets the index version.
     ///
-    /// @param version
+    /// @param v
     ///   The index version.
+    ///
+    /// @return
+    ///   A reference to the object on which this member function is being called.  This facilitates
+    ///   method chaining.
     ///
     index& version(std::int32_t v);
 
@@ -225,6 +285,10 @@ class MONGOCXX_API index {
     /// @param weights
     ///   The weight document for text indexes.
     ///
+    /// @return
+    ///   A reference to the object on which this member function is being called.  This facilitates
+    ///   method chaining.
+    ///
     index& weights(bsoncxx::document::view weights);
 
     ///
@@ -240,6 +304,10 @@ class MONGOCXX_API index {
     ///
     /// @param default_language
     ///   The default language used when creating text indexes.
+    ///
+    /// @return
+    ///   A reference to the object on which this member function is being called.  This facilitates
+    ///   method chaining.
     ///
     index& default_language(bsoncxx::string::view_or_value default_language);
 
@@ -257,6 +325,10 @@ class MONGOCXX_API index {
     /// @param language_override
     ///   The name of the field that contains the override language for text indexes.
     ///
+    /// @return
+    ///   A reference to the object on which this member function is being called.  This facilitates
+    ///   method chaining.
+    ///
     index& language_override(bsoncxx::string::view_or_value language_override);
 
     ///
@@ -271,6 +343,10 @@ class MONGOCXX_API index {
     ///
     /// @param partial_filter_expression
     ///   The partial filter expression document.
+    ///
+    /// @return
+    ///   A reference to the object on which this member function is being called.  This facilitates
+    ///   method chaining.
     ///
     index& partial_filter_expression(bsoncxx::document::view partial_filter_expression);
 
@@ -287,6 +363,10 @@ class MONGOCXX_API index {
     /// @param twod_sphere_version
     ///   The 2dsphere index version number.
     ///
+    /// @return
+    ///   A reference to the object on which this member function is being called.  This facilitates
+    ///   method chaining.
+    ///
     index& twod_sphere_version(std::uint8_t twod_sphere_version);
 
     ///
@@ -301,6 +381,10 @@ class MONGOCXX_API index {
     ///
     /// @param twod_bits_precision
     ///   The precision of the stored geohash value.
+    ///
+    /// @return
+    ///   A reference to the object on which this member function is being called.  This facilitates
+    ///   method chaining.
     ///
     index& twod_bits_precision(std::uint8_t twod_bits_precision);
 
@@ -317,6 +401,10 @@ class MONGOCXX_API index {
     /// @param twod_location_min
     ///   The lower inclusive boundary.
     ///
+    /// @return
+    ///   A reference to the object on which this member function is being called.  This facilitates
+    ///   method chaining.
+    ///
     index& twod_location_min(double twod_location_min);
 
     ///
@@ -332,6 +420,10 @@ class MONGOCXX_API index {
     /// @param twod_location_max
     ///   The upper inclusive boundary.
     ///
+    /// @return
+    ///   A reference to the object on which this member function is being called.  This facilitates
+    ///   method chaining.
+    ///
     index& twod_location_max(double twod_location_max);
 
     ///
@@ -346,25 +438,47 @@ class MONGOCXX_API index {
     /// values; i.e. group in the same bucket those location values that are within the specified
     /// number of units to each other.
     ///
-    /// @see https://docs.mongodb.com/master/core/geohaystack/
+    /// @see https://www.mongodb.com/docs/manual/core/geohaystack/
     ///
     /// @param haystack_bucket_size
     ///   The geoHaystack bucket size.
     ///
-    index& haystack_bucket_size(double haystack_bucket_size);
+    /// @deprecated
+    ///   This option is deprecated.
+    ///
+    /// @return
+    ///   A reference to the object on which this member function is being called.  This facilitates
+    ///   method chaining.
+    ///
+    MONGOCXX_DEPRECATED index& haystack_bucket_size(double haystack_bucket_size);
+    index& haystack_bucket_size_deprecated(double haystack_bucket_size);
 
     ///
     /// The current haystack_bucket_size setting.
     ///
     /// @return The current haystack_bucket_size.
     ///
-    const stdx::optional<double>& haystack_bucket_size() const;
+    /// @deprecated
+    ///   This method is deprecated.
+    ///
+    MONGOCXX_DEPRECATED const stdx::optional<double>& haystack_bucket_size() const;
+    const stdx::optional<double>& haystack_bucket_size_deprecated() const;
+
+    ///
+    /// Conversion operator that provides a view of the options in document form.
+    ///
+    /// @exception mongocxx::logic_error if an invalid expireAfterSeconds field is provided.
+    ///
+    /// @return A view of the current builder contents.
+    ///
+    operator bsoncxx::document::view_or_value();
 
    private:
     friend collection;
 
     stdx::optional<bool> _background;
     stdx::optional<bool> _unique;
+    stdx::optional<bool> _hidden;
     stdx::optional<bsoncxx::string::view_or_value> _name;
     stdx::optional<bsoncxx::document::view> _collation;
     stdx::optional<bool> _sparse;

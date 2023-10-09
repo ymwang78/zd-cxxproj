@@ -16,12 +16,9 @@
 
 #include <bsoncxx/document/value.hpp>
 #include <bsoncxx/document/view_or_value.hpp>
-#include <bsoncxx/builder/stream/document.hpp>
-#include <bsoncxx/builder/stream/helpers.hpp>
-#include <bsoncxx/builder/stream/key_context.hpp>
 #include <bsoncxx/stdx/optional.hpp>
 #include <bsoncxx/string/view_or_value.hpp>
-#include <bsoncxx/types/value.hpp>
+#include <bsoncxx/types/bson_value/view.hpp>
 #include <mongocxx/stdx.hpp>
 
 #include <mongocxx/config/prelude.hpp>
@@ -62,42 +59,29 @@ class MONGOCXX_API hint {
     ///
     friend MONGOCXX_API bool MONGOCXX_CALL operator==(const hint& index_hint, std::string index);
 
-    friend MONGOCXX_API bool MONGOCXX_CALL
-    operator==(const hint& index_hint, bsoncxx::document::view index);
+    friend MONGOCXX_API bool MONGOCXX_CALL operator==(const hint& index_hint,
+                                                      bsoncxx::document::view index);
     ///
     /// @}
     ///
 
     ///
-    /// Returns a types::value representing this hint.
+    /// Returns a types::bson_value::view representing this hint.
     ///
-    /// @return Hint, as a types::value. The caller must ensure that the returned object not outlive
+    /// @return Hint, as a types::bson_value::view. The caller must ensure that the returned object
+    /// not outlive
     /// the hint object that it was created from.
     ///
-    bsoncxx::types::value to_value() const;
+    bsoncxx::types::bson_value::view to_value() const;
 
     ///
-    /// Return a bson document representing this hint.
+    /// Returns a types::bson_value::view representing this hint.
     ///
-    /// @deprecated
-    ///   This method has been deprecated in favor of to_value().
+    /// @return Hint, as a types::bson_value::view. The caller must ensure that the returned object
+    /// not outlive
+    /// the hint object that it was created from.
     ///
-    /// @return Hint, as a document.
-    ///
-    bsoncxx::document::value to_document() const;
-
-    ///
-    /// @todo document this method
-    ///
-    MONGOCXX_INLINE operator bsoncxx::types::value() const;
-
-    ///
-    /// @todo document this method
-    ///
-    /// @deprecated
-    ///   This method has been deprecated in favor of operator bsoncxx::types::value().
-    ///
-    MONGOCXX_INLINE operator bsoncxx::document::value() const;
+    MONGOCXX_INLINE operator bsoncxx::types::bson_value::view() const;
 
    private:
     stdx::optional<bsoncxx::document::view_or_value> _index_doc;
@@ -153,12 +137,8 @@ MONGOCXX_API bool MONGOCXX_CALL operator!=(bsoncxx::document::view index, const 
 /// @}
 ///
 
-MONGOCXX_INLINE hint::operator bsoncxx::types::value() const {
+MONGOCXX_INLINE hint::operator bsoncxx::types::bson_value::view() const {
     return to_value();
-}
-
-MONGOCXX_INLINE hint::operator bsoncxx::document::value() const {
-    return to_document();
 }
 
 MONGOCXX_INLINE_NAMESPACE_END

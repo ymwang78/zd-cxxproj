@@ -35,16 +35,14 @@ class client;
 /// For interoperability with other MongoDB drivers, the minimum and maximum number of connections
 /// in the pool is configured using the 'minPoolSize' and 'maxPoolSize' connection string options.
 ///
-/// @see https://docs.mongodb.com/master/reference/connection-string/#connection-string-options
+/// @see https://www.mongodb.com/docs/manual/reference/connection-string/#connection-string-options
 ///
 /// @remark When connecting to a replica set, it is @b much more efficient to use a pool as opposed
-/// to manually constructing @c client objects. The pool will use a single background thread used
-/// to monitor the topology of the replica set that is shared between all the client objects it
-/// creates. Each standalone client, however, will start its own background thread, leading to many
-/// redundant threads and network operations.
-///
-/// As a @c client is @b not thread safe, the @c pool should be preferred in multithreaded
-/// programs as it can safely be shared across threads.
+/// to manually constructing @c client objects. The pool will use a single background thread per
+/// server to monitor the topology of the replica set, all of which are shared between the client
+/// objects created by the pool. A standalone client will instead "stop the world" every 60 seconds
+/// to check the status of the cluster. Because of this, if multiple threads are available, a
+/// connection pool should be used even if the application itself is single-threaded.
 ///
 class MONGOCXX_API pool {
    public:
@@ -67,12 +65,37 @@ class MONGOCXX_API pool {
     ~pool();
 
     ///
-    /// An entry is a handle on a @c client object acquired via the pool.
+    /// An entry is a handle on a @c client object acquired via the pool. Similar to
+    /// std::unique_ptr.
     ///
     /// @note The lifetime of any entry object must be a subset of the pool object
     ///  from which it was acquired.
     ///
-    using entry = std::unique_ptr<client, std::function<void MONGOCXX_CALL(client*)>>;
+    class MONGOCXX_API entry {
+       public:
+        /// Access a member of the client instance.
+        client* operator->() const& noexcept;
+        client* operator->() && = delete;
+
+        /// Retrieve a reference to the client.
+        client& operator*() const& noexcept;
+        client& operator*() && = delete;
+
+        /// Assign nullptr to this entry to release its client to the pool.
+        entry& operator=(std::nullptr_t) noexcept;
+
+        /// Return true if this entry has a client acquired from the pool.
+        explicit operator bool() const noexcept;
+
+       private:
+        friend class pool;
+
+        using unique_client = std::unique_ptr<client, std::function<void MONGOCXX_CALL(client*)>>;
+
+        MONGOCXX_PRIVATE explicit entry(unique_client);
+
+        unique_client _client;
+    };
 
     ///
     /// Acquires a client from the pool. The calling thread will block until a connection is
@@ -87,6 +110,8 @@ class MONGOCXX_API pool {
     stdx::optional<entry> try_acquire();
 
    private:
+    friend class options::auto_encryption;
+
     MONGOCXX_PRIVATE void _release(client* client);
 
     class MONGOCXX_PRIVATE impl;

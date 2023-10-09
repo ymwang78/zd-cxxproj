@@ -27,7 +27,6 @@ namespace mongocxx {
 MONGOCXX_INLINE_NAMESPACE_BEGIN
 
 class collection;
-class insert_many_builder;
 
 namespace result {
 
@@ -38,6 +37,14 @@ namespace result {
 class MONGOCXX_API insert_many {
    public:
     using id_map = std::map<std::size_t, bsoncxx::document::element>;
+
+    insert_many(result::bulk_write result, bsoncxx::array::value inserted_ids);
+
+    insert_many(const insert_many&);
+    insert_many(insert_many&&) = default;
+
+    insert_many& operator=(const insert_many&);
+    insert_many& operator=(insert_many&&) = default;
 
     ///
     /// Returns the bulk write result for this insert many operation.
@@ -60,13 +67,13 @@ class MONGOCXX_API insert_many {
     /// destroyed.
     /// @return Map of the index of the operation to the _id of the inserted document.
     ///
-    id_map inserted_ids();
+    id_map inserted_ids() const;
 
    private:
     friend collection;
-    friend insert_many_builder;
 
-    MONGOCXX_PRIVATE insert_many(result::bulk_write result, bsoncxx::array::view inserted_ids);
+    // Construct _inserted_ids from _inserted_ids_owned
+    MONGOCXX_PRIVATE void _buildInsertedIds();
 
     result::bulk_write _result;
 
@@ -76,6 +83,9 @@ class MONGOCXX_API insert_many {
 
     // Points into _inserted_ids_owned.
     id_map _inserted_ids;
+
+    friend MONGOCXX_API bool MONGOCXX_CALL operator==(const insert_many&, const insert_many&);
+    friend MONGOCXX_API bool MONGOCXX_CALL operator!=(const insert_many&, const insert_many&);
 };
 
 }  // namespace result

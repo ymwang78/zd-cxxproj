@@ -25,7 +25,10 @@ namespace mongocxx {
 MONGOCXX_INLINE_NAMESPACE_BEGIN
 
 ///
-/// @todo document this class
+/// Class representing an exception received from a MongoDB server.  It includes the server-provided
+/// error code, if one was available.
+///
+/// @see mongocxx::exception
 ///
 class MONGOCXX_API operation_exception : public exception {
    public:
@@ -41,7 +44,8 @@ class MONGOCXX_API operation_exception : public exception {
     /// @param what_arg
     ///   An optional message to be returned by `what`.
     ///
-    operation_exception(std::error_code ec, bsoncxx::document::value&& raw_server_error,
+    operation_exception(std::error_code ec,
+                        bsoncxx::document::value&& raw_server_error,
                         std::string what_arg = "");
 
     ///
@@ -56,6 +60,16 @@ class MONGOCXX_API operation_exception : public exception {
     ///
     /// @}
     ///
+
+    ///
+    /// Checks for the specified label in a operation exception.
+    ///
+    /// @param label
+    ///   A string of the label to search for
+    ///
+    /// @returns True if the label is found in the operation exception, and false otherwise.
+    ///
+    bool has_error_label(stdx::string_view label) const;
 
    private:
     stdx::optional<bsoncxx::document::value> _raw_server_error;

@@ -16,6 +16,7 @@
 #define BSONCXX_POLY_USE_MNMLSTC
 /* #undef BSONCXX_POLY_USE_SYSTEM_MNMLSTC */
 /* #undef BSONCXX_POLY_USE_BOOST */
+/* #undef BSONCXX_POLY_USE_STD */
 
 #define BSONCXX_INLINE_NAMESPACE_BEGIN inline namespace v_noabi {
 

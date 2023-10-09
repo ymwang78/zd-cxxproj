@@ -14,21 +14,43 @@
 
 #pragma once
 
+#include <bsoncxx/array/view_or_value.hpp>
 #include <bsoncxx/document/view_or_value.hpp>
 #include <bsoncxx/stdx/optional.hpp>
+#include <mongocxx/hint.hpp>
+#include <mongocxx/pipeline.hpp>
 #include <mongocxx/stdx.hpp>
 
 #include <mongocxx/config/prelude.hpp>
 
 namespace mongocxx {
 MONGOCXX_INLINE_NAMESPACE_BEGIN
+
 namespace model {
 
 ///
 /// Class representing a MongoDB update operation that modifies multiple documents.
 ///
 class MONGOCXX_API update_many {
+    //
+    // Utility class supporting the convenience of {} meaning an empty bsoncxx::document.
+    //
+    // Users may not use this class directly.
+    //
+    // In places where driver methods take this class as a parameter, passing {} will
+    // translate to a default-constructed bsoncxx::document::view_or_value,
+    // regardless of other overloads taking other default-constructible types
+    // for that parameter. This class avoids compiler ambiguity with such overloads.
+    //
+    // See update_many() for an example of such overloads.
+    //
+    class _empty_doc_tag {
+        _empty_doc_tag() = default;
+    };
+
    public:
+    ///
+    /// @{
     ///
     /// Constructs an update operation that will modify all documents matching the filter.
     ///
@@ -38,6 +60,31 @@ class MONGOCXX_API update_many {
     ///   Document representing the modifications to be applied to matching documents.
     ///
     update_many(bsoncxx::document::view_or_value filter, bsoncxx::document::view_or_value update);
+
+    ///
+    /// Constructs an update operation that will modify all documents matching the filter.
+    ///
+    /// @param filter
+    ///   Document representing the criteria for applying the update.
+    /// @param update
+    ///   Pipeline representing the modifications to be applied to matching documents.
+    ///
+    update_many(bsoncxx::document::view_or_value filter, const pipeline& update);
+
+    ///
+    /// Constructs an update operation that will modify all documents matching the filter.
+    ///
+    /// @param filter
+    ///   Document representing the criteria for applying the update.
+    /// @param update
+    ///   Supports the empty update {}.
+    ///
+    update_many(bsoncxx::document::view_or_value filter,
+                std::initializer_list<_empty_doc_tag> update);
+
+    ///
+    /// @}
+    ///
 
     ///
     /// Gets the filter.
@@ -60,7 +107,7 @@ class MONGOCXX_API update_many {
     ///   The new collation.
     ///
     /// @see
-    ///   https://docs.mongodb.com/master/reference/collation/
+    ///   https://www.mongodb.com/docs/manual/reference/collation/
     ///
     update_many& collation(bsoncxx::document::view_or_value collation);
 
@@ -71,9 +118,30 @@ class MONGOCXX_API update_many {
     ///   The optional value of the collation option.
     ///
     /// @see
-    ///   https://docs.mongodb.com/master/reference/collation/
+    ///   https://www.mongodb.com/docs/manual/reference/collation/
     ///
     const stdx::optional<bsoncxx::document::view_or_value>& collation() const;
+
+    /// Sets the index to use for this operation.
+    ///
+    /// @note if the server already has a cached shape for this query, it may
+    /// ignore a hint.
+    ///
+    /// @param index_hint
+    ///   Object representing the index to use.
+    ///
+    /// @return
+    ///   A reference to the object on which this member function is being called.  This facilitates
+    ///   method chaining.
+    ///
+    update_many& hint(class hint index_hint);
+
+    ///
+    /// Gets the current hint.
+    ///
+    /// @return The current hint, if one is set.
+    ///
+    const stdx::optional<class hint>& hint() const;
 
     ///
     /// Sets the upsert option.
@@ -97,12 +165,34 @@ class MONGOCXX_API update_many {
     ///
     const stdx::optional<bool>& upsert() const;
 
+    ///
+    /// Set array filters for this update operation.
+    ///
+    /// @param array_filters
+    ///   Array representing filters determining which array elements to modify.
+    ///
+    /// @see https://www.mongodb.com/docs/manual/reference/command/update/
+    ///
+    update_many& array_filters(bsoncxx::array::view_or_value array_filters);
+
+    ///
+    /// Get array filters for this operation.
+    ///
+    /// @return
+    ///   The current array filters.
+    ///
+    /// @see https://www.mongodb.com/docs/manual/reference/command/update/
+    ///
+    const stdx::optional<bsoncxx::array::view_or_value>& array_filters() const;
+
    private:
     bsoncxx::document::view_or_value _filter;
     bsoncxx::document::view_or_value _update;
 
     stdx::optional<bsoncxx::document::view_or_value> _collation;
+    stdx::optional<bsoncxx::array::view_or_value> _array_filters;
     stdx::optional<bool> _upsert;
+    stdx::optional<class hint> _hint;
 };
 
 }  // namespace model

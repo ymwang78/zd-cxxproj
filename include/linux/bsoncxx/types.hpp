@@ -13,6 +13,13 @@
 // limitations under the License.
 
 #pragma once
+#if defined(__clang__)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wfloat-equal"
+#elif defined(__GNUC__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wfloat-equal"
+#endif
 
 #include <chrono>
 #include <cstring>
@@ -32,7 +39,7 @@ BSONCXX_INLINE_NAMESPACE_BEGIN
 /// An enumeration of each BSON type.
 /// These x-macros will expand to be of the form:
 ///    k_double = 0x01,
-///    k_utf8 = 0x02,
+///    k_string = 0x02,
 ///    k_document = 0x03,
 ///    k_array = 0x04 ...
 ///
@@ -40,6 +47,7 @@ enum class type : std::uint8_t {
 #define BSONCXX_ENUM(name, val) k_##name = val,
 #include <bsoncxx/enums/type.hpp>
 #undef BSONCXX_ENUM
+    k_utf8 = 0x02,
 };
 
 ///
@@ -49,7 +57,11 @@ enum class type : std::uint8_t {
 ///   k_function = 0x01,
 ///   k_binary_deprecated = 0x02,
 ///   k_uuid_deprecated = 0x03,
-///   k_uuid = 0x04 ...
+///   k_uuid = 0x04,
+///   k_md5 = 0x05,
+///   k_encrypted = 0x06,
+///   k_column = 0x07,
+///   k_user = 0x80
 ///
 enum class binary_sub_type : std::uint8_t {
 #define BSONCXX_ENUM(name, val) k_##name = val,
@@ -90,7 +102,7 @@ struct BSONCXX_API b_double {
     ///
     /// Conversion operator unwrapping a double
     ///
-    BSONCXX_INLINE operator double() {
+    BSONCXX_INLINE operator double() const {
         return value;
     }
 };
@@ -107,40 +119,45 @@ BSONCXX_INLINE bool operator==(const b_double& lhs, const b_double& rhs) {
 ///
 /// A BSON UTF-8 encoded string value.
 ///
-struct BSONCXX_API b_utf8 {
-    static constexpr auto type_id = type::k_utf8;
+struct BSONCXX_API b_string {
+    static constexpr auto type_id = type::k_string;
 
     ///
-    /// Constructor for b_utf8.
+    /// Constructor for b_string.
     ///
-    /// @param value
+    /// @param t
     ///   The value to wrap.
     ///
     template <typename T,
-              typename std::enable_if<!std::is_same<b_utf8, typename std::decay<T>::type>::value,
+              typename std::enable_if<!std::is_same<b_string, typename std::decay<T>::type>::value,
                                       int>::type = 0>
-    BSONCXX_INLINE explicit b_utf8(T&& t)
-        : value(std::forward<T>(t)) {
-    }
+    BSONCXX_INLINE explicit b_string(T&& t) : value(std::forward<T>(t)) {}
 
     stdx::string_view value;
 
     ///
     /// Conversion operator unwrapping a string_view
     ///
-    BSONCXX_INLINE operator stdx::string_view() {
+    BSONCXX_INLINE operator stdx::string_view() const {
         return value;
     }
 };
 
 ///
-/// free function comparator for b_utf8
+/// free function comparator for b_string
 ///
-/// @relatesalso b_utf8
+/// @relatesalso b_string
 ///
-BSONCXX_INLINE bool operator==(const b_utf8& lhs, const b_utf8& rhs) {
+BSONCXX_INLINE bool operator==(const b_string& lhs, const b_string& rhs) {
     return lhs.value == rhs.value;
 }
+
+///
+/// This class has been renamed to b_string
+///
+/// @deprecated use b_string instead.
+///
+BSONCXX_DEPRECATED typedef b_string b_utf8;
 
 ///
 /// A BSON document value.
@@ -153,7 +170,7 @@ struct BSONCXX_API b_document {
     ///
     /// Conversion operator unwrapping a document::view
     ///
-    BSONCXX_INLINE operator document::view() {
+    BSONCXX_INLINE operator document::view() const {
         return value;
     }
 
@@ -185,7 +202,7 @@ struct BSONCXX_API b_array {
     ///
     /// Conversion operator unwrapping an array::view
     ///
-    BSONCXX_INLINE operator array::view() {
+    BSONCXX_INLINE operator array::view() const {
         return value;
     }
 };
@@ -217,7 +234,7 @@ struct BSONCXX_API b_binary {
 ///
 BSONCXX_INLINE bool operator==(const b_binary& lhs, const b_binary& rhs) {
     return lhs.sub_type == rhs.sub_type && lhs.size == rhs.size &&
-           (std::memcmp(lhs.bytes, rhs.bytes, lhs.size) == 0);
+           (!lhs.size || (std::memcmp(lhs.bytes, rhs.bytes, lhs.size) == 0));
 }
 
 ///
@@ -268,7 +285,7 @@ struct BSONCXX_API b_bool {
     ///
     /// Conversion operator unwrapping a bool
     ///
-    BSONCXX_INLINE operator bool() {
+    BSONCXX_INLINE operator bool() const {
         return value;
     }
 };
@@ -295,26 +312,24 @@ struct BSONCXX_API b_date {
     ///   Milliseconds since the system_clock epoch.
     ///
     BSONCXX_INLINE
-    explicit b_date(std::chrono::milliseconds value) : value(value) {
-    }
+    explicit b_date(std::chrono::milliseconds value) : value(value) {}
 
     ///
     /// Constructor for b_date
     ///
-    /// @param value
+    /// @param tp
     ///   A system_clock time_point.
     ///
     BSONCXX_INLINE
     explicit b_date(const std::chrono::system_clock::time_point& tp)
-        : value(std::chrono::duration_cast<std::chrono::milliseconds>(tp.time_since_epoch())) {
-    }
+        : value(std::chrono::duration_cast<std::chrono::milliseconds>(tp.time_since_epoch())) {}
 
     std::chrono::milliseconds value;
 
     ///
     /// Conversion operator unwrapping a int64_t
     ///
-    BSONCXX_INLINE operator int64_t() {
+    BSONCXX_INLINE operator int64_t() const {
         return value.count();
     }
 
@@ -328,7 +343,7 @@ struct BSONCXX_API b_date {
     ///
     /// Conversion operator unwrapping a time_point
     ///
-    BSONCXX_INLINE operator std::chrono::system_clock::time_point() {
+    BSONCXX_INLINE operator std::chrono::system_clock::time_point() const {
         return std::chrono::system_clock::time_point(
             std::chrono::duration_cast<std::chrono::system_clock::duration>(value));
     }
@@ -374,10 +389,12 @@ struct BSONCXX_API b_regex {
     /// @param options
     ///   The regex options
     ///
-    template <typename T, typename U>
-    BSONCXX_INLINE explicit b_regex(T&& regex, U&& options)
-        : regex(std::forward<T>(regex)), options(std::forward<U>(options)) {
-    }
+    template <typename T,
+              typename U = stdx::string_view,
+              typename std::enable_if<!std::is_same<b_regex, typename std::decay<T>::type>::value,
+                                      int>::type = 0>
+    BSONCXX_INLINE explicit b_regex(T&& regex, U&& options = U{})
+        : regex(std::forward<T>(regex)), options(std::forward<U>(options)) {}
 
     stdx::string_view regex;
     stdx::string_view options;
@@ -423,22 +440,20 @@ struct BSONCXX_API b_code {
     ///
     /// Constructor for b_code.
     ///
-    /// @param code
+    /// @param t
     ///   The js code
     ///
     template <typename T,
               typename std::enable_if<!std::is_same<b_code, typename std::decay<T>::type>::value,
                                       int>::type = 0>
-    BSONCXX_INLINE explicit b_code(T&& t)
-        : code(std::forward<T>(t)) {
-    }
+    BSONCXX_INLINE explicit b_code(T&& t) : code(std::forward<T>(t)) {}
 
     stdx::string_view code;
 
     ///
     /// Conversion operator unwrapping a string_view
     ///
-    BSONCXX_INLINE operator stdx::string_view() {
+    BSONCXX_INLINE operator stdx::string_view() const {
         return code;
     }
 };
@@ -464,22 +479,20 @@ struct BSONCXX_API b_symbol {
     ///
     /// Constructor for b_symbol.
     ///
-    /// @param symbol
+    /// @param t
     ///   The symbol.
     ///
     template <typename T,
               typename std::enable_if<!std::is_same<b_symbol, typename std::decay<T>::type>::value,
                                       int>::type = 0>
-    BSONCXX_INLINE explicit b_symbol(T&& t)
-        : symbol(std::forward<T>(t)) {
-    }
+    BSONCXX_INLINE explicit b_symbol(T&& t) : symbol(std::forward<T>(t)) {}
 
     stdx::string_view symbol;
 
     ///
     /// Conversion operator unwrapping a string_view
     ///
-    BSONCXX_INLINE operator stdx::string_view() {
+    BSONCXX_INLINE operator stdx::string_view() const {
         return symbol;
     }
 };
@@ -508,10 +521,13 @@ struct BSONCXX_API b_codewscope {
     /// @param scope
     ///   A bson document view holding the scope environment.
     ///
-    template <typename T, typename U>
+    template <
+        typename T,
+        typename U,
+        typename std::enable_if<!std::is_same<b_codewscope, typename std::decay<T>::type>::value,
+                                int>::type = 0>
     BSONCXX_INLINE explicit b_codewscope(T&& code, U&& scope)
-        : code(std::forward<T>(code)), scope(std::forward<U>(scope)) {
-    }
+        : code(std::forward<T>(code)), scope(std::forward<U>(scope)) {}
 
     stdx::string_view code;
     document::view scope;
@@ -537,7 +553,7 @@ struct BSONCXX_API b_int32 {
     ///
     /// Conversion operator unwrapping a int32_t
     ///
-    BSONCXX_INLINE operator int32_t() {
+    BSONCXX_INLINE operator int32_t() const {
         return value;
     }
 };
@@ -553,10 +569,6 @@ BSONCXX_INLINE bool operator==(const b_int32& lhs, const b_int32& rhs) {
 
 ///
 /// A BSON replication timestamp value.
-///
-/// @warning
-///   This BSON type is used internally by the MongoDB server - use by clients
-///   is discouraged.
 ///
 struct BSONCXX_API b_timestamp {
     static constexpr auto type_id = type::k_timestamp;
@@ -585,7 +597,7 @@ struct BSONCXX_API b_int64 {
     ///
     /// Conversion operator unwrapping a int64_t
     ///
-    BSONCXX_INLINE operator int64_t() {
+    BSONCXX_INLINE operator int64_t() const {
         return value;
     }
 };
@@ -610,15 +622,14 @@ struct BSONCXX_API b_decimal128 {
     ///
     /// Constructor for b_decimal128.
     ///
-    /// @param value
+    /// @param t
     ///   The value to wrap.
     ///
-    template <typename T,
-              typename std::enable_if<
-                  !std::is_same<b_decimal128, typename std::decay<T>::type>::value, int>::type = 0>
-    BSONCXX_INLINE explicit b_decimal128(T&& t)
-        : value(std::forward<T>(t)) {
-    }
+    template <
+        typename T,
+        typename std::enable_if<!std::is_same<b_decimal128, typename std::decay<T>::type>::value,
+                                int>::type = 0>
+    BSONCXX_INLINE explicit b_decimal128(T&& t) : value(std::forward<T>(t)) {}
 };
 
 ///
@@ -674,3 +685,9 @@ BSONCXX_INLINE_NAMESPACE_END
 }  // namespace bsoncxx
 
 #include <bsoncxx/config/postlude.hpp>
+
+#if defined(__clang__)
+#pragma clang diagnostic pop
+#elif defined(__GNUC__)
+#pragma GCC diagnostic pop
+#endif

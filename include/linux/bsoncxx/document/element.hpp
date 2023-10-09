@@ -30,7 +30,7 @@ enum class binary_sub_type : std::uint8_t;
 namespace types {
 struct b_eod;
 struct b_double;
-struct b_utf8;
+struct b_string;
 struct b_document;
 struct b_array;
 struct b_binary;
@@ -50,7 +50,12 @@ struct b_int64;
 struct b_decimal128;
 struct b_minkey;
 struct b_maxkey;
+
+namespace bson_value {
 class value;
+class view;
+}  // namespace bson_value
+
 }  // namespace types
 
 namespace array {
@@ -79,21 +84,8 @@ class BSONCXX_API element {
     element();
 
     ///
-    /// Construct an element as an offset into a buffer of bson bytes.
-    ///
-    /// @param raw
-    ///   A pointer to the raw bson bytes.
-    ///
-    /// @param length
-    ///   The size of the bson buffer.
-    ///
-    /// @param offset
-    ///   The element's offset into the buffer.
-    ///
-    explicit element(const std::uint8_t* raw, std::uint32_t length, std::uint32_t offset);
-
-    ///
-    /// Conversion operator to bool which is true for valid elements.
+    /// Conversion operator to bool which is true for valid elements
+    /// and false for invalid elements.
     ///
     explicit operator bool() const;
 
@@ -105,14 +97,6 @@ class BSONCXX_API element {
     const std::uint8_t* raw() const;
 
     ///
-    /// Setter for the raw bson bytes the element points to.
-    ///
-    /// @param raw
-    ///   The bytes this element should point to.
-    ///
-    void raw(const std::uint8_t* raw);
-
-    ///
     /// Getter for length of the raw bson bytes the element points to.
     ///
     /// @return a pointer to the length of the raw bson bytes.
@@ -120,27 +104,11 @@ class BSONCXX_API element {
     std::uint32_t length() const;
 
     ///
-    /// Setter for length of the raw bson bytes the element points to.
-    ///
-    /// @param length
-    ///   The length of the bytes this element points to.
-    ///
-    void length(std::uint32_t length);
-
-    ///
     /// Getter for the offset into the raw bson bytes the element points to.
     ///
     /// @return the offset into the raw bson bytes.
     ///
     std::uint32_t offset() const;
-
-    ///
-    /// Setter for the offset into the raw bson bytes the element points to.
-    ///
-    /// @param offset
-    ///   The offset into the bytes this element points to.
-    ///
-    void offset(std::uint32_t offset);
 
     ///
     /// Getter for the type of the element.
@@ -161,6 +129,13 @@ class BSONCXX_API element {
     stdx::string_view key() const;
 
     ///
+    /// Getter for the element's key length.
+    ///
+    /// @return the element's key length.
+    ///
+    std::uint32_t keylen() const;
+
+    ///
     /// Getter for elements of the b_double type.
     ///
     /// @throws bsoncxx::exception if this element is not a b_double.
@@ -170,13 +145,24 @@ class BSONCXX_API element {
     types::b_double get_double() const;
 
     ///
-    /// Getter for elements of the b_utf8 type.
+    /// Getter for elements of the b_string type.
     ///
-    /// @throws bsoncxx::exception if this element is not a b_utf8.
+    /// @deprecated use document::element::get_string() instead.
+    ///
+    /// @throws bsoncxx::exception if this element is not a b_string.
     ///
     /// @return the element's value.
     ///
-    types::b_utf8 get_utf8() const;
+    BSONCXX_DEPRECATED types::b_string get_utf8() const;
+
+    ///
+    /// Getter for elements of the b_string type.
+    ///
+    /// @throws bsoncxx::exception if this element is not a b_string.
+    ///
+    /// @return the element's value.
+    ///
+    types::b_string get_string() const;
 
     ///
     /// Getter for elements of the b_document type.
@@ -350,12 +336,20 @@ class BSONCXX_API element {
     types::b_maxkey get_maxkey() const;
 
     ///
-    /// Getter for a types::value variant wrapper of the value portion of the
+    /// Getter for a types::bson_value::view variant wrapper of the value portion of the
     /// element.
     ///
     /// @return the element's value.
     ///
-    types::value get_value() const;
+    types::bson_value::view get_value() const;
+
+    ///
+    /// Getter for a types::bson_value::value variant wrapper of the value portion of
+    /// the element. The returned object will make a copy of the buffer from this object.
+    ///
+    /// @return an owning version of the element's value.
+    ///
+    types::bson_value::value get_owning_value() const;
 
     ///
     /// If this element is a document, finds the first element of the document
@@ -390,10 +384,61 @@ class BSONCXX_API element {
     array::element operator[](std::uint32_t i) const;
 
    private:
+    ///
+    /// Construct an element as an offset into a buffer of bson bytes.
+    ///
+    /// @param raw
+    ///   A pointer to the raw bson bytes.
+    ///
+    /// @param length
+    ///   The size of the bson buffer.
+    ///
+    /// @param offset
+    ///   The element's offset into the buffer.
+    ///
+    BSONCXX_PRIVATE explicit element(const std::uint8_t* raw,
+                                     std::uint32_t length,
+                                     std::uint32_t offset,
+                                     std::uint32_t keylen);
+
+    friend class view;
+    friend class array::element;
+
     const std::uint8_t* _raw;
     std::uint32_t _length;
     std::uint32_t _offset;
+    std::uint32_t _keylen;
 };
+
+///
+/// @{
+///
+/// Convenience methods to compare for equality against a bson_value.
+///
+/// Returns true if this element contains a bson_value that matches.
+///
+/// @relates element
+///
+BSONCXX_API bool BSONCXX_CALL operator==(const element& elem, const types::bson_value::view& v);
+BSONCXX_API bool BSONCXX_CALL operator==(const types::bson_value::view& v, const element& elem);
+///
+/// @}
+///
+
+///
+/// @{
+///
+/// Convenience methods to compare for equality against a bson_value.
+///
+/// Returns false if this element contains a bson_value that matches.
+///
+/// @relates element
+///
+BSONCXX_API bool BSONCXX_CALL operator!=(const element& elem, const types::bson_value::view& v);
+BSONCXX_API bool BSONCXX_CALL operator!=(const types::bson_value::view& v, const element& elem);
+///
+/// @}
+///
 
 }  // namespace document
 

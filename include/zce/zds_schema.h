@@ -1,5 +1,15 @@
 #pragma once
 
+#ifndef CHECKLEN_MOVEBUF_ADDRET_DECSIZE
+    #define CHECKLEN_MOVEBUF_ADDRET_DECSIZE do{\
+            if (len < 0) \
+                return len;\
+            buf += len;\
+            ret += len;\
+            size -= len;\
+    }while(0)
+#endif
+
 namespace zdp
 {
     int ZCE_API write_varuint_raw(zce_byte* buf, int size, zce_uint64 val);
@@ -8,7 +18,7 @@ namespace zdp
 
     int ZCE_API set_struct_array_header(zce_byte* buf, int size, zce_uint64 val);
 
-    int ZCE_API get_struct_array_header(zce_uint64* val, zce_byte* buf, int size);
+    int ZCE_API get_struct_array_header(zce_uint64* val, const zce_byte* buf, int size);
 
 	int ZCE_API zds_pack(zce_byte* buf, zce_int32 size, zce_int64 val);
 

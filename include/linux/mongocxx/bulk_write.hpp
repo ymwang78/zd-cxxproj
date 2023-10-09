@@ -1,4 +1,4 @@
-// Copyright 2014 MongoDB Inc.
+// Copyright 2014-present MongoDB Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,8 +14,10 @@
 
 #pragma once
 
-#include <mongocxx/options/bulk_write.hpp>
+#include <mongocxx/client_session.hpp>
 #include <mongocxx/model/write.hpp>
+#include <mongocxx/options/bulk_write.hpp>
+#include <mongocxx/result/bulk_write.hpp>
 
 #include <mongocxx/config/prelude.hpp>
 
@@ -31,27 +33,15 @@ class collection;
 /// part of a bulk_write in order to avoid unnecessary network-level round trips between the driver
 /// and the server.
 ///
-/// Bulk writes affect a single collection only and are executed via the collection::bulk_write()
+/// Bulk writes affect a single collection only and are executed via the bulk_write::execute()
 /// method. Options that you would typically specify for individual write operations (such as write
 /// concern) are instead specified for the aggregate operation.
 ///
-/// @see https://docs.mongodb.com/master/core/crud/
-/// @see https://docs.mongodb.com/master/core/bulk-write-operations/
+/// @see https://www.mongodb.com/docs/manual/core/crud/
+/// @see https://www.mongodb.com/docs/manual/core/bulk-write-operations/
 ///
 class MONGOCXX_API bulk_write {
    public:
-    ///
-    /// Initializes a new bulk operation to be executed against a mongocxx::collection.
-    ///
-    /// @param ordered
-    ///   If @c true all write operations will be executed serially in the order they were appended
-    ///   and the entire bulk operation will abort on the first error. If @c false operations will
-    ///   be executed in an arbitrary order (possibly in parallel on the server) and any errors will
-    ///   be reported after attempting all operations. Unordered bulk writes may be more efficient
-    ///   than ordered bulk writes.
-    ///
-    explicit bulk_write(options::bulk_write options = {});
-
     ///
     /// Move constructs a bulk write operation.
     ///
@@ -83,14 +73,35 @@ class MONGOCXX_API bulk_write {
     ///     - model::update_many
     ///     - model::update_one
     ///
+    /// @return
+    ///   A reference to the object on which this member function is being called. This facilitates
+    ///   method chaining.
+    ///
     /// @throws mongocxx::logic_error if the given operation is invalid.
     ///
-    void append(const model::write& operation);
+    bulk_write& append(const model::write& operation);
+
+    ///
+    /// Executes a bulk write.
+    ///
+    /// @throws mongocxx::bulk_write_exception when there are errors processing the writes.
+    ///
+    /// @return The optional result of the bulk operation execution, a result::bulk_write.
+    ///
+    /// @see https://www.mongodb.com/docs/manual/core/bulk-write-operations/
+    ///
+    stdx::optional<result::bulk_write> execute() const;
 
    private:
     friend class collection;
 
     class MONGOCXX_PRIVATE impl;
+
+    MONGOCXX_PRIVATE bulk_write(const collection& coll,
+                                const options::bulk_write& options,
+                                const client_session* session = nullptr);
+
+    bool _created_from_collection;
     std::unique_ptr<impl> _impl;
 };
 

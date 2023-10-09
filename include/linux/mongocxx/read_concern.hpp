@@ -16,8 +16,10 @@
 
 #include <memory>
 
+#include <bsoncxx/document/value.hpp>
 #include <bsoncxx/stdx/optional.hpp>
 #include <bsoncxx/stdx/string_view.hpp>
+#include <mongocxx/options/transaction.hpp>
 #include <mongocxx/stdx.hpp>
 
 #include <mongocxx/config/prelude.hpp>
@@ -47,14 +49,14 @@ class uri;
 /// a single document. Note that writes must be made with majority write concern in order for reads
 /// to be linearizable.
 ///
-/// @see https://docs.mongodb.com/master/reference/read-concern/
+/// @see https://www.mongodb.com/docs/manual/reference/read-concern/
 ///
 class MONGOCXX_API read_concern {
    public:
     ///
     /// A class to represent the read concern level.
     ///
-    /// @see https://docs.mongodb.com/master/reference/read-concern/#read-concern-levels
+    /// @see https://www.mongodb.com/docs/manual/reference/read-concern/#read-concern-levels
     ///
     enum class level {
         k_local,
@@ -62,6 +64,8 @@ class MONGOCXX_API read_concern {
         k_linearizable,
         k_server_default,
         k_unknown,
+        k_available,
+        k_snapshot
     };
 
     ///
@@ -105,7 +109,7 @@ class MONGOCXX_API read_concern {
     ///   Either k_local, k_majority, k_linearizable, or k_server_default.
     ///
     /// @throws
-    ///   std::invalid_argument if rc_level is not k_local, k_majority, k_linearizable, or
+    ///   mongocxx::exception if rc_level is not k_local, k_majority, k_linearizable, or
     ///   k_server_default.
     ///
     void acknowledge_level(level rc_level);
@@ -121,9 +125,10 @@ class MONGOCXX_API read_concern {
     level acknowledge_level() const;
 
     ///
-    /// Sets the read concern string.
-    ///
-    /// One of "local", "majority", "linearizable", or "".
+    /// Sets the read concern string. Any valid read concern string (e.g. "local",
+    /// "majority", "linearizable", "") may be passed in.  For forward-compatibility
+    /// with read concern levels introduced in the future, no validation is performed on
+    /// this string.
     ///
     /// @param rc_string
     ///   The read concern string.
@@ -140,11 +145,34 @@ class MONGOCXX_API read_concern {
     ///
     stdx::string_view acknowledge_string() const;
 
+    ///
+    /// Gets the document form of this read_concern.
+    ///
+    /// @return
+    ///   Document representation of this read_concern.
+    ///
+    bsoncxx::document::value to_document() const;
+
    private:
     friend client;
     friend collection;
     friend database;
+    /// \relates mongocxx::options::transaction
+    friend mongocxx::options::transaction;
     friend uri;
+
+    ///
+    /// @{
+    ///
+    /// Compares two read_concern objects for (in)-equality.
+    ///
+    /// @relates: read_concern
+    ///
+    friend MONGOCXX_API bool MONGOCXX_CALL operator==(const read_concern&, const read_concern&);
+    friend MONGOCXX_API bool MONGOCXX_CALL operator!=(const read_concern&, const read_concern&);
+    ///
+    /// @}
+    ///
 
     class MONGOCXX_PRIVATE impl;
 
