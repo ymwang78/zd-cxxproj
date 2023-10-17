@@ -5,6 +5,13 @@
 #include <zce/zce_smartptr.h>
 #include <zce/zce_object.h>
 
+int ZCE_API zdb_connstr_parser(const std::string& filename,
+	std::string& dbuser,
+	std::string& dbpass,
+	std::string& dbhost,
+	std::string& dbport,
+	std::string& dbname);
+
 class zdb_stmt : public zce_smartptr_mtbase
 {
 public:
@@ -97,7 +104,6 @@ public:
     virtual int lasterr_code() const = 0;
     virtual int lasterr_column() const = 0;
     virtual const char* get_sqlstr() = 0;
-	virtual int get_row() { return 0; };
 	virtual int get_column() { return 0; };
 	virtual int get_rows_effected() { return 0; }
 	virtual const char* get_column_name(int colidx) = 0;
@@ -330,7 +336,7 @@ struct zdb_object
 			int ret = connptr->create_stmt(stmtptr, sql, false);
 			if (ret < 0) return ret;
 			*stmtptr << zdb_stmt::endl;
-			while (stmtptr->get_row() > 0) {
+			while (stmtptr->end_row() > 0) {
 				//@todo check
 				T m;
 				m.extract(stmtptr);
@@ -361,7 +367,7 @@ struct zdb_object
 			int ret = connptr->create_stmt(stmtptr, sql, false);
 			if (ret < 0) return ret;
 			*stmtptr << zdb_stmt::endl;
-			while (stmtptr->get_row() > 0) {
+			while (stmtptr->end_row() > 0) {
 				//@todo check
 				T m;
 				m.extract(stmtptr);
@@ -388,7 +394,7 @@ struct zdb_object
 			int ret = connptr->create_stmt(stmtptr, sql, false);
 			if (ret < 0) return ret;
 			*stmtptr << zdb_stmt::endl;
-			while (stmtptr->get_row() > 0) {
+			while (stmtptr->end_row() > 0) {
 				//@todo check
 				zce_smartptr<T> m(new T);
 				m->extract(stmtptr);
@@ -416,7 +422,7 @@ struct zdb_object
 			int ret = connptr->create_stmt(stmtptr, sql, false);
 			if (ret < 0) return ret;
 			*stmtptr << prop << zdb_stmt::endl;
-			while (stmtptr->get_row() > 0) {
+			while (stmtptr->end_row() > 0) {
 				//@todo check
 				Q m;
 				extract(m, stmtptr);
@@ -447,7 +453,7 @@ struct zdb_object
 			int ret = connptr->create_stmt(stmtptr, sql, false);
 			if (ret < 0) return ret;
 			*stmtptr << prop << zdb_stmt::endl;
-			while (stmtptr->get_row() > 0) {
+			while (stmtptr->end_row() > 0) {
 				//@todo check
 				extract(m, stmtptr);
 				return 1;
@@ -473,7 +479,7 @@ struct zdb_object
 			int ret = connptr->create_stmt(stmtptr, sql, false);
 			if (ret < 0) return ret;
 			*stmtptr << prop << zdb_stmt::endl;
-			while (stmtptr->get_row() > 0) {
+			while (stmtptr->end_row() > 0) {
 				//@todo check
 				T m;
 				m.extract(stmtptr);
@@ -502,7 +508,7 @@ struct zdb_object
 			int ret = connptr->create_stmt(stmtptr, sql, false);
 			if (ret < 0) return ret;
 			*stmtptr << prop << zdb_stmt::endl;
-			while (stmtptr->get_row() > 0) {
+			while (stmtptr->end_row() > 0) {
 				//@todo check
 				m.extract(stmtptr);
 				return 1;
@@ -559,7 +565,7 @@ struct zdb_object
 			int ret = connptr->create_stmt(stmtptr, sql, false);
 			if (ret < 0) return ret;
 			*stmtptr << key << zdb_stmt::endl;
-			while (stmtptr->get_row() > 0) {
+			while (stmtptr->end_row() > 0) {
 				//@todo check
 				mvec.push_back(T());
 				mvec[mvec.size() - 1].extract(stmtptr);
@@ -590,7 +596,7 @@ struct zdb_object
 			if (ret < 0) return ret;
 			m.putinsertvars(stmtptr);
 			*stmtptr << zdb_stmt::endl;
-			while (stmtptr->get_row() > 0) {
+			while (stmtptr->end_row() > 0) {
 				//@todo check
 				*stmtptr >> zdb_stmt::_none_ignoreidx;
 			}
@@ -620,7 +626,7 @@ struct zdb_object
 			if (ret < 0) return ret;
 			m.putreplacevars(stmtptr);
 			*stmtptr << zdb_stmt::endl;
-			while (stmtptr->get_row() > 0) {
+			while (stmtptr->end_row() > 0) {
 				//@todo check
 				*stmtptr >> zdb_stmt::_none_ignoreidx;
 			}
@@ -707,7 +713,7 @@ struct zdb_object
 			if (ret < 0) return ret;
 			m.putvars(stmtptr, sql, ctx);
 			*stmtptr << zdb_stmt::endl;
-			while (stmtptr->get_row() > 0) {
+			while (stmtptr->end_row() > 0) {
 				//@todo check
 				m.extract(stmtptr);
 				return 1;
@@ -737,7 +743,7 @@ struct zdb_object
 			int ret = connptr->create_stmt(stmtptr, sql, false);
 			if (ret < 0) return ret;
 			*stmtptr << prop << zdb_stmt::endl;
-			while (stmtptr->get_row() > 0) {
+			while (stmtptr->end_row() > 0) {
 				//@todo check
 				mvec.push_back(T());
 				mvec[mvec.size() - 1].extract(stmtptr);

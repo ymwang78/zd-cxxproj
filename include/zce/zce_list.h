@@ -36,6 +36,11 @@ static inline void zce_list_add(struct zce_list_node *item, struct zce_list_node
     __list_add(item, head, head->next);
 };
 
+static inline void zce_list_add_tail(struct zce_list_node* item, struct zce_list_node* head)
+{
+	__list_add(item, head->prev, head);
+};
+
 static inline bool zce_list_empty(const struct zce_list_node *head)
 {
     return head->next == head;
