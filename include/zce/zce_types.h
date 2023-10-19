@@ -19,7 +19,6 @@
     typedef DWORD       threadid_t;
     typedef HANDLE      handle_t;
     typedef int         socklen_t;
-    typedef struct timespec timespec_t;
     typedef long long          int zce_int64;
     typedef unsigned long long int zce_uint64;
 #else
@@ -47,6 +46,7 @@ typedef unsigned int        zce_uint32;
 typedef float               zce_float;
 typedef double              zce_double;
 typedef int                 zce_serial;
+typedef struct timespec timespec_t;
 
 #endif //ZCE_TYPES_DEFINED
 

@@ -172,7 +172,8 @@ public:
 #define ZERROR(...) do { if(zlog_getlevel() <= ZLOG_ERROR) zce_logstr(ZLOG_ERROR, __FUNCTION__, __FILE__, __LINE__).write(__VA_ARGS__); } while(0)
 #define ZFATAL(...) do { if(zlog_getlevel() <= ZLOG_FATAL) zce_logstr(ZLOG_FATAL, __FUNCTION__, __FILE__, __LINE__).write(__VA_ARGS__); } while(0)
 
-#define ZBIZDT(...) do { if(zlog_getlevel() <= ZLOG_BIZDT) zce_logstr(ZLOG_BIZDT, __FUNCTION__, __FILE__, __LINE__).write(__VA_ARGS__); } while(0)
+#define ZBIZDT(...) 
+//#define ZBIZDT(...) do { if(zlog_getlevel() <= ZLOG_BIZDT) zce_logstr(ZLOG_BIZDT, __FUNCTION__, __FILE__, __LINE__).write(__VA_ARGS__); } while(0)
 
 #endif
 
