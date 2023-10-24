@@ -15,6 +15,7 @@
 #include <IceUtil/Shared.h>
 #include <Ice/Exception.h>
 #include <Ice/LocalException.h>
+#include <Ice/Current.h>
 
 #include <zce/zce_smartptr.h>
 #include <zce/zce_task.h>
@@ -41,8 +42,8 @@ namespace zce
     };
     typedef zce_smartptr<rvice_task> rvice_task_ptr;
 
-    template <typename CALLBACK_CTX, typename BASE, typename ARG0_TYPE, typename ARG1_TYPE>
-    class rvice_task_impl : public BASE, public rvice_task_base
+    template <typename CALLBACK_CTX, typename ARG0_TYPE, typename ARG1_TYPE>
+    class rvice_task_impl : public rvice_task_base
     {
         CALLBACK_CTX cbctx_;
         int result_;
@@ -72,21 +73,21 @@ namespace zce
             this->enqueue(cbctx_->get_tskdeque(), desc_);
         }
 
-        virtual void ice_response(::Ice::Int result, ARG0_TYPE arg0)
-        {
-            result_ = result;
-            arg0_ = arg0;
-            this->enqueue(cbctx_->get_tskdeque(), desc_);
-        }
+        //virtual void ice_response(::Ice::Int result, ARG0_TYPE arg0)
+        //{
+        //    result_ = result;
+        //    arg0_ = arg0;
+        //    this->enqueue(cbctx_->get_tskdeque(), desc_);
+        //}
 
-        virtual void ice_response(::Ice::Int result, const ARG0_TYPE& arg0)
-        {
-            result_ = result;
-            arg0_ = arg0;
-            this->enqueue(cbctx_->get_tskdeque(), desc_);
-        }
+		virtual void ice_response(::Ice::Int result, const ARG0_TYPE& arg0)
+		{
+			result_ = result;
+			arg0_ = arg0;
+			this->enqueue(cbctx_->get_tskdeque(), desc_);
+		}
 
-        virtual void ice_exception(const ::Ice::Exception& ex)
+        virtual void ice_exception(const std::exception_ptr& ex)
         {
             //ZCE_ERROR((ZLOG_ERROR, "rvice_task_impl(%s) exception %s\n", desc_, ex.what()));
             result_ = 0x80010004; /*ERV_ERRO_CMN_UNAVAILSERVICE*/
