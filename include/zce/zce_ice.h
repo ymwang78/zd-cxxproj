@@ -25,34 +25,27 @@ class zce_task_queue;
 
 namespace zce
 {
-    class rvice_task_base
-    {
-    public:
-        int enqueue(const zce_smartptr<zce_task_queue>& tskdeque_ctx, const char* name = "rvice_task_base");
-        virtual void rvice_execute() = 0;
-    };
-
-    class rvice_task : public zce_task
-    {
-        IceUtil::Handle<IceUtil::Shared> ice_ptr_;
-
-    public:
-        rvice_task(const IceUtil::Handle<IceUtil::Shared>& ptr, const char* name);
-        virtual void call(void);
-    };
-    typedef zce_smartptr<rvice_task> rvice_task_ptr;
-
     template <typename CALLBACK_CTX, typename ARG0_TYPE, typename ARG1_TYPE>
-    class rvice_task_impl : public rvice_task_base
+    class rvice_task_impl : public zce_task
     {
         CALLBACK_CTX cbctx_;
         int result_;
         ARG0_TYPE arg0_;
         ARG1_TYPE arg1_;
         const char* desc_;
+
+        int enqueue(const zce_smartptr<zce_task_queue>& tskdeque_ctx, const char* name = "rvice_task_base") {
+			zce_smartptr<zce_task> task_ptr(this);
+			if (tskdeque_ctx != 0)
+				return tskdeque_ctx->enqueue(task_ptr);
+			else
+				return zce_schedule_sigt::instance()->perform(task_ptr);
+        }
+
     public:
+
         rvice_task_impl(const CALLBACK_CTX& ctx, const ARG1_TYPE& arg1, const char* desc)
-            :cbctx_(ctx), arg1_(arg1), desc_(desc), result_(0)
+            :zce_task("rvice_task_impl"), cbctx_(ctx), arg1_(arg1), desc_(desc), result_(0)
         {
             ZCE_ASSERT(ctx != 0);
         }
@@ -94,10 +87,8 @@ namespace zce
             this->enqueue(cbctx_->get_tskdeque(), desc_);
         }
 
-        virtual void rvice_execute()
-        {
-            //ZCE_ERROR((ZLOG_TRACE, "rvice_task_impl(%s) succeed 0x%x", desc_, result_));
-            cbctx_->rvice_execute(result_, arg0_, arg1_);
+        virtual void call(void) {
+			cbctx_->rvice_execute(result_, arg0_, arg1_);
         }
     };
 
@@ -176,34 +167,6 @@ namespace zce
         {
             //ZCE_ERROR((ZLOG_TRACE, "rvice_task_impl(%s) succeed %d\n", desc_, result_));
             cbctx_->rvice_execute(result_, arg0_, arg1_, arg_);
-        }
-    };
-
-    template <typename BASE, typename ARG0_TYPE = int>
-    class rvice_task_oneway : public BASE
-    {
-        virtual void ice_response()
-        {
-        }
-
-        virtual void ice_response(::Ice::Int result)
-        {
-            ZCE_DEBUG((ZLOG_DEBUG, "result:0x%x", result));
-        }
-
-        virtual void ice_response(::Ice::Int result, ARG0_TYPE arg0)
-        {
-            ZCE_DEBUG((ZLOG_DEBUG, "result:0x%x", result));
-        }
-
-        virtual void ice_response(::Ice::Int result, const ARG0_TYPE& arg0)
-        {
-            ZCE_DEBUG((ZLOG_DEBUG, "result:0x%x", result));
-        }
-
-        virtual void ice_exception(const ::Ice::Exception& ex)
-        {
-            ZCE_DEBUG((ZLOG_DEBUG, "result:%s", ex.what()));
         }
     };
 
