@@ -28,6 +28,7 @@ namespace zce
     template <typename CALLBACK_CTX, typename ARG0_TYPE, typename ARG1_TYPE>
     class rvice_task_impl : public zce_task
     {
+        typedef typename rvice_task_impl<CALLBACK_CTX, ARG0_TYPE, ARG1_TYPE> impl_class;
         CALLBACK_CTX cbctx_;
         int result_;
         ARG0_TYPE arg0_;
@@ -42,12 +43,16 @@ namespace zce
 				return zce_schedule_sigt::instance()->perform(task_ptr);
         }
 
-    public:
+		rvice_task_impl(const CALLBACK_CTX& ctx, const ARG1_TYPE& arg1, const char* desc)
+			:zce_task("rvice_task_impl"), cbctx_(ctx), arg1_(arg1), desc_(desc), result_(0)
+		{
+			ZCE_ASSERT(ctx != 0);
+		}
 
-        rvice_task_impl(const CALLBACK_CTX& ctx, const ARG1_TYPE& arg1, const char* desc)
-            :zce_task("rvice_task_impl"), cbctx_(ctx), arg1_(arg1), desc_(desc), result_(0)
-        {
-            ZCE_ASSERT(ctx != 0);
+    public:
+        static zce_smartptr<impl_class> create(
+            const CALLBACK_CTX& ctx, const ARG1_TYPE& arg1, const char* desc) {
+            return zce_smartptr<impl_class>(new impl_class(ctx, arg1, desc));
         }
 
         ~rvice_task_impl()
