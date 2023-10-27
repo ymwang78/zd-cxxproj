@@ -97,21 +97,37 @@ namespace zce
         }
     };
 
-    template <typename CALLBACK_CTX, typename BASE, typename ARG0_TYPE, typename ARG1_TYPE, typename ARG_TYPE>
-    class rvice_task_impl_2 : public BASE, public rvice_task_base
+    template <typename CALLBACK_CTX, typename ARG0_TYPE, typename ARG1_TYPE, typename ARG_TYPE>
+    class rvice_task_impl_2 :public zce_task
     {
+        typedef typename rvice_task_impl_2<CALLBACK_CTX, ARG0_TYPE, ARG1_TYPE, ARG_TYPE> impl_class;
         CALLBACK_CTX cbctx_;
         int result_;
         ARG0_TYPE arg0_;
         ARG1_TYPE arg1_;
         ARG_TYPE arg_;
         const char* desc_;
-    public:
+
+		int enqueue(const zce_smartptr<zce_task_queue>& tskdeque_ctx, const char* name = "rvice_task_base") {
+			zce_smartptr<zce_task> task_ptr(this);
+			if (tskdeque_ctx != 0)
+				return tskdeque_ctx->enqueue(task_ptr);
+			else
+				return zce_schedule_sigt::instance()->perform(task_ptr);
+		}
+
         rvice_task_impl_2(const CALLBACK_CTX& ctx, const ARG_TYPE& arg, const char* desc = 0)
-            :cbctx_(ctx), arg_(arg), desc_(desc), result_(0)
-        {
-            ZCE_ASSERT(ctx != 0);
-        }
+			:zce_task("rvice_task_impl_2"), cbctx_(ctx), arg_(arg), desc_(desc), result_(0)
+		{
+			ZCE_ASSERT(ctx != 0);
+		}
+
+    public:
+
+		static zce_smartptr<impl_class> create(
+			const CALLBACK_CTX& ctx, const ARG_TYPE& arg, const char* desc = 0) {
+			return zce_smartptr<impl_class>(new impl_class(ctx, arg, desc));
+		}
 
         ~rvice_task_impl_2()
         {
@@ -129,29 +145,29 @@ namespace zce
             this->enqueue(cbctx_->get_tskdeque());
         }
 
-        virtual void ice_response(::Ice::Int result, ARG0_TYPE arg0, ARG1_TYPE arg1)
-        {
-            result_ = result;
-            arg0_ = arg0;
-            arg1_ = arg1;
-            this->enqueue(cbctx_->get_tskdeque());
-        }
+        //virtual void ice_response(::Ice::Int result, ARG0_TYPE arg0, ARG1_TYPE arg1)
+        //{
+        //    result_ = result;
+        //    arg0_ = arg0;
+        //    arg1_ = arg1;
+        //    this->enqueue(cbctx_->get_tskdeque());
+        //}
 
-        virtual void ice_response(::Ice::Int result, ARG0_TYPE arg0, const ARG1_TYPE& arg1)
-        {
-            result_ = result;
-            arg0_ = arg0;
-            arg1_ = arg1;
-            this->enqueue(cbctx_->get_tskdeque());
-        }
+        //virtual void ice_response(::Ice::Int result, ARG0_TYPE arg0, const ARG1_TYPE& arg1)
+        //{
+        //    result_ = result;
+        //    arg0_ = arg0;
+        //    arg1_ = arg1;
+        //    this->enqueue(cbctx_->get_tskdeque());
+        //}
 
-        virtual void ice_response(::Ice::Int result, const ARG0_TYPE& arg0, ARG1_TYPE arg1)
-        {
-            result_ = result;
-            arg0_ = arg0;
-            arg1_ = arg1;
-            this->enqueue(cbctx_->get_tskdeque());
-        }
+        //virtual void ice_response(::Ice::Int result, const ARG0_TYPE& arg0, ARG1_TYPE arg1)
+        //{
+        //    result_ = result;
+        //    arg0_ = arg0;
+        //    arg1_ = arg1;
+        //    this->enqueue(cbctx_->get_tskdeque());
+        //}
 
         virtual void ice_response(::Ice::Int result, const ARG0_TYPE& arg0, const ARG1_TYPE& arg1)
         {
@@ -161,18 +177,16 @@ namespace zce
             this->enqueue(cbctx_->get_tskdeque());
         }
 
-        virtual void ice_exception(const ::Ice::Exception& ex)
+        virtual void ice_exception(const ::std::exception_ptr& ex)
         {
             //ZCE_ERROR((ZLOG_ERROR, "rvice_task_impl(%s) exception %s\n", desc_, ex.what()));
             result_ = 0x80010004; /*ERV_ERRO_CMN_UNAVAILSERVICE*/
             this->enqueue(cbctx_->get_tskdeque());
         }
 
-        virtual void rvice_execute()
-        {
-            //ZCE_ERROR((ZLOG_TRACE, "rvice_task_impl(%s) succeed %d\n", desc_, result_));
-            cbctx_->rvice_execute(result_, arg0_, arg1_, arg_);
-        }
+		virtual void call(void) {
+			cbctx_->rvice_execute(result_, arg0_, arg1_, arg_);
+		}
     };
 
     class rv_ipclass
