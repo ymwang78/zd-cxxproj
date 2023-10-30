@@ -73,6 +73,11 @@ int ZCE_API zdb_mgo_getfield(const bsoncxx::document::view& p, const std::string
 
 int ZCE_API zdb_mgo_getfield(const bsoncxx::document::view& p, const std::string& field, bsoncxx::document::view& subv);
 
+
+#ifndef WIN32
+void ZCE_API zdb_mgo_getarray(std::vector<long long>& v, const bsoncxx::document::view& doc, const std::string& field);
+#endif
+
 void ZCE_API zdb_mgo_getarray(std::vector<zce_int64>& v, const bsoncxx::document::view& doc, const std::string& field);
 
 void ZCE_API zdb_mgo_getarray(std::vector<int>& v, const bsoncxx::document::view& p, const std::string& field);
