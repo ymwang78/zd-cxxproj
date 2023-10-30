@@ -118,6 +118,11 @@ public:
     virtual zdb_stmt& operator << (const struct timespec& v) = 0;
     virtual zdb_stmt& operator << (const none&) = 0; 
     virtual zdb_stmt& operator << (const none_ignoreidx&) = 0;
+	#ifndef WIN32
+	virtual zdb_stmt& operator << (long long v) {
+		return operator << ((zce_int64)v);
+	}
+	#endif
 
 	virtual zdb_stmt& operator >> (double& v) = 0;
     virtual zdb_stmt& operator >> (zce_int64& v) = 0;
@@ -128,6 +133,11 @@ public:
     virtual zdb_stmt& operator >> (struct timespec& v) = 0;
     virtual zdb_stmt& operator >> (none&) = 0;
     virtual zdb_stmt& operator >> (none_ignoreidx&) = 0;
+	#ifndef WIN32
+	virtual zdb_stmt& operator >> (long long& v) {
+		return operator >> ((zce_int64&)v);
+	}
+	#endif
 
     virtual zdb_stmt& operator << (zce_uint64 v) {
         return operator << ((zce_int64)v);

@@ -112,19 +112,19 @@ enum ERV_ZCE_ERROR
     ZCE_ERROR_BASE = 0x81000000, //keep for stdc error
 
     ZCE_ERROR_COMMON = 0x81010000, //ZCE ERROR
-    ZCE_ERROR_MALLOC,  //дз╢Ф╥жеД╢МнС
-    ZCE_ERROR_UNSUPPORT,//сЖ╣╫н╢ж╖Ёж╣д╧╕дэр╙гС
-    ZCE_ERROR_SHRTLEN,  //йЩ╬щ╠хр╙гС╣дл╚╤л
-    ZCE_ERROR_EXCDLEN,  //йЩ╬щ╠хр╙гС╣дл╚Ё╓
-    ZCE_ERROR_CORRUPT,  //йЩ╬щ╡╩р╩жб
-    ZCE_ERROR_SYNTAX,   //йЩ╬щсОрЕ╢МнС
-    ZCE_ERROR_ZIP,      //я╧кУЁЖ╢М
-    ZCE_ERROR_TIMEOUT,  //╫сйуоЛс╕Ё╛й╠
+    ZCE_ERROR_MALLOC,  //О©╫з╢О©╫О©╫О©╫О©╫О©╫О©╫О©╫
+    ZCE_ERROR_UNSUPPORT,//О©╫О©╫О©╫О©╫н╢ж╖О©╫ж╣д╧О©╫О©╫О©╫р╙О©╫О©╫
+    ZCE_ERROR_SHRTLEN,  //О©╫О©╫О©╫щ╠О©╫р╙О©╫О©╫О©╫л╚О©╫О©╫
+    ZCE_ERROR_EXCDLEN,  //О©╫О©╫О©╫щ╠О©╫р╙О©╫О©╫О©╫л╚О©╫О©╫
+    ZCE_ERROR_CORRUPT,  //О©╫О©╫О©╫щ╡О©╫р╩О©╫О©╫
+    ZCE_ERROR_SYNTAX,   //О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫
+    ZCE_ERROR_ZIP,      //я╧О©╫О©╫О©╫О©╫О©╫О©╫
+    ZCE_ERROR_TIMEOUT,  //О©╫О©╫О©╫О©╫О©╫О©╫с╕О©╫О©╫й╠
     ZCE_ERROR_CONVERTOR,
-    ZCE_ERROR_CLOSED,   //а╛╫сря╬╜╧ь╠у
-    ZCE_ERROR_TOCLOSE,  //а╛╫с╫╚р╙╧ь╠у
+    ZCE_ERROR_CLOSED,   //О©╫О©╫О©╫О©╫О©╫я╬О©╫О©╫ь╠О©╫
+    ZCE_ERROR_TOCLOSE,  //О©╫О©╫О©╫с╫О©╫р╙О©╫ь╠О©╫
     ZCE_ERROR_PREVNULL, //ISTEAM PREV NOT EXISTS
-    ZCE_ERROR_OVERFLOW, //рГЁЖё╛юЩхГ╧Щ╢С╣дйЩвж
+    ZCE_ERROR_OVERFLOW, //О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫О©╫
 
     ZCE_ERROR_UVBASE = 0x81020000,
 
@@ -135,9 +135,9 @@ enum ERV_ZCE_ERROR
     ZDB_ERROR_BINDERROR,
     ZDB_ERROR_PARAMCNT,
 
-    ZDB_ERROR_SQLITE_COMMON = 0x82010000, //ртоб╢МнС╢ЗбК╤тс╕SQLITEвтиМ╣д╢МнС╢ЗбК
-    ZDB_ERROR_MYSQL_COMMON = 0x82020000, //ртоб╢МнС╢ЗбК╤тс╕MYSQLвтиМ╣д╢МнС╢ЗбК
-    ZDB_ERROR_PGSQL_COMMON = 0x82030000, //ртоб╢МнС╢ЗбК╤тс╕PGSQLвтиМ╣д╢МнС╢ЗбК
+    ZDB_ERROR_SQLITE_COMMON = 0x82010000, //О©╫О©╫О©╫б╢О©╫О©╫О©╫О©╫О©╫О©╫О©╫с╕SQLITEО©╫О©╫О©╫О©╫О©╫д╢О©╫О©╫О©╫О©╫О©╫О©╫
+    ZDB_ERROR_MYSQL_COMMON = 0x82020000, //О©╫О©╫О©╫б╢О©╫О©╫О©╫О©╫О©╫О©╫О©╫с╕MYSQLО©╫О©╫О©╫О©╫О©╫д╢О©╫О©╫О©╫О©╫О©╫О©╫
+    ZDB_ERROR_PGSQL_COMMON = 0x82030000, //О©╫О©╫О©╫б╢О©╫О©╫О©╫О©╫О©╫О©╫О©╫с╕PGSQLО©╫О©╫О©╫О©╫О©╫д╢О©╫О©╫О©╫О©╫О©╫О©╫
 
     ZUA_ERROR_BASE = 0x88010000,
     ZUA_ERROR_RPC_BASE = 0x88010100,

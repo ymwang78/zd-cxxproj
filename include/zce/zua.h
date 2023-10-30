@@ -53,6 +53,13 @@ public:
         luas_push_lstring(dblock, v.c_str(), (zce_int32)v.length());
     }
 
+#ifndef WIN32
+    void luas_push(zce_dblock& dblock,
+        long long v) {
+        luas_push_integer(dblock, v);
+    }
+#endif
+
     void luas_push(zce_dblock& dblock,
         zce_int64 v) {
         luas_push_integer(dblock, v);

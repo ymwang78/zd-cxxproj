@@ -5,7 +5,7 @@
 //  -------------------------------------------------------------
 //  Copyright (C) 2009 - All Rights Reserved
 // ***************************************************************
-// 存放ICE相关可重用类和函数
+// 
 // **************************************************************/
 #ifndef __rv_ice_h__
 #define __rv_ice_h__
@@ -19,6 +19,7 @@
 
 #include <zce/zce_smartptr.h>
 #include <zce/zce_task.h>
+#include <zce/zce_task_queue.h>
 #include <set>
 
 class zce_task_queue;
@@ -28,7 +29,7 @@ namespace zce
     template <typename CALLBACK_CTX, typename ARG0_TYPE, typename ARG1_TYPE>
     class rvice_task_impl : public zce_task
     {
-        typedef typename rvice_task_impl<CALLBACK_CTX, ARG0_TYPE, ARG1_TYPE> impl_class;
+        typedef rvice_task_impl<CALLBACK_CTX, ARG0_TYPE, ARG1_TYPE> impl_class;
         CALLBACK_CTX cbctx_;
         int result_;
         ARG0_TYPE arg0_;
@@ -100,7 +101,7 @@ namespace zce
     template <typename CALLBACK_CTX, typename ARG0_TYPE, typename ARG1_TYPE, typename ARG_TYPE>
     class rvice_task_impl_2 :public zce_task
     {
-        typedef typename rvice_task_impl_2<CALLBACK_CTX, ARG0_TYPE, ARG1_TYPE, ARG_TYPE> impl_class;
+        typedef rvice_task_impl_2<CALLBACK_CTX, ARG0_TYPE, ARG1_TYPE, ARG_TYPE> impl_class;
         CALLBACK_CTX cbctx_;
         int result_;
         ARG0_TYPE arg0_;
