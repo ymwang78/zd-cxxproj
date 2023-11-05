@@ -3,6 +3,16 @@ export SLICE=/usr/share/ice/slice
 export HOME=~/cxxproj
 export RVSLICE=$HOME/vsvr/libsrc
 
+git pull
+
+cd vsvr
+git pull
+cd $HOME
+
+cd libsrc/libzce
+git pull
+cd $HOME
+
 cd libsrc/libzce/zua
 slice2cpp -I$SLICE -I.. --include-dir zua lua_rpc.ice
 cd $HOME
