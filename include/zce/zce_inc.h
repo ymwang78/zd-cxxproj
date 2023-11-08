@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #ifdef _WIN32
 #   define NOMINMAX
@@ -112,19 +112,19 @@ enum ERV_ZCE_ERROR
     ZCE_ERROR_BASE = 0x81000000, //keep for stdc error
 
     ZCE_ERROR_COMMON = 0x81010000, //ZCE ERROR
-    ZCE_ERROR_MALLOC,  //�ڴ�������
-    ZCE_ERROR_UNSUPPORT,//����δ֧�ֵĹ���Ҫ��
-    ZCE_ERROR_SHRTLEN,  //���ݱ�Ҫ���̫��
-    ZCE_ERROR_EXCDLEN,  //���ݱ�Ҫ���̫��
-    ZCE_ERROR_CORRUPT,  //���ݲ�һ��
-    ZCE_ERROR_SYNTAX,   //�����������
-    ZCE_ERROR_ZIP,      //ѹ������
-    ZCE_ERROR_TIMEOUT,  //������Ӧ��ʱ
+    ZCE_ERROR_MALLOC,  //内存分配错误
+    ZCE_ERROR_UNSUPPORT,//遇到未支持的功能要求
+    ZCE_ERROR_SHRTLEN,  //数据比要求的太短
+    ZCE_ERROR_EXCDLEN,  //数据比要求的太长
+    ZCE_ERROR_CORRUPT,  //数据不一致
+    ZCE_ERROR_SYNTAX,   //数据语义错误
+    ZCE_ERROR_ZIP,      //压缩出错
+    ZCE_ERROR_TIMEOUT,  //接收响应超时
     ZCE_ERROR_CONVERTOR,
-    ZCE_ERROR_CLOSED,   //�����Ѿ��ر�
-    ZCE_ERROR_TOCLOSE,  //���ӽ�Ҫ�ر�
+    ZCE_ERROR_CLOSED,   //连接已经关闭
+    ZCE_ERROR_TOCLOSE,  //连接将要关闭
     ZCE_ERROR_PREVNULL, //ISTEAM PREV NOT EXISTS
-    ZCE_ERROR_OVERFLOW, //�����������������
+    ZCE_ERROR_OVERFLOW, //溢出，例如过大的数字
 
     ZCE_ERROR_UVBASE = 0x81020000,
 
@@ -135,9 +135,9 @@ enum ERV_ZCE_ERROR
     ZDB_ERROR_BINDERROR,
     ZDB_ERROR_PARAMCNT,
 
-    ZDB_ERROR_SQLITE_COMMON = 0x82010000, //���´�������ӦSQLITE�����Ĵ������
-    ZDB_ERROR_MYSQL_COMMON = 0x82020000, //���´�������ӦMYSQL�����Ĵ������
-    ZDB_ERROR_PGSQL_COMMON = 0x82030000, //���´�������ӦPGSQL�����Ĵ������
+    ZDB_ERROR_SQLITE_COMMON = 0x82010000, //以下错误代码对应SQLITE自身的错误代码
+    ZDB_ERROR_MYSQL_COMMON = 0x82020000, //以下错误代码对应MYSQL自身的错误代码
+    ZDB_ERROR_PGSQL_COMMON = 0x82030000, //以下错误代码对应PGSQL自身的错误代码
 
     ZUA_ERROR_BASE = 0x88010000,
     ZUA_ERROR_RPC_BASE = 0x88010100,
