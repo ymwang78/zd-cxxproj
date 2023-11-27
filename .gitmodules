@@ -1,3 +1,6 @@
 [submodule "DingCheng"]
 	path = DingCheng
 	url = https://github.com/ymwang78/my-DingCheng.git
+[submodule "libzce"]
+	path = libsrc/libzce
+	url = https://github.com/ymwang78/zd-libzce.git
