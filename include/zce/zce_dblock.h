@@ -56,13 +56,13 @@ public:
         :rd_pos_(0), wr_pos_(0) {
     }
 
-    zce_dblock(zce_dblock&& rhs)
+    zce_dblock(zce_dblock&& rhs) noexcept
         :dt_ptr_(std::move(rhs.dt_ptr_)), rd_pos_(rhs.rd_pos_), wr_pos_(rhs.wr_pos_) {
         rhs.dt_ptr_ = 0;
         rhs.rd_pos_ = 0;
     };
 
-    zce_dblock(const zce_dblock& rhs)
+    zce_dblock(const zce_dblock& rhs) noexcept
         :dt_ptr_(rhs.dt_ptr_), rd_pos_(rhs.rd_pos_), wr_pos_(rhs.wr_pos_){
     };
 

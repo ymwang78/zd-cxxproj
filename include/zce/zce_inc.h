@@ -4,9 +4,9 @@
 #   define NOMINMAX
 #   if defined(_DEBUG) && !defined(_UNICODE)
 #       //include <vld.h>
-#       define ZCE_ZDB_MYSQL 1
-#       define ZCE_ZDB_PGSQL 1
-#       define ZCE_ISSERVICE_MODE  1
+#       define ZCE_ZDB_MYSQL 0
+#       define ZCE_ZDB_PGSQL 0
+#       define ZCE_ISSERVICE_MODE  0
 #   endif
 #   include <winsock2.h>
 #   include <ws2tcpip.h>

@@ -4,7 +4,7 @@
 #include <zce/zce_task.h>
 #include <zce/zce_dblock.h>
 #include <zce/zua_serialize.h>
-#ifdef ZCE_ISSERVICE_MODE
+#if ZCE_ISSERVICE_MODE
 #   include <Ice/Ice.h>
 #endif
 
@@ -30,7 +30,7 @@ public:
 
     void boot(const zce_smartptr<zce_schedule>&,
         const zce_smartptr<zce_reactor>&,
-#ifdef ZCE_ISSERVICE_MODE
+#if ZCE_ISSERVICE_MODE
         const Ice::CommunicatorPtr&,
 #endif
         const std::string& path);
