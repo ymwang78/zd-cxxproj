@@ -1,5 +1,5 @@
 // ***************************************************************
-//  zce_object   version:  1.0     date: 07/31/2002
+//  zce_object_counter   version:  1.0     date: 07/31/2002
 //  -------------------------------------------------------------
 //  Yongming Wang(ymwang@iipc.zju.edu.cn)
 //  The Institute of System Engineering, Zhejiang University
@@ -8,8 +8,8 @@
 // ***************************************************************
 // 实现精细粒度对象统计
 // ***************************************************************
-#ifndef __zce_object_h__
-#define __zce_object_h__
+#ifndef __zce_object_counter_h__
+#define __zce_object_counter_h__
 
 #include <zce/zce_config.h>
 #include <vector>
@@ -43,12 +43,12 @@ class ZCE_API zce_monitor_sigt : public zce_singleton<zce_monitor, zce_mutex_nul
     ~zce_monitor_sigt();
 };
 
-class ZCE_API zce_object
+class ZCE_API zce_object_counter
 {
-    zce_object();
+    zce_object_counter();
 public:
-    zce_object(const char* name);
-    virtual ~zce_object();
+    zce_object_counter(const char* name);
+    virtual ~zce_object_counter();
     inline void inc_ref() { ++(*alloc_ref_ptr_); };
     inline void dec_ref() { ++(*free_ref_ptr_); };
 protected:
@@ -56,16 +56,16 @@ protected:
     zce_atomic_long* free_ref_ptr_;
 };
 
-class ZCE_API zce_object_proxy
+class ZCE_API zce_object_counter_proxy
 {
 public:
-    zce_object_proxy(zce_object& obj);
-    zce_object_proxy(const zce_object_proxy& rhs);
-    ~zce_object_proxy();
-    const zce_object& object() { return object_; }
-    zce_object_proxy& operator=(const zce_object_proxy& rhs);
+    zce_object_counter_proxy(zce_object_counter& obj);
+    zce_object_counter_proxy(const zce_object_counter_proxy& rhs);
+    ~zce_object_counter_proxy();
+    const zce_object_counter& object() { return object_; }
+    zce_object_counter_proxy& operator=(const zce_object_counter_proxy& rhs);
 private:
-    zce_object& object_;
+    zce_object_counter& object_;
 };
 
-#endif /*__zce_object_h__*/
+#endif /*__zce_object_counter_h__*/

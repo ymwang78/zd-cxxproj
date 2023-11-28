@@ -88,10 +88,10 @@
 #endif
 
 #ifndef ZCE_OBJECT_NO_MONITOR
-#   define ZCE_OBJECT_DECLARE              zce_object_proxy object_proxy_
-#   define ZCE_OBJECT_IMPLEMENT(x)         ,object_proxy_(x##_object)
-#   define ZCE_OBJECT_IMPLEMENT_EMPTY(x)   :object_proxy_(x##_object)
-#   define ZCE_OBJECT_INSTANCE(x)          static zce_object x##_object(#x);
+#   define ZCE_OBJECT_DECLARE              zce_object_counter_proxy object_proxy_
+#   define ZCE_OBJECT_IMPLEMENT(x)         ,object_proxy_(x##_object_counter)
+#   define ZCE_OBJECT_IMPLEMENT_EMPTY(x)   :object_proxy_(x##_object_counter)
+#   define ZCE_OBJECT_INSTANCE(x)          static zce_object_counter x##_object_counter(#x);
 #else
 #   define ZCE_OBJECT_DECLARE 
 #   define ZCE_OBJECT_IMPLEMENT(x)

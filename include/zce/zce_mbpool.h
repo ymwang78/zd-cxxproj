@@ -10,7 +10,7 @@
 #ifndef __zce_mbpool_h__
 #define __zce_mbpool_h__
 
-#include <zce/zce_object.h>
+#include <zce/zce_object_counter.h>
 #include <zce/zce_sync.h>
 #include <zce/zce_allocator.h>
 #include <map>
@@ -37,9 +37,9 @@ public:
 
     void add_pool(size_t size, size_t count);
 
-    zce_dtblock* acquire(size_t len, zce_object& obj);
+    zce_dtblock* acquire(size_t len, zce_object_counter& obj);
 
-    zce_dblock acquire_dblock(size_t len, zce_object& obj);
+    zce_dblock acquire_dblock(size_t len, zce_object_counter& obj);
 
     void get_stat(std::vector<zce_alloc_stat>& stat) const;
 };
@@ -71,7 +71,7 @@ public:
 typedef zce_singleton<zce_mbpool> zce_mbpool_sigt;
 
 #define ZCE_MBACQUIRE(RET, x) do{ \
-    static zce_object obj(__FUNCTION__); \
+    static zce_object_counter obj(__FUNCTION__); \
     RET = zce_mbpool_sigt::instance()->acquire_dblock(x, obj);\
 }while(0)
 

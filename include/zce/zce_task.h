@@ -12,7 +12,7 @@
 
 #include <zce/zce_config.h>
 #include <zce/zce_smartptr.h>
-#include <zce/zce_object.h>
+#include <zce/zce_object_counter.h>
 #include <deque>
 
 

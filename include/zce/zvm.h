@@ -1,0 +1,31 @@
+#pragma once
+
+class zvm_pimpl;
+
+class zvm : public zce_smartptr_mtbase
+{
+    zce_smartptr<zvm_pimpl> pimpl_ptr_;
+
+public:
+
+    zvm(const zce_smartptr<zce_schedule>&,
+        const zce_smartptr<zce_reactor>&);
+
+    ~zvm();
+
+    int boot(const std::string& name,
+        const std::string& path);
+
+    int lpc_call_dblock(const std::string& svrname,
+        const std::string& method,
+        zce_dblock& dblock);
+
+    template<typename... Args>
+    int lpc_call(const std::string& svrname,
+        const std::string& method,
+        Args... args) {
+        zce_dblock dblock;
+        zds_push(dblock, args...);
+        return lpc_call_dblock(svrname, method, dblock);
+    }
+};

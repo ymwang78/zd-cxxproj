@@ -3,7 +3,7 @@
 #define __ZDB_RDB__H__
 
 #include <zce/zce_smartptr.h>
-#include <zce/zce_object.h>
+#include <zce/zce_object_counter.h>
 
 int ZCE_API zdb_connstr_parser(const std::string& filename,
 	std::string& dbuser,

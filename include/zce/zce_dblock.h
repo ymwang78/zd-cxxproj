@@ -17,14 +17,14 @@
 #include <zce/zce_smartptr.h>
 #include <zce/zce_dblock.h>
 
-class zce_object;
+class zce_object_counter;
 class zce_allocator;
 
 class ZCE_API zce_dtblock : public zce_smartptr_mtbase
 {
     zce_byte* buffer_;
     size_t size_;
-    zce_object* obj_;       //for alloc position statistics
+    zce_object_counter* obj_;       //for alloc position statistics
     zce_allocator* alloc_;
     bool ownbuf_;           //will take response of free buffer
 
@@ -33,7 +33,7 @@ class ZCE_API zce_dtblock : public zce_smartptr_mtbase
     friend class zce_mbpool;
 
 public:
-    zce_dtblock(size_t len, zce_object* obj = NULL, zce_allocator* alloc = NULL);
+    zce_dtblock(size_t len, zce_object_counter* obj = NULL, zce_allocator* alloc = NULL);
 
     zce_dtblock(size_t len, zce_byte* buf);
     

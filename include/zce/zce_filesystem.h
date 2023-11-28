@@ -8,6 +8,10 @@
 
 std::string ZCE_API zce_get_path(const char* filename);
 
+std::string ZCE_API zce_abs_path(const char* filename);
+
+int ZCE_API zce_add_path(const char* path);
+
 void ZCE_API zce_chdir();
 
 bool ZCE_API zce_makedir(const char* dir);

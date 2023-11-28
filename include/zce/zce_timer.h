@@ -10,7 +10,7 @@
 // ***************************************************************
 #include <zce/zce_config.h>
 #include <zce/zce_smartptr.h>
-#include <zce/zce_object.h>
+#include <zce/zce_object_counter.h>
 class zce_reactor;
 class zce_task_queue;
 
