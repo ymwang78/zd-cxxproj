@@ -86,7 +86,7 @@ void ZCE_API        zlog_rawprint(unsigned level, const char* fmt);
 
 #ifdef __cplusplus
 
-#include <zce/zce_smartptr.h>
+#include <zce/zce_object.h>
 #include <sstream>
 #include <vector>
 
@@ -114,7 +114,7 @@ std::ostream& operator<<(std::ostream& ost, const hex_t<T>& t)
     return ost;
 }
 
-class ZCE_API zce_logstr : public zce_smartptr_mtbase
+class ZCE_API zce_logstr : public zce_object
 {
 private:
     _zlog_level level_;

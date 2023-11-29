@@ -12,7 +12,7 @@
 #ifndef __zce_allocator_h__
 #define __zce_allocator_h__
 
-#include <zce/zce_smartptr.h>
+#include <zce/zce_object.h>
 #include <zce/zce_sync.h>
 #include <zce/zce_list.h>
 #include <vector>
@@ -30,7 +30,7 @@ struct ZCE_API zce_alloc_stat {
     unsigned chunk_max_alloc_;      //the max number of chunks used in history
 };
 
-class ZCE_API zce_allocator : public zce_smartptr_mtbase
+class ZCE_API zce_allocator : public zce_object
 {
 
 private:

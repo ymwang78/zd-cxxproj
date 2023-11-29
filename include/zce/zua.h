@@ -1,6 +1,6 @@
 #pragma once
 
-#include <zce/zce_smartptr.h>
+#include <zce/zce_object.h>
 #include <zce/zce_task.h>
 #include <zce/zce_dblock.h>
 #include <zce/zua_serialize.h>
@@ -14,7 +14,7 @@ class zua_vm;
 class zua_pimpl;
 struct lua_State;
 
-class ZCE_API zua : public zce_smartptr_mtbase
+class ZCE_API zua : public zce_object
 {
     zce_smartptr<zua_pimpl> pimpl_ptr_;
 

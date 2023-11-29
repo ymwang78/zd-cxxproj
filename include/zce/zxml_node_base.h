@@ -17,20 +17,20 @@
 #include <string>
 #include <map>
 #include <vector>
-#include <zce/zce_smartptr.h>
+#include <zce/zce_object.h>
 
 class ZCE_API zxml_proc
 {
 public:
     template<typename T, typename MSGT>
-    void zxml_proc_packet_tpl(const zce_smartptr_mtbase_ptr& ctx, const zce_smartptr_mtbase_ptr& root)
+    void zxml_proc_packet_tpl(const zce_object_ptr& ctx, const zce_object_ptr& root)
     {
         zce_smartptr<MSGT> msgptr = zce_smartptr<MSGT>::__dynamic_cast(root);
         ((T*)this)->zxml_proc_packet(ctx, msgptr);
     }
 };
 
-class ZCE_API zxml_node_base_pack : public zce_smartptr_mtbase
+class ZCE_API zxml_node_base_pack : public zce_object
 {
 public:
     zxml_node_base_pack() { };
@@ -48,7 +48,7 @@ public:
     int generate_node_tail(char* buffer, int size, const char* name,bool sepa = false) const;
 };
 
-class ZCE_API zxml_node_base_unpack : public zce_smartptr_mtbase
+class ZCE_API zxml_node_base_unpack : public zce_object
 {
 public:
     enum E_CHILD_STATUS

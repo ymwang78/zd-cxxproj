@@ -11,7 +11,7 @@
 #define _zdp_base_proto_h_
 
 #include <zce/zce_config.h>
-#include <zce/zce_smartptr.h>
+#include <zce/zce_object.h>
 #include <zce/zce_types.h>
 
 namespace zdp_base
@@ -297,7 +297,7 @@ namespace zdp_base
 
         std::vector<zce_int32> val;
     };
-    struct MSG_NONE_REQ : public zce_smartptr_mtbase
+    struct MSG_NONE_REQ : public zce_object
     {
         const static unsigned short MSG_TYPE = E_MSG_NONE_REQ;
         static const char* type_name() { return ("MSG_NONE_REQ");}
@@ -305,14 +305,14 @@ namespace zdp_base
     };
     typedef zce_smartptr<MSG_NONE_REQ> MSG_NONE_REQ_PTR;
 
-    struct MSG_DISCONN_REQ : public zce_smartptr_mtbase
+    struct MSG_DISCONN_REQ : public zce_object
     {
         const static unsigned short MSG_TYPE = E_MSG_DISCONN_REQ;
         static const char* type_name() { return ("MSG_DISCONN_REQ");}
     };
     typedef zce_smartptr<MSG_DISCONN_REQ> MSG_DISCONN_REQ_PTR;
 
-    struct MSG_CONTAINER_REQ : public zce_smartptr_mtbase
+    struct MSG_CONTAINER_REQ : public zce_object
     {
         const static unsigned short MSG_TYPE = E_MSG_CONTAINER_REQ;
         static const char* type_name() { return ("MSG_CONTAINER_REQ");}
@@ -320,7 +320,7 @@ namespace zdp_base
     };
     typedef zce_smartptr<MSG_CONTAINER_REQ> MSG_CONTAINER_REQ_PTR;
 
-    struct MSG_CONTAINER_RES : public zce_smartptr_mtbase
+    struct MSG_CONTAINER_RES : public zce_object
     {
         const static unsigned short MSG_TYPE = E_MSG_CONTAINER_RES;
         static const char* type_name() { return ("MSG_CONTAINER_RES");}

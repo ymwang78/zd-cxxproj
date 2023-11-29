@@ -2,7 +2,7 @@
 #ifndef __ZDB_RDB__H__
 #define __ZDB_RDB__H__
 
-#include <zce/zce_smartptr.h>
+#include <zce/zce_object.h>
 #include <zce/zce_object_counter.h>
 
 int ZCE_API zdb_connstr_parser(const std::string& filename,
@@ -12,7 +12,7 @@ int ZCE_API zdb_connstr_parser(const std::string& filename,
 	std::string& dbport,
 	std::string& dbname);
 
-class zdb_stmt : public zce_smartptr_mtbase
+class zdb_stmt : public zce_object
 {
 public:
 	enum field_type_e {
@@ -179,7 +179,7 @@ public:
 
 extern zdb_stmt& operator<<(zdb_stmt& stmt_ptr, const std::vector<std::string>& vecargs);
 
-class ZCE_API zdb_connection : public zce_smartptr_mtbase
+class ZCE_API zdb_connection : public zce_object
 {
 public:
 
@@ -301,10 +301,10 @@ public:
 
 typedef zce_smartptr<zdb_connection> zdb_connection_ptr;
 
-class ZCE_API zdb_database : public zce_smartptr_mtbase
+class ZCE_API zdb_database : public zce_object
 {
 public:
-    class zdb_database_impl : public zce_smartptr_mtbase {
+    class zdb_database_impl : public zce_object {
     public:
         virtual zce_smartptr<zdb_connection> get_connection() = 0;
     };

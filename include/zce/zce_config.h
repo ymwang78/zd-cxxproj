@@ -13,6 +13,6 @@
 #include <zce/zce_atomic.h>
 #include <zce/zce_sync.h>
 #include <zce/zce_tss.h>
-#include <zce/zce_smartptr.h>
+#include <zce/zce_object.h>
 #include <zce/zce_log.h>
 #include <zce/zce_api.h>

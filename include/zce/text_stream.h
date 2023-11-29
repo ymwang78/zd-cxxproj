@@ -1,7 +1,7 @@
 #pragma once
 
 #include <zce/zce_config.h>
-#include <zce/zce_smartptr.h>
+#include <zce/zce_object.h>
 #include <map>
 #include <functional>
 
@@ -18,7 +18,7 @@ static auto ci_less = [](const std::string & s1, const std::string & s2) -> bool
             });  // comparison
 };
 
-struct ZCE_API TEXT_HEADER : virtual public zce_smartptr_mtbase
+struct ZCE_API TEXT_HEADER : virtual public zce_object
 {
     static const std::string emptystr;
 

@@ -3,7 +3,7 @@
 #include <zce/zce_inc.h>
 #include <zce/zce_types.h>
 
-class zce_smartptr_mtbase;
+class zce_object;
 typedef struct _JavaVM JavaVM;
 typedef struct _JNIEnv JNIEnv;
 typedef struct AAssetManager AAssetManager;
@@ -20,9 +20,9 @@ public:
 
     ~zce_tss();
 
-    zce_smartptr_mtbase* ts_object(zce_smartptr_mtbase* ptr);
+    zce_object* ts_object(zce_object* ptr);
 
-    zce_smartptr_mtbase* ts_object();
+    zce_object* ts_object();
 
 public:
     struct global_t {

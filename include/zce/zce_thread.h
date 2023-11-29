@@ -10,10 +10,10 @@
 #ifndef __zce_thread_h__
 #define __zce_thread_h__
 
-#include <zce/zce_smartptr.h>
+#include <zce/zce_object.h>
 #include <zce/zce_sync.h>
 
-class ZCE_API zce_thread : virtual public zce_smartptr_mtbase
+class ZCE_API zce_thread : virtual public zce_object
 {
     struct pimpl;
     struct pimpl* pimpl_;

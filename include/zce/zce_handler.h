@@ -11,7 +11,7 @@
 #ifndef __zce_handler_h__
 #define __zce_handler_h__
 
-#include <zce/zce_smartptr.h>
+#include <zce/zce_object.h>
 #include <zce/zce_task.h>
 #include <zce/zce_types.h>
 #include <zce/zce_dblock.h>
@@ -31,7 +31,7 @@ bool ZCE_API operator<(const zce_addr_t & s1, const zce_addr_t & s2);
 
 //////////////////////////////////////////////////////////////////////////
 
-class ZCE_API zce_istream : virtual public zce_smartptr_mtbase
+class ZCE_API zce_istream : virtual public zce_object
 {
 protected:
 
@@ -275,7 +275,7 @@ public:
     virtual int get_local_addr(zce_sockaddr_t& addr) const;
 };
 
-class ZCE_API zce_dnsresolve : virtual public zce_smartptr_mtbase
+class ZCE_API zce_dnsresolve : virtual public zce_object
 {
     ZCE_OBJECT_DECLARE;
 	zce_smartptr<zce_reactor> reactor_ptr_;
@@ -291,7 +291,7 @@ public:
 	virtual void on_resolved(const zce_sockaddr_t& addr) = 0;
 };
 
-class ZCE_API zce_connector : public zce_smartptr_mtbase
+class ZCE_API zce_connector : public zce_object
 {
     ZCE_OBJECT_DECLARE;
 
@@ -331,7 +331,7 @@ public:
 	const zce_smartptr<zce_reactor>& reactor() { return tcp_ptr_->reactor(); }
 };
 
-class ZCE_API zce_acceptor : public zce_smartptr_mtbase
+class ZCE_API zce_acceptor : public zce_object
 {
     struct pimpl;
     struct pimpl *pimpl_;

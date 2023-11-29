@@ -9,7 +9,7 @@
 // ***************************************************************
 #pragma once
 
-#include <zce/zce_smartptr.h>
+#include <zce/zce_object.h>
 #include <zce/zdp_schema.h>
 #include <zce/zce_api.h>
 #include <zce/zce_handler.h>
@@ -47,7 +47,7 @@ namespace zdp
         zce_int64 ZCE_API zdp_user_ident(unsigned uid, const char siteid[4]);
     };
 
-    class ZCE_API zdp_storm : public zce_smartptr_mtbase
+    class ZCE_API zdp_storm : public zce_object
     {
     public:
         struct Pimpl;
@@ -68,7 +68,7 @@ namespace zdp
         int stop();
     };
 
-    class ZCE_API zdp_storm_client : public zce_smartptr_mtbase
+    class ZCE_API zdp_storm_client : public zce_object
     {
     public:
         struct Pimpl;

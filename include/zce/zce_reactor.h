@@ -11,7 +11,7 @@
 #ifndef __zce_reactor_h__
 #define __zce_reactor_h__
 
-#include <zce/zce_smartptr.h>
+#include <zce/zce_object.h>
 #include <deque>
 
 class zce_thread;
@@ -19,7 +19,7 @@ class zce_allocator;
 class zce_task;
 class zce_dnsresolve;
 
-class ZCE_API zce_reactor : virtual public zce_smartptr_mtbase
+class ZCE_API zce_reactor : virtual public zce_object
 {
     struct pimpl;
     struct pimpl* pimpl_;

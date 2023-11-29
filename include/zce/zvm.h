@@ -2,7 +2,7 @@
 
 class zvm_pimpl;
 
-class zvm : public zce_smartptr_mtbase
+class zvm : public zce_object
 {
     zce_smartptr<zvm_pimpl> pimpl_ptr_;
 

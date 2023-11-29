@@ -13,7 +13,7 @@
 
 #include <zce/zce_config.h>
 #include <vector>
-#include <zce/zce_smartptr.h>
+#include <zce/zce_object.h>
 #include <zce/zce_singleton.h>
 #include <zce/zce_atomic.h>
 

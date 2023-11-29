@@ -17,7 +17,7 @@
 #include <Ice/LocalException.h>
 #include <Ice/Current.h>
 
-#include <zce/zce_smartptr.h>
+#include <zce/zce_object.h>
 #include <zce/zce_task.h>
 #include <zce/zce_task_queue.h>
 #include <set>

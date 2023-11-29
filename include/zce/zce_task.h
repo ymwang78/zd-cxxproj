@@ -11,13 +11,13 @@
 #define __zce_task_h__
 
 #include <zce/zce_config.h>
-#include <zce/zce_smartptr.h>
+#include <zce/zce_object.h>
 #include <zce/zce_object_counter.h>
 #include <deque>
 
 
 
-class ZCE_API zce_task : virtual public zce_smartptr_mtbase
+class ZCE_API zce_task : virtual public zce_object
 {
 protected:
 
@@ -37,7 +37,7 @@ public:
 typedef zce_smartptr<zce_task> zce_task_ptr;
 
 
-class ZCE_API zce_schedule : public zce_smartptr_mtbase
+class ZCE_API zce_schedule : public zce_object
 {
     struct zce_worker_contex;
 

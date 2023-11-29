@@ -15,7 +15,7 @@
 #include <zce/zce_config.h>
 #include <zce/zce_types.h>
 #include <zce/zce_bytes.h>
-#include <zce/zce_smartptr.h>
+#include <zce/zce_object.h>
 #include <zce/zce_dblock.h>
 #include <zce/zce_mbpool.h>
 #include <typeinfo>

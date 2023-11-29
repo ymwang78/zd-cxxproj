@@ -9,18 +9,18 @@
 // 
 // ***************************************************************
 #include <zce/zce_config.h>
-#include <zce/zce_smartptr.h>
+#include <zce/zce_object.h>
 #include <zce/zce_object_counter.h>
 class zce_reactor;
 class zce_task_queue;
 
-class ZCE_API zce_timer_doozer : virtual public zce_smartptr_mtbase
+class ZCE_API zce_timer_doozer : virtual public zce_object
 {
 public:
     virtual void handle_timeout(const void* arg) = 0;
 };
 
-class ZCE_API zce_timer : public zce_smartptr_mtbase
+class ZCE_API zce_timer : public zce_object
 {
     ZCE_OBJECT_DECLARE;
     struct pimpl;

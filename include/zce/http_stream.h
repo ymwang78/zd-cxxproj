@@ -14,7 +14,7 @@
 
 #include <zce/zce_config.h>
 #include <zce/zce_handler.h>
-#include <zce/zce_smartptr.h>
+#include <zce/zce_object.h>
 #include <zce/text_stream.h>
 
 #define HTTP_VERSION_BIND(x, y) (((x) << 16) | (y))

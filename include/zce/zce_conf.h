@@ -10,11 +10,11 @@
 #ifndef __zce_conf_h__
 #define __zce_conf_h__
 
-#include <zce/zce_smartptr.h>
+#include <zce/zce_object.h>
 
 class zce_dblock;
 
-class ZCE_API zce_filemon : public zce_smartptr_mtbase
+class ZCE_API zce_filemon : public zce_object
 {
     time_t st_mtime_;
 

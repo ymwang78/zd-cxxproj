@@ -14,7 +14,7 @@
 
 #include <zce/zce_config.h>
 #include <map>
-#include <zce/zce_smartptr.h>
+#include <zce/zce_object.h>
 
 class zxml_node_base_unpack;
 
@@ -26,10 +26,10 @@ public:
     zxml_node_factory();
     virtual ~zxml_node_factory();
     
-    virtual zce_smartptr<zxml_node_base_unpack> create_node(const std::string& name, zxml_node_base_unpack* parent, bool* validate_self, zce_smartptr_mtbase_ptr& node_ptr, unsigned& msgtype);
-    virtual zce_smartptr<zxml_node_base_unpack> create_root_bysubitem(const std::string& elem_name, const std::string& elem_val, zce_smartptr_mtbase_ptr& node_ptr, unsigned& msgtype);
+    virtual zce_smartptr<zxml_node_base_unpack> create_node(const std::string& name, zxml_node_base_unpack* parent, bool* validate_self, zce_object_ptr& node_ptr, unsigned& msgtype);
+    virtual zce_smartptr<zxml_node_base_unpack> create_root_bysubitem(const std::string& elem_name, const std::string& elem_val, zce_object_ptr& node_ptr, unsigned& msgtype);
 
-    typedef zxml_node_base_unpack* (*pfn_node_creator)(zxml_node_base_unpack* parent, bool* validate_self, zce_smartptr_mtbase_ptr& node_ptr, unsigned& msgtype);
+    typedef zxml_node_base_unpack* (*pfn_node_creator)(zxml_node_base_unpack* parent, bool* validate_self, zce_object_ptr& node_ptr, unsigned& msgtype);
     int registe_type(const std::string& node_name, pfn_node_creator lpfn_creator);
     pfn_node_creator find_type(const std::string& node_name);
     

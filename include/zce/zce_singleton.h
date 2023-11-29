@@ -19,7 +19,7 @@ public:
             {
                 instance_ = new T;
                 //if compile error here, T must have one virtual method
-                zce_smartptr_mtbase* ptr = dynamic_cast<zce_smartptr_mtbase*>(instance_);
+                zce_object* ptr = dynamic_cast<zce_object*>(instance_);
                 if (ptr)
                     ptr->__addref();
             }
@@ -32,7 +32,7 @@ public:
         zce_guard<L> g(lock_);
         if (instance_ != 0)
         {
-            zce_smartptr_mtbase* ptr = dynamic_cast<zce_smartptr_mtbase*>(instance_);
+            zce_object* ptr = dynamic_cast<zce_object*>(instance_);
             if (ptr)
                 ptr->__decref();
             else

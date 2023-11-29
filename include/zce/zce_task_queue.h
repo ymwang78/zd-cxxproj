@@ -12,7 +12,7 @@
 #define __zce_task_queue_h__
 
 #include <zce/zce_config.h>
-#include <zce/zce_smartptr.h>
+#include <zce/zce_object.h>
 #include <zce/zce_task.h>
 #include <deque>
 

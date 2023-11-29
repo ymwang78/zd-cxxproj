@@ -55,10 +55,10 @@ extern "C"
 
 #ifdef __cplusplus
 
-#include <zce/zce_smartptr.h>
+#include <zce/zce_object.h>
 #include <zce/zce_task.h>
 
-class ZCE_API zdb_ecpg_connection : public zce_smartptr_mtbase
+class ZCE_API zdb_ecpg_connection : public zce_object
 {
     zdb_ecpg_conn_t conn_t;
 
@@ -75,7 +75,7 @@ public:
     void close();
 };
 
-class ZCE_API zdb_ecpg_database : public zce_smartptr_mtbase
+class ZCE_API zdb_ecpg_database : public zce_object
 {
     long dbid_;
     std::string dbhost_;

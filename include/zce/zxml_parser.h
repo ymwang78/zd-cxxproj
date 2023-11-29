@@ -13,7 +13,7 @@
 #define __zxml_parser_h__
 
 #include <zce/zce_config.h>
-#include <zce/zce_smartptr.h>
+#include <zce/zce_object.h>
 
 class zxml_node_factory;
 class zxml_node_base_unpack;
@@ -33,7 +33,7 @@ public:
     int parser(zxml_node_base_unpack_ptr& root, zxml_node_factory& factory, 
         const char* buffer, int len, bool interrupt_if_missing = true, bool interrupt_if_dummy = false);
 
-    zce_smartptr_mtbase_ptr root_node_ptr();
+    zce_object_ptr root_node_ptr();
     unsigned msgtype();
 };
 

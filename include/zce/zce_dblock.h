@@ -14,13 +14,13 @@
 #define __zce_data_block_h__
 
 #include <zce/zce_types.h>
-#include <zce/zce_smartptr.h>
+#include <zce/zce_object.h>
 #include <zce/zce_dblock.h>
 
 class zce_object_counter;
 class zce_allocator;
 
-class ZCE_API zce_dtblock : public zce_smartptr_mtbase
+class ZCE_API zce_dtblock : public zce_object
 {
     zce_byte* buffer_;
     size_t size_;

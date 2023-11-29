@@ -1,7 +1,7 @@
 #pragma once
 
 #include <zce/zce_config.h>
-#include <zce/zce_smartptr.h>
+#include <zce/zce_object.h>
 #include <zce/zce_conf.h>
 #include <map>
 #include <set>

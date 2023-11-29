@@ -58,7 +58,7 @@ public:
     }
 };
 
-class ZCE_API zdb_redis_connection : public zce_smartptr_mtbase
+class ZCE_API zdb_redis_connection : public zce_object
 {
     redisContext* context_;
 
@@ -130,7 +130,7 @@ public:
     int expire(const std::string& k, zce_int64 expiresec);
 };
 
-class ZCE_API zdb_redis_databse : public zce_smartptr_mtbase
+class ZCE_API zdb_redis_databse : public zce_object
 {
     std::string ip_;
     unsigned short port_;

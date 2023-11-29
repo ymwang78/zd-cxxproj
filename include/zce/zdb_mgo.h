@@ -12,7 +12,7 @@
 
 class zce_dblock;
 
-class ZCE_API zdb_mgo_connection : public zce_smartptr_mtbase, public mongocxx::v_noabi::client
+class ZCE_API zdb_mgo_connection : public zce_object, public mongocxx::v_noabi::client
 {
     bool connection_ok_;
 
