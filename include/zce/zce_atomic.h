@@ -20,7 +20,7 @@ extern long ext_atomic_add(volatile long *atomic, long val);
 class ZCE_API zce_atomic_long
 {
 public:
-    zce_atomic_long(long c = 0);
+    zce_atomic_long(long c = 0) noexcept;
 
     long operator ++ ();
     long operator -- ();
@@ -30,7 +30,7 @@ private:
     volatile long value_;
 };
 
-inline zce_atomic_long::zce_atomic_long(long c)
+inline zce_atomic_long::zce_atomic_long(long c) noexcept
 : value_ (c)
 {
 }

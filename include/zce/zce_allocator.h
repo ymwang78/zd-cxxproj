@@ -54,9 +54,9 @@ private:
 
 public:
 
-    inline unsigned chunk_size() const { return alloc_stat_.chunk_size_; }
+    inline unsigned chunk_size() const noexcept { return alloc_stat_.chunk_size_; }
 
-    inline zce_alloc_stat stat() const { return alloc_stat_; }
+    inline zce_alloc_stat stat() const noexcept { return alloc_stat_; }
 
 public:
 

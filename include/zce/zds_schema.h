@@ -4,7 +4,7 @@
     #define CHECKLEN_MOVEBUF_ADDRET_DECSIZE do{\
             if (len < 0) \
                 return len;\
-            buf += len;\
+            if (buf) buf += len;\
             ret += len;\
             size -= len;\
     }while(0)
@@ -12,108 +12,135 @@
 
 namespace zdp
 {
-    int ZCE_API write_varuint_raw(zce_byte* buf, int size, zce_uint64 val);
+    struct zds_context_t
+    {
+        zce_byte noarray_ifsmall : 1;
+        zce_byte version : 7;
+    };
 
-    int ZCE_API read_varuint_raw(zce_uint64* val, const zce_byte* buf, int size);
+    int ZCE_API write_varuint_raw(zce_byte* buf, int size, zce_uint64 val, zds_context_t* ctx);
 
-    int ZCE_API set_struct_array_header(zce_byte* buf, int size, zce_uint64 val);
+    int ZCE_API read_varuint_raw(zce_uint64& val, const zce_byte* buf, int size, zds_context_t* ctx);
 
-    int ZCE_API get_struct_array_header(zce_uint64* val, const zce_byte* buf, int size);
+    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, zce_int64 val, zds_context_t* ctx);
 
-	int ZCE_API zds_pack(zce_byte* buf, zce_int32 size, zce_int64 val);
-
-	int ZCE_API zds_unpack(zce_int64* val, zce_byte* buf, zce_int32 size);
-
-	int ZCE_API zds_pack(zce_byte* buf, zce_int32 size, const std::string& val);
-
-	int ZCE_API zds_unpack(std::string& val, const zce_byte* buf, zce_int32 size);
-
-    int ZCE_API pack_builtin_array(zce_byte* buf, zce_int32 size, const std::vector<bool>& val, zce_int32 fixed_len);
-
-    int ZCE_API pack_builtin_array(zce_byte* buf, zce_int32 size, const std::vector<zce_byte>& val, zce_int32 fixed_len);
-
-    int ZCE_API pack_builtin_array(zce_byte* buf, zce_int32 size, const std::vector<zce_uint16>& val, zce_int32 fixed_len);
-
-    int ZCE_API pack_builtin_array(zce_byte* buf, zce_int32 size, const std::vector<zce_uint32>& val, zce_int32 fixed_len);
-
-    int ZCE_API pack_builtin_array(zce_byte* buf, zce_int32 size, const std::vector<zce_uint64>& val, zce_int32 fixed_len);
-
-    int ZCE_API pack_builtin_array(zce_byte* buf, zce_int32 size, const std::vector<zce_int8>& val, zce_int32 fixed_len);
-
-    int ZCE_API pack_builtin_array(zce_byte* buf, zce_int32 size, const std::vector<zce_int16>& val, zce_int32 fixed_len);
-
-    int ZCE_API pack_builtin_array(zce_byte* buf, zce_int32 size, const std::vector<zce_int32>& val, zce_int32 fixed_len);
-
-    int ZCE_API pack_builtin_array(zce_byte* buf, zce_int32 size, const std::vector<zce_int64>& val, zce_int32 fixed_len);
-
-    int ZCE_API pack_builtin_array(zce_byte* buf, zce_int32 size, const std::vector<zce_float>& val, zce_int32 fixed_len);
-
-    int ZCE_API pack_builtin_array(zce_byte* buf, zce_int32 size, const std::vector<zce_double>& val, zce_int32 fixed_len);
-
-	int ZCE_API unpack_builtin_array(std::vector<bool>& val, zce_byte* buf, zce_int32 size, zce_int32 fixed_len);
-
-	int ZCE_API unpack_builtin_array(std::vector<zce_byte>& val, zce_byte* buf, zce_int32 size, zce_int32 fixed_len);
-
-	int ZCE_API unpack_builtin_array(std::vector<zce_uint16>& val, zce_byte* buf, zce_int32 size, zce_int32 fixed_len);
-
-	int ZCE_API unpack_builtin_array(std::vector<zce_uint32>& val, zce_byte* buf, zce_int32 size, zce_int32 fixed_len);
-
-	int ZCE_API unpack_builtin_array(std::vector<zce_uint64>& val, zce_byte* buf, zce_int32 size, zce_int32 fixed_len);
-
-	int ZCE_API unpack_builtin_array(std::vector<zce_int8>& val, zce_byte* buf, zce_int32 size, zce_int32 fixed_len);
-
-	int ZCE_API unpack_builtin_array(std::vector<zce_int16>& val, zce_byte* buf, zce_int32 size, zce_int32 fixed_len);
-
-	int ZCE_API unpack_builtin_array(std::vector<zce_int32>& val, zce_byte* buf, zce_int32 size, zce_int32 fixed_len);
-
-	int ZCE_API unpack_builtin_array(std::vector<zce_int64>& val, zce_byte* buf, zce_int32 size, zce_int32 fixed_len);
-
-	int ZCE_API unpack_builtin_array(std::vector<zce_float>& val, zce_byte* buf, zce_int32 size, zce_int32 fixed_len);
-
-	int ZCE_API unpack_builtin_array(std::vector<zce_double>& val, zce_byte* buf, zce_int32 size, zce_int32 fixed_len);
+    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, zce_uint64 val, zds_context_t* ctx);
 
     template<typename T>
-    int pack_array(zce_byte* buf, zce_int32 size, const std::vector<T>& val, int fixed_len) {
+    inline int zds_pack_builtin(zce_byte* buf, zce_int32 size, T val, zds_context_t* ctx) {
+        if (std::is_signed<T>::value) {
+            zce_int64 tmp = (zce_int64)val;
+            return zds_pack_builtin(buf, size, tmp, ctx);
+        }
+        else {
+            zce_uint64 tmp = (zce_uint64)val;
+            return zds_pack_builtin(buf, size, tmp, ctx);
+        }
+    }
+
+    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const std::vector<bool>& val, zds_context_t* ctx);
+
+    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const std::vector<zce_byte>& val, zds_context_t* ctx);
+
+    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const std::vector<zce_uint16>& val, zds_context_t* ctx);
+
+    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const std::vector<zce_uint32>& val, zds_context_t* ctx);
+
+    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const std::vector<zce_uint64>& val, zds_context_t* ctx);
+
+    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const std::vector<zce_int8>& val, zds_context_t* ctx);
+
+    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const std::vector<zce_int16>& val, zds_context_t* ctx);
+
+    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const std::vector<zce_int32>& val, zds_context_t* ctx);
+
+    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const std::vector<zce_int64>& val, zds_context_t* ctx);
+
+    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const std::vector<zce_float>& val, zds_context_t* ctx);
+
+    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const std::vector<zce_double>& val, zds_context_t* ctx);
+
+    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const std::string& val, zds_context_t* ctx);
+
+    int ZCE_API zds_pack_struct_header(zce_byte* buf, int size, zce_uint64 struct_prefix, zds_context_t* ctx);
+
+    int ZCE_API zds_pack_struct_array_header(zce_byte* buf, int size, zce_uint64 array_size, zds_context_t* ctx);
+
+    ///////////////////////////////////////////////////////////////////////////
+
+    int ZCE_API zds_unpack_builtin(zce_int64& val, const zce_byte* buf, zce_int32 size, zds_context_t* ctx);
+
+    template<typename T>
+    inline int zds_unpack_builtin(T& val, const zce_byte* buf, zce_int32 size, zds_context_t* ctx) {
+        zce_int64 tmp = 0;
+        int len = zds_unpack_builtin(tmp, buf, size, ctx);
+        if (len > 0) val = (T)tmp;
+        return len;
+    }
+
+	int ZCE_API zds_unpack_builtin(std::vector<bool>& val, const zce_byte* buf, zce_int32 size, zds_context_t* ctx);
+
+	int ZCE_API zds_unpack_builtin(std::vector<zce_byte>& val, const zce_byte* buf, zce_int32 size, zds_context_t* ctx);
+
+	int ZCE_API zds_unpack_builtin(std::vector<zce_uint16>& val, const zce_byte* buf, zce_int32 size, zds_context_t* ctx);
+
+	int ZCE_API zds_unpack_builtin(std::vector<zce_uint32>& val, const zce_byte* buf, zce_int32 size, zds_context_t* ctx);
+
+	int ZCE_API zds_unpack_builtin(std::vector<zce_uint64>& val, const zce_byte* buf, zce_int32 size, zds_context_t* ctx);
+
+	int ZCE_API zds_unpack_builtin(std::vector<zce_int8>& val, const zce_byte* buf, zce_int32 size, zds_context_t* ctx);
+
+	int ZCE_API zds_unpack_builtin(std::vector<zce_int16>& val, const zce_byte* buf, zce_int32 size, zds_context_t* ctx);
+
+	int ZCE_API zds_unpack_builtin(std::vector<zce_int32>& val, const zce_byte* buf, zce_int32 size, zds_context_t* ctx);
+
+	int ZCE_API zds_unpack_builtin(std::vector<zce_int64>& val, const zce_byte* buf, zce_int32 size, zds_context_t* ctx);
+
+	int ZCE_API zds_unpack_builtin(std::vector<zce_float>& val, const zce_byte* buf, zce_int32 size, zds_context_t* ctx);
+
+	int ZCE_API zds_unpack_builtin(std::vector<zce_double>& val, const zce_byte* buf, zce_int32 size, zds_context_t* ctx);
+
+    int ZCE_API zds_unpack_builtin(std::string& val, const zce_byte* buf, zce_int32 size, zds_context_t* ctx);
+
+    int ZCE_API zds_unpack_struct_header(zce_uint64& struct_prefix, const zce_byte* buf, int size, zds_context_t* ctx);
+
+    int ZCE_API zds_unpack_struct_array_header(zce_uint64& val, const zce_byte* buf, int size, zds_context_t* ctx);
+
+    template<typename T>
+    int zds_pack_array(zce_byte* buf, zce_int32 size, const std::vector<T>& val, zds_context_t* ctx) {
 
         int len = 0, ret = 0;
 
-        if (fixed_len > 0 && fixed_len != val.size()) {
-            ZCE_DEBUG((ZLOG_DEBUG, "pack_array fixed_len != val.size()\n"));
-            return ZCE_ERROR_SYNTAX;
-        }
-
-        len = set_struct_array_header(buf, size, val.size());
+        len = zds_pack_struct_array_header(buf, size, val.size(), ctx);
         CHECKLEN_MOVEBUF_ADDRET_DECSIZE;
 
         for (auto iter = val.begin(); iter != val.end(); ++iter) {
-            len = zdp_pack(*iter, buf, size, false);
+            len = zds_pack(buf, size, *iter, false);
             CHECKLEN_MOVEBUF_ADDRET_DECSIZE;
         };
         return ret;
     }
 
     template<typename T>
-    int unpack_array(std::vector<T>& val, const zce_byte* buf, zce_int32 size, int fixed_len) {
+    int zds_unpack_array(std::vector<T>& val, const zce_byte* buf, zce_int32 size, zds_context_t* ctx) {
         int len = 0, ret = 0;
         zce_uint64 alen = 0;
-        len = get_struct_array_header(&alen, buf, size);
+        len = zds_unpack_struct_array_header(alen, buf, size, ctx);
         CHECKLEN_MOVEBUF_ADDRET_DECSIZE;
-        if (fixed_len && (fixed_len != (int)alen)) {
-            ZCE_DEBUG((ZLOG_DEBUG, "unpack_array fixed_len != alen\n"));
-            return ZCE_ERROR_SYNTAX;
-        }
 
         //fast size check, to avoid a very large array size
         //at least every struct has 1 byte
         if (size < alen) return ZCE_ERROR_SHRTLEN;
 
         val.resize(alen);
-
         typename std::vector<T>::iterator iter;
         for (iter = val.begin(); iter != val.end(); ++iter) {
-            len = zdp_unpack(*iter, buf, size, false);
+            len = zds_unpack(*iter, buf, size, false);
             CHECKLEN_MOVEBUF_ADDRET_DECSIZE;
         };
+
         return ret;
     }
+
+    int ZCE_API zds_unpack_skip(const zce_byte* buf, zce_int32 size, zds_context_t* ctx);
 }
