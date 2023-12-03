@@ -16,6 +16,8 @@
 #include "zdl/zdl_builtin.h"
 #include "zdl/zdl_enum.h"
 #include "zdl/zdl_struct.h"
+#include "zdl/zdl_parser_context.h"
+#include "zdl/zdl_member.h"
 #include "zdl_grammar.tab.hpp"
 
 struct equal_typename
@@ -73,7 +75,7 @@ zdl_type_container::zdl_type_container()
     int tpid = UIDL_CHAR;
     while(tpid < UIDL_ENUM){
         zdl_builtin_ptr bt(new zdl_builtin(tpid));
-        add_type(bt);
+        add_type(zdl_type_ptr::__dynamic_cast(bt));
         tpid ++;
     }
 }
@@ -187,5 +189,5 @@ zdl_type_ptr zdl_type_container::create_ns_type(const std::string& ns,
     default:
         break;
     }
-    return 0;
+    return zdl_type_ptr(0);
 }

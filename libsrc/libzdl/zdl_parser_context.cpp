@@ -19,8 +19,8 @@
 #include "zdl/zdl_parser.h"
 #include "zdl/zdl_module.h"
 
-zdl_parser_context::zdl_parser_context(const char* ns)
-:module_ptr_(new zdl_module(ns)), parser_(0)
+zdl_parser_context::zdl_parser_context(std::map<std::string, zdl_module_ptr>& modules)
+:modules_(modules)
 {
 }
 
@@ -42,9 +42,9 @@ void zdl_parser_context::add_member_start(const std::string& varname, const std:
         ZCE_ERROR((ZLOG_ERROR, "ONLY STRUCT CAN CONTAIN MEMBERS\n"));
         return;
     }
-    zdl_member_ptr member (new zdl_member(current_struct_.get(), current_struct_->get_member_count(), varname, minsize, maxsize));
+    zdl_member_ptr member (new zdl_member(current_struct_, current_struct_->get_member_count(), varname, minsize, maxsize));
     current_member_ = member; 
-    current_member_->type(current_member_type_.get());
+    current_member_->type(current_member_type_);
     if (current_member_arg_ != "")
     {
         current_member_->add_template_arg(current_member_arg_);
@@ -167,9 +167,9 @@ void zdl_parser_context::add_type_start(int tpid, const std::string& tpname)
 void zdl_parser_context::add_type_end(const std::string& tpname)
 {
     if (current_struct_!=0)
-        module_ptr_->type_container()->add_type(current_struct_);
+        module_ptr_->type_container()->add_type(zdl_type_ptr::__dynamic_cast(current_struct_));
     else if (current_enum_ != 0)
-        module_ptr_->type_container()->add_type(current_enum_);
+        module_ptr_->type_container()->add_type(zdl_type_ptr::__dynamic_cast(current_enum_));
     else
         ZCE_ERROR((ZLOG_ERROR, "unknow type name(%s) to add\n", tpname.c_str()));
 
@@ -198,7 +198,15 @@ void zdl_parser_context::set_comment(const std::string& cmt)
 
 void zdl_parser_context::set_namespace(const std::string& ns)
 {
-    module_ptr_.reset(new zdl_module(ns));
+    auto iter = modules_.find(ns);
+    if (iter != modules_.end()) {
+        module_ptr_ = iter->second;
+    }
+    else {
+        zdl_module_ptr module_ptr(new zdl_module(ns));
+        modules_.insert(std::make_pair(ns, module_ptr));
+        module_ptr_ = module_ptr;
+    }
 }
 
 void zdl_parser_context::add_type_template_arg(const std::string& arg)
@@ -209,7 +217,7 @@ void zdl_parser_context::add_type_template_arg(const std::string& arg)
     }
     else 
     {
-        assert(false);
+        ZCE_ASSERT(false);
     }
 }
 
@@ -221,6 +229,6 @@ void zdl_parser_context::add_member_template_arg(const std::string& arg)
     }
     else 
     {
-        assert(false);
+        ZCE_ASSERT(false);
     }
 }

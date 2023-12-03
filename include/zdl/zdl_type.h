@@ -17,9 +17,9 @@
 #ifndef __zdl_type_h__
 #define __zdl_type_h__
 
+#include <zce/zce_object.h>
 #include <vector>
 #include <string>
-#include <boost/shared_ptr.hpp>
 #include <algorithm>
 #include <map>
 class zdl_visitor;
@@ -38,7 +38,7 @@ struct match_pair_key
     }
 };
 
-class meta_base
+class meta_base : public zce_object
 {
 
 public:
@@ -66,6 +66,7 @@ public:
     const std::vector<std::pair<std::string, std::string> >& vec_metas() { return vec_metas_; }
 
     virtual void vec_metas_added() {};
+
 protected:
     std::vector<std::pair<std::string, std::string> > vec_metas_;
 };
@@ -74,7 +75,7 @@ protected:
 class zdl_type : public meta_base
 {
 protected:
-    typedef boost::shared_ptr<zdl_visitor> zdl_visitor_ptr;
+    typedef zce_smartptr<zdl_visitor> zdl_visitor_ptr;
 public:
 
     enum zdl_type_e {
@@ -107,12 +108,13 @@ private:
     int         type_id_;
     std::string type_name_;
 };
-typedef boost::shared_ptr<zdl_type> zdl_type_ptr;
+typedef zce_smartptr<zdl_type> zdl_type_ptr;
 
 class zdl_visitor;
-class zdl_type_container
+
+class zdl_type_container : public zce_object
 {
-    typedef boost::shared_ptr<zdl_visitor> zdl_visitor_ptr;
+    typedef zce_smartptr<zdl_visitor> zdl_visitor_ptr;
 
 public:
     zdl_type_container();

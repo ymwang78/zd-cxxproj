@@ -17,11 +17,14 @@
 #ifndef __zdl_module_h__
 #define __zdl_module_h__
 
-#include <boost/shared_ptr.hpp>
+#include <zce/zce_object.h>
+#include <zce/zce_object.h>
 
-class zdl_module
+class zdl_type_container;
+
+class zdl_module : public zce_object
 {
-    typedef boost::shared_ptr<zdl_type_container> zdl_type_container_ptr;
+    typedef zce_smartptr<zdl_type_container> zdl_type_container_ptr;
 
     std::string namespace_name_;
     zdl_type_container_ptr type_container_;
@@ -41,6 +44,6 @@ public:
     }
 };
 
-typedef boost::shared_ptr<zdl_module> zdl_module_ptr;
+typedef zce_smartptr<zdl_module> zdl_module_ptr;
 
 #endif /*__zdl_module_h__*/

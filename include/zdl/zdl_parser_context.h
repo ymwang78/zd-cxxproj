@@ -20,7 +20,8 @@
 #include <string>
 #include <map>
 #include <vector>
-#include <boost/shared_ptr.hpp>
+#include <zce/zce_object.h>
+#include <zce/zce_object.h>
 
 class zdl_type_container;
 class zdl_enum;
@@ -30,26 +31,19 @@ class zdl_module;
 class zdl_parser;
 class zdl_type;
 
-class zdl_parser_context
+class zdl_parser_context : public zce_object
 {
-    typedef boost::shared_ptr<zdl_type_container> zdl_type_container_ptr;
-    typedef boost::shared_ptr<zdl_enum>        zdl_enum_ptr;
-    typedef boost::shared_ptr<zdl_struct>      zdl_struct_ptr;
-    typedef boost::shared_ptr<zdl_member>      zdl_member_ptr;
-    typedef boost::shared_ptr<zdl_module>      zdl_module_ptr;
-    //typedef boost::shared_ptr<zdl_parser>      zdl_parser_ptr;
-    typedef boost::shared_ptr<zdl_type>        zdl_type_ptr;
+    typedef zce_smartptr<zdl_type_container> zdl_type_container_ptr;
+    typedef zce_smartptr<zdl_enum>        zdl_enum_ptr;
+    typedef zce_smartptr<zdl_struct>      zdl_struct_ptr;
+    typedef zce_smartptr<zdl_member>      zdl_member_ptr;
+    typedef zce_smartptr<zdl_module> zdl_module_ptr;
+    //typedef zce_smartptr<zdl_parser>      zdl_parser_ptr;
+    typedef zce_smartptr<zdl_type>        zdl_type_ptr;
 
+    std::map<std::string, zdl_module_ptr>& modules_;
 public:
-    zdl_parser_context(const char* ns = "");
-
-    void parser(zdl_parser* parser){
-        parser_ = parser;
-    };
-
-    zdl_parser* parser(){
-        return parser_;
-    };
+    zdl_parser_context(std::map<std::string, zdl_module_ptr>& modules);
 
     ///implemention
     //void add_member_start(const std::string& varname);
@@ -84,9 +78,8 @@ private:
     zdl_module_ptr         current_module_;
     std::vector<std::pair<std::string, std::string> > current_metas_;
     zdl_module_ptr         module_ptr_;
-    zdl_parser*            parser_;
 };
 
-typedef boost::shared_ptr<zdl_parser_context> zdl_parser_context_ptr;
+typedef zce_smartptr<zdl_parser_context> zdl_parser_context_ptr;
 
 #endif /*__zdl_parser_context_h__*/

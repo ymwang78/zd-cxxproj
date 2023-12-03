@@ -5,10 +5,11 @@
  *  All Rights Reserved
  * ***************************************************************/
 
-
+#include <zce/zce_config.h>
 #include "zdl_lex.h"
 #include "zdl/zdl_utils.h"
 #include "zdl/zdl_parser.h"
+#include "zdl/zdl_parser_context.h"
 #include "zdl_grammar.tab.hpp"
 #include "unistd.h"
 

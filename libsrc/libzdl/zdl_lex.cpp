@@ -440,10 +440,11 @@ static const flex_int16_t yy_chk[45] =
  *  All Rights Reserved
  * ***************************************************************/
 
-
+#include <zce/zce_config.h>
 #include "zdl_lex.h"
 #include "zdl/zdl_utils.h"
 #include "zdl/zdl_parser.h"
+#include "zdl/zdl_parser_context.h"
 #include "zdl_grammar.tab.hpp"
 #include "unistd.h"
 
@@ -457,8 +458,8 @@ void zdl_yy_user_init();
 #define YY_USER_INIT zdl_yy_user_init();
 #define YY_NO_UNISTD_H
 #define YY_DECL int yylex(YYSTYPE* yylvalp, yyscan_t yyscanner, zdl_parser* parser)
-#line 460 "zdl_lex.cpp"
 #line 461 "zdl_lex.cpp"
+#line 462 "zdl_lex.cpp"
 
 #define INITIAL 0
 
@@ -718,10 +719,10 @@ YY_DECL
 		}
 
 	{
-#line 34 "zdl_lex.l"
+#line 35 "zdl_lex.l"
 
 
-#line 724 "zdl_lex.cpp"
+#line 725 "zdl_lex.cpp"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -780,7 +781,7 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 36 "zdl_lex.l"
+#line 37 "zdl_lex.l"
 {
 	// STRING
     int c;
@@ -805,7 +806,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 58 "zdl_lex.l"
+#line 59 "zdl_lex.l"
 {  
     // C++-style comment
     int c;
@@ -824,7 +825,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 74 "zdl_lex.l"
+#line 75 "zdl_lex.l"
 {
     // C-style comment
     std::string comment = yytext + 2;
@@ -859,7 +860,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 106 "zdl_lex.l"
+#line 107 "zdl_lex.l"
 {
     std::string id = yytext;
     int ret = g_keyword_map_ptr->get_identifier_by_name(id);
@@ -876,7 +877,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 120 "zdl_lex.l"
+#line 121 "zdl_lex.l"
 {
     *yylvalp = yytext;
     return UIDL_INTEGER_LITERAL;
@@ -885,7 +886,7 @@ YY_RULE_SETUP
 case 6:
 /* rule 6 can match eol */
 YY_RULE_SETUP
-#line 125 "zdl_lex.l"
+#line 126 "zdl_lex.l"
 {
     // Igore white-space
     if (yytext[0] == '\n'){
@@ -895,7 +896,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 132 "zdl_lex.l"
+#line 133 "zdl_lex.l"
 {
     *yylvalp = yytext;
     return yytext[0];
@@ -903,10 +904,10 @@ YY_RULE_SETUP
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 137 "zdl_lex.l"
+#line 138 "zdl_lex.l"
 ECHO;
 	YY_BREAK
-#line 909 "zdl_lex.cpp"
+#line 910 "zdl_lex.cpp"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2075,7 +2076,7 @@ void yyfree (void * ptr , yyscan_t yyscanner)
 
 #define YYTABLES_NAME "yytables"
 
-#line 137 "zdl_lex.l"
+#line 138 "zdl_lex.l"
 
 
 zdl_keyword::zdl_keyword(const char* name, int id)

@@ -19,9 +19,9 @@
 
 #include <string>
 #include <map>
-#include <boost/shared_ptr.hpp>
+#include <zce/zce_object.h>
 
-class zdl_keyword
+class zdl_keyword : public zce_object
 {
 public:
     zdl_keyword(const char* name, int id);
@@ -42,9 +42,9 @@ private:
     int id_;
     void* payload_;
 };
-typedef boost::shared_ptr<zdl_keyword> zdl_keyword_ptr;
+typedef zce_smartptr<zdl_keyword> zdl_keyword_ptr;
 
-class zdl_keyword_map
+class zdl_keyword_map : public zce_object
 {
 public:
     zdl_keyword_map();
@@ -58,7 +58,7 @@ private:
     std::map<std::string, zdl_keyword_ptr> name_keyword_map_;
     std::map<int, zdl_keyword_ptr>         id_keyword_map_;
 };
-typedef boost::shared_ptr<zdl_keyword_map> zdl_keyword_map_ptr;
+typedef zce_smartptr<zdl_keyword_map> zdl_keyword_map_ptr;
 
 extern zdl_keyword_map_ptr g_keyword_map_ptr;
 

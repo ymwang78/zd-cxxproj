@@ -19,7 +19,7 @@
 
 #include <vector>
 #include <string>
-#include <boost/shared_ptr.hpp>
+#include <zce/zce_object.h>
 #pragma once
 
 #include <zdl/zdl_type.h>
@@ -27,19 +27,8 @@
 class zdl_visitor;
 class zdl_enum;
 
-struct zdl_enumerator
-{
-    struct zdl_enumerator_match : 
-        public std::binary_function<boost::shared_ptr<zdl_enumerator>, std::string, bool>
-    {
-        bool operator()(const boost::shared_ptr<zdl_enumerator>& enumerator, const std::string& name) const
-        {
-            if (enumerator->name_ == name)
-                return true;
-            return false;
-        }
-    };
-    
+struct zdl_enumerator : public zce_object
+{    
     zdl_enumerator(zdl_enum* enum_t, const std::string& name, unsigned long val, const std::string& comment)
         :enum_(enum_t), name_(name), val_(val), comment_(comment){
     };
@@ -48,12 +37,12 @@ struct zdl_enumerator
     unsigned val_;
     std::string comment_;
 };
-typedef boost::shared_ptr<zdl_enumerator> zdl_enumerator_ptr;
+typedef zce_smartptr<zdl_enumerator> zdl_enumerator_ptr;
 
 
 class zdl_enum : public zdl_type
 {
-    typedef boost::shared_ptr<zdl_visitor> zdl_visitor_ptr;
+    typedef zce_smartptr<zdl_visitor> zdl_visitor_ptr;
 public:
     zdl_enum(const std::string& name);
     const std::vector<zdl_enumerator_ptr>& enumerators() const{
@@ -71,7 +60,7 @@ private:
     std::vector<zdl_enumerator_ptr> enumerators_;
     int current_enumerator_val_;
 };
-typedef boost::shared_ptr<zdl_enum> zdl_enum_ptr;
+typedef zce_smartptr<zdl_enum> zdl_enum_ptr;
 
 
 #endif /*__zdl_enum_h__*/

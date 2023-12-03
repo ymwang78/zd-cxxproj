@@ -14,6 +14,7 @@
 #include "zdl/zdl_struct.h"
 #include "zdl/zdl_member.h"
 #include "zdl/zdl_parser.h"
+#include "zdl/zdl_parser_context.h"
 #include "zdl_grammar.tab.hpp"
 #include "zdl/zdl_visitor.h"
 #pragma warning (push, 3)
@@ -47,8 +48,9 @@ void zdl_struct::add_template_arg(const std::string& arg)
 int zdl_struct::add_member(const zdl_member_ptr& member)
 {
     std::vector<zdl_member_ptr>::iterator pos;
-    pos = find_if(members_.begin(), members_.end(), 
-        bind2nd(zdl_member::zdl_member_match(), member->var_name()));
+    pos = find_if(members_.begin(), members_.end(), [=](const zdl_member_ptr& ptr)->bool {
+            return ptr->var_name() == member->var_name();
+        });
     if (pos!=members_.end())
     {
         ZCE_ERROR((ZLOG_ERROR, "member %s already exists in %s\n", 
@@ -120,7 +122,7 @@ int zdl_struct::add_member(const zdl_member_ptr& member)
 
 int zdl_struct::get_member_count() const
 {
-    return members_.size();
+    return (int) members_.size();
 }
 
 int zdl_struct::get_member_count(const std::string& meta) const
@@ -129,7 +131,7 @@ int zdl_struct::get_member_count(const std::string& meta) const
         = meta_member_map_.find(meta);
     if (map_iter == meta_member_map_.end())
         return 0;
-    return map_iter->second.size();
+    return (int) map_iter->second.size();
 }
 
 void zdl_struct::visit(const zdl_visitor_ptr& visitor) const
@@ -141,7 +143,7 @@ void zdl_struct::visit(const zdl_visitor_ptr& visitor) const
         std::vector<zdl_member_ptr>::const_iterator iter;
         for(iter = members_.begin(); iter != members_.end(); ++iter, ++i)
         {
-            visitor->visit_member(iter->get(), i == (members_.size()-1));
+            visitor->visit_member(*iter, i == (members_.size()-1));
         }
         //for_each(members_.begin(), members_.end(), 
         //    bind2nd(zdl_member::zdl_member_visitor(), visitor));
@@ -162,7 +164,7 @@ void zdl_struct::visit(const zdl_visitor_ptr& visitor, const std::string& meta, 
             std::vector<zdl_member_ptr>::const_iterator iter;
             for(iter = map_iter->second.begin(); iter != map_iter->second.end(); ++iter, ++i)
             {
-                visitor->visit_member(iter->get(), i == (map_iter->second.size()-1));
+                visitor->visit_member(*iter, i == (map_iter->second.size()-1));
             }        
         }
     }
@@ -181,7 +183,7 @@ void zdl_struct::visit(const zdl_visitor_ptr& visitor, const std::string& meta, 
             if ((*iter)->fetch_meta(meta))
                 continue;
             --count;
-            visitor->visit_member(iter->get(), !count);
+            visitor->visit_member(*iter, !count);
         }
     }
     visitor->visit_struct_end(this);

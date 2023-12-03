@@ -56,52 +56,9 @@ std::string zdl_builtin::builtin_name(int tpid)
     return "";
 }
 
-std::string zdl_builtin::signed_builtin_name(int tpid)
-{
-    switch (tpid)
-    {
-    case UIDL_CHAR:
-        return "zce_char";
-    case UIDL_UCHAR:
-        return "zce_byte";
-    case UIDL_SHORT:
-        return "zce_int16";
-    case UIDL_USHORT:
-        return "zce_int32";
-    case UIDL_INT32:
-        return "zce_int32";
-    case UIDL_UINT32:
-        return "zce_int64";
-    case UIDL_INT64:
-        return "zce_int64";
-    case UIDL_UINT64:
-        return "zce_int64";
-    case UIDL_ASTRING:
-        return "zce_astring";
-    case UIDL_TSTRING:
-        return "zce_string";
-    case UIDL_WSTRING:
-        return "zce_wstring";
-    case UIDL_ASTRVEC:
-        return "zce_astr";
-    case UIDL_TSTRVEC:
-        return "zce_str";
-    case UIDL_WSTRVEC:
-        return "zce_wstr";
-    case UIDL_FLOAT:
-        return "zce_float";
-    case UIDL_DOUBLE:
-        return "zce_double";
-    case UIDL_SERIAL:
-        return "zce_serial";
-    }
-    return "";
-}
-
 zdl_builtin::zdl_builtin(int tpid)
 :zdl_type(tpid, builtin_name(tpid))
 {
-
 }
 
 void zdl_builtin::visit(const zdl_visitor_ptr& visitor) const

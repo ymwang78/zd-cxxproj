@@ -18,7 +18,7 @@
 #define __zdl_member_h__
 
 #include <string>
-#include <boost/shared_ptr.hpp>
+#include <zce/zce_object.h>
 
 #include "zdl/zdl_visitor.h"
 #include "zdl/zdl_type.h"
@@ -31,18 +31,6 @@ class zdl_type;
 
 class zdl_member : public meta_base
 {
-public:
-    struct zdl_member_match : 
-        public std::binary_function<boost::shared_ptr<zdl_member>, std::string, bool>
-    {
-        bool operator()(const boost::shared_ptr<zdl_member>& member_ptr, const std::string& varname) const
-        {
-            if (member_ptr->var_name_ == varname)
-                return true;
-            return false;
-        }
-    };
-
 public:
     enum member_type_e
     {
@@ -187,6 +175,6 @@ private:
     std::vector<zdl_template_arg_ptr> args_;
 };
 
-typedef boost::shared_ptr<zdl_member> zdl_member_ptr;
+typedef zce_smartptr<zdl_member> zdl_member_ptr;
 
 #endif /*__zdl_member_h__*/

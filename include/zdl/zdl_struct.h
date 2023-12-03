@@ -21,7 +21,6 @@
 #include <map>
 #include <string>
 #include <algorithm>
-#include <boost/shared_ptr.hpp>
 #include "zdl/zdl_type.h"
 #include "zdl/zdl_template_arg.h"
 #include "zdl/zdl_module.h"
@@ -33,8 +32,8 @@ class zdl_visitor;
 class zdl_struct : public zdl_type
 {
 
-    typedef boost::shared_ptr<zdl_member>  zdl_member_ptr;
-    typedef boost::shared_ptr<zdl_visitor> zdl_visitor_ptr;
+    typedef zce_smartptr<zdl_member>  zdl_member_ptr;
+    typedef zce_smartptr<zdl_visitor> zdl_visitor_ptr;
 public:
     zdl_struct(const zdl_module_ptr& module_ptr, const std::string& name);
     ~zdl_struct();
@@ -124,7 +123,7 @@ private:
     unsigned refcount_;
 };
 
-typedef boost::shared_ptr<zdl_struct>  zdl_struct_ptr;
+typedef zce_smartptr<zdl_struct>  zdl_struct_ptr;
 
 template <typename predicate>
 void zdl_struct::visit(const zdl_visitor_ptr& visitor, predicate p) const

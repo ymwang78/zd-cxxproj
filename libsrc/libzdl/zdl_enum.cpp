@@ -14,6 +14,7 @@
 #include "zdl/zdl_parser.h"
 #include "zdl_grammar.tab.hpp"
 #include "zdl/zdl_visitor.h"
+#include "zdl/zdl_parser_context.h"
 
 zdl_enum::zdl_enum(const std::string& name)
 :zdl_type(UIDL_ENUM, name), current_enumerator_val_(0)
@@ -44,8 +45,9 @@ int zdl_enum::add_enumerator(const std::string& emname, const std::string& comme
 zdl_enumerator_ptr zdl_enum::find_enumerator(const std::string& emname)
 {
     std::vector<zdl_enumerator_ptr>::iterator pos;
-    pos = find_if(enumerators_.begin(), enumerators_.end(), 
-        bind2nd(zdl_enumerator::zdl_enumerator_match(), emname));
+    pos = find_if(enumerators_.begin(), enumerators_.end(), [=](const zce_smartptr<zdl_enumerator>& enumerator) -> bool {
+            return enumerator->name_ == emname;
+        });
     if(pos!=enumerators().end()){
         return *pos;
     }

@@ -2,15 +2,16 @@
 #define __zdl_parser_h
 
 #include <string>
-#include <boost/shared_ptr.hpp>
+#include <zce/zce_object.h>
 
 class zdl_parser_context;
 
-class zdl_parser
+class zdl_parser : public zce_object
 {
-    typedef boost::shared_ptr<zdl_parser_context> zdl_parser_context_ptr;
+    typedef zce_smartptr<zdl_parser_context> zdl_parser_context_ptr;
 public:
     zdl_parser();
+    ~zdl_parser();
 
     void error(const char* s);
     void warning(const char* s);
@@ -25,6 +26,6 @@ private:
     char* filename_;
 };
 
-typedef boost::shared_ptr<zdl_parser> zdl_parser_ptr;
+typedef zce_smartptr<zdl_parser> zdl_parser_ptr;
 
 #endif //__zdl_parser_h

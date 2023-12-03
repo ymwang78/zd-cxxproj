@@ -11,6 +11,7 @@
 #include "zdl/zdl_member.h"
 #include "zdl/zdl_struct.h"
 #include "zdl/zdl_parser.h"
+#include "zdl/zdl_parser_context.h"
 #include "zdl_grammar.tab.hpp"
 #pragma warning (push, 3)
 #include <boost/tokenizer.hpp>
