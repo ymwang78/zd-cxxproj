@@ -1,0 +1,77 @@
+/* ***************************************************************
+ *  Copyright (C) 2006  Yongming Wang(wangym@gmail.com)
+ *  All Rights Reserved
+ *
+ *  This file is part of Ubeda project (http://www.ubeda.cn).
+ *
+ *  This copy of file is licensed to you under Ubeda License.
+ *  You should have received a copy of the Ubeda License
+ *  along with this program, if not, get it from  
+ *      http://www.ubeda.cn
+ * ***************************************************************/
+/*****************************************************************
+ * @file zdl_enum.h
+ * @brief
+ *****************************************************************/
+
+#ifndef __zdl_enum_h__
+#define __zdl_enum_h__
+
+#include <vector>
+#include <string>
+#include <boost/shared_ptr.hpp>
+#pragma once
+
+#include <zdl/zdl_type.h>
+
+class zdl_visitor;
+class zdl_enum;
+
+struct zdl_enumerator
+{
+    struct zdl_enumerator_match : 
+        public std::binary_function<boost::shared_ptr<zdl_enumerator>, std::string, bool>
+    {
+        bool operator()(const boost::shared_ptr<zdl_enumerator>& enumerator, const std::string& name) const
+        {
+            if (enumerator->name_ == name)
+                return true;
+            return false;
+        }
+    };
+    
+    zdl_enumerator(zdl_enum* enum_t, const std::string& name, unsigned long val, const std::string& comment)
+        :enum_(enum_t), name_(name), val_(val), comment_(comment){
+    };
+    zdl_enum*  enum_;
+    std::string name_;
+    unsigned val_;
+    std::string comment_;
+};
+typedef boost::shared_ptr<zdl_enumerator> zdl_enumerator_ptr;
+
+
+class zdl_enum : public zdl_type
+{
+    typedef boost::shared_ptr<zdl_visitor> zdl_visitor_ptr;
+public:
+    zdl_enum(const std::string& name);
+    const std::vector<zdl_enumerator_ptr>& enumerators() const{
+        return enumerators_;
+    };
+    int add_enumerator(unsigned long val, const std::string& emname, const std::string& comment);
+    int add_enumerator(const std::string& emname, const std::string& comment);
+
+    zdl_enumerator_ptr find_enumerator(const std::string& emname);
+
+public:
+    virtual void visit(const zdl_visitor_ptr&) const;
+    
+private:
+    std::vector<zdl_enumerator_ptr> enumerators_;
+    int current_enumerator_val_;
+};
+typedef boost::shared_ptr<zdl_enum> zdl_enum_ptr;
+
+
+#endif /*__zdl_enum_h__*/
