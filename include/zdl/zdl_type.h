@@ -91,10 +91,18 @@ public:
     //tpid : UIDL_CHAR ,UIDL_UCHAR... @TODO CHECK CONV
     zdl_type(int tpid, const std::string& name)
         :type_id_(tpid), type_name_(name){
+        auto pos = type_name_.rfind(':');
+        if (pos == std::string::npos)
+            pure_name_ = type_name_;
+        else
+            pure_name_ = type_name_.substr(pos + 1);
     };
     const std::string& name() const{
         return type_name_;
     };
+    const std::string& pure_name() const {
+        return pure_name_;
+    }
     int id() const{
         return type_id_;
     };
@@ -102,11 +110,16 @@ public:
         return get_type_e(type_id_);
     };
 
+    bool is_struct() const {
+        return type_e() == type_struct_e;
+    }
+
     virtual void visit(const zdl_visitor_ptr&) const = 0;
     virtual void visit(const zdl_visitor_ptr&, const std::string&, bool include = true) const {};
 private:
     int         type_id_;
     std::string type_name_;
+    std::string pure_name_;
 };
 typedef zce_smartptr<zdl_type> zdl_type_ptr;
 

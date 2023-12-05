@@ -41,7 +41,6 @@ class zdl_parser_context : public zce_object
     //typedef zce_smartptr<zdl_parser>      zdl_parser_ptr;
     typedef zce_smartptr<zdl_type>        zdl_type_ptr;
 
-    std::map<std::string, zdl_module_ptr>& modules_;
 public:
     zdl_parser_context(std::map<std::string, zdl_module_ptr>& modules);
 
@@ -68,6 +67,8 @@ public:
     void add_type_template_arg(const std::string& argname);
     void add_member_template_arg(const std::string& arg);
 
+    const zdl_module_ptr& get_module_by_name(const std::string& ns);
+
     const zdl_module_ptr& module_ptr() { return module_ptr_; };
 private:
     zdl_struct_ptr         current_struct_;
@@ -78,6 +79,8 @@ private:
     zdl_module_ptr         current_module_;
     std::vector<std::pair<std::string, std::string> > current_metas_;
     zdl_module_ptr         module_ptr_;
+    std::map<std::string, zdl_module_ptr>& modules_;
+
 };
 
 typedef zce_smartptr<zdl_parser_context> zdl_parser_context_ptr;

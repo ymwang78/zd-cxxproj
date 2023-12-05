@@ -232,3 +232,12 @@ void zdl_parser_context::add_member_template_arg(const std::string& arg)
         ZCE_ASSERT(false);
     }
 }
+
+const zdl_module_ptr& zdl_parser_context::get_module_by_name(const std::string& ns)
+{
+    auto iter = modules_.find(ns);
+    if (iter != modules_.end())
+        return iter->second;
+    return module_ptr_;
+}
+

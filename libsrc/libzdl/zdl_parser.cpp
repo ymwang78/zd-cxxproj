@@ -49,7 +49,7 @@ void zdl_parser::parse(const char* filename, const zdl_parser_context_ptr& parse
     line_ = 1;
 
     zce_dblock mb;
-    int ret = zce_dblock_from_file(mb, filename);
+    int ret = zce_dblock_from_file(mb, filename, 2);
 
     mb.wr_ptr()[0] = 0;
     mb.wr_ptr()[1] = 0;

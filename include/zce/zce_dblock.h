@@ -116,7 +116,7 @@ public:
 
 typedef zce_dblock zce_data_block_ptr;
 
-int ZCE_API zce_dblock_from_file(zce_dblock& mb, const char* path);
+int ZCE_API zce_dblock_from_file(zce_dblock& mb, const char* path, unsigned extra);
 
 //////////////////////////////////////////////////////////////////////////
 

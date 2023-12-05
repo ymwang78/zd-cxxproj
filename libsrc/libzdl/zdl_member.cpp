@@ -22,7 +22,6 @@ bool zdl_member::is_string() const
     return (type()->id() >= UIDL_ASTRING && type()->id() <= UIDL_WSTRING);
 }
 
-
 void zdl_member::add_template_arg(const std::string& arg)
 {
     if(type_->type_e() != zdl_type::type_struct_e)

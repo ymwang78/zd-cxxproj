@@ -10,6 +10,9 @@
     }while(0)
 #endif
 
+class zdl_member;
+typedef struct _object PyObject;
+
 namespace zdp
 {
     struct zds_context_t
@@ -147,4 +150,41 @@ namespace zdp
     }
 
     int ZCE_API zds_unpack_skip(const zce_byte* buf, zce_int32 size, zds_context_t* ctx);
-}
+
+} //namespace zdp
+
+class zdl_struct;
+class zdl_member;
+class zdl_parser_context;
+class zvm_py;
+
+class zpy_unmarshal_context
+{
+    zce_smartptr<zvm_py> zvm_;
+    zce_smartptr<zdl_parser_context> idl_;
+
+    static std::string get_module_name(const std::string& structname);
+
+    PyObject* default_struct_instance(const zce_smartptr<zdl_struct>& struct_ptr);
+
+    PyObject* default_obj_from_member(const zce_smartptr<zdl_member>& member_ptr);
+public:
+
+    zpy_unmarshal_context(const zce_smartptr<zvm_py>& pyvm, const zce_smartptr<zdl_parser_context>& idl);
+
+    ~zpy_unmarshal_context();
+
+    int unmarshal_builtin(PyObject*& p, zce_byte pt, const zce_byte* buf, int size);
+
+    int unmarshal_string(PyObject*& str, const zce_byte* buf, int size);
+
+    int unmarshal_struct(PyObject*& obj, const zce_smartptr<zdl_struct>& struct_ptr, const zce_byte* buf, int size);
+
+    int unmarshal_builtin_array(PyObject*& obj, int pt, const zce_byte* buf, int size);
+
+    int unmarshal_struct_array(PyObject*& obj, const zce_smartptr<zdl_struct>& struct_ptr, const zce_byte* buf, int size);
+
+    int unmarshal_member(PyObject*& obj, const zce_smartptr<zdl_member>& member, const zce_byte* buf, int size);
+
+    int unmarshal_vector_from_struct(std::vector<PyObject*>& obj, const zce_smartptr<zdl_struct>& struct_ptr, const zce_byte* buf, int size);
+};

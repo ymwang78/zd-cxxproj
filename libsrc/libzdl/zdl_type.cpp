@@ -20,21 +20,6 @@
 #include "zdl/zdl_member.h"
 #include "zdl_grammar.tab.hpp"
 
-struct equal_typename
-{
-    equal_typename(const std::string& type_name)
-        :type_name_(type_name)
-    {
-    }
-    bool operator()(const zdl_type_ptr& ptr)
-    {
-        if (ptr == 0)
-            return false;
-        return ptr->name() == type_name_;
-    }
-
-    const std::string& type_name_;
-};
 
 zdl_type::zdl_type_e zdl_type::get_type_e (int tpid)
 {
@@ -99,7 +84,9 @@ int zdl_type_container::add_type(const zdl_type_ptr& type_ptr)
 zdl_type_ptr zdl_type_container::get_type(const std::string& name)
 {
     std::vector<zdl_type_ptr>::iterator iter 
-        = std::find_if(types_.begin(), types_.end(), equal_typename(name));
+        = std::find_if(types_.begin(), types_.end(), [=](const zdl_type_ptr& ptr)->bool {
+        return ptr->pure_name() == name || ptr->name() == name;
+    });
     if (iter!=types_.end())
         return *iter;
     return zdl_type_ptr((zdl_type*)0);
