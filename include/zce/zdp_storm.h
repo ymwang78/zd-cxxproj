@@ -154,7 +154,6 @@ namespace zdp
         }
 
         virtual int  write(const zce_dblock& dblock, ERV_ISTREAM_WRITEOPT);
-
     };
 
 }

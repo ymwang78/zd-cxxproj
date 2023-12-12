@@ -25,12 +25,6 @@ namespace zdp
 {
     static const int ZDP_HEADLEN = 10;
 
-    static const int   GEP_HEADLEN = 76;
-    static const char* GEP_ZERO_DOMAIN = "000000";
-    static const char* GEP_ZERO_ID = "000000000000000000";
-
-    static const int   NSSD_HEADLEN = 20;
-
     static inline int zdp_dynarr_length(size_t x) {
         return (((x) < 255) ? (int)((x)+1) : (int)((x)+5));
     };
@@ -40,63 +34,34 @@ namespace zdp
     }
 
     static inline int zdp_headlen(int rev) {
-        return rev == 3 ? GEP_HEADLEN : ZDP_HEADLEN;
+        return ZDP_HEADLEN;
     }
 
     struct ZCE_API zdp_head
     {
-        zce_byte    magic /*'Z':ZDP, 'B': BSON, 'J': JSON, 'P': PROTOBUF, 'G': GEP, '\8':NSSD*/;
+        zce_byte    magic /*'Z':ZDP, 'S':ZDS, 'B': BSON, 'J': JSON, 'P': PROTOBUF*/;
         zce_byte    attrib;
         zce_uint16  msgmid;
         zce_uint32  msglen;
         zce_uint32  msgseq;
 
-#if 1 //def ZDP_GEP
-        struct gepex_t {
-            zce_astring src_dmn;
-            zce_astring src_id;
-            zce_astring dst_dmn;
-            zce_astring dst_id;
-
-            gepex_t()
-                : src_dmn(GEP_ZERO_DOMAIN), src_id(GEP_ZERO_ID),
-                dst_dmn(GEP_ZERO_DOMAIN), dst_id(GEP_ZERO_ID) {
-            };
-
-        } gepex;
-
-        struct nssdex_t {
-            zce_uint32 msgtype;
-            zce_uint32 msgfullid;
-            zce_uint32 connid;
-            nssdex_t() : msgtype(0), msgfullid(0) {
-            };
-        } nssdex;
-#endif 
-
         zdp_head() : magic(0), attrib(0), msgmid(0), msglen(0), msgseq(0) { };
 
         inline zce_byte   rev() const { return (attrib >> 4) & 0x3; };
         inline zce_byte   zip() const { return attrib & 0x3; }
-        inline zce_uint32 len() const { return (rev() == 3) ? ((magic == 0x08) ? NSSD_HEADLEN : GEP_HEADLEN) : ZDP_HEADLEN; }
+        inline zce_uint32 len() const { return ZDP_HEADLEN; }
 		inline void set_rev(zce_byte v) { attrib = (attrib & 0xF) | (v << 4); }
 		inline void set_zip(zce_byte v) { attrib = (attrib & 0xFC) | (v & 0x3); }
     };
 
     static inline unsigned zdp_msglen(const zce_byte* buf) //should ensure >= 10
     {
-        if (buf[0] != 'G')
-            return (buf[5] << 16) | (buf[6] << 8) | (buf[7]);
-        else
-            return (buf[69] << 16) | (buf[70] << 8) | (buf[71]);
+        return (buf[5] << 16) | (buf[6] << 8) | (buf[7]);
     };
 
     static inline unsigned short zdp_msgtype(const zce_byte* buf) //should ensure >= 10
     {
-        if (buf[0] != 'G')
-            return (buf[2] << 8) | (buf[3]);
-        else
-            return (buf[7] << 8) | (buf[8]);
+        return (buf[2] << 8) | (buf[3]);
     };
 
     int ZCE_API zdp_unpack(zdp_head&, const zce_byte* buf, zce_int32 size, zce_byte rev);
@@ -106,8 +71,6 @@ namespace zdp
     int ZCE_API zdp_reset_seq(const zdp_head&, zce_byte* buf, zce_int32 size, zce_byte rev);
 
     int ZCE_API zdp_reset_zip(zce_byte v, zce_byte* buf, zce_int32 size, zce_byte rev);
-
-    static inline int zdp_ie_head_len(int bodylen, zce_byte rev) { return 6; }
 
 #define MOVE(x)    std::move(x)
 
@@ -229,32 +192,6 @@ namespace zdp
         }
 
         return sizeof(T);
-    }
-
-    static inline int pack_builtin_iehead(zce_byte* buf, int size,
-        unsigned short ie_val, zce_byte ie_format, zce_int32 ie_len, zce_byte /*version*/)
-    {
-        if (size < 6 || ie_len >= 1024 * 1024 * 1024)
-            return ZCE_ERROR_SHRTLEN;
-        buf[0] = (zce_byte)(ie_val >> 8);
-        buf[1] = (zce_byte)ie_val;
-        buf[2] = ie_format;
-        buf[3] = (zce_byte)(ie_len >> 16);
-        buf[4] = (zce_byte)(ie_len >> 8);
-        buf[5] = (zce_byte)ie_len;
-        return 6;
-    }
-
-    static inline int unpack_builtin_iehead(
-        zce_uint16* ie_val, zce_byte* ie_format, zce_int32* ie_len,
-        const zce_byte* buf, int size, zce_byte /*version*/)
-    {
-        if (size < 6)
-            return ZCE_ERROR_SHRTLEN;
-        *ie_val = ((zce_uint16)buf[0] << 8) | buf[1];
-        *ie_format = buf[2];
-        *ie_len = ((zce_uint32)buf[3] << 16) | ((zce_uint32)buf[4] << 8) | buf[5];
-        return 6;
     }
 
     template<typename T>
