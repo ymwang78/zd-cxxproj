@@ -82,7 +82,7 @@ public:
 
     virtual void on_open(bool passive, const char* peerip, zce_uint16 peerport);
 
-    virtual void on_read(zce_dblock& dblock, void*);
+    virtual void on_read(const zce_dblock& dblock, void*);
 
     virtual void on_close();
 
@@ -403,7 +403,7 @@ public:
 
     virtual void on_open(bool passive, const char* peerip, zce_uint16 peerport);
 
-    virtual void on_read(zce_dblock& dblock, void*);
+    virtual void on_read(const zce_dblock& dblock, void*);
 
     virtual void on_close();
 
@@ -419,6 +419,8 @@ class zce_proxy_socks : public zce_istream
     std::string pass_;
 
     std::string remote_ip_;
+
+    zce_dblock dblock_;
 
     zce_uint16 remote_port_ = 0;
 
@@ -436,7 +438,7 @@ public:
 
     virtual void on_open(bool passive, const char* peerip, zce_uint16 peerport);
 
-    virtual void on_read(zce_dblock& dblock, void*);
+    virtual void on_read(const zce_dblock& dblock, void*);
 };
 
 #endif //__zce_handler_h__

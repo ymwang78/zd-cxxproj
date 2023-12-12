@@ -61,6 +61,8 @@ namespace zdp
     {
         enum { READ_HEAD, READ_BODY } status_;
 
+        zce_dblock dblock_;
+
         zce_smartptr<zce_reactor> reactor_ptr_;
 
         unsigned last_recv_tick_;
@@ -92,7 +94,7 @@ namespace zdp
 
         //////////////////////////////////////////////////////////////////////////
 
-        virtual void on_read(zce_dblock& dblock_ptr, void*);
+        virtual void on_read(const zce_dblock& dblock_ptr, void*);
 
         virtual int write(const zce_dblock& dblock_ptr, zce_istream::ERV_ISTREAM_WRITEOPT opt = zce_istream::ERV_ISTREAM_DEFAULT);
 

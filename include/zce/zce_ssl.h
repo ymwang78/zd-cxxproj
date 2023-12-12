@@ -21,6 +21,8 @@ class zce_ssl : public zce_istream
 
     bool is_server_;
 
+    zce_dblock dblock_;
+
     /* SSL reads from, we write to. */
     //zce_dblock read_dblock_;
     BIO *read_bio_;
@@ -50,7 +52,7 @@ public:
 
     virtual void on_open(bool passive, const char* peerip, zce_uint16 peerport);
 
-    virtual void on_read(zce_dblock& dblock, void*);
+    virtual void on_read(const zce_dblock& dblock, void*);
 
     virtual void close();
 

@@ -10,6 +10,8 @@ class ZCE_API whp_stream : public zce_istream
 {
 	zce_smartptr<zce_reactor> reactor_ptr_;
 
+    zce_dblock dblock_;
+
 	unsigned char m_cbSendRound;
 
 	unsigned char m_cbRecvRound;
@@ -39,7 +41,7 @@ public:
 
 	virtual int write(const zce_dblock& dblock_ptr, ERV_ISTREAM_WRITEOPT opt);
 
-	virtual void on_read(zce_dblock& dblock, void*);
+	virtual void on_read(const zce_dblock& dblock, void*);
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -48,11 +50,13 @@ class ZCE_API idip_stream : public zce_istream
 {
     zce_smartptr<zce_reactor> reactor_ptr_;
 
+    zce_dblock dblock_;
+
 public:
 
     idip_stream(const zce_smartptr<zce_reactor>& reactor_ptr, unsigned preserv = 0);
 
     //virtual int write(const zce_dblock& dblock_ptr, ERV_ISTREAM_WRITEOPT opt);
 
-    virtual void on_read(zce_dblock& dblock, void*);
+    virtual void on_read(const zce_dblock& dblock, void*);
 };

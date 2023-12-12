@@ -124,9 +124,9 @@ protected:
     HTTP_CGI_E  cgi_;
     zce_smartptr<ZCE_HTTP_REQUEST> org_request_;
 	zce_smartptr<ZCE_HTTP_REQUEST> request_;
-    zce_dblock req_dblock_;
     std::string remote_ip_;
     unsigned short remote_port_;
+    zce_dblock dblock_;
 
 public:
 
@@ -146,7 +146,7 @@ public:
 
     virtual void on_open(bool passive, const char* peerip, zce_uint16 peerport);
 
-    virtual void on_read(zce_dblock& dblock, void*);
+    virtual void on_read(const zce_dblock& dblock, void*);
 
     virtual void on_http_request(const zce_smartptr<ZCE_HTTP_REQUEST>&, const zce_dblock& dblock);
 
@@ -168,7 +168,7 @@ class ZCE_API zce_http_client : public zce_istream
 	zce_dblock cont_dblock_;
 public:
 
-	virtual void on_read(zce_dblock& dblock, void*);
+	virtual void on_read(const zce_dblock& dblock, void*);
 
 	virtual void on_http_response(const ZCE_HTTP_RESPONSE& header, const zce_dblock& dblock) = 0;
 
@@ -246,7 +246,7 @@ public:
 
     virtual void on_open(bool passive, const char* peerip, zce_uint16 peerport);
 
-    virtual void on_read(zce_dblock& dblock, void* ctx);
+    virtual void on_read(const zce_dblock& dblock, void* ctx);
 
     virtual void on_http_response(const ZCE_HTTP_RESPONSE& header, const zce_dblock& dblock) ;
 
