@@ -336,6 +336,8 @@ class ZCE_API zce_acceptor : public zce_object
     struct pimpl;
     struct pimpl *pimpl_;
 
+protected:
+
     zce_smartptr<zce_reactor> reactor_ptr_;
 
     std::string local_ip_;

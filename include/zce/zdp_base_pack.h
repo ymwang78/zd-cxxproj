@@ -37,5 +37,9 @@ namespace zdp
     int zds_unpack(zdp_base::MSG_CONTAINER_REQ& _t, const zce_byte* buf, int size, zds_context_t* ctx);
     int zds_pack(zce_byte* buf, int size, const zdp_base::MSG_CONTAINER_RES& _t, zds_context_t* ctx);
     int zds_unpack(zdp_base::MSG_CONTAINER_RES& _t, const zce_byte* buf, int size, zds_context_t* ctx);
+    int zds_pack(zce_byte* buf, int size, const zdp_base::MSG_RPCCALL_REQ& _t, zds_context_t* ctx);
+    int zds_unpack(zdp_base::MSG_RPCCALL_REQ& _t, const zce_byte* buf, int size, zds_context_t* ctx);
+    int zds_pack(zce_byte* buf, int size, const zdp_base::MSG_RPCCALL_RES& _t, zds_context_t* ctx);
+    int zds_unpack(zdp_base::MSG_RPCCALL_RES& _t, const zce_byte* buf, int size, zds_context_t* ctx);
 } //namespace zdp_base
 #endif //_zdp_base_pack_h_

@@ -42,6 +42,8 @@ namespace zdp_base
         E_MSG_DISCONN_REQ = (int)0x00000004,
         E_MSG_CONTAINER_REQ = (int)0x00000006,
         E_MSG_CONTAINER_RES = (int)0x00000007,
+        E_MSG_RPCCALL_REQ = (int)0x00000008,
+        E_MSG_RPCCALL_RES = (int)0x00000009,
     };
 
     struct zdp_addr_t
@@ -157,6 +159,44 @@ namespace zdp_base
         std::vector<zdp_container_t> ie_res;
     };
     typedef zce_smartptr<MSG_CONTAINER_RES> MSG_CONTAINER_RES_PTR;
+
+    struct MSG_RPCCALL_REQ : public zce_object
+    {
+        const static unsigned short MSG_TYPE = E_MSG_RPCCALL_REQ;
+        static const char* type_name() { return ("MSG_RPCCALL_REQ");}
+        static MSG_RPCCALL_REQ _empty;
+
+        bool operator==(const MSG_RPCCALL_REQ& _t) const noexcept
+        {
+            if (svcname != _t.svcname) return false;
+            if (method != _t.method) return false;
+            if (payload != _t.payload) return false;
+            return true;
+        }
+
+        zce_string svcname;
+        zce_string method;
+        std::vector<zce_byte> payload;
+    };
+    typedef zce_smartptr<MSG_RPCCALL_REQ> MSG_RPCCALL_REQ_PTR;
+
+    struct MSG_RPCCALL_RES : public zce_object
+    {
+        const static unsigned short MSG_TYPE = E_MSG_RPCCALL_RES;
+        static const char* type_name() { return ("MSG_RPCCALL_RES");}
+        static MSG_RPCCALL_RES _empty;
+
+        bool operator==(const MSG_RPCCALL_RES& _t) const noexcept
+        {
+            if (ie_result != _t.ie_result) return false;
+            if (payload != _t.payload) return false;
+            return true;
+        }
+
+        zce_int32    ie_result;
+        std::vector<zce_byte> payload;
+    };
+    typedef zce_smartptr<MSG_RPCCALL_RES> MSG_RPCCALL_RES_PTR;
 
 } //namespace zdp_base
 #endif //_zdp_base_proto_h_

@@ -1,5 +1,7 @@
 #pragma once
 
+
+#include <functional>
 class zvm_pimpl;
 
 class zvm : public zce_object
@@ -18,14 +20,16 @@ public:
 
     int lpc_call_dblock(const std::string& svrname,
         const std::string& method,
-        zce_dblock& dblock);
+        zce_dblock& dblock,
+        const std::function<void(int error_code, const zce_dblock& retdata)>& response);
 
     template<typename... Args>
     int lpc_call(const std::string& svrname,
         const std::string& method,
+        const std::function<void(int error_code, const zce_dblock& retdata)>& response,
         Args... args) {
         zce_dblock dblock;
         zds_push(dblock, args...);
-        return lpc_call_dblock(svrname, method, dblock);
+        return lpc_call_dblock(svrname, method, dblock, response);
     }
 };
