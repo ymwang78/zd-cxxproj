@@ -15,8 +15,12 @@ public:
 
     ~zvm();
 
-    int boot(const std::string& name,
+    zce_smartptr<zce_object> boot(const std::string& svc_name,
         const std::string& path);
+
+    zce_smartptr<zce_object> boot(const std::string& svc_name,
+        const std::string& host, 
+        unsigned short port);
 
     int rpc_call_dblock(const std::string& host, 
         unsigned short port,
