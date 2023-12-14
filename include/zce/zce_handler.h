@@ -15,6 +15,7 @@
 #include <zce/zce_task.h>
 #include <zce/zce_types.h>
 #include <zce/zce_dblock.h>
+#include <zce/zce_any.h>
 #include <string>
 #include <deque>
 #include <map>
@@ -82,7 +83,7 @@ public:
 
     virtual void on_open(bool passive, const char* peerip, zce_uint16 peerport);
 
-    virtual void on_read(const zce_dblock& dblock, void*);
+    virtual void on_read(const zce_dblock& dblock, const zce_any&);
 
     virtual void on_close();
 
@@ -253,7 +254,7 @@ public:
 
     ~zce_tcp();
 
-    void handle_timeout(const void*);
+    void handle_timeout(const zce_any&);
 
     virtual void* handle() const;
 
@@ -322,7 +323,7 @@ public:
 
     int start_connect();
 
-    void handle_timeout(const void*);
+    void handle_timeout(const zce_any&);
 
 	void on_resolved(const zce_sockaddr_t& addr);
 
@@ -399,11 +400,11 @@ public:
 
     ~zce_sync_istream();
 
-    virtual int do_match_queue(zce_smartptr<zce_task_queue>&, const zce_dblock& dblock, void* ctx) { return 0; };
+    virtual int do_match_queue(zce_smartptr<zce_task_queue>&, const zce_dblock& dblock, const zce_any& ctx) { return 0; };
 
     virtual void on_open(bool passive, const char* peerip, zce_uint16 peerport);
 
-    virtual void on_read(const zce_dblock& dblock, void*);
+    virtual void on_read(const zce_dblock& dblock, const zce_any&);
 
     virtual void on_close();
 
@@ -426,9 +427,9 @@ class zce_proxy_socks : public zce_istream
 
     enum { STATE_BEGIN, STATE_AUTH, STATE_CONNECT} state_ = STATE_BEGIN;
 
-    void proc_begin_ack(zce_dblock& dblock, void* ctx);
+    void proc_begin_ack(zce_dblock& dblock, const zce_any& ctx);
 
-    void proc_auth_ack(zce_dblock& dblock, void* ctx);
+    void proc_auth_ack(zce_dblock& dblock, const zce_any& ctx);
 
     void send_cmd_connect();
 
@@ -438,7 +439,7 @@ public:
 
     virtual void on_open(bool passive, const char* peerip, zce_uint16 peerport);
 
-    virtual void on_read(const zce_dblock& dblock, void*);
+    virtual void on_read(const zce_dblock& dblock, const zce_any&);
 };
 
 #endif //__zce_handler_h__

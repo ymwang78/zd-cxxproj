@@ -30,10 +30,10 @@ namespace zdp
     };
 
     extern "C" {
-        typedef int (*publish_callback)(void * ctx, int cnt,
+        typedef int (*publish_callback)(const zce_any& ctx, int cnt,
             zce_int64* topics, zce_int64 from, zce_byte* data, zce_uint32 len);
 
-        typedef int (*set_callback)(void * ctx, zce_int64 topic, const zce_string& name, 
+        typedef int (*set_callback)(const zce_any& ctx, zce_int64 topic, const zce_string& name,
             zce_int64 seq, zce_int64 tick, zce_int64 uid, zce_int64 flag, const std::vector<zce_byte>& data);
 
         char* ZCE_API zdp_printable_topic(char buffer[32], zce_int64 topic);
@@ -58,8 +58,11 @@ namespace zdp
 
         zdp_storm(const zce_smartptr<zce_reactor>&, 
             const zce_smartptr<zce_schedule>&,
-            zce_int64 uniqueid, const zce_string& token, void* ctx,
-            publish_callback child_cb, set_callback set_cb);
+            zce_int64 uniqueid,
+            const zce_string& token,
+            const zce_any& ctx,
+            publish_callback child_cb,
+            set_callback set_cb);
 
         ~zdp_storm();
 
@@ -79,7 +82,7 @@ namespace zdp
 
         zdp_storm_client(const zce_smartptr<zce_reactor>& ,
             zce_int64 uniqueid, const zce_string& token,
-            void* ctx, publish_callback father_cb, set_callback set_cb);
+            const zce_any& ctx, publish_callback father_cb, set_callback set_cb);
 
         ~zdp_storm_client();
 

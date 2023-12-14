@@ -76,7 +76,7 @@ public:
     }
 
     void luas_push(zce_dblock& dblock,
-        void* ctx) {
+        const void* ctx) {
         luas_push_lightuserdata(dblock, ctx);
     }
 

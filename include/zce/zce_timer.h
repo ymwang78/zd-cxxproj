@@ -17,7 +17,7 @@ class zce_task_queue;
 class ZCE_API zce_timer_doozer : virtual public zce_object
 {
 public:
-    virtual void handle_timeout(const void* arg) = 0;
+    virtual void handle_timeout(const zce_any& arg) = 0;
 };
 
 class ZCE_API zce_timer : public zce_object
@@ -36,7 +36,7 @@ public:
         const zce_smartptr<zce_timer_doozer>& doozerptr, 
         unsigned msecond, 
         bool repeat = true, 
-        const void* arg = 0);
+        const zce_any& arg = zce_any());
 
     ~zce_timer();
 
@@ -59,7 +59,7 @@ public:
     zce_timer_tpl(_t* p) : p_(p) {
     }
 public:
-    void handle_timeout(const void *arg) {
+    void handle_timeout(const zce_any& arg) {
         p_->handle_timeout(arg);
     }
 private:
@@ -74,14 +74,14 @@ class zce_timer_queue_tpl : public zce_timer_doozer, public zce_task
 {
 public:
 	zce_timer_queue_tpl(const zce_smartptr<_t>& p, zce_smartptr<zce_task_queue> queueptr) 
-		: zce_task("zce_timer_queue_tpl"), p_(p), queue_ptr_(queueptr), arg_(0) {
+		: zce_task("zce_timer_queue_tpl"), p_(p), queue_ptr_(queueptr) {
 	}
 
     void stop() { //should sync in same queue
         p_ = 0;
     }
 
-	void handle_timeout(const void *arg) { 
+	void handle_timeout(const zce_any& arg) { 
         if (p_ == 0) //run in reactor thread, may race, just for conv
             return;
 		arg_ = arg;
@@ -96,6 +96,6 @@ public:
 	}
 private:
 	zce_smartptr<zce_task_queue> queue_ptr_;
-	const void * arg_;
+	zce_any arg_;
 	zce_smartptr<_t> p_;
 };

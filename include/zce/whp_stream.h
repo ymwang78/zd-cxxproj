@@ -33,7 +33,7 @@ class ZCE_API whp_stream : public zce_istream
 
 	unsigned char MapRecvByte(unsigned char cbData);
 
-	int proc_next(zce_dblock& dblock_ptr, void* ctx);
+	int proc_next(zce_dblock& dblock_ptr, const zce_any& ctx);
 
 public:
 
@@ -41,7 +41,7 @@ public:
 
 	virtual int write(const zce_dblock& dblock_ptr, ERV_ISTREAM_WRITEOPT opt);
 
-	virtual void on_read(const zce_dblock& dblock, void*);
+	virtual void on_read(const zce_dblock& dblock, const zce_any&);
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -58,5 +58,5 @@ public:
 
     //virtual int write(const zce_dblock& dblock_ptr, ERV_ISTREAM_WRITEOPT opt);
 
-    virtual void on_read(const zce_dblock& dblock, void*);
+    virtual void on_read(const zce_dblock& dblock, const zce_any&);
 };

@@ -14,6 +14,7 @@
 #include <zce/zce_handler.h>
 #include <zce/zdp_schema.h>
 #include <zce/zce_timer.h>
+#include <zce/zce_any.h>
 
 class zce_dblock;
 class zce_reactor;
@@ -28,7 +29,7 @@ namespace zdp
 
         unsigned short msgid_;
 
-        void* ctx_;
+        zce_any ctx_;
 
         zce_smartptr<zdp_stream> stream_ptr_;
 
@@ -36,9 +37,9 @@ namespace zdp
 
     public:
 
-        zdp_resctx(const zce_smartptr<zdp_stream>& stream_ptr, unsigned short seq, unsigned short msgid, void* ctx);
+        zdp_resctx(const zce_smartptr<zdp_stream>& stream_ptr, unsigned short seq, unsigned short msgid, const zce_any& ctx);
 
-        void* context() const {
+        const zce_any& context() const {
             return ctx_;
         }
 
@@ -54,7 +55,7 @@ namespace zdp
 
         void cancel_timer();
 
-        virtual void handle_timeout(const void* arg);
+        virtual void handle_timeout(const zce_any& arg);
     };
 
     class ZCE_API zdp_stream : public zce_istream
@@ -90,11 +91,11 @@ namespace zdp
         }
 
         //////////////////////////////////////////////////////////////////////////
-        int peek_response_context(void*& ctx, zce_uint16 msgmid, unsigned msgseq);
+        int peek_response_context(zce_any& ctx, zce_uint16 msgmid, unsigned msgseq);
 
         //////////////////////////////////////////////////////////////////////////
 
-        virtual void on_read(const zce_dblock& dblock_ptr, void*);
+        virtual void on_read(const zce_dblock& dblock_ptr, const zce_any&);
 
         virtual int write(const zce_dblock& dblock_ptr, zce_istream::ERV_ISTREAM_WRITEOPT opt = zce_istream::ERV_ISTREAM_DEFAULT);
 
@@ -102,19 +103,19 @@ namespace zdp
 
         //////////////////////////////////////////////////////////////////////////
 
-        virtual void on_packet(const zdp_head&, const zce_dblock& plain_body, const zce_dblock& org_full, const void* ctx);
+        virtual void on_packet(const zdp_head&, const zce_dblock& plain_body, const zce_dblock& org_full, const zce_any& ctx);
 
         virtual void on_timeout(zdp_resctx* resctx);
 
         zce_dblock create_failed_response_dblock(zce_uint16 msgmid, unsigned msgseq);
 
-        int do_failed_process(zce_uint16 msgmid, unsigned msgseq, void* ctx);
+        int do_failed_process(zce_uint16 msgmid, unsigned msgseq, const zce_any& ctx);
 
         //timeout = 0, won't wait res
-        int do_request(const zce_dblock& plain_body, int mstimeout = 0, void* ctx = 0);
+        int do_request(const zce_dblock& plain_body, int mstimeout = 0, const zce_any& ctx = zce_any((zce_int64)0));
 
         template<typename MSG_T>
-        int request(const MSG_T& msg, int mstimeout = 0, void* ctx = 0, ERV_ZCE_COMPRESS cps = ZCE_COMPRESS_NONE);
+        int request(const MSG_T& msg, int mstimeout = 0, const zce_any& ctx = zce_any((zce_int64)0), ERV_ZCE_COMPRESS cps = ZCE_COMPRESS_NONE);
 
         template<typename MSG_T>
         int response(const MSG_T& msg, unsigned seq, zce_byte rev = 0, ERV_ZCE_COMPRESS cps = ZCE_COMPRESS_NONE);
@@ -187,7 +188,7 @@ namespace zdp
     }
 
     template<typename MSG_T>
-    int zdp_stream::request(const MSG_T& msg, int mstimeout, void* ctx, ERV_ZCE_COMPRESS cps)
+    int zdp_stream::request(const MSG_T& msg, int mstimeout, const zce_any& ctx, ERV_ZCE_COMPRESS cps)
     {
         zce_dblock dblock_ptr;
         int ret = zdp_serialize(dblock_ptr, 0, msg, 0, cps, 32);

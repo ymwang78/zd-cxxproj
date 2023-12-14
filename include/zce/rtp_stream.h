@@ -13,7 +13,7 @@ public:
 
     ~rtp_stream();
 
-    virtual void on_read(const zce_dblock& dblock_ptr, void*);
+    virtual void on_read(const zce_dblock& dblock_ptr, const zce_any&);
 
     virtual int write(const zce_dblock& dblock_ptr, zce_istream::ERV_ISTREAM_WRITEOPT opt);
 };

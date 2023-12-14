@@ -18,6 +18,13 @@ public:
     int boot(const std::string& name,
         const std::string& path);
 
+    int rpc_call_dblock(const std::string& host, 
+        unsigned short port,
+        const std::string& svrname,
+        const std::string& method,
+        zce_dblock& dblock,
+        const std::function<void(int error_code, const zce_dblock& retdata)>& response);
+
     int lpc_call_dblock(const std::string& svrname,
         const std::string& method,
         zce_dblock& dblock,
