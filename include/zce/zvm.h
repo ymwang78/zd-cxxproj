@@ -1,6 +1,4 @@
 #pragma once
-
-
 #include <functional>
 class zvm_pimpl;
 
@@ -22,25 +20,32 @@ public:
         const std::string& host, 
         unsigned short port);
 
-    int rpc_call_dblock(const std::string& host, 
-        unsigned short port,
-        const std::string& svrname,
+    int rpc_call_dblock(const zce_smartptr<zce_object>& vmptr,
         const std::string& method,
         zce_dblock& dblock,
         const std::function<void(int error_code, const zce_dblock& retdata)>& response);
 
-    int lpc_call_dblock(const std::string& svrname,
-        const std::string& method,
-        zce_dblock& dblock,
-        const std::function<void(int error_code, const zce_dblock& retdata)>& response);
+    //int lpc_call_dblock(const std::string& svrname,
+    //    const std::string& method,
+    //    zce_dblock& dblock,
+    //    const std::function<void(int error_code, const zce_dblock& retdata)>& response);
 
-    template<typename... Args>
-    int lpc_call(const std::string& svrname,
+    template<typename T>
+    int rpc_call(const zce_smartptr<zce_object>& vmptr,
         const std::string& method,
-        const std::function<void(int error_code, const zce_dblock& retdata)>& response,
-        Args... args) {
+        const T& t,
+        const std::function<void(int error_code, const zce_dblock& retdata)>& response) {
         zce_dblock dblock;
-        zds_push(dblock, args...);
-        return lpc_call_dblock(svrname, method, dblock, response);
+        int ret = zdp::zds_pack(0, 0, t, 0);
+        if (ret < 0)
+            return ret;
+        ZCE_MBACQUIRE(dblock, ret);
+        if (dblock.capacity() < ret)
+            return ZCE_ERROR_MALLOC;
+        ret = zdp::zds_pack(dblock.rd_ptr(), dblock.capacity(), t, 0);
+        if (ret < 0)
+            return ret;
+        dblock.wr_ptr(ret);
+        return rpc_call_dblock(vmptr, method, dblock, response);
     }
 };
