@@ -30,6 +30,10 @@ namespace zdp
 
     int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, zce_uint64 val, zds_context_t* ctx);
 
+    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, zce_float val, zds_context_t* ctx);
+
+    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, zce_double val, zds_context_t* ctx);
+
     template<typename T>
     inline int zds_pack_builtin(zce_byte* buf, zce_int32 size, T val, zds_context_t* ctx) {
         if (std::is_signed<T>::value) {
@@ -72,6 +76,10 @@ namespace zdp
     ///////////////////////////////////////////////////////////////////////////
 
     int ZCE_API zds_unpack_builtin(zce_int64& val, const zce_byte* buf, zce_int32 size, zds_context_t* ctx);
+
+    int ZCE_API zds_unpack_builtin(zce_float& val, const zce_byte* buf, zce_int32 size, zds_context_t* ctx);
+
+    int ZCE_API zds_unpack_builtin(zce_double& val, const zce_byte* buf, zce_int32 size, zds_context_t* ctx);
 
     template<typename T>
     inline int zds_unpack_builtin(T& val, const zce_byte* buf, zce_int32 size, zds_context_t* ctx) {

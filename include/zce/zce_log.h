@@ -9,6 +9,7 @@
 #endif
 
 #ifdef __cplusplus
+#include <iomanip>
 extern "C" {
 #endif
 
@@ -138,6 +139,18 @@ public:
     void log_args(std::ostream& ost, const T& t) {
         ost << t;
         if (splitter_ )
+            ost << splitter_;
+    }
+
+    void log_args(std::ostream& ost, float t) {
+        ost << std::setprecision(8) << t;
+        if (splitter_)
+            ost << splitter_;
+    }
+
+    void log_args(std::ostream& ost, double t) {
+        ost << std::setprecision(16) << t;
+        if (splitter_)
             ost << splitter_;
     }
 
