@@ -1,5 +1,6 @@
 #pragma once
 
+#include <zce/zce_string.h>
 #ifndef CHECKLEN_MOVEBUF_ADDRET_DECSIZE
     #define CHECKLEN_MOVEBUF_ADDRET_DECSIZE do{\
             if (len < 0) \
@@ -41,29 +42,26 @@ namespace zdp
         }
     }
 
+#define DECLARE_PACK_BUILTIN_ARRAY(TT) \
+    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const std::vector<TT>& val, zds_context_t* ctx);\
+    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const TT* vec, unsigned vec_size, zds_context_t* ctx);
+
     int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const std::vector<bool>& val, zds_context_t* ctx);
 
-    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const std::vector<zce_byte>& val, zds_context_t* ctx);
-
-    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const std::vector<zce_uint16>& val, zds_context_t* ctx);
-
-    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const std::vector<zce_uint32>& val, zds_context_t* ctx);
-
-    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const std::vector<zce_uint64>& val, zds_context_t* ctx);
-
-    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const std::vector<zce_int8>& val, zds_context_t* ctx);
-
-    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const std::vector<zce_int16>& val, zds_context_t* ctx);
-
-    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const std::vector<zce_int32>& val, zds_context_t* ctx);
-
-    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const std::vector<zce_int64>& val, zds_context_t* ctx);
-
-    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const std::vector<zce_float>& val, zds_context_t* ctx);
-
-    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const std::vector<zce_double>& val, zds_context_t* ctx);
+    DECLARE_PACK_BUILTIN_ARRAY(zce_byte)
+    DECLARE_PACK_BUILTIN_ARRAY(zce_uint16)
+    DECLARE_PACK_BUILTIN_ARRAY(zce_uint32)
+    DECLARE_PACK_BUILTIN_ARRAY(zce_uint64)
+    DECLARE_PACK_BUILTIN_ARRAY(zce_int8)
+    DECLARE_PACK_BUILTIN_ARRAY(zce_int16)
+    DECLARE_PACK_BUILTIN_ARRAY(zce_int32)
+    DECLARE_PACK_BUILTIN_ARRAY(zce_int64)
+    DECLARE_PACK_BUILTIN_ARRAY(zce_float)
+    DECLARE_PACK_BUILTIN_ARRAY(zce_double)
 
     int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const std::string& val, zds_context_t* ctx);
+
+    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const zce::string_view& val, zds_context_t* ctx);
 
     int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const std::vector<std::string>& val, zds_context_t* ctx);
 
@@ -161,7 +159,6 @@ class zvm_py;
 class zpy_unmarshal_context
 {
     zce_smartptr<zvm_py> zvm_;
-    zce_smartptr<zdl_parser_context> idl_;
 
     static std::string get_module_name(const std::string& structname);
 
@@ -170,7 +167,7 @@ class zpy_unmarshal_context
     PyObject* default_obj_from_member(const zce_smartptr<zdl_member>& member_ptr);
 public:
 
-    zpy_unmarshal_context(const zce_smartptr<zvm_py>& pyvm, const zce_smartptr<zdl_parser_context>& idl);
+    zpy_unmarshal_context(const zce_smartptr<zvm_py>& pyvm);
 
     ~zpy_unmarshal_context();
 
@@ -187,4 +184,26 @@ public:
     int unmarshal_member(PyObject*& obj, const zce_smartptr<zdl_member>& member, const zce_byte* buf, int size);
 
     int unmarshal_vector_from_struct(std::vector<PyObject*>& obj, const zce_smartptr<zdl_struct>& struct_ptr, const zce_byte* buf, int size);
+};
+
+class zpy_marshal_context
+{
+    zce_smartptr<zvm_py> zvm_;
+
+    static std::string get_module_name(const std::string& structname);
+    
+public:
+    zpy_marshal_context(const zce_smartptr<zvm_py>& pyvm);
+
+    ~zpy_marshal_context();
+
+    int marshal_string(zce_byte* buf, int size, PyObject* str, const char* varname);
+
+    int marshal_struct(zce_byte* buf, int size, PyObject* obj, const zdl_struct* struct_ptr);
+
+    int marshal_builtin_array(zce_byte* buf, int size, PyObject* obj, int ut, const char* varname);
+
+    int marshal_struct_array(zce_byte* buf, int size, PyObject* obj, const zdl_struct* struct_ptr, const char* varname);
+
+    int marshal_member(zce_byte* buf, int size, PyObject* obj, const zce_smartptr<zdl_member>& member);
 };
