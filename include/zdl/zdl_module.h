@@ -1,49 +1,46 @@
 /* ***************************************************************
- *  Copyright (C) 2006  Yongming Wang(wangym@gmail.com)
+ *  Copyright (C) 2006 -  Yongming Wang(wangym@gmail.com)
  *  All Rights Reserved
- *
- *  This file is part of Ubeda project (http://www.ubeda.cn).
- *
- *  This copy of file is licensed to you under Ubeda License.
- *  You should have received a copy of the Ubeda License
- *  along with this program, if not, get it from  
- *      http://www.ubeda.cn
  * ***************************************************************/
-/*****************************************************************
- * @file zdl_module.h
- * @brief
- *****************************************************************/
-
-#ifndef __zdl_module_h__
-#define __zdl_module_h__
+#pragma once
 
 #include <zce/zce_object.h>
-#include <zce/zce_object.h>
+#include <zdl/zdl_type.h>
+#include <map>
 
-class zdl_type_container;
+class zdl_type;
+class zdl_visitor;
 
 class zdl_module : public zce_object
 {
-    typedef zce_smartptr<zdl_type_container> zdl_type_container_ptr;
-
     std::string namespace_name_;
-    zdl_type_container_ptr type_container_;
+    std::map<std::string, zce_smartptr<zdl_type>> type_dict_;
+    std::vector<zce_smartptr<zdl_type>> type_vec_;
 
 public:
-    zdl_module(const std::string& ns)
-        :namespace_name_(ns), type_container_(new zdl_type_container())
-    {
-    };
-    const zdl_type_container_ptr& type_container() const
-    {
-        return type_container_;
+    zdl_module(const std::string& ns);
+
+    const std::map<std::string, zce_smartptr<zdl_type>>& type_dict() const noexcept {
+        return type_dict_;
     }
-    const std::string& name_space() 
-    {
+
+    const std::string& name_space() const noexcept {
         return namespace_name_;
     }
+
+    zce_smartptr<zdl_type> create_type(const std::string& name, zdl_type::zdl_type_e e);
+
+    zce_smartptr<zdl_type> get_builtin_type(int tpid) const;
+
+    zce_smartptr<zdl_type> get_type(const std::string& name) const;
+
+    int add_type(const zce_smartptr<zdl_type>& type_ptr);
+
+    void visit(const zce_smartptr<zdl_visitor>& visitor) const;
+
+    void visit(const zce_smartptr<zdl_visitor>& visitor, const std::string& meta, bool include) const;
+
+    void visit_type_meta(const zce_smartptr<zdl_visitor>& visitor, const std::string& meta, bool include) const;
 };
 
 typedef zce_smartptr<zdl_module> zdl_module_ptr;
-
-#endif /*__zdl_module_h__*/

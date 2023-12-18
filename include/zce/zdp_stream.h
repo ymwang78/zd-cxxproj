@@ -155,7 +155,7 @@ namespace zdp
     int zdp_serialize(zce_dblock& dblock_ptr, zce_uint32 seq, const T& msg, zce_byte rev,
         ERV_ZCE_COMPRESS cps = ZCE_COMPRESS_NONE, int preserv = 0) 
     {
-        int bodylen = zds_pack(0, 0, msg, 0);
+        int bodylen = zds_pack(0, 0, msg, 0, true);
         ZCE_MBACQUIRE(dblock_ptr, preserv + zdp_headlen(rev) + bodylen);
         if (dblock_ptr.space() <= 0)
             return ZCE_ERROR_MALLOC;
@@ -165,7 +165,7 @@ namespace zdp
 
         if (bodylen) {
             int ret = zds_pack(dblock_ptr.wr_ptr() + zdp_headlen(rev),
-                (int)(dblock_ptr.space() - zdp_headlen(rev)), msg, 0);
+                (int)(dblock_ptr.space() - zdp_headlen(rev)), msg, 0, true);
             ZCE_ASSERT(bodylen == ret);
             if (ret < 0)
                 return ret;

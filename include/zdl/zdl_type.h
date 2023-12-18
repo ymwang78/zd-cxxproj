@@ -1,42 +1,17 @@
 /* ***************************************************************
- *  Copyright (C) 2006  Yongming Wang(wangym@gmail.com)
+ *  Copyright (C) 2006 -  Yongming Wang(wangym@gmail.com)
  *  All Rights Reserved
- *
- *  This file is part of Ubeda project (http://www.ubeda.cn).
- *
- *  This copy of file is licensed to you under Ubeda License.
- *  You should have received a copy of the Ubeda License
- *  along with this program, if not, get it from  
- *      http://www.ubeda.cn
  * ***************************************************************/
-/*****************************************************************
- * @file zdl_type.h
- * @brief
- *****************************************************************/
-
-#ifndef __zdl_type_h__
-#define __zdl_type_h__
+#pragma once
 
 #include <zce/zce_object.h>
 #include <vector>
 #include <string>
 #include <algorithm>
 #include <map>
+
 class zdl_visitor;
-
-struct match_pair_key
-{
-    std::string value_;
-    match_pair_key(const std::string& first)
-        :value_(first)
-    {
-    }
-
-    bool operator()(const std::pair<std::string, std::string>& val)
-    {
-        return val.first == value_;
-    }
-};
+class zdl_module;
 
 class meta_base : public zce_object
 {
@@ -51,7 +26,10 @@ public:
 
     const char* fetch_meta(const std::string& key, const char* def = NULL) const
     {
-        std::vector<std::pair<std::string, std::string> >::const_iterator iter = std::find_if(vec_metas_.begin(), vec_metas_.end(), match_pair_key(key));
+        std::vector<std::pair<std::string, std::string> >::const_iterator iter = std::find_if(
+            vec_metas_.begin(), vec_metas_.end(), [key](auto iter) {
+                return iter.first == key;
+            });
         if (iter == vec_metas_.end())
             return def;
         return iter->second.c_str();
@@ -71,7 +49,6 @@ protected:
     std::vector<std::pair<std::string, std::string> > vec_metas_;
 };
 
-
 class zdl_type : public meta_base
 {
 protected:
@@ -89,20 +66,22 @@ public:
     
 public:
     //tpid : UIDL_CHAR ,UIDL_UCHAR... @TODO CHECK CONV
-    zdl_type(int tpid, const std::string& name)
-        :type_id_(tpid), type_name_(name){
-        auto pos = type_name_.rfind(':');
-        if (pos == std::string::npos)
-            pure_name_ = type_name_;
-        else
-            pure_name_ = type_name_.substr(pos + 1);
-    };
+    zdl_type(int tpid, const zce_smartptr<zdl_module>& module_ptr, const std::string& name);
+
+    ~zdl_type();
+
     const std::string& name() const{
         return type_name_;
     };
-    const std::string& pure_name() const {
-        return pure_name_;
+
+    const std::string& full_name() const {
+        return full_name_;
     }
+
+    const zce_smartptr<zdl_module>& module_ptr() const {
+        return module_ptr_;
+    }
+
     int id() const{
         return type_id_;
     };
@@ -116,53 +95,10 @@ public:
 
     virtual void visit(const zdl_visitor_ptr&) const = 0;
     virtual void visit(const zdl_visitor_ptr&, const std::string&, bool include = true) const {};
-private:
+protected:
     int         type_id_;
+    zce_smartptr<zdl_module> module_ptr_;
     std::string type_name_;
-    std::string pure_name_;
+    std::string full_name_;
 };
 typedef zce_smartptr<zdl_type> zdl_type_ptr;
-
-class zdl_visitor;
-
-class zdl_type_container : public zce_object
-{
-    typedef zce_smartptr<zdl_visitor> zdl_visitor_ptr;
-
-public:
-    zdl_type_container();
-    int add_type(const zdl_type_ptr& type_ptr);
-    zdl_type_ptr get_type(const std::string& name);
-    zdl_type_ptr get_builtin_type(int tpid);
-
-    void visit(const zdl_visitor_ptr&) const;
-    void visit(const zdl_visitor_ptr&, const std::string&, bool include = true) const;
-    void visit_type_meta(const zdl_visitor_ptr&, const std::string&, bool include = true) const;
-
-    template <class tfunc>
-    void sort_me(tfunc func) {
-        sort(types_.begin(), types_.end(), func);
-    }
-
-    const std::vector<zdl_type_ptr>& types() const {
-		return types_;
-	}
-
-	const std::map<std::string, std::map<std::string, zdl_type_ptr> > ns_types() const {
-		return ns_types_;
-	}
-
-private:
-    //std::map<std::string, zdl_type_ptr> types_;
-    std::vector<zdl_type_ptr> types_;
-
-public:
-    zdl_type_ptr create_ns_type(const std::string& ns, const std::string& name, zdl_type::zdl_type_e e);
-
-private:
-    //std::map<std::string, zdl_type_ptr> ns_types_;
-	std::map<std::string, std::map<std::string, zdl_type_ptr> > ns_types_;
-};
-
-
-#endif /*__zdl_type_h__*/

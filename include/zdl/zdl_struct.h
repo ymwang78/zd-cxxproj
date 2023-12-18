@@ -113,7 +113,6 @@ public:
         }
     }
 private:
-    zdl_module_ptr module_ptr_;
     std::vector<zdl_template_arg_ptr> args_;
     std::vector<zdl_member_ptr> members_;
     std::map<std::string, std::vector<zdl_member_ptr> > meta_member_map_;

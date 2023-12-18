@@ -34,12 +34,11 @@ class zdl_type;
 class zdl_parser_context : public zce_object
 {
     typedef zce_smartptr<zdl_type_container> zdl_type_container_ptr;
-    typedef zce_smartptr<zdl_enum>        zdl_enum_ptr;
-    typedef zce_smartptr<zdl_struct>      zdl_struct_ptr;
-    typedef zce_smartptr<zdl_member>      zdl_member_ptr;
+    typedef zce_smartptr<zdl_enum> zdl_enum_ptr;
+    typedef zce_smartptr<zdl_struct> zdl_struct_ptr;
+    typedef zce_smartptr<zdl_member> zdl_member_ptr;
     typedef zce_smartptr<zdl_module> zdl_module_ptr;
-    //typedef zce_smartptr<zdl_parser>      zdl_parser_ptr;
-    typedef zce_smartptr<zdl_type>        zdl_type_ptr;
+    typedef zce_smartptr<zdl_type> zdl_type_ptr;
 
 public:
     zdl_parser_context(std::map<std::string, zdl_module_ptr>& modules);

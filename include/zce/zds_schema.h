@@ -69,7 +69,7 @@ namespace zdp
 
     int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const std::vector<std::string>& val, zds_context_t* ctx);
 
-    int ZCE_API zds_pack_struct_header(zce_byte* buf, int size, zce_uint64 struct_prefix, zds_context_t* ctx);
+    int ZCE_API zds_pack_struct_header(zce_byte* buf, int size, zce_uint64 struct_prefix, zds_context_t* ctx, bool has_prefix);
 
     int ZCE_API zds_pack_struct_array_header(zce_byte* buf, int size, zce_uint64 array_size, zds_context_t* ctx);
 
@@ -115,7 +115,7 @@ namespace zdp
 
     int ZCE_API zds_unpack_builtin(std::vector<std::string>& val, const zce_byte* buf, zce_int32 size, zds_context_t* ctx);
 
-    int ZCE_API zds_unpack_struct_header(zce_uint64& struct_prefix, const zce_byte* buf, int size, zds_context_t* ctx);
+    int ZCE_API zds_unpack_struct_header(zce_uint64& struct_prefix, const zce_byte* buf, int size, zds_context_t* ctx, bool has_prefix);
 
     int ZCE_API zds_unpack_struct_array_header(zce_uint64& val, const zce_byte* buf, int size, zds_context_t* ctx);
 
@@ -128,9 +128,10 @@ namespace zdp
         CHECKLEN_MOVEBUF_ADDRET_DECSIZE;
 
         for (auto iter = val.begin(); iter != val.end(); ++iter) {
-            len = zds_pack(buf, size, *iter, false);
+            len = zds_pack(buf, size, *iter, ctx, false);
             CHECKLEN_MOVEBUF_ADDRET_DECSIZE;
         };
+
         return ret;
     }
 
@@ -146,9 +147,10 @@ namespace zdp
         if (size < alen) return ZCE_ERROR_SHRTLEN;
 
         val.resize(alen);
+
         typename std::vector<T>::iterator iter;
         for (iter = val.begin(); iter != val.end(); ++iter) {
-            len = zds_unpack(*iter, buf, size, false);
+            len = zds_unpack(*iter, buf, size, ctx, false);
             CHECKLEN_MOVEBUF_ADDRET_DECSIZE;
         };
 
@@ -207,7 +209,7 @@ public:
 
     int marshal_string(zce_byte* buf, int size, PyObject* str, const char* varname);
 
-    int marshal_struct(zce_byte* buf, int size, PyObject* obj, const zdl_struct* struct_ptr);
+    int marshal_struct(zce_byte* buf, int size, PyObject* obj, const zdl_struct* struct_ptr, bool has_prefix);
 
     int marshal_builtin_array(zce_byte* buf, int size, PyObject* obj, int ut, const char* varname);
 

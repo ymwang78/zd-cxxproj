@@ -44,7 +44,7 @@ class zdl_enum : public zdl_type
 {
     typedef zce_smartptr<zdl_visitor> zdl_visitor_ptr;
 public:
-    zdl_enum(const std::string& name);
+    zdl_enum(const zce_smartptr<zdl_module>& module_ptr, const std::string& name);
     const std::vector<zdl_enumerator_ptr>& enumerators() const{
         return enumerators_;
     };

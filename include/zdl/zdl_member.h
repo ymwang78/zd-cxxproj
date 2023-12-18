@@ -68,13 +68,19 @@ public:
         else
         {
             std::vector<std::pair<std::string, std::string> >::const_iterator iter ;
-            iter = std::find_if(vec_metas_.begin(), vec_metas_.end(), match_pair_key("o"));
+            iter = std::find_if(vec_metas_.begin(), vec_metas_.end(), [](const std::pair<std::string, std::string>& val) {
+                    return val.first == "o";
+                });
             if (iter != vec_metas_.end())
                 return true;
-            iter = std::find_if(vec_metas_.begin(), vec_metas_.end(), match_pair_key("O"));
+            iter = std::find_if(vec_metas_.begin(), vec_metas_.end(), [](const std::pair<std::string, std::string>& val) {
+                return val.first == "O";
+                });
             if (iter != vec_metas_.end())
                 return true;
-            iter = std::find_if(vec_metas_.begin(), vec_metas_.end(), match_pair_key("_default_val"));
+            iter = std::find_if(vec_metas_.begin(), vec_metas_.end(), [](const std::pair<std::string, std::string>& val) {
+                return val.first == "_default_val";
+                });
             if (iter != vec_metas_.end())
                 return true;
         }
