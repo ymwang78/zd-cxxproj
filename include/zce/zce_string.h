@@ -264,12 +264,17 @@ namespace zce
 
     namespace templates
     {
+        inline size_t tcslen(const char* s) { return strlen(s); }
+        inline size_t tcslen(const wchar_t* s) { return wcslen(s); }
+        template<typename T>
         class StringSplitter {
         public:
+            typedef typename std::basic_string<T, std::char_traits<T>, std::allocator<T>> tstring;
+            typedef typename std::basic_stringstream<T, std::char_traits<T>, std::allocator<T>> tstringstream;
             /** @param big the string to be split
             @param splitter the delimiter
             */
-            StringSplitter(const char * big, const char * splitter)
+            StringSplitter(const T* big, const T* splitter)
                 : _big(big), _splitter(splitter) {
             }
 
@@ -279,12 +284,12 @@ namespace zce
             }
 
             /** get next split string fragment */
-            std::string next() {
-                const char* begin = _big;
-                const char* end = begin;
+            tstring next() {
+                const T* begin = _big;
+                const T* end = begin;
                 bool match = false;
                 while (*end) {
-                    const char* sp = _splitter;
+                    const T* sp = _splitter;
                     while (*sp) {
                         if (*sp == *end) {
                             match = true;
@@ -295,40 +300,40 @@ namespace zce
                     if (match) {
                         _big = end + 1;
                         if (begin == end) {                            
-                            return std::string();
+                            return tstring();
                         }
                         else {
-                            return std::string(begin, end - begin);
+                            return tstring(begin, end - begin);
                         }
                     }
                     else {
                         ++end;
                     }
                 }
-                std::string s = _big;
-                _big += strlen(_big);
+                tstring s = _big;
+                _big += tcslen(_big);
                 return s;
             }
 
-            void split(std::vector<std::string>& l) {
+            void split(std::vector<tstring>& l) {
                 while (more()) {
                     l.push_back(next());
                 }
             }
 
-            std::vector<std::string> split() {
-                std::vector<std::string> l;
+            std::vector<tstring> split() {
+                std::vector<tstring> l;
                 split(l);
                 return l;
             }
 
-            static std::vector<std::string> split(const std::string& big, const std::string& splitter) {
+            static std::vector<tstring> split(const tstring& big, const tstring& splitter) {
                 StringSplitter ss(big.c_str(), splitter.c_str());
                 return ss.split();
             }
 
-            static std::string join(std::vector<std::string>& l, const std::string& split) {
-                std::stringstream ss;
+            static tstring join(std::vector<tstring>& l, const tstring& split) {
+                tstringstream ss;
                 for (unsigned i = 0; i<l.size(); i++) {
                     if (i > 0)
                         ss << split;
@@ -338,19 +343,23 @@ namespace zce
             }
 
         private:
-            const char * _big;
-            const char * _splitter;
+            const T * _big;
+            const T* _splitter;
         };
 
-        inline void split(std::vector<std::string>& _ret, const char* _source, const char* _delims)
+        template<typename T>
+        inline void split(std::vector<typename StringSplitter<T>::tstring>& _ret, const T* _source, const T* _delims)
         {
-            StringSplitter spliter(_source, _delims);
+            StringSplitter<T> spliter(_source, _delims);
             spliter.split(_ret);
         }
 
-        inline void split_fullmatch(std::vector<std::string>& _ret, const std::string& _source, const std::string& _delims)
+        template<typename T>
+        inline void split_fullmatch(std::vector<typename StringSplitter<T>::tstring>& _ret,
+            const typename StringSplitter<T>::tstring& _source,
+            const typename StringSplitter<T>::tstring& _delims)
         {
-            if (_source == "") {
+            if (_source[0] == 0) {
                 return;
             }
             size_t start = 0;
@@ -374,14 +383,27 @@ namespace zce
         }
     } // namespace templates
 
+    
     inline std::vector<std::string> split(const char* _source, const char* _delims = "\t\n ")
     {
         std::vector<std::string> result;
-        templates::split(result, _source, _delims);
+        templates::split<char>(result, _source, _delims);
+        return result;
+    }
+
+    inline std::vector<std::wstring> split(const wchar_t* _source, const wchar_t* _delims = L"\t\n ")
+    {
+        std::vector<std::wstring> result;
+        templates::split<wchar_t>(result, _source, _delims);
         return result;
     }
 
     inline std::vector<std::string> split(const std::string& _source, const char* _delims = "\t\n ")
+    {
+        return split(_source.c_str(), _delims);
+    }
+
+    inline std::vector<std::wstring> split(const std::wstring& _source, const wchar_t* _delims = L"\t\n ")
     {
         return split(_source.c_str(), _delims);
     }

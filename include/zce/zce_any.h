@@ -117,7 +117,11 @@ public:
         len_or_port_ = port;
     }
 
-    zce_object* object() const noexcept {
+    inline bool is_object() const noexcept {
+        return type_ == any_object;
+    }
+
+    inline zce_object* object() const noexcept {
         ZCE_ASSERT_RETURN(type_ == any_object, 0);
         return u_.obj_;
     }
