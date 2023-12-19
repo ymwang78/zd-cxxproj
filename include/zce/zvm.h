@@ -20,6 +20,8 @@ public:
         const std::string& host, 
         unsigned short port);
 
+    void destroy(const std::string& svc_name);
+
     int rpc_call_dblock(const zce_smartptr<zce_object>& vmptr,
         const std::string& method,
         zce_dblock& dblock,
