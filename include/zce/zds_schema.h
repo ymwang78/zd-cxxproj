@@ -17,22 +17,17 @@ typedef struct _object PyObject;
 namespace zdp
 {
     enum ERV_ZDS_PAYLOAD : zce_byte {
-        ZDS_PAYLOAD_ANY,
-        ZDS_PAYLOAD_STRUCT,
-        ZDS_PAYLOAD_VARUINT,
-        ZDS_PAYLOAD_VARNINT, //如果是正数直接表达为VARUINT即可，这里只需要表达负数
-
-        ZDS_PAYLOAD_BYTE,
-        ZDS_PAYLOAD_UTF8,
-        ZDS_PAYLOAD_UTF16,
-        ZDS_PAYLOAD_UTF32,
-
+        ZDS_PAYLOAD_SIMPBINT, 
         ZDS_PAYLOAD_FLOAT,
         ZDS_PAYLOAD_DOUBLE,
         ZDS_PAYLOAD_DATETIME,
-        ZDS_PAYLOAD_BOOL,
+        ZDS_PAYLOAD_VARUINT,
+        ZDS_PAYLOAD_VARNINT,
 
-        ZDS_PAYLOAD_INTEXT1, //为支持快速各种INT/UINT数组内存交换，INTEXT通过一个扩展字节描述数组的INT子类型
+        ZDS_PAYLOAD_UTF8STR,
+        ZDS_PAYLOAD_FIXARR,
+        ZDS_PAYLOAD_STRUCT,
+        ZDS_PAYLOAD_ANY,
     };
 
     struct zds_context_t
@@ -44,6 +39,8 @@ namespace zdp
 
     int ZCE_API read_varuint_raw(zce_uint64& val, const zce_byte* buf, int size, zds_context_t* ctx);
 
+    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, bool val, zds_context_t* ctx);
+
     int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, zce_int64 val, zds_context_t* ctx);
 
     int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, zce_uint64 val, zds_context_t* ctx);
@@ -54,6 +51,7 @@ namespace zdp
 
     template<typename T>
     inline int zds_pack_builtin(zce_byte* buf, zce_int32 size, T val, zds_context_t* ctx) {
+        static_assert (std::is_integral<T>::value, "must be integral type");
         if (std::is_signed<T>::value) {
             zce_int64 tmp = (zce_int64)val;
             return zds_pack_builtin(buf, size, tmp, ctx);
@@ -183,6 +181,7 @@ namespace zdp
         return ret;
     }
 
+    //skip one object
     int ZCE_API zds_unpack_skip(const zce_byte* buf, zce_int32 size, zds_context_t* ctx);
 
 } //namespace zdp
