@@ -27,6 +27,7 @@ class zdl_builtin : public zdl_type
 public:
     zdl_builtin(int tpid);
     static std::string builtin_name(int tpid);
+    static std::string signed_builtin_name(int tpid);
     virtual void visit(const zdl_visitor_ptr&) const ;
 };
 typedef zce_smartptr<zdl_builtin> zdl_builtin_ptr;

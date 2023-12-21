@@ -16,9 +16,27 @@ typedef struct _object PyObject;
 
 namespace zdp
 {
+    enum ERV_ZDS_PAYLOAD : zce_byte {
+        ZDS_PAYLOAD_ANY,
+        ZDS_PAYLOAD_STRUCT,
+        ZDS_PAYLOAD_VARUINT,
+        ZDS_PAYLOAD_VARNINT, //如果是正数直接表达为VARUINT即可，这里只需要表达负数
+
+        ZDS_PAYLOAD_BYTE,
+        ZDS_PAYLOAD_UTF8,
+        ZDS_PAYLOAD_UTF16,
+        ZDS_PAYLOAD_UTF32,
+
+        ZDS_PAYLOAD_FLOAT,
+        ZDS_PAYLOAD_DOUBLE,
+        ZDS_PAYLOAD_DATETIME,
+        ZDS_PAYLOAD_BOOL,
+
+        ZDS_PAYLOAD_INTEXT1, //为支持快速各种INT/UINT数组内存交换，INTEXT通过一个扩展字节描述数组的INT子类型
+    };
+
     struct zds_context_t
     {
-        zce_byte noarray_ifsmall : 1;
         zce_byte version : 7;
     };
 
@@ -46,6 +64,8 @@ namespace zdp
         }
     }
 
+    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const zce_any& val, zds_context_t* ctx);
+
 #define DECLARE_PACK_BUILTIN_ARRAY(TT) \
     int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const std::vector<TT>& val, zds_context_t* ctx);\
     int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const TT* vec, unsigned vec_size, zds_context_t* ctx);
@@ -68,6 +88,10 @@ namespace zdp
     int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const zce::string_view& val, zds_context_t* ctx);
 
     int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const std::vector<std::string>& val, zds_context_t* ctx);
+
+    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const std::vector<zce_any>& val, zds_context_t* ctx);
+
+    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const std::map<zce_any, zce_any>& val, zds_context_t* ctx);
 
     int ZCE_API zds_pack_struct_header(zce_byte* buf, int size, zce_uint64 struct_prefix, zds_context_t* ctx, bool has_prefix);
 
@@ -112,6 +136,8 @@ namespace zdp
 	int ZCE_API zds_unpack_builtin(std::vector<zce_double>& val, const zce_byte* buf, zce_int32 size, zds_context_t* ctx);
 
     int ZCE_API zds_unpack_builtin(std::string& val, const zce_byte* buf, zce_int32 size, zds_context_t* ctx);
+
+    int ZCE_API zds_unpack_builtin(zce_any& val, const zce_byte* buf, zce_int32 size, zds_context_t* ctx);
 
     int ZCE_API zds_unpack_builtin(std::vector<std::string>& val, const zce_byte* buf, zce_int32 size, zds_context_t* ctx);
 

@@ -63,7 +63,7 @@ public:
         ZCE_MBACQUIRE(dblock, ret);
         if (dblock.capacity() < ret)
             return ZCE_ERROR_MALLOC;
-        ret = zdp::zds_pack(dblock.rd_ptr(), dblock.capacity(), t, 0, true);
+        ret = zdp::zds_pack(dblock.rd_ptr(), (int)dblock.capacity(), t, 0, true);
         if (ret < 0)
             return ret;
         dblock.wr_ptr(ret);

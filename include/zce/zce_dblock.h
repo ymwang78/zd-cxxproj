@@ -73,6 +73,10 @@ public:
         return *this;
     };
 
+    bool operator==(const zce_dblock& rhs) const noexcept {
+        return dt_ptr_ == rhs.dt_ptr_ && rd_pos_ == rhs.rd_pos_ && wr_pos_ == rhs.wr_pos_;
+    }
+
     zce_dblock(zce_dtblock* dtblock);
 
     zce_dblock(size_t size, zce_byte* buf, int wr_pos, int rd_pos = 0 ); //assign buffer, buffer managed outside

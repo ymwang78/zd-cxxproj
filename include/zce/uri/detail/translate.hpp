@@ -40,9 +40,9 @@ struct translate_impl<const char[N]> {
 
 template <>
 struct translate_impl<std::wstring> {
-  std::string operator()(const std::wstring &source) const {
-    return std::string(std::begin(source), std::end(source));
-  }
+    std::string operator()(const std::wstring &source) const {
+        return std:: string(std::begin(source), std::end(source));
+    }
 };
 
 template <int N>
