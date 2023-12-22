@@ -16,20 +16,6 @@ typedef struct _object PyObject;
 
 namespace zdp
 {
-    enum ERV_ZDS_PAYLOAD : zce_byte {
-        ZDS_PAYLOAD_SIMPBINT, 
-        ZDS_PAYLOAD_FLOAT,
-        ZDS_PAYLOAD_DOUBLE,
-        ZDS_PAYLOAD_DATETIME,
-        ZDS_PAYLOAD_VARUINT,
-        ZDS_PAYLOAD_VARNINT,
-
-        ZDS_PAYLOAD_UTF8STR,
-        ZDS_PAYLOAD_FIXARR,
-        ZDS_PAYLOAD_STRUCT,
-        ZDS_PAYLOAD_ANY,
-    };
-
     struct zds_context_t
     {
         zce_byte version : 7;
@@ -185,60 +171,3 @@ namespace zdp
     int ZCE_API zds_unpack_skip(const zce_byte* buf, zce_int32 size, zds_context_t* ctx);
 
 } //namespace zdp
-
-class zdl_struct;
-class zdl_member;
-class zdl_parser_context;
-class zvm_py;
-
-class zpy_unmarshal_context
-{
-    zce_smartptr<zvm_py> zvm_;
-
-    static std::string get_module_name(const std::string& structname);
-
-    PyObject* default_struct_instance(const zce_smartptr<zdl_struct>& struct_ptr);
-
-    PyObject* default_obj_from_member(const zce_smartptr<zdl_member>& member_ptr);
-public:
-
-    zpy_unmarshal_context(const zce_smartptr<zvm_py>& pyvm);
-
-    ~zpy_unmarshal_context();
-
-    int unmarshal_builtin(PyObject*& p, zce_byte pt, const zce_byte* buf, int size);
-
-    int unmarshal_string(PyObject*& str, const zce_byte* buf, int size);
-
-    int unmarshal_struct(PyObject*& obj, const zce_smartptr<zdl_struct>& struct_ptr, const zce_byte* buf, int size);
-
-    int unmarshal_builtin_array(PyObject*& obj, int pt, const zce_byte* buf, int size);
-
-    int unmarshal_struct_array(PyObject*& obj, const zce_smartptr<zdl_struct>& struct_ptr, const zce_byte* buf, int size);
-
-    int unmarshal_member(PyObject*& obj, const zce_smartptr<zdl_member>& member, const zce_byte* buf, int size);
-
-    int unmarshal_vector_from_struct(std::vector<PyObject*>& obj, const zce_smartptr<zdl_struct>& struct_ptr, const zce_byte* buf, int size);
-};
-
-class zpy_marshal_context
-{
-    zce_smartptr<zvm_py> zvm_;
-
-    static std::string get_module_name(const std::string& structname);
-    
-public:
-    zpy_marshal_context(const zce_smartptr<zvm_py>& pyvm);
-
-    ~zpy_marshal_context();
-
-    int marshal_string(zce_byte* buf, int size, PyObject* str, const char* varname);
-
-    int marshal_struct(zce_byte* buf, int size, PyObject* obj, const zdl_struct* struct_ptr, bool has_prefix);
-
-    int marshal_builtin_array(zce_byte* buf, int size, PyObject* obj, int ut, const char* varname);
-
-    int marshal_struct_array(zce_byte* buf, int size, PyObject* obj, const zdl_struct* struct_ptr, const char* varname);
-
-    int marshal_member(zce_byte* buf, int size, PyObject* obj, const zce_smartptr<zdl_member>& member);
-};
