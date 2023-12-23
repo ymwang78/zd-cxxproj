@@ -22,8 +22,8 @@ class ZCE_API zce_any
         any_intarray,
         any_fltarray,
         any_dblarray,
-        any_boolarray,  //not fully supported
         any_str,        //string always as a 0 in tail, but not calculated in length
+        any_boolarray,  //not fully supported
         any_dict,
         any_vector,
     };
@@ -41,6 +41,7 @@ class ZCE_API zce_any
             zce_dblock* dblock_;
             zce_byte* bytearray_;
             char* str_;
+            std::vector<bool>* boolvec_;
             std::map<zce_any, zce_any>* dict_;
             std::vector<zce_any>* vec_;
         } u_;
@@ -54,8 +55,8 @@ class ZCE_API zce_any
     } data_;
 
     template<typename T>
-    zce_byte _to_type() {
-        else if constexpr (std::is_same<T, zce_float>::value) {
+    _any_types _to_type() {
+        if constexpr (std::is_same<T, zce_float>::value) {
             return any_fltarray;
         }
         else if constexpr (std::is_same<T, zce_double>::value) {
@@ -64,7 +65,11 @@ class ZCE_API zce_any
         else if constexpr (std::is_same<T, char>::value) {
             return any_str;
         }
+        else if constexpr (std::is_integral<T>::value) {
+            return any_intarray;
+        }
         else {
+            static_assert (std::is_same<T, zce_byte>::value, "must be integral type");
             return any_intarray;
         }
     }
@@ -108,24 +113,34 @@ public:
 
     zce_any(zce_double dbl) noexcept 
         : data_{} {
+        data_.type_ = any_double;
         data_.u_.dbl_ = dbl;
+    }
+
+    zce_any(const void* raw) noexcept
+        : data_{} {
+        data_.type_ = any_rawptr;
+        data_.u_.rawptr_ = (void*)raw;
     }
 
     zce_any(zce_object* obj) noexcept 
         : data_{} {
+        data_.type_ = any_object;
         data_.u_.obj_ = obj;
         if (data_.u_.obj_)
             data_.u_.obj_->__addref();
     }
 
     template<typename T>
-    zce_any(const T* brray, size_t len) noexcept
-        : type_(_to_type<T>()), intbits_(0), outplace_(0) {
-        new (this) zce_any((const zce_byte*)buf, len * sizeof(T),
+    zce_any(const T* brray, size_t len) noexcept {
+        new (this) zce_any((const zce_byte*)brray,
+            (size_t)len * sizeof(T),
             _to_type<T>(),
             constexpr (std::is_signed<T>::value),
             zce_bits_msb_index(sizeof(T)));
     }
+
+    zce_any(const std::vector<bool>& vec) noexcept;
 
     zce_any(const char* str, size_t len) noexcept;
 
@@ -133,12 +148,14 @@ public:
 
     zce_any(const struct in_addr& ipv4, unsigned short port) noexcept 
         : data_{} {
+        data_.type_ = any_ipv4;
         data_.u_.ipv4_ = ipv4;
         data_.len_or_port_ = port;
     }
 
     zce_any(const struct in6_addr& ipv6, unsigned short port) noexcept 
         : data_{} {
+        data_.type_ = any_ipv6;
         data_.u_.ipv6_ = ipv6;
         data_.len_or_port_ = port;
     }
@@ -190,9 +207,10 @@ public:
         return data_.u_.dblock_;
     }
 
+    int get_array_raw(const zce_byte*& buf, size_t& len, zce_byte& fixarr_v) const noexcept;
+
     inline bool is_array() const noexcept {
         return data_.type_ == any_intarray 
-            || data_.type_ == any_boolarray 
             || data_.type_ == any_fltarray 
             || data_.type_ == any_dblarray;
     }
@@ -236,13 +254,25 @@ public:
     }
 
     inline std::map<zce_any, zce_any>& dict() {
-        ZCE_ASSERT_RETURN(data_.type_ == any_dict, *(std::map<zce_any, zce_any>*)0);
+        static std::map<zce_any, zce_any> empty;
+        ZCE_ASSERT_RETURN(data_.type_ == any_dict, empty);
         return *data_.u_.dict_;
     }
 
     inline const std::map<zce_any, zce_any>& dict() const noexcept {
-        ZCE_ASSERT_RETURN(type_ == any_dict, *(std::map<zce_any, zce_any>*)0);
+        static std::map<zce_any, zce_any> empty;
+        ZCE_ASSERT_RETURN(data_.type_ == any_dict, empty);
         return *data_.u_.dict_;
+    }
+
+    inline bool is_boolvec() const noexcept {
+        return data_.type_ == any_boolarray;
+    }
+
+    inline const std::vector<bool>& boolvec() const noexcept {
+        static std::vector<bool> empty;
+        ZCE_ASSERT_RETURN(data_.type_ == any_boolarray, empty);
+        return *data_.u_.boolvec_;
     }
 
     inline bool is_vector() const noexcept {
@@ -250,12 +280,14 @@ public:
     }
 
     inline std::vector<zce_any>& vector() {
-        ZCE_ASSERT_RETURN(data_.type_ == any_vector, *(std::vector<zce_any>*)0);
+        static std::vector<zce_any> empty;
+        ZCE_ASSERT_RETURN(data_.type_ == any_vector, empty);
         return *data_.u_.vec_;
     }
 
     inline const std::vector<zce_any>& vector() const noexcept {
-        ZCE_ASSERT_RETURN(data_.type_ == any_vector, *(std::vector<zce_any>*)0);
+        static std::vector<zce_any> empty;
+        ZCE_ASSERT_RETURN(data_.type_ == any_vector, empty);
         return *data_.u_.vec_;
     }
 };
