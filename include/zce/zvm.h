@@ -29,11 +29,6 @@ public:
         zce_dblock& dblock,
         const std::function<void(int error_code, const zce_dblock& retdata)>& response);
 
-    //int lpc_call_dblock(const std::string& svrname,
-    //    const std::string& method,
-    //    zce_dblock& dblock,
-    //    const std::function<void(int error_code, const zce_dblock& retdata)>& response);
-
     template<typename T>
     int rpc_call_builtin(const zce_smartptr<zce_object>& vmptr,
         const std::string& method,
@@ -54,7 +49,7 @@ public:
     }
 
     template<typename T>
-    int rpc_call(const zce_smartptr<zce_object>& vmptr,
+    int rpc_call_msg(const zce_smartptr<zce_object>& vmptr,
         const std::string& method,
         const T& t,
         const std::function<void(int error_code, const zce_dblock& retdata)>& response) {
@@ -70,5 +65,22 @@ public:
             return ret;
         dblock.wr_ptr(ret);
         return rpc_call_dblock(vmptr, method, dblock, response);
+    }
+
+    template<typename T>
+    int rpc_call(const zce_smartptr<zce_object>& vmptr,
+        const std::string& method,
+        const T& t,
+        const std::function<void(int error_code, const zce_dblock& retdata)>& response) {
+
+        if constexpr (std::is_same<T, zce_dblock>::value) {
+            return rpc_call_dblock(vmptr, method, t, response);
+        }
+        else if constexpr (zdp::is_builtin_type<T>()) {
+            return rpc_call_builtin(vmptr, method, t, response);
+        }
+        else {
+            return rpc_call_msg(vmptr, method, t, response);
+        }
     }
 };

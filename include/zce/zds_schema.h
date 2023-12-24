@@ -21,6 +21,35 @@ namespace zdp
         zce_byte version : 7;
     };
 
+    template<typename T>
+    struct is_builtin_basic : std::integral_constant <bool, 
+        std::is_arithmetic<T>::value 
+        || std::is_same<T, std::string>::value 
+        || std::is_same<T, zce_dblock>::value
+    > {};
+
+    template<typename T>
+    struct is_builtin_vector : std::false_type {};
+
+    template<typename T>
+    struct is_builtin_vector<std::vector<T>> : std::integral_constant <bool,
+        is_builtin_basic<T>::value > {};
+
+    //template<typename T>
+    //struct is_builtin_or_vector_or_string : std::integral_constant<bool,
+    //    is_builtin_basic<T>::value ||
+    //    is_builtin_string<T>::value ||
+    //    is_string<T>::value> {};
+
+    template<typename T>
+    constexpr bool is_builtin_type() {
+        using decayed_type = typename std::remove_cv<typename std::remove_reference<T>::type>::type;
+        return is_builtin_basic<T>::value 
+            || is_builtin_vector<T>::value 
+            || (std::is_pointer<decayed_type>::value && is_builtin_basic<typename std::remove_pointer<decayed_type>::type>::value)
+            || (std::is_array<decayed_type>::value && is_builtin_basic<typename std::remove_extent<decayed_type>::type>::value);
+    }
+
     int ZCE_API write_varuint_raw(zce_byte* buf, int size, zce_uint64 val, zds_context_t* ctx);
 
     int ZCE_API read_varuint_raw(zce_uint64& val, const zce_byte* buf, int size, zds_context_t* ctx);
@@ -66,6 +95,8 @@ namespace zdp
     DECLARE_PACK_BUILTIN_ARRAY(zce_int64)
     DECLARE_PACK_BUILTIN_ARRAY(zce_float)
     DECLARE_PACK_BUILTIN_ARRAY(zce_double)
+
+    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const char* val, zds_context_t* ctx);
 
     int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const std::string& val, zds_context_t* ctx);
 

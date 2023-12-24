@@ -290,4 +290,29 @@ public:
         ZCE_ASSERT_RETURN(data_.type_ == any_vector, empty);
         return *data_.u_.vec_;
     }
+
+    template<typename T> 
+    T* get() noexcept {
+        if constexpr (std::is_same<T, zce_float>::value) {
+            return (T*)array<zce_float>();
+        }
+        else if constexpr (std::is_same<T, zce_double>::value) {
+            return (T*)array<zce_double>();
+        }
+        else if constexpr (std::is_same<T, char>::value) {
+            return (T*)str();
+        }
+        else if constexpr (std::is_integral<T>::value) {
+            return (T*)array<zce_byte>();
+        }
+        else if constexpr (std::is_same<T, zce_byte>::value) {
+            return (T*)array<zce_byte>();
+        }
+        else {
+            if (is_object()) {
+                return dynamic_cast<T*>(object());
+            }
+            return nullptr;
+        }
+    }
 };
