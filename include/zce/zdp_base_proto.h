@@ -121,17 +121,23 @@ namespace zdp_base
 
         bool operator==(const zobject_proxy_t& _t) const noexcept
         {
+            if (objtype != _t.objtype) return false;
+            if (objid != _t.objid) return false;
+            if (svcname != _t.svcname) return false;
             if (host != _t.host) return false;
             if (port != _t.port) return false;
-            if (svcname != _t.svcname) return false;
-            if (objid != _t.objid) return false;
+            if (keepalive != _t.keepalive) return false;
+            if (dummy != _t.dummy) return false;
             return true;
         }
 
+        zce_astring objtype;
+        zce_int64    objid;
+        zce_astring svcname;
         zce_astring host;
         zce_uint16    port;
-        zce_astring svcname;
-        zce_int64    objid;
+        zce_byte    keepalive;
+        zce_byte    dummy;
     };
     struct MSG_NONE_REQ : public zce_object
     {
@@ -185,13 +191,13 @@ namespace zdp_base
 
         bool operator==(const MSG_RPCCALL_REQ& _t) const noexcept
         {
-            if (svcname != _t.svcname) return false;
+            if (!(target == _t.target)) return false;
             if (method != _t.method) return false;
             if (payload != _t.payload) return false;
             return true;
         }
 
-        zce_string svcname;
+        zobject_proxy_t    target;
         zce_string method;
         std::vector<zce_byte> payload;
     };
