@@ -31,8 +31,13 @@ void zdl_yy_user_init();
 
 identifier          [[:alpha:]_][[:alnum:]_]*
 integer_constant    (\+|-)?((0[0-7]+)|(0x[[:xdigit:]]+)|([[:digit:]]+))
-
+double_constant     (\+|-)?[[:digit:]]+\.[[:digit:]]*([eE](\+|-)?[[:digit:]]+)?
+utf8_bom            \xEF\xBB\xBF
 %%
+
+{utf8_bom} {
+    // Ignore white-space
+}
 
 "\"" {
 	// STRING
@@ -123,6 +128,11 @@ integer_constant    (\+|-)?((0[0-7]+)|(0x[[:xdigit:]]+)|([[:digit:]]+))
     return UIDL_INTEGER_LITERAL;
 }
 
+{double_constant} {
+    *yylvalp = yytext;
+    return UIDL_DOUBLE_LITERAL;
+}
+
 [[:space:]] {
     // Igore white-space
     if (yytext[0] == '\n'){
@@ -173,6 +183,7 @@ zdl_keyword_map::zdl_keyword_map()
     add_new_keyword("enum",			UIDL_ENUM);
     add_new_keyword("struct",		UIDL_STRUCT);
     add_new_keyword("namespace",	UIDL_NAMESPACE);
+    add_new_keyword("any",	        UIDL_ANY);
 }
 
 void zdl_keyword_map::add_new_keyword(const char* name, int id)

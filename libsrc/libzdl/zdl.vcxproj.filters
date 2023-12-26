@@ -36,6 +36,9 @@
     <ClCompile Include="zdl_type.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="zdl_module.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="zdl_grammar.y">

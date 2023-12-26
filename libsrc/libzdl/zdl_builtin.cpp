@@ -13,6 +13,7 @@
 #include "zdl/zdl_builtin.h"
 #include "zdl/zdl_visitor.h"
 #include "zdl_grammar.tab.hpp"
+#include "zdl/zdl_module.h"
 
 std::string zdl_builtin::builtin_name(int tpid)
 {
@@ -52,12 +53,27 @@ std::string zdl_builtin::builtin_name(int tpid)
         return "zce_double";
     case UIDL_SERIAL:
         return "zce_serial";
+    case UIDL_ANY:
+        return "zce_any";
     }
     return "";
 }
 
+std::string zdl_builtin::signed_builtin_name(int tpid)
+{
+    switch (tpid) {
+    case UIDL_USHORT:
+        return "zce_int32";
+    case UIDL_UINT32:
+        return "zce_int64";
+    case UIDL_UINT64:
+        return "zce_int64";
+    }
+    return builtin_name(tpid);
+}
+
 zdl_builtin::zdl_builtin(int tpid)
-:zdl_type(tpid, builtin_name(tpid))
+:zdl_type(tpid, zce_smartptr<zdl_module>(0), builtin_name(tpid))
 {
 }
 

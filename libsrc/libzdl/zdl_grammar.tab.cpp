@@ -148,57 +148,60 @@ enum yysymbol_kind_t
   YYSYMBOL_UIDL_ASTRVEC = 18,              /* UIDL_ASTRVEC  */
   YYSYMBOL_UIDL_TSTRVEC = 19,              /* UIDL_TSTRVEC  */
   YYSYMBOL_UIDL_WSTRVEC = 20,              /* UIDL_WSTRVEC  */
-  YYSYMBOL_UIDL_ENUM = 21,                 /* UIDL_ENUM  */
-  YYSYMBOL_UIDL_STRUCT = 22,               /* UIDL_STRUCT  */
-  YYSYMBOL_UIDL_NAMESPACE = 23,            /* UIDL_NAMESPACE  */
-  YYSYMBOL_UIDL_IDENTIFIER = 24,           /* UIDL_IDENTIFIER  */
-  YYSYMBOL_UIDL_INTEGER_LITERAL = 25,      /* UIDL_INTEGER_LITERAL  */
-  YYSYMBOL_UIDL_STRING_LITERAL = 26,       /* UIDL_STRING_LITERAL  */
-  YYSYMBOL_UIDL_COMMENT = 27,              /* UIDL_COMMENT  */
-  YYSYMBOL_UIDL_USER_START = 28,           /* UIDL_USER_START  */
-  YYSYMBOL_29_ = 29,                       /* '{'  */
-  YYSYMBOL_30_ = 30,                       /* '}'  */
-  YYSYMBOL_31_ = 31,                       /* ';'  */
-  YYSYMBOL_32_ = 32,                       /* ','  */
-  YYSYMBOL_33_ = 33,                       /* '['  */
-  YYSYMBOL_34_ = 34,                       /* ']'  */
-  YYSYMBOL_35_ = 35,                       /* '<'  */
-  YYSYMBOL_36_ = 36,                       /* '>'  */
-  YYSYMBOL_37_ = 37,                       /* '*'  */
-  YYSYMBOL_38_ = 38,                       /* '~'  */
-  YYSYMBOL_39_ = 39,                       /* '='  */
-  YYSYMBOL_40_ = 40,                       /* ':'  */
-  YYSYMBOL_YYACCEPT = 41,                  /* $accept  */
-  YYSYMBOL_start = 42,                     /* start  */
-  YYSYMBOL_comments = 43,                  /* comments  */
-  YYSYMBOL_namespace_def = 44,             /* namespace_def  */
-  YYSYMBOL_45_1 = 45,                      /* $@1  */
-  YYSYMBOL_definitions = 46,               /* definitions  */
-  YYSYMBOL_definition = 47,                /* definition  */
-  YYSYMBOL_meta_key = 48,                  /* meta_key  */
-  YYSYMBOL_meta_val = 49,                  /* meta_val  */
-  YYSYMBOL_meta_data = 50,                 /* meta_data  */
-  YYSYMBOL_meta_data_set = 51,             /* meta_data_set  */
-  YYSYMBOL_num = 52,                       /* num  */
-  YYSYMBOL_limit_arg = 53,                 /* limit_arg  */
-  YYSYMBOL_template_args = 54,             /* template_args  */
-  YYSYMBOL_template = 55,                  /* template  */
-  YYSYMBOL_type_id = 56,                   /* type_id  */
-  YYSYMBOL_struct_id = 57,                 /* struct_id  */
-  YYSYMBOL_struct_def = 58,                /* struct_def  */
-  YYSYMBOL_59_2 = 59,                      /* $@2  */
-  YYSYMBOL_struct_exports = 60,            /* struct_exports  */
-  YYSYMBOL_struct_export = 61,             /* struct_export  */
-  YYSYMBOL_data_member = 62,               /* data_member  */
-  YYSYMBOL_enum_id = 63,                   /* enum_id  */
-  YYSYMBOL_enum_def = 64,                  /* enum_def  */
-  YYSYMBOL_65_3 = 65,                      /* $@3  */
-  YYSYMBOL_enumerator_list = 66,           /* enumerator_list  */
-  YYSYMBOL_enumerator = 67,                /* enumerator  */
-  YYSYMBOL_type = 68,                      /* type  */
-  YYSYMBOL_basetype = 69,                  /* basetype  */
-  YYSYMBOL_usertype = 70,                  /* usertype  */
-  YYSYMBOL_keyword = 71                    /* keyword  */
+  YYSYMBOL_UIDL_ANY = 21,                  /* UIDL_ANY  */
+  YYSYMBOL_UIDL_ENUM = 22,                 /* UIDL_ENUM  */
+  YYSYMBOL_UIDL_STRUCT = 23,               /* UIDL_STRUCT  */
+  YYSYMBOL_UIDL_NAMESPACE = 24,            /* UIDL_NAMESPACE  */
+  YYSYMBOL_UIDL_IDENTIFIER = 25,           /* UIDL_IDENTIFIER  */
+  YYSYMBOL_UIDL_INTEGER_LITERAL = 26,      /* UIDL_INTEGER_LITERAL  */
+  YYSYMBOL_UIDL_DOUBLE_LITERAL = 27,       /* UIDL_DOUBLE_LITERAL  */
+  YYSYMBOL_UIDL_STRING_LITERAL = 28,       /* UIDL_STRING_LITERAL  */
+  YYSYMBOL_UIDL_COMMENT = 29,              /* UIDL_COMMENT  */
+  YYSYMBOL_UIDL_USER_START = 30,           /* UIDL_USER_START  */
+  YYSYMBOL_31_ = 31,                       /* '='  */
+  YYSYMBOL_32_ = 32,                       /* '{'  */
+  YYSYMBOL_33_ = 33,                       /* '}'  */
+  YYSYMBOL_34_ = 34,                       /* ';'  */
+  YYSYMBOL_35_ = 35,                       /* ','  */
+  YYSYMBOL_36_ = 36,                       /* '['  */
+  YYSYMBOL_37_ = 37,                       /* ']'  */
+  YYSYMBOL_38_ = 38,                       /* '<'  */
+  YYSYMBOL_39_ = 39,                       /* '>'  */
+  YYSYMBOL_40_ = 40,                       /* '*'  */
+  YYSYMBOL_41_ = 41,                       /* '~'  */
+  YYSYMBOL_42_ = 42,                       /* ':'  */
+  YYSYMBOL_YYACCEPT = 43,                  /* $accept  */
+  YYSYMBOL_start = 44,                     /* start  */
+  YYSYMBOL_initval = 45,                   /* initval  */
+  YYSYMBOL_comments = 46,                  /* comments  */
+  YYSYMBOL_namespace_def = 47,             /* namespace_def  */
+  YYSYMBOL_48_1 = 48,                      /* $@1  */
+  YYSYMBOL_definitions = 49,               /* definitions  */
+  YYSYMBOL_definition = 50,                /* definition  */
+  YYSYMBOL_meta_key = 51,                  /* meta_key  */
+  YYSYMBOL_meta_val = 52,                  /* meta_val  */
+  YYSYMBOL_meta_data = 53,                 /* meta_data  */
+  YYSYMBOL_meta_data_set = 54,             /* meta_data_set  */
+  YYSYMBOL_num = 55,                       /* num  */
+  YYSYMBOL_limit_arg = 56,                 /* limit_arg  */
+  YYSYMBOL_template_args = 57,             /* template_args  */
+  YYSYMBOL_template = 58,                  /* template  */
+  YYSYMBOL_type_id = 59,                   /* type_id  */
+  YYSYMBOL_struct_id = 60,                 /* struct_id  */
+  YYSYMBOL_struct_def = 61,                /* struct_def  */
+  YYSYMBOL_62_2 = 62,                      /* $@2  */
+  YYSYMBOL_struct_exports = 63,            /* struct_exports  */
+  YYSYMBOL_struct_export = 64,             /* struct_export  */
+  YYSYMBOL_data_member = 65,               /* data_member  */
+  YYSYMBOL_enum_id = 66,                   /* enum_id  */
+  YYSYMBOL_enum_def = 67,                  /* enum_def  */
+  YYSYMBOL_68_3 = 68,                      /* $@3  */
+  YYSYMBOL_enumerator_list = 69,           /* enumerator_list  */
+  YYSYMBOL_enumerator = 70,                /* enumerator  */
+  YYSYMBOL_type = 71,                      /* type  */
+  YYSYMBOL_basetype = 72,                  /* basetype  */
+  YYSYMBOL_usertype = 73,                  /* usertype  */
+  YYSYMBOL_keyword = 74                    /* keyword  */
 };
 typedef enum yysymbol_kind_t yysymbol_kind_t;
 
@@ -526,19 +529,19 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  5
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   171
+#define YYLAST   189
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  41
+#define YYNTOKENS  43
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  31
+#define YYNNTS  32
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  79
+#define YYNRULES  84
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  117
+#define YYNSTATES  125
 
 /* YYMAXUTOK -- Last valid token kind.  */
-#define YYMAXUTOK   283
+#define YYMAXUTOK   285
 
 
 /* YYTRANSLATE(TOKEN-NUM) -- Symbol number corresponding to TOKEN-NUM
@@ -556,15 +559,15 @@ static const yytype_int8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,    37,     2,    32,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,    40,    31,
-      35,    39,    36,     2,     2,     2,     2,     2,     2,     2,
+       2,     2,    40,     2,    35,     2,     2,     2,     2,     2,
+       2,     2,     2,     2,     2,     2,     2,     2,    42,    34,
+      38,    31,    39,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,    33,     2,    34,     2,     2,     2,     2,     2,     2,
+       2,    36,     2,    37,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,    29,     2,    30,    38,     2,     2,     2,
+       2,     2,     2,    32,     2,    33,    41,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
@@ -580,21 +583,22 @@ static const yytype_int8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     1,     2,     3,     4,
        5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
       15,    16,    17,    18,    19,    20,    21,    22,    23,    24,
-      25,    26,    27,    28
+      25,    26,    27,    28,    29,    30
 };
 
 #if YYDEBUG
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int16 yyrline[] =
 {
-       0,    81,    81,    88,   100,   108,   107,   115,   121,   124,
-     128,   133,   139,   143,   150,   156,   160,   165,   170,   178,
-     182,   186,   191,   197,   206,   214,   218,   225,   230,   238,
-     243,   254,   261,   271,   278,   287,   286,   298,   302,   307,
-     313,   323,   327,   331,   339,   344,   353,   352,   362,   365,
-     369,   375,   380,   384,   393,   396,   401,   405,   409,   413,
-     417,   421,   425,   429,   433,   437,   441,   445,   449,   453,
-     457,   461,   465,   469,   476,   480,   484,   490,   491,   492
+       0,    82,    82,    88,    92,    96,   101,   106,   118,   126,
+     125,   133,   139,   142,   146,   151,   157,   161,   168,   174,
+     178,   183,   188,   196,   200,   204,   209,   215,   224,   232,
+     236,   243,   248,   256,   261,   272,   279,   289,   297,   306,
+     305,   317,   321,   326,   332,   344,   348,   352,   360,   365,
+     374,   373,   383,   386,   390,   396,   401,   405,   414,   417,
+     422,   426,   430,   434,   438,   442,   446,   450,   454,   458,
+     462,   466,   470,   474,   478,   482,   486,   490,   494,   501,
+     505,   509,   515,   516,   517
 };
 #endif
 
@@ -614,17 +618,17 @@ static const char *const yytname[] =
   "UIDL_UCHAR", "UIDL_SHORT", "UIDL_USHORT", "UIDL_INT32", "UIDL_UINT32",
   "UIDL_INT64", "UIDL_UINT64", "UIDL_FLOAT", "UIDL_DOUBLE", "UIDL_ASTRING",
   "UIDL_TSTRING", "UIDL_WSTRING", "UIDL_SERIAL", "UIDL_DATETIME",
-  "UIDL_ASTRVEC", "UIDL_TSTRVEC", "UIDL_WSTRVEC", "UIDL_ENUM",
+  "UIDL_ASTRVEC", "UIDL_TSTRVEC", "UIDL_WSTRVEC", "UIDL_ANY", "UIDL_ENUM",
   "UIDL_STRUCT", "UIDL_NAMESPACE", "UIDL_IDENTIFIER",
-  "UIDL_INTEGER_LITERAL", "UIDL_STRING_LITERAL", "UIDL_COMMENT",
-  "UIDL_USER_START", "'{'", "'}'", "';'", "','", "'['", "']'", "'<'",
-  "'>'", "'*'", "'~'", "'='", "':'", "$accept", "start", "comments",
-  "namespace_def", "$@1", "definitions", "definition", "meta_key",
-  "meta_val", "meta_data", "meta_data_set", "num", "limit_arg",
-  "template_args", "template", "type_id", "struct_id", "struct_def", "$@2",
-  "struct_exports", "struct_export", "data_member", "enum_id", "enum_def",
-  "$@3", "enumerator_list", "enumerator", "type", "basetype", "usertype",
-  "keyword", YY_NULLPTR
+  "UIDL_INTEGER_LITERAL", "UIDL_DOUBLE_LITERAL", "UIDL_STRING_LITERAL",
+  "UIDL_COMMENT", "UIDL_USER_START", "'='", "'{'", "'}'", "';'", "','",
+  "'['", "']'", "'<'", "'>'", "'*'", "'~'", "':'", "$accept", "start",
+  "initval", "comments", "namespace_def", "$@1", "definitions",
+  "definition", "meta_key", "meta_val", "meta_data", "meta_data_set",
+  "num", "limit_arg", "template_args", "template", "type_id", "struct_id",
+  "struct_def", "$@2", "struct_exports", "struct_export", "data_member",
+  "enum_id", "enum_def", "$@3", "enumerator_list", "enumerator", "type",
+  "basetype", "usertype", "keyword", YY_NULLPTR
 };
 
 static const char *
@@ -634,12 +638,12 @@ yysymbol_name (yysymbol_kind_t yysymbol)
 }
 #endif
 
-#define YYPACT_NINF (-102)
+#define YYPACT_NINF (-85)
 
 #define yypact_value_is_default(Yyn) \
   ((Yyn) == YYPACT_NINF)
 
-#define YYTABLE_NINF (-40)
+#define YYTABLE_NINF (-44)
 
 #define yytable_value_is_error(Yyn) \
   0
@@ -648,18 +652,19 @@ yysymbol_name (yysymbol_kind_t yysymbol)
    STATE-NUM.  */
 static const yytype_int16 yypact[] =
 {
-      -8,   -13,    17,  -102,  -102,  -102,    -1,     4,    -4,    81,
-       5,     0,     1,     2,     9,  -102,  -102,  -102,  -102,  -102,
-    -102,  -102,  -102,  -102,  -102,  -102,  -102,  -102,  -102,  -102,
-    -102,  -102,  -102,  -102,  -102,  -102,  -102,  -102,    12,    14,
-    -102,  -102,  -102,  -102,  -102,  -102,     7,  -102,     4,  -102,
-     103,    13,    15,  -102,   -28,    -5,    11,  -102,    34,     6,
-     -14,   125,    -2,    31,  -102,  -102,  -102,  -102,     6,     6,
-    -102,   147,    16,    41,   -21,    43,    42,  -102,  -102,  -102,
-    -102,    44,    39,    23,  -102,  -102,    12,    14,  -102,     6,
-      46,  -102,   -14,    52,  -102,  -102,   125,    -2,  -102,    34,
-    -102,    45,    55,  -102,  -102,     6,  -102,  -102,  -102,    -2,
-    -102,  -102,   -24,  -102,    -2,    48,  -102
+      20,    28,    54,   -85,   -85,   -85,    25,    23,    21,    97,
+      31,    27,    32,    30,   -85,   -85,   -85,   -85,   -85,   -85,
+     -85,   -85,   -85,   -85,   -85,   -85,   -85,   -85,   -85,   -85,
+     -85,   -85,   -85,   -85,   -85,   -85,   -85,   -85,    36,    41,
+     -85,   -85,   -85,   -85,   -85,   -85,    42,    27,    45,   -85,
+      23,    37,    38,   -85,   -11,   -85,    39,   -85,   120,   -85,
+      -1,   143,    17,    29,   -85,    13,    35,    40,    31,    27,
+      43,    46,    18,    44,    47,   -85,   -85,   -85,   -85,    48,
+      34,    56,   -85,   -85,   -85,    31,   -85,   166,   -85,    -1,
+      58,   -85,   -85,   143,    17,   -85,    40,   -85,    36,    41,
+     -85,    55,     0,   -85,    31,   -85,   -85,   -85,     9,    31,
+      49,    62,   -85,   -85,   -85,   -85,   -85,   -85,    17,   -85,
+      -8,   -85,    17,    51,   -85
 };
 
 /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -667,36 +672,37 @@ static const yytype_int16 yypact[] =
    means the default is an error.  */
 static const yytype_int8 yydefact[] =
 {
-       7,     0,     0,     2,     5,     1,     0,     0,     0,     0,
-       0,     0,     9,    20,     0,    35,    12,    46,    13,    10,
-      56,    57,    58,    59,    60,    61,    62,    63,    64,    65,
-      66,    67,    68,    72,    73,    69,    70,    71,    78,    79,
-      44,    77,    54,    55,    45,    14,    17,     6,     0,    19,
-       0,     0,     0,    76,    28,     0,     0,     8,    28,     4,
-      20,    50,    22,     0,    74,    16,    15,    18,     4,     4,
-      34,     0,     0,    38,     4,     0,    49,    53,    24,    21,
-      23,    26,     0,     0,    33,     3,     0,     0,    41,     4,
-      43,    36,    20,     0,    52,    47,    50,    22,    27,    28,
-      40,    29,     0,    42,    37,     4,    48,    25,    75,    22,
-      30,    51,     0,    32,    22,     0,    31
+      11,     0,     0,     2,     9,     1,     0,     0,     0,     0,
+       8,    24,     0,    13,    39,    16,    50,    17,    14,    60,
+      61,    62,    63,    64,    65,    66,    67,    68,    69,    70,
+      71,    72,    76,    77,    73,    74,    75,    78,    83,    84,
+      48,    82,    58,    59,    49,     7,     0,    24,     0,    10,
+       0,     0,     0,    81,    32,    18,    21,    23,     0,    12,
+       8,    54,    26,     0,    79,     0,     0,    32,     8,    24,
+       0,    42,     8,     0,    53,    57,    28,    25,    27,    30,
+       0,     0,    20,    19,    22,     8,    38,     0,    40,     8,
+       0,    56,    51,    54,    26,    31,    32,    37,     0,     0,
+      45,     6,    47,    41,     8,    52,    29,    80,     0,     8,
+      33,     0,    46,    55,     3,     5,     4,    44,    26,    34,
+       0,    36,    26,     0,    35
 };
 
 /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-    -102,  -102,   -65,  -102,  -102,    56,  -102,  -102,  -102,  -102,
-     -12,  -102,  -101,    29,   -56,  -102,  -102,  -102,  -102,    78,
-    -102,  -102,  -102,  -102,  -102,    75,  -102,    77,  -102,  -102,
-      -9
+     -85,   -85,   -85,   -10,   -85,   -85,    71,   -85,   -85,   -85,
+     -85,   -21,   -85,   -84,    -5,   -66,   -85,   -85,   -85,   -85,
+       1,   -85,   -85,   -85,   -85,   -85,    -2,   -85,     5,   -85,
+     -85,    -7
 };
 
 /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-       0,     2,    70,     3,     6,    11,    12,    46,    56,    13,
-      14,    80,    81,    82,    64,    88,    15,    16,    51,    72,
-      73,    89,    17,    18,    52,    75,    76,    41,    42,    43,
-      77
+       0,     2,   109,    11,     3,     6,    12,    13,    56,    66,
+      47,    48,    78,    79,    80,    64,   100,    14,    15,    51,
+      70,    71,   101,    16,    17,    52,    73,    74,    41,    42,
+      43,    75
 };
 
 /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -704,90 +710,95 @@ static const yytype_int8 yydefgoto[] =
    number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_int8 yytable[] =
 {
-      44,    49,    68,    84,    85,     8,    69,    62,   112,    94,
-     113,     4,    63,   115,   114,     1,   -39,     5,    93,    10,
-      65,    66,    78,    79,   100,     9,   -20,    19,     7,    45,
-      47,    50,    48,    69,   -11,    10,    53,    10,    54,    55,
-     111,    59,    60,   108,    61,    67,    91,    99,    71,    20,
-      21,    22,    23,    24,    25,    26,    27,    28,    29,    30,
-      31,    32,    33,    34,    35,    36,    37,    38,    39,    62,
-     101,    83,    92,    95,    96,    98,    97,   105,   109,   110,
-      71,   103,   116,   102,    20,    21,    22,    23,    24,    25,
+      45,    85,    44,    19,    20,    21,    22,    23,    24,    25,
       26,    27,    28,    29,    30,    31,    32,    33,    34,    35,
-      36,    37,    38,    39,    57,    40,    20,    21,    22,    23,
-      24,    25,    26,    27,    28,    29,    30,    31,    32,    33,
-      34,    35,    36,    37,    38,    39,   107,    58,    20,    21,
-      22,    23,    24,    25,    26,    27,    28,    29,    30,    31,
-      32,    33,    34,    35,    36,    37,    38,    39,    90,    74,
+      36,    37,    38,    39,     8,   110,    57,    62,    10,   121,
+     107,    63,   -43,   122,   120,   114,   115,   116,   123,    82,
+     111,    83,    76,    77,     1,     9,    -8,    10,    87,    90,
+      69,    68,    10,     4,     5,    18,   -15,     7,    86,    -8,
+      10,    53,    91,    46,    50,    49,    54,    55,    58,    60,
+      61,    81,    84,    95,    65,    97,    88,    92,    62,    69,
+      89,    96,    93,    94,   104,   118,   108,   119,   124,   106,
+     103,   105,   102,     0,   113,   112,     0,     0,     0,   117,
+      19,    20,    21,    22,    23,    24,    25,    26,    27,    28,
+      29,    30,    31,    32,    33,    34,    35,    36,    37,    38,
+      39,    59,    40,    19,    20,    21,    22,    23,    24,    25,
+      26,    27,    28,    29,    30,    31,    32,    33,    34,    35,
+      36,    37,    38,    39,     0,    67,    19,    20,    21,    22,
+      23,    24,    25,    26,    27,    28,    29,    30,    31,    32,
+      33,    34,    35,    36,    37,    38,    39,     0,    72,    19,
       20,    21,    22,    23,    24,    25,    26,    27,    28,    29,
-      30,    31,    32,    33,    34,    35,    36,    37,    86,    87,
-     104,   106
+      30,    31,    32,    33,    34,    35,    36,    37,    98,    99
 };
 
 static const yytype_int8 yycheck[] =
 {
-       9,    13,    58,    68,    69,     1,    27,    35,   109,    74,
-      34,    24,    40,   114,    38,    23,    30,     0,    39,    33,
-      25,    26,    24,    25,    89,    21,    22,    31,    29,    24,
-      30,    22,    31,    27,    30,    33,    24,    33,    24,    32,
-     105,    50,    29,    99,    29,    34,    30,    24,    60,     3,
-       4,     5,     6,     7,     8,     9,    10,    11,    12,    13,
-      14,    15,    16,    17,    18,    19,    20,    21,    22,    35,
-      24,    40,    31,    30,    32,    36,    32,    25,    33,    24,
-      92,    90,    34,    37,     3,     4,     5,     6,     7,     8,
-       9,    10,    11,    12,    13,    14,    15,    16,    17,    18,
-      19,    20,    21,    22,    48,    24,     3,     4,     5,     6,
-       7,     8,     9,    10,    11,    12,    13,    14,    15,    16,
-      17,    18,    19,    20,    21,    22,    97,    24,     3,     4,
-       5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
-      15,    16,    17,    18,    19,    20,    21,    22,    71,    24,
+      10,    67,     9,     3,     4,     5,     6,     7,     8,     9,
+      10,    11,    12,    13,    14,    15,    16,    17,    18,    19,
+      20,    21,    22,    23,     1,    25,    47,    38,    29,    37,
+      96,    42,    33,    41,   118,    26,    27,    28,   122,    26,
+      40,    28,    25,    26,    24,    22,    23,    29,    69,    31,
+      60,    58,    29,    25,     0,    34,    33,    32,    68,    36,
+      29,    25,    72,    36,    34,    33,    25,    25,    23,    32,
+      32,    42,    37,    39,    35,    85,    33,    33,    38,    89,
+      34,    25,    35,    35,    26,    36,    31,    25,    37,    94,
+      89,    93,    87,    -1,   104,   102,    -1,    -1,    -1,   109,
        3,     4,     5,     6,     7,     8,     9,    10,    11,    12,
       13,    14,    15,    16,    17,    18,    19,    20,    21,    22,
-      92,    96
+      23,    50,    25,     3,     4,     5,     6,     7,     8,     9,
+      10,    11,    12,    13,    14,    15,    16,    17,    18,    19,
+      20,    21,    22,    23,    -1,    25,     3,     4,     5,     6,
+       7,     8,     9,    10,    11,    12,    13,    14,    15,    16,
+      17,    18,    19,    20,    21,    22,    23,    -1,    25,     3,
+       4,     5,     6,     7,     8,     9,    10,    11,    12,    13,
+      14,    15,    16,    17,    18,    19,    20,    21,    22,    23
 };
 
 /* YYSTOS[STATE-NUM] -- The symbol kind of the accessing symbol of
    state STATE-NUM.  */
 static const yytype_int8 yystos[] =
 {
-       0,    23,    42,    44,    24,     0,    45,    29,     1,    21,
-      33,    46,    47,    50,    51,    57,    58,    63,    64,    31,
-       3,     4,     5,     6,     7,     8,     9,    10,    11,    12,
-      13,    14,    15,    16,    17,    18,    19,    20,    21,    22,
-      24,    68,    69,    70,    71,    24,    48,    30,    31,    51,
-      22,    59,    65,    24,    24,    32,    49,    46,    24,    71,
-      29,    29,    35,    40,    55,    25,    26,    34,    55,    27,
-      43,    51,    60,    61,    24,    66,    67,    71,    24,    25,
-      52,    53,    54,    40,    43,    43,    21,    22,    56,    62,
-      68,    30,    31,    39,    43,    30,    32,    32,    36,    24,
-      43,    24,    37,    71,    60,    25,    66,    54,    55,    33,
-      24,    43,    53,    34,    38,    53,    34
+       0,    24,    44,    47,    25,     0,    48,    32,     1,    22,
+      29,    46,    49,    50,    60,    61,    66,    67,    34,     3,
+       4,     5,     6,     7,     8,     9,    10,    11,    12,    13,
+      14,    15,    16,    17,    18,    19,    20,    21,    22,    23,
+      25,    71,    72,    73,    74,    46,    36,    53,    54,    33,
+      34,    62,    68,    25,    25,    25,    51,    54,    23,    49,
+      32,    32,    38,    42,    58,    35,    52,    25,    74,    46,
+      63,    64,    25,    69,    70,    74,    25,    26,    55,    56,
+      57,    42,    26,    28,    37,    58,    46,    54,    33,    34,
+      31,    46,    33,    35,    35,    39,    25,    46,    22,    23,
+      59,    65,    71,    63,    26,    69,    57,    58,    31,    45,
+      25,    40,    74,    46,    26,    27,    28,    46,    36,    25,
+      56,    37,    41,    56,    37
 };
 
 /* YYR1[RULE-NUM] -- Symbol kind of the left-hand side of rule RULE-NUM.  */
 static const yytype_int8 yyr1[] =
 {
-       0,    41,    42,    43,    43,    45,    44,    44,    46,    46,
-      46,    46,    47,    47,    48,    49,    49,    49,    50,    51,
-      51,    52,    52,    53,    53,    54,    54,    55,    55,    56,
-      56,    56,    56,    57,    57,    59,    58,    60,    60,    60,
-      61,    62,    62,    62,    63,    63,    65,    64,    66,    66,
-      66,    67,    67,    67,    68,    68,    69,    69,    69,    69,
-      69,    69,    69,    69,    69,    69,    69,    69,    69,    69,
-      69,    69,    69,    69,    70,    70,    70,    71,    71,    71
+       0,    43,    44,    45,    45,    45,    45,    46,    46,    48,
+      47,    47,    49,    49,    49,    49,    50,    50,    51,    52,
+      52,    52,    53,    54,    54,    55,    55,    56,    56,    57,
+      57,    58,    58,    59,    59,    59,    59,    60,    60,    62,
+      61,    63,    63,    63,    64,    65,    65,    65,    66,    66,
+      68,    67,    69,    69,    69,    70,    70,    70,    71,    71,
+      72,    72,    72,    72,    72,    72,    72,    72,    72,    72,
+      72,    72,    72,    72,    72,    72,    72,    72,    72,    73,
+      73,    73,    74,    74,    74
 };
 
 /* YYR2[RULE-NUM] -- Number of symbols on the right-hand side of rule RULE-NUM.  */
 static const yytype_int8 yyr2[] =
 {
-       0,     2,     1,     2,     0,     0,     6,     0,     3,     1,
-       2,     0,     1,     1,     1,     2,     2,     0,     4,     2,
-       0,     1,     0,     1,     1,     3,     1,     3,     0,     2,
-       3,     7,     5,     5,     4,     0,     5,     3,     1,     0,
-       3,     1,     2,     1,     2,     2,     0,     5,     3,     1,
-       0,     4,     2,     1,     1,     1,     1,     1,     1,     1,
+       0,     2,     1,     2,     2,     2,     0,     2,     0,     0,
+       6,     0,     3,     1,     2,     0,     1,     1,     1,     2,
+       2,     0,     4,     2,     0,     1,     0,     1,     1,     3,
+       1,     3,     0,     2,     3,     7,     5,     6,     5,     0,
+       5,     3,     1,     0,     5,     1,     2,     1,     2,     2,
+       0,     5,     3,     1,     0,     4,     2,     1,     1,     1,
        1,     1,     1,     1,     1,     1,     1,     1,     1,     1,
-       1,     1,     1,     1,     3,     6,     2,     1,     1,     1
+       1,     1,     1,     1,     1,     1,     1,     1,     1,     3,
+       6,     2,     1,     1,     1
 };
 
 
@@ -1261,14 +1272,46 @@ yyreduce:
   switch (yyn)
     {
   case 2: /* start: namespace_def  */
-#line 82 "zdl_grammar.y"
+#line 83 "zdl_grammar.y"
 {
 }
-#line 1268 "zdl_grammar.tab.cpp"
+#line 1279 "zdl_grammar.tab.cpp"
     break;
 
-  case 3: /* comments: UIDL_COMMENT comments  */
+  case 3: /* initval: '=' UIDL_INTEGER_LITERAL  */
 #line 89 "zdl_grammar.y"
+{
+yyval=yyvsp[0];
+}
+#line 1287 "zdl_grammar.tab.cpp"
+    break;
+
+  case 4: /* initval: '=' UIDL_STRING_LITERAL  */
+#line 93 "zdl_grammar.y"
+{
+yyval=yyvsp[0];
+}
+#line 1295 "zdl_grammar.tab.cpp"
+    break;
+
+  case 5: /* initval: '=' UIDL_DOUBLE_LITERAL  */
+#line 97 "zdl_grammar.y"
+{
+yyval=yyvsp[0];
+}
+#line 1303 "zdl_grammar.tab.cpp"
+    break;
+
+  case 6: /* initval: %empty  */
+#line 101 "zdl_grammar.y"
+{
+yyval="";
+}
+#line 1311 "zdl_grammar.tab.cpp"
+    break;
+
+  case 7: /* comments: UIDL_COMMENT comments  */
+#line 107 "zdl_grammar.y"
 {
     if (yyvsp[0] != "")
     {
@@ -1279,158 +1322,158 @@ yyreduce:
         yyval = yyvsp[-1];
     }	
 }
-#line 1283 "zdl_grammar.tab.cpp"
+#line 1326 "zdl_grammar.tab.cpp"
     break;
 
-  case 4: /* comments: %empty  */
-#line 100 "zdl_grammar.y"
+  case 8: /* comments: %empty  */
+#line 118 "zdl_grammar.y"
 {
     yyval = "";
 }
-#line 1291 "zdl_grammar.tab.cpp"
+#line 1334 "zdl_grammar.tab.cpp"
     break;
 
-  case 5: /* $@1: %empty  */
-#line 108 "zdl_grammar.y"
+  case 9: /* $@1: %empty  */
+#line 126 "zdl_grammar.y"
 {
     parser->context_ptr()->set_namespace(yyvsp[0]);
 }
-#line 1299 "zdl_grammar.tab.cpp"
+#line 1342 "zdl_grammar.tab.cpp"
     break;
 
-  case 6: /* namespace_def: UIDL_NAMESPACE UIDL_IDENTIFIER $@1 '{' definitions '}'  */
-#line 112 "zdl_grammar.y"
+  case 10: /* namespace_def: UIDL_NAMESPACE UIDL_IDENTIFIER $@1 '{' definitions '}'  */
+#line 130 "zdl_grammar.y"
 {
 }
-#line 1306 "zdl_grammar.tab.cpp"
+#line 1349 "zdl_grammar.tab.cpp"
     break;
 
-  case 7: /* namespace_def: %empty  */
-#line 115 "zdl_grammar.y"
-{
-}
-#line 1313 "zdl_grammar.tab.cpp"
-    break;
-
-  case 8: /* definitions: definition ';' definitions  */
-#line 122 "zdl_grammar.y"
-{
-}
-#line 1320 "zdl_grammar.tab.cpp"
-    break;
-
-  case 9: /* definitions: definition  */
-#line 125 "zdl_grammar.y"
-{
-    yyerror(scanner, parser, "';' missing after definition");
-}
-#line 1328 "zdl_grammar.tab.cpp"
-    break;
-
-  case 10: /* definitions: error ';'  */
-#line 129 "zdl_grammar.y"
-{
-    yyerror(scanner, parser, "error got");
-}
-#line 1336 "zdl_grammar.tab.cpp"
-    break;
-
-  case 11: /* definitions: %empty  */
+  case 11: /* namespace_def: %empty  */
 #line 133 "zdl_grammar.y"
 {
 }
-#line 1343 "zdl_grammar.tab.cpp"
+#line 1356 "zdl_grammar.tab.cpp"
     break;
 
-  case 12: /* definition: struct_def  */
+  case 12: /* definitions: definition ';' definitions  */
 #line 140 "zdl_grammar.y"
 {
-    parser->context_ptr()->add_type_end(yyvsp[0]);
 }
-#line 1351 "zdl_grammar.tab.cpp"
+#line 1363 "zdl_grammar.tab.cpp"
     break;
 
-  case 13: /* definition: enum_def  */
-#line 144 "zdl_grammar.y"
+  case 13: /* definitions: definition  */
+#line 143 "zdl_grammar.y"
+{
+    yyerror(scanner, parser, "';' missing after definition");
+}
+#line 1371 "zdl_grammar.tab.cpp"
+    break;
+
+  case 14: /* definitions: error ';'  */
+#line 147 "zdl_grammar.y"
+{
+    yyerror(scanner, parser, "error got");
+}
+#line 1379 "zdl_grammar.tab.cpp"
+    break;
+
+  case 15: /* definitions: %empty  */
+#line 151 "zdl_grammar.y"
+{
+}
+#line 1386 "zdl_grammar.tab.cpp"
+    break;
+
+  case 16: /* definition: struct_def  */
+#line 158 "zdl_grammar.y"
 {
     parser->context_ptr()->add_type_end(yyvsp[0]);
 }
-#line 1359 "zdl_grammar.tab.cpp"
+#line 1394 "zdl_grammar.tab.cpp"
     break;
 
-  case 14: /* meta_key: UIDL_IDENTIFIER  */
-#line 151 "zdl_grammar.y"
+  case 17: /* definition: enum_def  */
+#line 162 "zdl_grammar.y"
+{
+    parser->context_ptr()->add_type_end(yyvsp[0]);
+}
+#line 1402 "zdl_grammar.tab.cpp"
+    break;
+
+  case 18: /* meta_key: UIDL_IDENTIFIER  */
+#line 169 "zdl_grammar.y"
 {
   yyval = yyvsp[0];
 }
-#line 1367 "zdl_grammar.tab.cpp"
+#line 1410 "zdl_grammar.tab.cpp"
     break;
 
-  case 15: /* meta_val: ',' UIDL_STRING_LITERAL  */
-#line 157 "zdl_grammar.y"
+  case 19: /* meta_val: ',' UIDL_STRING_LITERAL  */
+#line 175 "zdl_grammar.y"
 {
   yyval = std::string("\"") + yyvsp[0] + "\"";
 }
-#line 1375 "zdl_grammar.tab.cpp"
+#line 1418 "zdl_grammar.tab.cpp"
     break;
 
-  case 16: /* meta_val: ',' UIDL_INTEGER_LITERAL  */
-#line 161 "zdl_grammar.y"
+  case 20: /* meta_val: ',' UIDL_INTEGER_LITERAL  */
+#line 179 "zdl_grammar.y"
 {
   yyval = yyvsp[0];
 }
-#line 1383 "zdl_grammar.tab.cpp"
+#line 1426 "zdl_grammar.tab.cpp"
     break;
 
-  case 17: /* meta_val: %empty  */
-#line 165 "zdl_grammar.y"
+  case 21: /* meta_val: %empty  */
+#line 183 "zdl_grammar.y"
 {
   yyval = "";
 }
-#line 1391 "zdl_grammar.tab.cpp"
+#line 1434 "zdl_grammar.tab.cpp"
     break;
 
-  case 18: /* meta_data: '[' meta_key meta_val ']'  */
-#line 171 "zdl_grammar.y"
+  case 22: /* meta_data: '[' meta_key meta_val ']'  */
+#line 189 "zdl_grammar.y"
 {
     parser->context_ptr()->add_current_member_metadata(yyvsp[-2], yyvsp[-1]);
     yyval = yyvsp[-2];
 }
-#line 1400 "zdl_grammar.tab.cpp"
+#line 1443 "zdl_grammar.tab.cpp"
     break;
 
-  case 19: /* meta_data_set: meta_data meta_data_set  */
-#line 179 "zdl_grammar.y"
+  case 23: /* meta_data_set: meta_data meta_data_set  */
+#line 197 "zdl_grammar.y"
 {
 }
-#line 1407 "zdl_grammar.tab.cpp"
+#line 1450 "zdl_grammar.tab.cpp"
     break;
 
-  case 20: /* meta_data_set: %empty  */
-#line 182 "zdl_grammar.y"
+  case 24: /* meta_data_set: %empty  */
+#line 200 "zdl_grammar.y"
 {
 }
-#line 1414 "zdl_grammar.tab.cpp"
+#line 1457 "zdl_grammar.tab.cpp"
     break;
 
-  case 21: /* num: UIDL_INTEGER_LITERAL  */
-#line 187 "zdl_grammar.y"
+  case 25: /* num: UIDL_INTEGER_LITERAL  */
+#line 205 "zdl_grammar.y"
 {
     yyval = yyvsp[0];
 }
-#line 1422 "zdl_grammar.tab.cpp"
+#line 1465 "zdl_grammar.tab.cpp"
     break;
 
-  case 22: /* num: %empty  */
-#line 191 "zdl_grammar.y"
+  case 26: /* num: %empty  */
+#line 209 "zdl_grammar.y"
 {
     yyval = "0"; 
 }
-#line 1430 "zdl_grammar.tab.cpp"
+#line 1473 "zdl_grammar.tab.cpp"
     break;
 
-  case 23: /* limit_arg: num  */
-#line 198 "zdl_grammar.y"
+  case 27: /* limit_arg: num  */
+#line 216 "zdl_grammar.y"
 {
     int val = strtol(yyvsp[0].c_str(), 0, 0);
     if (val < 0){
@@ -1438,60 +1481,60 @@ yyreduce:
     }
     yyval = yyvsp[0];
 }
-#line 1442 "zdl_grammar.tab.cpp"
+#line 1485 "zdl_grammar.tab.cpp"
     break;
 
-  case 24: /* limit_arg: UIDL_IDENTIFIER  */
-#line 207 "zdl_grammar.y"
+  case 28: /* limit_arg: UIDL_IDENTIFIER  */
+#line 225 "zdl_grammar.y"
 {
     yyval = yyvsp[0] + "_";
 }
-#line 1450 "zdl_grammar.tab.cpp"
+#line 1493 "zdl_grammar.tab.cpp"
     break;
 
-  case 25: /* template_args: limit_arg ',' template_args  */
-#line 215 "zdl_grammar.y"
+  case 29: /* template_args: limit_arg ',' template_args  */
+#line 233 "zdl_grammar.y"
 {
     yyval = yyvsp[-2] + "," + yyvsp[0];
 }
-#line 1458 "zdl_grammar.tab.cpp"
+#line 1501 "zdl_grammar.tab.cpp"
     break;
 
-  case 26: /* template_args: limit_arg  */
-#line 219 "zdl_grammar.y"
+  case 30: /* template_args: limit_arg  */
+#line 237 "zdl_grammar.y"
 {
     yyval = yyvsp[0];
 }
-#line 1466 "zdl_grammar.tab.cpp"
+#line 1509 "zdl_grammar.tab.cpp"
     break;
 
-  case 27: /* template: '<' template_args '>'  */
-#line 226 "zdl_grammar.y"
+  case 31: /* template: '<' template_args '>'  */
+#line 244 "zdl_grammar.y"
 {
     yyval = yyvsp[-1];
 }
-#line 1474 "zdl_grammar.tab.cpp"
+#line 1517 "zdl_grammar.tab.cpp"
     break;
 
-  case 28: /* template: %empty  */
-#line 230 "zdl_grammar.y"
+  case 32: /* template: %empty  */
+#line 248 "zdl_grammar.y"
 {
     yyval = "";
 }
-#line 1482 "zdl_grammar.tab.cpp"
+#line 1525 "zdl_grammar.tab.cpp"
     break;
 
-  case 29: /* type_id: type UIDL_IDENTIFIER  */
-#line 239 "zdl_grammar.y"
+  case 33: /* type_id: type UIDL_IDENTIFIER  */
+#line 257 "zdl_grammar.y"
 {
     parser->context_ptr()->add_member_start(yyvsp[0], "1", "1");
     yyval = yyvsp[0];
 }
-#line 1491 "zdl_grammar.tab.cpp"
+#line 1534 "zdl_grammar.tab.cpp"
     break;
 
-  case 30: /* type_id: type '*' UIDL_IDENTIFIER  */
-#line 244 "zdl_grammar.y"
+  case 34: /* type_id: type '*' UIDL_IDENTIFIER  */
+#line 262 "zdl_grammar.y"
 {
     int val = 0;
     if (val >=0){
@@ -1502,383 +1545,394 @@ yyreduce:
     }
     yyval = yyvsp[0];
 }
-#line 1506 "zdl_grammar.tab.cpp"
+#line 1549 "zdl_grammar.tab.cpp"
     break;
 
-  case 31: /* type_id: type UIDL_IDENTIFIER '[' limit_arg '~' limit_arg ']'  */
-#line 255 "zdl_grammar.y"
+  case 35: /* type_id: type UIDL_IDENTIFIER '[' limit_arg '~' limit_arg ']'  */
+#line 273 "zdl_grammar.y"
 {
     //int low_val = strtol($4.c_str(), 0, 0);
     //int up_val = strtol($6.c_str(), 0, 0);
     parser->context_ptr()->add_member_start(yyvsp[-5], yyvsp[-3], yyvsp[-1]);
     yyval = yyvsp[-5];
 }
-#line 1517 "zdl_grammar.tab.cpp"
+#line 1560 "zdl_grammar.tab.cpp"
     break;
 
-  case 32: /* type_id: type UIDL_IDENTIFIER '[' limit_arg ']'  */
-#line 262 "zdl_grammar.y"
+  case 36: /* type_id: type UIDL_IDENTIFIER '[' limit_arg ']'  */
+#line 280 "zdl_grammar.y"
 {
     //int val = strtol($4.c_str(), 0, 0);
     parser->context_ptr()->add_member_start(yyvsp[-3], yyvsp[-1], yyvsp[-1]);
     yyval = yyvsp[-3];
 }
-#line 1527 "zdl_grammar.tab.cpp"
-    break;
-
-  case 33: /* struct_id: meta_data_set UIDL_STRUCT UIDL_IDENTIFIER template comments  */
-#line 272 "zdl_grammar.y"
-{
-    parser->context_ptr()->add_type_start(UIDL_STRUCT, yyvsp[-2]);
-    parser->context_ptr()->set_comment(yyvsp[0]);
-    parser->context_ptr()->add_type_template_arg(yyvsp[-1]);
-    yyval = yyvsp[-2];
-}
-#line 1538 "zdl_grammar.tab.cpp"
-    break;
-
-  case 34: /* struct_id: meta_data_set UIDL_STRUCT keyword comments  */
-#line 279 "zdl_grammar.y"
-{
-    yyerror(scanner, parser, "keyword cannot be used as struct name");
-}
-#line 1546 "zdl_grammar.tab.cpp"
-    break;
-
-  case 35: /* $@2: %empty  */
-#line 287 "zdl_grammar.y"
-{
-    auto err = zce_string_format(256, "[dbg] parser struct %s\n", yyvsp[0].c_str());
-    yyerror(scanner, parser, err.c_str());
-}
-#line 1555 "zdl_grammar.tab.cpp"
-    break;
-
-  case 36: /* struct_def: struct_id $@2 '{' struct_exports '}'  */
-#line 292 "zdl_grammar.y"
-{
-}
-#line 1562 "zdl_grammar.tab.cpp"
-    break;
-
-  case 37: /* struct_exports: struct_export ';' struct_exports  */
-#line 299 "zdl_grammar.y"
-{
-    //printf("struct_exports :%s %s\n", $1.c_str(), $2.c_str());
-}
 #line 1570 "zdl_grammar.tab.cpp"
     break;
 
-  case 38: /* struct_exports: struct_export  */
-#line 303 "zdl_grammar.y"
+  case 37: /* struct_id: comments meta_data_set UIDL_STRUCT UIDL_IDENTIFIER template comments  */
+#line 290 "zdl_grammar.y"
+{
+    parser->context_ptr()->add_type_start(UIDL_STRUCT, yyvsp[-2]);
+    parser->context_ptr()->add_current_member_metadata("_previous_comment", yyvsp[-5]);
+    parser->context_ptr()->add_type_template_arg(yyvsp[-1]);
+    parser->context_ptr()->set_comment(yyvsp[0]);
+    yyval = yyvsp[-2];
+}
+#line 1582 "zdl_grammar.tab.cpp"
+    break;
+
+  case 38: /* struct_id: comments meta_data_set UIDL_STRUCT keyword comments  */
+#line 298 "zdl_grammar.y"
+{
+    yyerror(scanner, parser, "keyword cannot be used as struct name");
+}
+#line 1590 "zdl_grammar.tab.cpp"
+    break;
+
+  case 39: /* $@2: %empty  */
+#line 306 "zdl_grammar.y"
+{
+    //yyerror(scanner, parser, err.c_str());
+    ZCE_DEBUG((ZLOG_DEBUG, "parser struct %s", yyvsp[0].c_str()));
+}
+#line 1599 "zdl_grammar.tab.cpp"
+    break;
+
+  case 40: /* struct_def: struct_id $@2 '{' struct_exports '}'  */
+#line 311 "zdl_grammar.y"
+{
+}
+#line 1606 "zdl_grammar.tab.cpp"
+    break;
+
+  case 41: /* struct_exports: struct_export ';' struct_exports  */
+#line 318 "zdl_grammar.y"
+{
+    //printf("struct_exports :%s %s\n", $1.c_str(), $2.c_str());
+}
+#line 1614 "zdl_grammar.tab.cpp"
+    break;
+
+  case 42: /* struct_exports: struct_export  */
+#line 322 "zdl_grammar.y"
 {
     yyerror(scanner, parser, "';' missing after struct definition");
 }
-#line 1578 "zdl_grammar.tab.cpp"
+#line 1622 "zdl_grammar.tab.cpp"
     break;
 
-  case 39: /* struct_exports: %empty  */
-#line 307 "zdl_grammar.y"
+  case 43: /* struct_exports: %empty  */
+#line 326 "zdl_grammar.y"
 {
 }
-#line 1585 "zdl_grammar.tab.cpp"
+#line 1629 "zdl_grammar.tab.cpp"
     break;
 
-  case 40: /* struct_export: meta_data_set data_member comments  */
-#line 314 "zdl_grammar.y"
+  case 44: /* struct_export: comments meta_data_set data_member initval comments  */
+#line 333 "zdl_grammar.y"
 {
+    parser->context_ptr()->add_current_member_metadata("_previous_comment", yyvsp[-4]);
     parser->context_ptr()->set_comment(yyvsp[0]);
-    parser->context_ptr()->add_member_end(yyvsp[-1]);
-    yyval=yyvsp[-1];
+    parser->context_ptr()->add_current_member_metadata("_default_val", yyvsp[-1]);
+    parser->context_ptr()->add_member_end(yyvsp[-2]);
+    yyval=yyvsp[-2];
 }
-#line 1595 "zdl_grammar.tab.cpp"
+#line 1641 "zdl_grammar.tab.cpp"
     break;
 
-  case 41: /* data_member: type_id  */
-#line 324 "zdl_grammar.y"
+  case 45: /* data_member: type_id  */
+#line 345 "zdl_grammar.y"
 {
     yyval=yyvsp[0];
 }
-#line 1603 "zdl_grammar.tab.cpp"
+#line 1649 "zdl_grammar.tab.cpp"
     break;
 
-  case 42: /* data_member: type keyword  */
-#line 328 "zdl_grammar.y"
+  case 46: /* data_member: type keyword  */
+#line 349 "zdl_grammar.y"
 {
     yyerror(scanner, parser, "keyword  cannot be used as data member name");
-}
-#line 1611 "zdl_grammar.tab.cpp"
-    break;
-
-  case 43: /* data_member: type  */
-#line 332 "zdl_grammar.y"
-{
-    yyerror(scanner, parser, "missing data member name");
-}
-#line 1619 "zdl_grammar.tab.cpp"
-    break;
-
-  case 44: /* enum_id: UIDL_ENUM UIDL_IDENTIFIER  */
-#line 340 "zdl_grammar.y"
-{
-    parser->context_ptr()->add_type_start(UIDL_ENUM, yyvsp[0]);
-    yyval = yyvsp[0];
-}
-#line 1628 "zdl_grammar.tab.cpp"
-    break;
-
-  case 45: /* enum_id: UIDL_ENUM keyword  */
-#line 345 "zdl_grammar.y"
-{
-    yyerror(scanner, parser, "keyword cannot be used as enumeration name");
-}
-#line 1636 "zdl_grammar.tab.cpp"
-    break;
-
-  case 46: /* $@3: %empty  */
-#line 353 "zdl_grammar.y"
-{
-}
-#line 1643 "zdl_grammar.tab.cpp"
-    break;
-
-  case 47: /* enum_def: enum_id $@3 '{' enumerator_list '}'  */
-#line 356 "zdl_grammar.y"
-{
-}
-#line 1650 "zdl_grammar.tab.cpp"
-    break;
-
-  case 48: /* enumerator_list: enumerator ',' enumerator_list  */
-#line 363 "zdl_grammar.y"
-{
 }
 #line 1657 "zdl_grammar.tab.cpp"
     break;
 
-  case 49: /* enumerator_list: enumerator  */
+  case 47: /* data_member: type  */
+#line 353 "zdl_grammar.y"
+{
+    yyerror(scanner, parser, "missing data member name");
+}
+#line 1665 "zdl_grammar.tab.cpp"
+    break;
+
+  case 48: /* enum_id: UIDL_ENUM UIDL_IDENTIFIER  */
+#line 361 "zdl_grammar.y"
+{
+    parser->context_ptr()->add_type_start(UIDL_ENUM, yyvsp[0]);
+    yyval = yyvsp[0];
+}
+#line 1674 "zdl_grammar.tab.cpp"
+    break;
+
+  case 49: /* enum_id: UIDL_ENUM keyword  */
 #line 366 "zdl_grammar.y"
 {
+    yyerror(scanner, parser, "keyword cannot be used as enumeration name");
 }
-#line 1664 "zdl_grammar.tab.cpp"
+#line 1682 "zdl_grammar.tab.cpp"
     break;
 
-  case 50: /* enumerator_list: %empty  */
-#line 369 "zdl_grammar.y"
+  case 50: /* $@3: %empty  */
+#line 374 "zdl_grammar.y"
 {
 }
-#line 1671 "zdl_grammar.tab.cpp"
+#line 1689 "zdl_grammar.tab.cpp"
     break;
 
-  case 51: /* enumerator: UIDL_IDENTIFIER '=' UIDL_INTEGER_LITERAL comments  */
-#line 376 "zdl_grammar.y"
+  case 51: /* enum_def: enum_id $@3 '{' enumerator_list '}'  */
+#line 377 "zdl_grammar.y"
 {
-    unsigned long val = strtoul(yyvsp[-1].c_str(), 0, 0);
-    parser->context_ptr()->add_enumerator(val, yyvsp[-3], yyvsp[0]);
-}
-#line 1680 "zdl_grammar.tab.cpp"
-    break;
-
-  case 52: /* enumerator: UIDL_IDENTIFIER comments  */
-#line 381 "zdl_grammar.y"
-{
-    parser->context_ptr()->add_enumerator(yyvsp[-1], yyvsp[0]);
-}
-#line 1688 "zdl_grammar.tab.cpp"
-    break;
-
-  case 53: /* enumerator: keyword  */
-#line 385 "zdl_grammar.y"
-{
-    yyerror(scanner, parser, "keyword cannot be used as enumerator");
 }
 #line 1696 "zdl_grammar.tab.cpp"
     break;
 
-  case 54: /* type: basetype  */
-#line 394 "zdl_grammar.y"
+  case 52: /* enumerator_list: enumerator ',' enumerator_list  */
+#line 384 "zdl_grammar.y"
 {
 }
 #line 1703 "zdl_grammar.tab.cpp"
     break;
 
-  case 55: /* type: usertype  */
-#line 397 "zdl_grammar.y"
+  case 53: /* enumerator_list: enumerator  */
+#line 387 "zdl_grammar.y"
 {
 }
 #line 1710 "zdl_grammar.tab.cpp"
     break;
 
-  case 56: /* basetype: UIDL_CHAR  */
-#line 402 "zdl_grammar.y"
+  case 54: /* enumerator_list: %empty  */
+#line 390 "zdl_grammar.y"
 {
-    parser->context_ptr()->set_current_member_type(UIDL_CHAR);
 }
-#line 1718 "zdl_grammar.tab.cpp"
+#line 1717 "zdl_grammar.tab.cpp"
     break;
 
-  case 57: /* basetype: UIDL_UCHAR  */
-#line 406 "zdl_grammar.y"
+  case 55: /* enumerator: UIDL_IDENTIFIER '=' UIDL_INTEGER_LITERAL comments  */
+#line 397 "zdl_grammar.y"
 {
-    parser->context_ptr()->set_current_member_type(UIDL_UCHAR);
+    unsigned long val = strtoul(yyvsp[-1].c_str(), 0, 0);
+    parser->context_ptr()->add_enumerator(val, yyvsp[-3], yyvsp[0]);
 }
 #line 1726 "zdl_grammar.tab.cpp"
     break;
 
-  case 58: /* basetype: UIDL_SHORT  */
-#line 410 "zdl_grammar.y"
+  case 56: /* enumerator: UIDL_IDENTIFIER comments  */
+#line 402 "zdl_grammar.y"
 {
-    parser->context_ptr()->set_current_member_type(UIDL_SHORT);
+    parser->context_ptr()->add_enumerator(yyvsp[-1], yyvsp[0]);
 }
 #line 1734 "zdl_grammar.tab.cpp"
     break;
 
-  case 59: /* basetype: UIDL_USHORT  */
-#line 414 "zdl_grammar.y"
+  case 57: /* enumerator: keyword  */
+#line 406 "zdl_grammar.y"
 {
-    parser->context_ptr()->set_current_member_type(UIDL_USHORT);
+    yyerror(scanner, parser, "keyword cannot be used as enumerator");
 }
 #line 1742 "zdl_grammar.tab.cpp"
     break;
 
-  case 60: /* basetype: UIDL_INT32  */
+  case 58: /* type: basetype  */
+#line 415 "zdl_grammar.y"
+{
+}
+#line 1749 "zdl_grammar.tab.cpp"
+    break;
+
+  case 59: /* type: usertype  */
 #line 418 "zdl_grammar.y"
+{
+}
+#line 1756 "zdl_grammar.tab.cpp"
+    break;
+
+  case 60: /* basetype: UIDL_CHAR  */
+#line 423 "zdl_grammar.y"
+{
+    parser->context_ptr()->set_current_member_type(UIDL_CHAR);
+}
+#line 1764 "zdl_grammar.tab.cpp"
+    break;
+
+  case 61: /* basetype: UIDL_UCHAR  */
+#line 427 "zdl_grammar.y"
+{
+    parser->context_ptr()->set_current_member_type(UIDL_UCHAR);
+}
+#line 1772 "zdl_grammar.tab.cpp"
+    break;
+
+  case 62: /* basetype: UIDL_SHORT  */
+#line 431 "zdl_grammar.y"
+{
+    parser->context_ptr()->set_current_member_type(UIDL_SHORT);
+}
+#line 1780 "zdl_grammar.tab.cpp"
+    break;
+
+  case 63: /* basetype: UIDL_USHORT  */
+#line 435 "zdl_grammar.y"
+{
+    parser->context_ptr()->set_current_member_type(UIDL_USHORT);
+}
+#line 1788 "zdl_grammar.tab.cpp"
+    break;
+
+  case 64: /* basetype: UIDL_INT32  */
+#line 439 "zdl_grammar.y"
 {
     parser->context_ptr()->set_current_member_type(UIDL_INT32);
 }
-#line 1750 "zdl_grammar.tab.cpp"
+#line 1796 "zdl_grammar.tab.cpp"
     break;
 
-  case 61: /* basetype: UIDL_UINT32  */
-#line 422 "zdl_grammar.y"
+  case 65: /* basetype: UIDL_UINT32  */
+#line 443 "zdl_grammar.y"
 {
     parser->context_ptr()->set_current_member_type(UIDL_UINT32);
 }
-#line 1758 "zdl_grammar.tab.cpp"
+#line 1804 "zdl_grammar.tab.cpp"
     break;
 
-  case 62: /* basetype: UIDL_INT64  */
-#line 426 "zdl_grammar.y"
+  case 66: /* basetype: UIDL_INT64  */
+#line 447 "zdl_grammar.y"
 {
     parser->context_ptr()->set_current_member_type(UIDL_INT64);
 }
-#line 1766 "zdl_grammar.tab.cpp"
+#line 1812 "zdl_grammar.tab.cpp"
     break;
 
-  case 63: /* basetype: UIDL_UINT64  */
-#line 430 "zdl_grammar.y"
+  case 67: /* basetype: UIDL_UINT64  */
+#line 451 "zdl_grammar.y"
 {
     parser->context_ptr()->set_current_member_type(UIDL_UINT64);
 }
-#line 1774 "zdl_grammar.tab.cpp"
+#line 1820 "zdl_grammar.tab.cpp"
     break;
 
-  case 64: /* basetype: UIDL_FLOAT  */
-#line 434 "zdl_grammar.y"
+  case 68: /* basetype: UIDL_FLOAT  */
+#line 455 "zdl_grammar.y"
 {
     parser->context_ptr()->set_current_member_type(UIDL_FLOAT);
 }
-#line 1782 "zdl_grammar.tab.cpp"
+#line 1828 "zdl_grammar.tab.cpp"
     break;
 
-  case 65: /* basetype: UIDL_DOUBLE  */
-#line 438 "zdl_grammar.y"
+  case 69: /* basetype: UIDL_DOUBLE  */
+#line 459 "zdl_grammar.y"
 {
     parser->context_ptr()->set_current_member_type(UIDL_DOUBLE);
 }
-#line 1790 "zdl_grammar.tab.cpp"
+#line 1836 "zdl_grammar.tab.cpp"
     break;
 
-  case 66: /* basetype: UIDL_ASTRING  */
-#line 442 "zdl_grammar.y"
+  case 70: /* basetype: UIDL_ASTRING  */
+#line 463 "zdl_grammar.y"
 {
     parser->context_ptr()->set_current_member_type(UIDL_ASTRING);
 }
-#line 1798 "zdl_grammar.tab.cpp"
+#line 1844 "zdl_grammar.tab.cpp"
     break;
 
-  case 67: /* basetype: UIDL_TSTRING  */
-#line 446 "zdl_grammar.y"
+  case 71: /* basetype: UIDL_TSTRING  */
+#line 467 "zdl_grammar.y"
 {
     parser->context_ptr()->set_current_member_type(UIDL_TSTRING);
 }
-#line 1806 "zdl_grammar.tab.cpp"
+#line 1852 "zdl_grammar.tab.cpp"
     break;
 
-  case 68: /* basetype: UIDL_WSTRING  */
-#line 450 "zdl_grammar.y"
+  case 72: /* basetype: UIDL_WSTRING  */
+#line 471 "zdl_grammar.y"
 {
     parser->context_ptr()->set_current_member_type(UIDL_WSTRING);
 }
-#line 1814 "zdl_grammar.tab.cpp"
+#line 1860 "zdl_grammar.tab.cpp"
     break;
 
-  case 69: /* basetype: UIDL_ASTRVEC  */
-#line 454 "zdl_grammar.y"
+  case 73: /* basetype: UIDL_ASTRVEC  */
+#line 475 "zdl_grammar.y"
 {
     parser->context_ptr()->set_current_member_type(UIDL_ASTRVEC);
 }
-#line 1822 "zdl_grammar.tab.cpp"
+#line 1868 "zdl_grammar.tab.cpp"
     break;
 
-  case 70: /* basetype: UIDL_TSTRVEC  */
-#line 458 "zdl_grammar.y"
+  case 74: /* basetype: UIDL_TSTRVEC  */
+#line 479 "zdl_grammar.y"
 {
     parser->context_ptr()->set_current_member_type(UIDL_TSTRVEC);
 }
-#line 1830 "zdl_grammar.tab.cpp"
+#line 1876 "zdl_grammar.tab.cpp"
     break;
 
-  case 71: /* basetype: UIDL_WSTRVEC  */
-#line 462 "zdl_grammar.y"
+  case 75: /* basetype: UIDL_WSTRVEC  */
+#line 483 "zdl_grammar.y"
 {
     parser->context_ptr()->set_current_member_type(UIDL_WSTRVEC);
 }
-#line 1838 "zdl_grammar.tab.cpp"
+#line 1884 "zdl_grammar.tab.cpp"
     break;
 
-  case 72: /* basetype: UIDL_SERIAL  */
-#line 466 "zdl_grammar.y"
+  case 76: /* basetype: UIDL_SERIAL  */
+#line 487 "zdl_grammar.y"
 {
     parser->context_ptr()->set_current_member_type(UIDL_SERIAL);
 }
-#line 1846 "zdl_grammar.tab.cpp"
+#line 1892 "zdl_grammar.tab.cpp"
     break;
 
-  case 73: /* basetype: UIDL_DATETIME  */
-#line 470 "zdl_grammar.y"
+  case 77: /* basetype: UIDL_DATETIME  */
+#line 491 "zdl_grammar.y"
 {
     parser->context_ptr()->set_current_member_type(UIDL_DATETIME);
 }
-#line 1854 "zdl_grammar.tab.cpp"
+#line 1900 "zdl_grammar.tab.cpp"
     break;
 
-  case 74: /* usertype: UIDL_STRUCT UIDL_IDENTIFIER template  */
-#line 477 "zdl_grammar.y"
+  case 78: /* basetype: UIDL_ANY  */
+#line 495 "zdl_grammar.y"
+{
+    parser->context_ptr()->set_current_member_type(UIDL_ANY);
+}
+#line 1908 "zdl_grammar.tab.cpp"
+    break;
+
+  case 79: /* usertype: UIDL_STRUCT UIDL_IDENTIFIER template  */
+#line 502 "zdl_grammar.y"
 {
     parser->context_ptr()->set_current_member_type(UIDL_STRUCT, yyvsp[0], yyvsp[-1]);
 }
-#line 1862 "zdl_grammar.tab.cpp"
+#line 1916 "zdl_grammar.tab.cpp"
     break;
 
-  case 75: /* usertype: UIDL_STRUCT UIDL_IDENTIFIER ':' ':' UIDL_IDENTIFIER template  */
-#line 481 "zdl_grammar.y"
+  case 80: /* usertype: UIDL_STRUCT UIDL_IDENTIFIER ':' ':' UIDL_IDENTIFIER template  */
+#line 506 "zdl_grammar.y"
 {
     parser->context_ptr()->set_current_member_type(UIDL_STRUCT, yyvsp[0], yyvsp[-1], yyvsp[-4]);
 }
-#line 1870 "zdl_grammar.tab.cpp"
+#line 1924 "zdl_grammar.tab.cpp"
     break;
 
-  case 76: /* usertype: UIDL_ENUM UIDL_IDENTIFIER  */
-#line 485 "zdl_grammar.y"
+  case 81: /* usertype: UIDL_ENUM UIDL_IDENTIFIER  */
+#line 510 "zdl_grammar.y"
 {
     parser->context_ptr()->set_current_member_type(UIDL_ENUM, "", yyvsp[0]);
 }
-#line 1878 "zdl_grammar.tab.cpp"
+#line 1932 "zdl_grammar.tab.cpp"
     break;
 
 
-#line 1882 "zdl_grammar.tab.cpp"
+#line 1936 "zdl_grammar.tab.cpp"
 
       default: break;
     }
@@ -2071,6 +2125,6 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 495 "zdl_grammar.y"
+#line 520 "zdl_grammar.y"
 
 

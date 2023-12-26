@@ -66,7 +66,7 @@ void zdl_parser_context::add_member_end(const std::string& varname)
 
 void zdl_parser_context::set_current_member_type(int tpid)
 {
-    current_member_type_ = module_ptr_->type_container()->get_builtin_type(tpid);
+    current_member_type_ = module_ptr_->get_builtin_type(tpid);
 }
 
 void zdl_parser_context::set_current_member_type(int tpid,
@@ -83,18 +83,14 @@ void zdl_parser_context::set_current_member_type(int tpid,
         case zdl_type::type_enum_e:
         case zdl_type::type_struct_e:
             {
-                if (ns.empty())
-                {
-                    zdl_type_ptr type = module_ptr_->type_container()->get_type(tpname);
-                    if (type == 0)
-                    {
-                        if (tpname == current_struct_->name())
-                        {
+                if (ns.empty()) {
+                    zdl_type_ptr type = module_ptr_->get_type(tpname);
+                    if (type == 0) {
+                        if (tpname == current_struct_->name()) {
                             current_member_type_ = current_struct_;
                             break;
                         }
-                        else
-                        {
+                        else {
                             ZCE_ERROR((ZLOG_ERROR, "type %s not defined\n", tpname.c_str()));
                             exit(1);
                         }
@@ -105,9 +101,17 @@ void zdl_parser_context::set_current_member_type(int tpid,
                     }
                     current_member_type_ = type;
                 }
-                else
-                {
-                    zdl_type_ptr type = module_ptr_->type_container()->create_ns_type(ns, tpname, tp_e);
+                else {
+                    zdl_module_ptr module_ptr;
+                    auto iter = modules_.find(ns);
+                    if (iter == modules_.end()) {
+                        module_ptr = zdl_module_ptr(new zdl_module(ns));
+                        modules_.insert(std::make_pair(ns, module_ptr));
+                    }
+                    else {
+                        module_ptr = iter->second;
+                    }
+                    zdl_type_ptr type = module_ptr->create_type(tpname, tp_e);
                     current_member_type_ = type;
                 }
                 //current_member_->type(type.get());
@@ -145,14 +149,14 @@ void zdl_parser_context::add_type_start(int tpid, const std::string& tpname)
             return;
         case zdl_type::type_enum_e:
             {
-                zdl_enum_ptr em(new zdl_enum(tpname));
+                zdl_enum_ptr em(new zdl_enum(module_ptr_, tpname));
                 current_enum_ = em;
                 current_struct_ = zdl_struct_ptr((zdl_struct*)0);
             }
             return;
         case zdl_type::type_struct_e:
             {
-                zdl_struct_ptr em(new zdl_struct(module_ptr(), tpname));
+                zdl_struct_ptr em(new zdl_struct(module_ptr_, tpname));
                 current_struct_ = em;
                 current_enum_ = zdl_enum_ptr((zdl_enum*)0);
                 current_struct_->vec_metas(current_metas_);
@@ -167,9 +171,9 @@ void zdl_parser_context::add_type_start(int tpid, const std::string& tpname)
 void zdl_parser_context::add_type_end(const std::string& tpname)
 {
     if (current_struct_!=0)
-        module_ptr_->type_container()->add_type(zdl_type_ptr::__dynamic_cast(current_struct_));
+        module_ptr_->add_type(zdl_type_ptr::__dynamic_cast(current_struct_));
     else if (current_enum_ != 0)
-        module_ptr_->type_container()->add_type(zdl_type_ptr::__dynamic_cast(current_enum_));
+        module_ptr_->add_type(zdl_type_ptr::__dynamic_cast(current_enum_));
     else
         ZCE_ERROR((ZLOG_ERROR, "unknow type name(%s) to add\n", tpname.c_str()));
 
@@ -179,20 +183,15 @@ void zdl_parser_context::add_type_end(const std::string& tpname)
 
 void zdl_parser_context::set_comment(const std::string& cmt)
 {
-    if (current_struct_ != 0)
-    {
-        if (current_member_ != 0)
-        {
+    if (current_struct_ != 0) {
+        if (current_member_ != 0) {
             current_member_->comment(cmt);
         }
-        else
-        {
+        else {
             current_struct_->comment(cmt);
         }
     }
-    else if (current_enum_ != 0)
-    {
-
+    else if (current_enum_ != 0) {
     }
 }
 

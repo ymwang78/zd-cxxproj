@@ -62,13 +62,14 @@ extern int yylex (YYSTYPE* yylvalp, yyscan_t yyscanner, zdl_parser* parser);
 %token UIDL_ASTRVEC
 %token UIDL_TSTRVEC
 %token UIDL_WSTRVEC
-
+%token UIDL_ANY
 %token UIDL_ENUM
 %token UIDL_STRUCT
 %token UIDL_NAMESPACE
 
 %token UIDL_IDENTIFIER
 %token UIDL_INTEGER_LITERAL
+%token UIDL_DOUBLE_LITERAL
 %token UIDL_STRING_LITERAL
 %token UIDL_COMMENT
 
@@ -83,6 +84,23 @@ start
 }
 ;
 
+initval
+:'='UIDL_INTEGER_LITERAL
+{
+$$=$2;
+}
+|'='UIDL_STRING_LITERAL
+{
+$$=$2;
+}
+|'='UIDL_DOUBLE_LITERAL
+{
+$$=$2;
+}
+|
+{
+$$="";
+}
 
 comments
 :UIDL_COMMENT comments
@@ -268,14 +286,15 @@ type_id
 
 // ----------------------------------------------------------------------
 struct_id
-:meta_data_set UIDL_STRUCT UIDL_IDENTIFIER template comments
+:comments meta_data_set UIDL_STRUCT UIDL_IDENTIFIER template comments
 {
-    parser->context_ptr()->add_type_start(UIDL_STRUCT, $3);
-    parser->context_ptr()->set_comment($5);
-    parser->context_ptr()->add_type_template_arg($4);
-    $$ = $3;
+    parser->context_ptr()->add_type_start(UIDL_STRUCT, $4);
+    parser->context_ptr()->add_current_member_metadata("_previous_comment", $1);
+    parser->context_ptr()->add_type_template_arg($5);
+    parser->context_ptr()->set_comment($6);
+    $$ = $4;
 }
-|meta_data_set UIDL_STRUCT keyword comments
+|comments meta_data_set UIDL_STRUCT keyword comments
 {
     yyerror(scanner, parser, "keyword cannot be used as struct name");
 }
@@ -285,8 +304,8 @@ struct_id
 struct_def
 :struct_id
 {
-    auto err = zce_string_format(256, "[dbg] parser struct %s\n", $1.c_str());
-    yyerror(scanner, parser, err.c_str());
+    //yyerror(scanner, parser, err.c_str());
+    ZCE_DEBUG((ZLOG_DEBUG, "parser struct %s", $1.c_str()));
 }
 '{' struct_exports '}'
 {
@@ -310,11 +329,13 @@ struct_exports
 
 // ----------------------------------------------------------------------
 struct_export
-:meta_data_set data_member comments
+:comments meta_data_set data_member initval comments
 {
-    parser->context_ptr()->set_comment($3);
-    parser->context_ptr()->add_member_end($2);
-    $$=$2;
+    parser->context_ptr()->add_current_member_metadata("_previous_comment", $1);
+    parser->context_ptr()->set_comment($5);
+    parser->context_ptr()->add_current_member_metadata("_default_val", $4);
+    parser->context_ptr()->add_member_end($3);
+    $$=$3;
 }
 ;
 
@@ -469,6 +490,10 @@ basetype
 |UIDL_DATETIME
 {
     parser->context_ptr()->set_current_member_type(UIDL_DATETIME);
+}
+|UIDL_ANY
+{
+    parser->context_ptr()->set_current_member_type(UIDL_ANY);
 }
 ;
 

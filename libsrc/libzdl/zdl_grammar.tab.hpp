@@ -82,14 +82,16 @@ typedef void* yyscan_t;
     UIDL_ASTRVEC = 273,            /* UIDL_ASTRVEC  */
     UIDL_TSTRVEC = 274,            /* UIDL_TSTRVEC  */
     UIDL_WSTRVEC = 275,            /* UIDL_WSTRVEC  */
-    UIDL_ENUM = 276,               /* UIDL_ENUM  */
-    UIDL_STRUCT = 277,             /* UIDL_STRUCT  */
-    UIDL_NAMESPACE = 278,          /* UIDL_NAMESPACE  */
-    UIDL_IDENTIFIER = 279,         /* UIDL_IDENTIFIER  */
-    UIDL_INTEGER_LITERAL = 280,    /* UIDL_INTEGER_LITERAL  */
-    UIDL_STRING_LITERAL = 281,     /* UIDL_STRING_LITERAL  */
-    UIDL_COMMENT = 282,            /* UIDL_COMMENT  */
-    UIDL_USER_START = 283          /* UIDL_USER_START  */
+    UIDL_ANY = 276,                /* UIDL_ANY  */
+    UIDL_ENUM = 277,               /* UIDL_ENUM  */
+    UIDL_STRUCT = 278,             /* UIDL_STRUCT  */
+    UIDL_NAMESPACE = 279,          /* UIDL_NAMESPACE  */
+    UIDL_IDENTIFIER = 280,         /* UIDL_IDENTIFIER  */
+    UIDL_INTEGER_LITERAL = 281,    /* UIDL_INTEGER_LITERAL  */
+    UIDL_DOUBLE_LITERAL = 282,     /* UIDL_DOUBLE_LITERAL  */
+    UIDL_STRING_LITERAL = 283,     /* UIDL_STRING_LITERAL  */
+    UIDL_COMMENT = 284,            /* UIDL_COMMENT  */
+    UIDL_USER_START = 285          /* UIDL_USER_START  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif

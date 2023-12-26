@@ -2,12 +2,12 @@
 
 #ifdef _WIN32
 #   define NOMINMAX
-#   if defined(_DEBUG) && !defined(_UNICODE)
+//#   if defined(_DEBUG) && !defined(_UNICODE)
 #       //include <vld.h>
 #       define ZCE_ZDB_MYSQL 0
 #       define ZCE_ZDB_PGSQL 0
 #       define ZCE_ISSERVICE_MODE  0
-#   endif
+//#   endif
 #   include <winsock2.h>
 #   include <ws2tcpip.h>
 #   include <stdio.h>
@@ -101,9 +101,13 @@
 
 #ifdef _WIN32
 #    define ZCE_PATH_SEPERATOR '\\'
+#    define ZCE_SYSPATH_SEPERATOR ";"
 #else
 #    define ZCE_PATH_SEPERATOR '/'
+#    define ZCE_SYSPATH_SEPERATOR ":"
 #endif
+#define ZCE_WIDE_STRING_HELPER(str) L##str
+#define ZCE_WIDE_STRING(str) ZCE_WIDE_STRING_HELPER(str)
 
 enum ERV_ZCE_ERROR
 {

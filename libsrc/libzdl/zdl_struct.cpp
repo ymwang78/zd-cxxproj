@@ -22,7 +22,7 @@
 #pragma warning (pop)
 
 zdl_struct::zdl_struct(const zdl_module_ptr& module_ptr, const std::string& name)
-:zdl_type(UIDL_STRUCT, name), module_ptr_(module_ptr), refcount_(0)
+:zdl_type(UIDL_STRUCT, module_ptr, name), refcount_(0)
 {
 
 };

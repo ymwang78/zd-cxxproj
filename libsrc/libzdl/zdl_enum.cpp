@@ -16,8 +16,8 @@
 #include "zdl/zdl_visitor.h"
 #include "zdl/zdl_parser_context.h"
 
-zdl_enum::zdl_enum(const std::string& name)
-:zdl_type(UIDL_ENUM, name), current_enumerator_val_(0)
+zdl_enum::zdl_enum(const zce_smartptr<zdl_module>& module_ptr, const std::string& name)
+:zdl_type(UIDL_ENUM, module_ptr, name), current_enumerator_val_(0)
 {
 
 }
