@@ -58,7 +58,6 @@ public:
     enum zdl_type_e {
         type_unknow_e,
         type_builtin_e,
-        type_builtinvec_e,
         type_enum_e,
         type_struct_e,
     };

@@ -10,7 +10,7 @@
 // ***************************************************************
 #pragma once
 
-#include <zce/zce_smartptr.h>
+#include <zce/zce_object.h>
 #include <zce/zce_handler.h>
 #include <zce/zce_singleton.h>
 #include <zce/zce_timer.h>

@@ -112,6 +112,8 @@ namespace zdp
 
     int ZCE_API zds_pack_struct_array_header(zce_byte* buf, int size, zce_uint64 array_size, zds_context_t* ctx);
 
+    int ZCE_API zds_pack_any_array_header(zce_byte* buf, int size, zce_uint64 array_size, zds_context_t* ctx);
+
     ///////////////////////////////////////////////////////////////////////////
 
     int ZCE_API zds_unpack_builtin(zce_int64& val, const zce_byte* buf, zce_int32 size, zds_context_t* ctx);
@@ -187,7 +189,7 @@ namespace zdp
         //at least every struct has 1 byte
         if (size < alen) return ZCE_ERROR_SHRTLEN;
 
-        val.resize(alen);
+        val.resize((size_t)alen);
 
         typename std::vector<T>::iterator iter;
         for (iter = val.begin(); iter != val.end(); ++iter) {
@@ -201,4 +203,22 @@ namespace zdp
     //skip one object
     int ZCE_API zds_unpack_skip(const zce_byte* buf, zce_int32 size, zds_context_t* ctx);
 
+    template <typename T, typename... Args>
+    int zds_pack_multi(zce_byte* buf, zce_int32 size, zds_context_t* ctx, bool has_prefix, const T& val, Args&&... args) {
+        int len = 0, ret = 0;
+        if constexpr (is_builtin_type<T>()) {
+            len = zds_pack_builtin(buf, size, val, ctx);
+            CHECKLEN_MOVEBUF_ADDRET_DECSIZE;
+        }
+        else {
+            len = zds_pack(buf, size, val, ctx, has_prefix);
+            CHECKLEN_MOVEBUF_ADDRET_DECSIZE;
+        }
+        if constexpr (sizeof...(args) > 0) {
+            len = zds_pack_multi(buf, size, ctx, has_prefix, std::forward<Args>(args)...);
+            CHECKLEN_MOVEBUF_ADDRET_DECSIZE;
+        }
+
+        return ret;
+    }
 } //namespace zdp

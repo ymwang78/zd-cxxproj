@@ -55,7 +55,7 @@ class ZCE_API zce_any
     } data_;
 
     template<typename T>
-    _any_types _to_type() {
+    constexpr _any_types _to_type() const {
         if constexpr (std::is_same<T, zce_float>::value) {
             return any_fltarray;
         }
@@ -132,11 +132,11 @@ public:
     }
 
     template<typename T>
-    zce_any(const T* brray, size_t len) noexcept {
-        new (this) zce_any((const zce_byte*)brray,
+    zce_any(const T* barray, size_t len) noexcept {
+        new (this) zce_any((const zce_byte*)barray,
             (size_t)len * sizeof(T),
             _to_type<T>(),
-            constexpr (std::is_signed<T>::value),
+            std::is_signed<T>::value,
             zce_bits_msb_index(sizeof(T)));
     }
 
@@ -180,7 +180,9 @@ public:
     }
 
     inline zce_double dbl() const noexcept {
-        ZCE_ASSERT_RETURN(data_.type_ == any_double, 0);
+        ZCE_ASSERT_RETURN(data_.type_ == any_double || data_.type_ == any_int64, 0);
+        if (data_.type_ == any_int64)
+            return (zce_double)data_.u_.i64_;
         return data_.u_.dbl_;
     }
 

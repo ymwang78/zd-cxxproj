@@ -198,7 +198,7 @@ namespace zdp_base
         }
 
         zobject_proxy_t    target;
-        zce_string method;
+        zce_astring method;
         std::vector<zce_byte> payload;
     };
     typedef zce_smartptr<MSG_RPCCALL_REQ> MSG_RPCCALL_REQ_PTR;

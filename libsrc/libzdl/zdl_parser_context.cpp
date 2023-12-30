@@ -77,7 +77,6 @@ void zdl_parser_context::set_current_member_type(int tpid,
     zdl_type::zdl_type_e tp_e = zdl_type::get_type_e(tpid);
     switch(tp_e){
         case zdl_type::type_builtin_e:
-        case zdl_type::type_builtinvec_e:
             set_current_member_type(tpid);
             return;
         case zdl_type::type_enum_e:
@@ -144,7 +143,6 @@ void zdl_parser_context::add_type_start(int tpid, const std::string& tpname)
     zdl_type::zdl_type_e tp_e = zdl_type::get_type_e(tpid);
     switch(tp_e){
         case zdl_type::type_builtin_e:
-        case zdl_type::type_builtinvec_e:
             ZCE_ERROR((ZLOG_ERROR, "global builtin type id(%d) and name(%s) not support\n", tpid, tpname.c_str()));
             return;
         case zdl_type::type_enum_e:

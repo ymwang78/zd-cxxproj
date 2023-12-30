@@ -2,12 +2,13 @@
 
 #ifdef _WIN32
 #   define NOMINMAX
-//#   if defined(_DEBUG) && !defined(_UNICODE)
+#   if defined(_UNICODE)
 #       //include <vld.h>
 #       define ZCE_ZDB_MYSQL 0
 #       define ZCE_ZDB_PGSQL 0
 #       define ZCE_ISSERVICE_MODE  0
-//#   endif
+#       define ZCE_SUPPORT_PYVM 0
+#   endif
 #   include <winsock2.h>
 #   include <ws2tcpip.h>
 #   include <stdio.h>

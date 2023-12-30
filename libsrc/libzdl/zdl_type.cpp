@@ -52,11 +52,10 @@ zdl_type::zdl_type_e zdl_type::get_type_e (int tpid)
     case UIDL_ANY:
     case UIDL_SERIAL:
     case UIDL_DATETIME:
-        return type_builtin_e;
     case UIDL_ASTRVEC:
     case UIDL_TSTRVEC:
     case UIDL_WSTRVEC:
-        return type_builtinvec_e;
+        return type_builtin_e;
     case UIDL_ENUM:
         return type_enum_e;
     case UIDL_STRUCT:

@@ -67,8 +67,7 @@ int zdl_struct::add_member(const zdl_member_ptr& member)
 
     //////////////////////////////////////////////////////////////////////////
     
-    if (member->type()->type_e() == type_builtin_e
-        || member->type()->type_e() == type_builtinvec_e)
+    if (member->type()->type_e() == type_builtin_e)
     {
         if (!member->is_string())
         {
