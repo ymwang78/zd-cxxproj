@@ -8,6 +8,8 @@
 #       define ZCE_ZDB_PGSQL 0
 #       define ZCE_ISSERVICE_MODE  0
 #       define ZCE_SUPPORT_PYVM 0
+#else
+#       define ZCE_SUPPORT_PYVM 1
 #   endif
 #   include <winsock2.h>
 #   include <ws2tcpip.h>
