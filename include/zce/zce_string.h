@@ -34,8 +34,10 @@ namespace zce
     struct none_t {
     };
 
-    inline void replace(std::string &strBase, const std::string& strSrc, const std::string& strDes, bool bReplaceAll)
-    {
+    inline void replace(std::string &strBase, 
+        const std::string& strSrc, 
+        const std::string& strDes, 
+        bool bReplaceAll) {
         std::string::size_type pos = 0;
         std::string::size_type srcLen = strSrc.size();
         std::string::size_type desLen = strDes.size();
@@ -50,23 +52,28 @@ namespace zce
         }
     }
 
+    inline unsigned int hash(const char* str, size_t len) {
+        unsigned int hash = 1315423911;
+        for (size_t i = 0; i < len; ++i) {
+            hash ^= ((hash << 5) + str[i] + (hash >> 2));
+        }
+        return hash;
+    }
+
     template<typename T>
-    inline std::string to_string(const T& value)
-    {
+    inline std::string to_string(const T& value) {
         std::stringstream ss;
         ss << value;
         return ss.str();
     }
 
     template<>
-    inline std::string to_string<const std::string&>(const std::string& str)
-    {
+    inline std::string to_string<const std::string&>(const std::string& str) {
         return str;
     }
 
     template<typename T>
-    inline std::string to_string(const std::vector<T>& arr)
-    {
+    inline std::string to_string(const std::vector<T>& arr) {
         std::ostringstream stream;
         for (unsigned i = 0; i < arr.size(); ++i) {
             stream << arr[i] << ",";
@@ -75,8 +82,7 @@ namespace zce
     }
 
     template<>
-    inline std::string to_string<bool>(const bool& _value)
-    {
+    inline std::string to_string<bool>(const bool& _value) {
         return _value ? "true" : "false";
     }
 
