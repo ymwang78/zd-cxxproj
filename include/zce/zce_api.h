@@ -65,7 +65,6 @@ extern "C"
     enum ERV_ZCE_COMPRESS {
         ZCE_COMPRESS_NONE,
         ZCE_COMPRESS_BZIP2,
-		ZCE_COMPRESS_CLEAN,
     };
 
     //out_size should be large enough
