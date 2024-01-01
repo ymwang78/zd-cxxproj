@@ -1,10 +1,10 @@
 // ***************************************************************
-//  vx_ecpg   version:  1.0 - date: 13/1/2013
+//  zdb_ecpg   version:  1.0   -  date: 2015/01/01
 //  -------------------------------------------------------------
-//  Hangzhou Zhidu Network Ltd.
-//  Administrator(admin@zhidu.biz)
+//  Yongming Wang(wangym@gmail.com)
 //  -------------------------------------------------------------
-//  Copyright (C) 2012 - All Rights Reserved
+//  This is a part of ZCE lib, which inherited from ubeda/utiny.
+//  Copyright (C) 2002 - All Rights Reserved
 // ***************************************************************
 // 
 // ***************************************************************

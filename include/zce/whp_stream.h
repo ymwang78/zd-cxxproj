@@ -1,5 +1,14 @@
 #pragma once
-
+// ***************************************************************
+//  whp_stream   version:  1.0   -  date: 2003/01/01
+//  -------------------------------------------------------------
+//  Yongming Wang(wangym@gmail.com)
+//  -------------------------------------------------------------
+//  This is a part of ZCE lib, which inherited from ubeda/utiny.
+//  Copyright (C) 2002 - All Rights Reserved
+// ***************************************************************
+// 
+// ***************************************************************
 #include <zce/zce_handler.h>
 #include <zce/zdp_schema.h>
 #include <zce/zce_timer.h>

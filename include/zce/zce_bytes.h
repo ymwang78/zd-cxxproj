@@ -1,9 +1,10 @@
+#pragma once
 // ***************************************************************
-//  zce_bytes   version:  1.0     date: 08/01/2002
+//  zce_bytes   version:  1.0   -  date: 2003/01/01
 //  -------------------------------------------------------------
-//  Yongming Wang(ymwang@iipc.zju.edu.cn)
-//  The Institute of System Engineering, Zhejiang University
+//  Yongming Wang(wangym@gmail.com)
 //  -------------------------------------------------------------
+//  This is a part of ZCE lib, which inherited from ubeda/utiny.
 //  Copyright (C) 2002 - All Rights Reserved
 // ***************************************************************
 // 

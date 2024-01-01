@@ -1,16 +1,16 @@
+#pragma once
 // ***************************************************************
-//  zxml_convertor   version:  1.0     date: 07/31/2002
+//  zxml_convertor   version:  1.0   -  date: 2002/07/31
 //  -------------------------------------------------------------
-//  Yongming Wang(ymwang@iipc.zju.edu.cn)
-//  The Institute of System Engineering, Zhejiang University
+//  Yongming Wang(wangym@gmail.com)
 //  -------------------------------------------------------------
+//  This is a part of ZCE lib, which inherited from ubeda/utiny.
 //  Copyright (C) 2002 - All Rights Reserved
 // ***************************************************************
 // char* assume utf-8 characters
 // wchar* assume utf-16 characters
 // std::string use native encode or unicode depends the mircro ACE_USES_WCHAR
 // ***************************************************************
-#pragma once
 #ifndef __zxml_convertor_h__
 #define __zxml_convertor_h__
 

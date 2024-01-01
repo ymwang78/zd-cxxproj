@@ -1,10 +1,11 @@
+#pragma once
 // ***************************************************************
-//  zdb_redis   version:  1.0   -  date: 9/25/2015
+//  zdb_redis   version:  1.0   -  date: 2015/01/01
 //  -------------------------------------------------------------
-//  Yongming Wang(wym@zhidu.biz)
-//  Zhidu Network Co. Ltd.
+//  Yongming Wang(wangym@gmail.com)
 //  -------------------------------------------------------------
-//  Copyright (C) 2015 - All Rights Reserved
+//  This is a part of ZCE lib, which inherited from ubeda/utiny.
+//  Copyright (C) 2002 - All Rights Reserved
 // ***************************************************************
 // 
 // ***************************************************************

@@ -1,10 +1,13 @@
+#pragma once
 // ***************************************************************
-//  zce_sync   version:  1.0     date: 06/21/2016
+//  zce_sync   version:  1.0   -  date: 2003/03/27
 //  -------------------------------------------------------------
-//  Yongming Wang(wym@zhidu.biz)
-//  Zhidu Network Co. Ltd.
+//  Yongming Wang(wangym@gmail.com)
 //  -------------------------------------------------------------
-//  Copyright (C) 2016 - All Rights Reserved
+//  This is a part of ZCE lib, which inherited from ubeda/utiny.
+//  Copyright (C) 2002 - All Rights Reserved
+// ***************************************************************
+// 
 // ***************************************************************
 #ifndef __zce_mutex_h__
 #define __zce_mutex_h__

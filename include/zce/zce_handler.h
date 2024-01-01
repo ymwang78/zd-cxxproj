@@ -1,9 +1,10 @@
+#pragma once
 // ***************************************************************
-//  zce_handler   version:  1.0     date: 07/31/2002
+//  zce_handler   version:  1.0     date: 2002/07/31
 //  -------------------------------------------------------------
-//  Yongming Wang(ymwang@iipc.zju.edu.cn)
-//  The Institute of System Engineering, Zhejiang University
+//  Yongming Wang(wangym@gmail.com)
 //  -------------------------------------------------------------
+//  This file is a part of ZCE, which inherited from ubeda/utiny.
 //  Copyright (C) 2002 - All Rights Reserved
 // ***************************************************************
 // 

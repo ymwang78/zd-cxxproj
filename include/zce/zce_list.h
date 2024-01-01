@@ -1,14 +1,14 @@
+#pragma once
 // ***************************************************************
-//  zce_list   version:  1.0   -  date: 11/14/2015
+//  zce_list   version:  1.0   -  date: 2002/11/14
 //  -------------------------------------------------------------
 //  Yongming Wang(wangym@gmail.com)
 //  -------------------------------------------------------------
-//  Copyright (C) 2010 - All Rights Reserved
+//  This file is a part of ZCE, which inherited from ubeda/utiny.
+//  Copyright (C) 2002 - All Rights Reserved
 // ***************************************************************
 // 
 // ***************************************************************
-#pragma once
-
 #ifndef __zce_list_h__
 #define __zce_list_h__
 

@@ -1,9 +1,11 @@
+#pragma once
 // ***************************************************************
-//  zce_mbpool   version:  1.0   -  date: 4/30/2012
+//  zce_mbpool   version:  1.0   -  date: 2015/4/30
 //  -------------------------------------------------------------
 //  Yongming Wang(wangym@gmail.com)
 //  -------------------------------------------------------------
-//  Copyright (C) 2010 - All Rights Reserved
+//  This is a part of ZCE lib, which inherited from ubeda/utiny.
+//  Copyright (C) 2012 - All Rights Reserved
 // ***************************************************************
 // add_pool 非线程安全，必须在初始化时全部add完成，其他函数安全
 // ***************************************************************

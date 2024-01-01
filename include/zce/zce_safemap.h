@@ -1,10 +1,11 @@
+#pragma once
 // ***************************************************************
-//  zce_safemap   version:  1.0     date: 07/31/2002
+//  zce_safemap   version:  1.0     date: 2003/07/31
 //  -------------------------------------------------------------
-//  Yongming Wang(ymwang@iipc.zju.edu.cn)
-//  The Institute of System Engineering, Zhejiang University
+//  Yongming Wang(wangym@gmail.com)
 //  -------------------------------------------------------------
-//  Copyright (C) 2002 - All Rights Reserved
+//  This is a part of ZCE lib, which inherited from ubeda/utiny.
+//  Copyright (C) 2003 - All Rights Reserved
 // ***************************************************************
 // 
 // ***************************************************************

@@ -1,13 +1,15 @@
 #pragma once
 // ***************************************************************
-//  zce_timer   version:  1.0   -  date: 11/26/2015
+//  zce_timer   version:  1.0   -  date: 2003/06/15
 //  -------------------------------------------------------------
 //  Yongming Wang(wangym@gmail.com)
 //  -------------------------------------------------------------
-//  Copyright (C) 2010 - All Rights Reserved
+//  This is a part of ZCE lib, which inherited from ubeda/utiny.
+//  Copyright (C) 2002 - All Rights Reserved
 // ***************************************************************
 // 
 // ***************************************************************
+#pragma once
 #include <zce/zce_config.h>
 #include <zce/zce_object.h>
 #include <zce/zce_object_counter.h>

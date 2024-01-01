@@ -1,14 +1,14 @@
+#pragma once
 // ***************************************************************
-//  zce_types   version:  1.0   -  date: 6/22/2015
+//  zce_types   version:  1.0   -  date: 2002/06/22
 //  -------------------------------------------------------------
-//  Yongming Wang(wym@zhidu.biz)
-//  Zhidu Network Co. Ltd.
+//  Yongming Wang(wangym@gmail.com)
 //  -------------------------------------------------------------
-//  Copyright (C) 2015 - All Rights Reserved
+//  This is a part of ZCE lib, which inherited from ubeda/utiny.
+//  Copyright (C) 2002 - All Rights Reserved
 // ***************************************************************
 // 
 // ***************************************************************
-#pragma once
 #ifndef __zce_types_h__
 #define __zce_types_h__
 

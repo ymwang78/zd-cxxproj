@@ -1,8 +1,10 @@
+#pragma once
 /* ***************************************************************
-//  zce_service   version:  1.0  date: 6/5/2009
+//  zce_service   version:  1.0  date: 2009/6/5
 //  -------------------------------------------------------------
 //  Yongming Wang(wangym@gmail.com)
 //  -------------------------------------------------------------
+//  This is a part of ZCE lib, which inherited from ubeda/utiny.
 //  Copyright (C) 2009 - All Rights Reserved
 // ***************************************************************
 // 

@@ -1,15 +1,16 @@
+#pragma once
 /* ***************************************************************
-//  zce_data_block   version:  1.0  date: 23/23/2009
+//  zce_data_block   version:  1.0  date: 2009/5/6
 //  -------------------------------------------------------------
 //  Yongming Wang(wangym@gmail.com)
 //  -------------------------------------------------------------
+//  This file is a part of ZCE, which inherited from ubeda/utiny.
 //  Copyright (C) 2009 - All Rights Reserved
 // ***************************************************************
 // |---prespace---|-----length-----|---space---|
 // |-------------------capacity----------------|
 // base         rd_pos           wr_pos      size
 // **************************************************************/
-#pragma once
 #ifndef __zce_data_block_h__
 #define __zce_data_block_h__
 

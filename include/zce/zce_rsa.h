@@ -1,13 +1,14 @@
+#pragma once
 /* ***************************************************************
-//  zce_rsa   version:  1.0  date: 2015/02/08/2/2015 
+//  zce_rsa   version:  1.0  date: 2015/02/08 
 //  -------------------------------------------------------------
 //  Yongming Wang(wangym@gmail.com)
 //  -------------------------------------------------------------
-//  Copyright (C) 2014 - All Rights Reserved
+//  This is a part of ZCE lib, which inherited from ubeda/utiny.
+//  Copyright (C) 2015 - All Rights Reserved
 // ***************************************************************
 // 
 // **************************************************************/
-#pragma once
 #ifndef __zce_rsa_h__
 #define __zce_rsa_h__
 

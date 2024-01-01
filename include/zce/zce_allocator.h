@@ -1,14 +1,15 @@
+#pragma once
 // ***************************************************************
-//  zce_allocator   version:  1.0   -  date: 4/29/2012
+//  zce_allocator   version:  1.0   -  date: 2002/04/29
 //  -------------------------------------------------------------
 //  Yongming Wang(wangym@gmail.com)
 //  -------------------------------------------------------------
-//  Copyright (C) 2010 - All Rights Reserved
+//  This file is a part of ZCE, which inherited from ubeda/utiny.
+//  Copyright (C) 2002 - All Rights Reserved
 // ***************************************************************
 // pool: |---chunk---|---chunk---|...|---chunk---|
 // pool: |---chunk---|---chunk---|...|---chunk---|
 // ***************************************************************
-#pragma once
 #ifndef __zce_allocator_h__
 #define __zce_allocator_h__
 

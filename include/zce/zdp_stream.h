@@ -1,13 +1,14 @@
+#pragma once
 // ***************************************************************
-//  zdp_tcp   version:  1.0   -  date: 11/14/2015
+//  zdp_stream   version:  1.0   -  date: 2023/07/06
 //  -------------------------------------------------------------
 //  Yongming Wang(wangym@gmail.com)
 //  -------------------------------------------------------------
-//  Copyright (C) 2010 - All Rights Reserved
+//  This is a part of ZCE lib, which inherited from ubeda/utiny.
+//  Copyright (C) 2002 - All Rights Reserved
 // ***************************************************************
 // 
 // ***************************************************************
-#pragma once
 #ifndef __zdp_tcp_h__
 #define __zdp_tcp_h__
 

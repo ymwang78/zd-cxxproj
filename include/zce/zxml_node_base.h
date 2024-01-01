@@ -1,15 +1,15 @@
+#pragma once
 // ***************************************************************
-//  zxml_node_base   version:  1.0     date: 07/31/2002
+//  zxml_node_factory   version:  1.0   -  date: 2002/07/31
 //  -------------------------------------------------------------
-//  Yongming Wang(ymwang@iipc.zju.edu.cn)
-//  The Institute of System Engineering, Zhejiang University
+//  Yongming Wang(wangym@gmail.com)
 //  -------------------------------------------------------------
+//  This is a part of ZCE lib, which inherited from ubeda/utiny.
 //  Copyright (C) 2002 - All Rights Reserved
 // ***************************************************************
 // return value(int) means characters
 // size is characters, too. 
 // ***************************************************************
-#pragma once
 #ifndef __zxml_node_base_h__
 #define __zxml_node_base_h__
 

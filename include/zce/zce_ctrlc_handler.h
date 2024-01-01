@@ -1,9 +1,11 @@
+#pragma once
 /* ***************************************************************
-//  zce_ctrlc_handler   version:  1.0  date: 6/5/2009
+//  zce_ctrlc_handler   version:  1.0  date: 2003/6/5
 //  -------------------------------------------------------------
 //  Yongming Wang(wangym@gmail.com)
 //  -------------------------------------------------------------
-//  Copyright (C) 2009 - All Rights Reserved
+//  This file is a part of ZCE, which inherited from ubeda/utiny.
+//  Copyright (C) 2002 - All Rights Reserved
 // ***************************************************************
 // 
 // **************************************************************/

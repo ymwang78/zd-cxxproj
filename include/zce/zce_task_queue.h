@@ -1,9 +1,11 @@
+#pragma once
 // ***************************************************************
-//  zce_task_queue   version:  1.0   -  date: 11/15/2015
+//  zce_task_queue   version:  1.0   -  date: 2002/11/15
 //  -------------------------------------------------------------
 //  Yongming Wang(wangym@gmail.com)
 //  -------------------------------------------------------------
-//  Copyright (C) 2010 - All Rights Reserved
+//  This is a part of ZCE lib, which inherited from ubeda/utiny.
+//  Copyright (C) 2002 - All Rights Reserved
 // ***************************************************************
 // 
 // ***************************************************************

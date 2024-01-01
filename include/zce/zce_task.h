@@ -1,12 +1,15 @@
+#pragma once
 // ***************************************************************
-//  zce_task   version:  1.0   -  date: 4/27/2012
+//  zce_task   version:  1.0   -  date: 2003/03/27
 //  -------------------------------------------------------------
 //  Yongming Wang(wangym@gmail.com)
 //  -------------------------------------------------------------
-//  Copyright (C) 2010 - All Rights Reserved
+//  This is a part of ZCE lib, which inherited from ubeda/utiny.
+//  Copyright (C) 2002 - All Rights Reserved
 // ***************************************************************
 // 
 // ***************************************************************
+#pragma once
 #ifndef __zce_task_h__
 #define __zce_task_h__
 
