@@ -1,5 +1,14 @@
 #pragma once
-
+// ***************************************************************
+//  zce_any   version:  1.0   -  date: 2023/08/01
+//  -------------------------------------------------------------
+//  Yongming Wang(wangym@gmail.com)
+//  -------------------------------------------------------------
+//  This is a part of ZCE lib, which inherited from ubeda/utiny.
+//  Copyright (C) 2002 - All Rights Reserved
+// ***************************************************************
+// 
+// ***************************************************************
 #include <zce/zce_types.h>
 #include <zce/zce_object.h>
 #include <map>

@@ -1,9 +1,8 @@
+#pragma once
 /* ***************************************************************
  *  Copyright (C) 2006 -  Yongming Wang(wangym@gmail.com)
  *  All Rights Reserved
  * ***************************************************************/
-#pragma once
-
 #include <zce/zce_object.h>
 #include <vector>
 #include <string>

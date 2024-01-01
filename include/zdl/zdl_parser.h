@@ -1,3 +1,15 @@
+#pragma once
+/* ***************************************************************
+ *  Copyright (C) 2006  Yongming Wang(wangym@gmail.com)
+ *  All Rights Reserved
+ *
+ *  This file is part of Ubeda project (http://www.ubeda.cn).
+ *
+ *  This copy of file is licensed to you under Ubeda License.
+ *  You should have received a copy of the Ubeda License
+ *  along with this program, if not, get it from
+ *      http://www.ubeda.cn
+ * ***************************************************************/
 #ifndef __zdl_parser_h
 #define __zdl_parser_h
 
