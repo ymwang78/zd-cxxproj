@@ -33,10 +33,10 @@ class ZCE_API zce_atomic_long
 public:
     zce_atomic_long(long c = 0) noexcept;
 
-    long operator ++ ();
-    long operator -- ();
+    long operator ++ () noexcept;
+    long operator -- () noexcept;
 
-    long value() const;
+    long value() const noexcept;
 private:
     volatile long value_;
 };
@@ -46,10 +46,10 @@ inline zce_atomic_long::zce_atomic_long(long c) noexcept
 {
 }
 
-inline long zce_atomic_long::operator ++ ()
+inline long zce_atomic_long::operator ++ () noexcept
 {
 #ifdef _WIN32
-    return InterlockedIncrement(const_cast<long*>(&this->value_));
+    return InterlockedIncrement((long*)(&this->value_));
 #elif defined(__APPLE__)
     return OSAtomicIncrement32((int*)&this->value_);
 #elif defined(ATOMIC_USE_MUTEX) || defined(ATOMIC_USE_ARMSPIN)
@@ -59,10 +59,10 @@ inline long zce_atomic_long::operator ++ ()
 #endif
 }
 
-inline long zce_atomic_long::operator -- ()
+inline long zce_atomic_long::operator -- () noexcept
 {
 #ifdef _WIN32
-    return InterlockedDecrement(const_cast<long*>(&this->value_));
+    return InterlockedDecrement((long*)(&this->value_));
 #elif defined (__APPLE__)
     return OSAtomicDecrement32((int*)&this->value_);
 #elif defined(ATOMIC_USE_MUTEX) || defined(ATOMIC_USE_ARMSPIN)
@@ -72,7 +72,7 @@ inline long zce_atomic_long::operator -- ()
 #endif
 }
 
-inline long zce_atomic_long::value() const
+inline long zce_atomic_long::value() const noexcept
 {
     return this->value_;
 }
