@@ -34,11 +34,11 @@ struct ZCE_API zce_alloc_stat {
             chunk_max_used_ = cur_alloc;
     }
 
-    unsigned chunk_data_size_;           //the size of chunk
+    unsigned chunk_data_size_;      //the size of chunk
     unsigned chunk_availble_;       //how many chunks available for use
     unsigned chunk_alloc_times_;    //alloc times, for profile
     unsigned chunk_free_times_;     //free times, for profile
-    unsigned chunk_max_used_;      //the max number of chunks used in history
+    unsigned chunk_max_used_;       //the max number of chunks used in history
 };
 
 class ZCE_API zce_allocator : public zce_object
@@ -87,7 +87,29 @@ public:
 
     void *alloc(size_t nbytes, size_t* nreal) override;
 
-    void zfree(void* item) override; //fuck off the macro
+    void zfree(void* item) override;
 };
 
+class ZCE_API zce_allocator_v2 : public zce_allocator
+{
+    struct pimpl;
+    
+    pimpl* pimpl_;
+
+    bool islock_;
+
+    zce_mutex lock_;
+
+public:
+    
+    zce_allocator_v2(size_t atmoic_size, bool islock = true);
+
+    virtual ~zce_allocator_v2();
+
+    int init_pool(size_t malloc_size);
+
+    void* alloc(size_t nbytes, size_t* nreal) override;
+
+    void zfree(void* item) override;
+};
 #endif // __zce_allocator_h__
