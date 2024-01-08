@@ -68,14 +68,6 @@ protected:
 
     virtual bool on_stop() = 0;
 
-    virtual void error(const std::string&);
-
-    virtual void warning(const std::string&);
-
-    virtual void trace(const std::string&);
-
-    virtual void print(const std::string&);
-
     void enable_interrupt();
 
     void disable_interrupt();
