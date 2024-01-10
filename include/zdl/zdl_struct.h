@@ -22,9 +22,10 @@
 #include <map>
 #include <string>
 #include <algorithm>
-#include "zdl/zdl_type.h"
-#include "zdl/zdl_template_arg.h"
-#include "zdl/zdl_module.h"
+#include <zdl/zdl_type.h>
+#include <zdl/zdl_template_arg.h>
+#include <zdl/zdl_module.h>
+#include <zdl/zdl_member.h>
 
 class zdl_member;
 class zdl_visitor;
@@ -143,7 +144,7 @@ void zdl_struct::visit(const zdl_visitor_ptr& visitor, predicate p) const
         if (p(*iter))
         {
             --count;
-            visitor->visit_member((*iter).get(), !count);
+            visitor->visit_member(*iter, !count);
         }
     }
     visitor->visit_struct_end(this);

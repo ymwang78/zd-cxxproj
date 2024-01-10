@@ -24,6 +24,10 @@ public:
         return type_dict_;
     }
 
+    const std::vector<zce_smartptr<zdl_type>>& types() const noexcept {
+        return type_vec_;
+    }
+
     const std::string& name_space() const noexcept {
         return namespace_name_;
     }
