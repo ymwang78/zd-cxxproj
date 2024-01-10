@@ -74,8 +74,12 @@ public:
         return *this;
     };
 
-    bool operator==(const zce_dblock& rhs) const noexcept {
+    inline bool operator==(const zce_dblock& rhs) const noexcept {
         return dt_ptr_ == rhs.dt_ptr_ && rd_pos_ == rhs.rd_pos_ && wr_pos_ == rhs.wr_pos_;
+    }
+
+    inline bool operator!=(const zce_dblock& rhs) const noexcept {
+        return ! operator==(rhs);
     }
 
     zce_dblock(zce_dtblock* dtblock);
@@ -109,6 +113,8 @@ public:
     int copy(const zce_byte* data, size_t len);
 
     void crunch(size_t preserved = 0);
+
+    inline bool empty() const noexcept { return length() == 0; };
 
     size_t prespace() const;
 

@@ -105,6 +105,8 @@ namespace zdp
     DECLARE_PACK_BUILTIN_ARRAY(zce_float)
     DECLARE_PACK_BUILTIN_ARRAY(zce_double)
 
+    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const zce_dblock& val, zds_context_t* ctx);
+
     int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const char* val, zds_context_t* ctx);
 
     int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const std::string& val, zds_context_t* ctx);
@@ -160,6 +162,8 @@ namespace zdp
 	int ZCE_API zds_unpack_builtin(std::vector<zce_float>& val, const zce_byte* buf, zce_int32 size, zds_context_t* ctx);
 
 	int ZCE_API zds_unpack_builtin(std::vector<zce_double>& val, const zce_byte* buf, zce_int32 size, zds_context_t* ctx);
+
+    int ZCE_API zds_unpack_builtin(zce_dblock& val, const zce_byte* buf, zce_int32 size, zds_context_t* ctx);
 
     int ZCE_API zds_unpack_builtin(std::string& val, const zce_byte* buf, zce_int32 size, zds_context_t* ctx);
 
