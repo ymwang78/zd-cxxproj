@@ -35,6 +35,7 @@ namespace zdp
         std::is_arithmetic<T>::value 
         || std::is_same<T, std::string>::value 
         || std::is_same<T, zce_dblock>::value
+        || std::is_same<T, zce_any>::value
     > {};
 
     template<typename T>
@@ -51,6 +52,12 @@ namespace zdp
     //    is_string<T>::value> {};
 
     template<typename T>
+    struct is_std_map : std::false_type {};
+
+    template<typename Key, typename Value, typename Compare, typename Alloc>
+    struct is_std_map<std::map<Key, Value, Compare, Alloc>> : std::true_type {};
+
+    template<typename T>
     constexpr bool is_builtin_type() {
         using decayed_type = typename std::remove_cv<typename std::remove_reference<T>::type>::type;
         return is_builtin_basic<T>::value 
@@ -59,22 +66,23 @@ namespace zdp
             || (std::is_array<decayed_type>::value && is_builtin_basic<typename std::remove_extent<decayed_type>::type>::value);
     }
 
+
     int ZCE_API write_varuint_raw(zce_byte* buf, int size, zce_uint64 val, zds_context_t* ctx);
 
     int ZCE_API read_varuint_raw(zce_uint64& val, const zce_byte* buf, int size, zds_context_t* ctx);
 
-    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, bool val, zds_context_t* ctx);
+    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, bool val, zds_context_t* ctx, bool has_prefix = true);
 
-    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, zce_int64 val, zds_context_t* ctx);
+    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, zce_int64 val, zds_context_t* ctx, bool has_prefix = true);
 
-    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, zce_uint64 val, zds_context_t* ctx);
+    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, zce_uint64 val, zds_context_t* ctx, bool has_prefix = true);
 
-    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, zce_float val, zds_context_t* ctx);
+    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, zce_float val, zds_context_t* ctx, bool has_prefix = true);
 
-    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, zce_double val, zds_context_t* ctx);
+    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, zce_double val, zds_context_t* ctx, bool has_prefix = true);
 
     template<typename T>
-    inline int zds_pack_builtin(zce_byte* buf, zce_int32 size, T val, zds_context_t* ctx) {
+    inline int zds_pack_builtin(zce_byte* buf, zce_int32 size, T val, zds_context_t* ctx, bool has_prefix = true) {
         static_assert (std::is_integral<T>::value, "must be integral type");
         if (std::is_signed<T>::value) {
             zce_int64 tmp = (zce_int64)val;
@@ -89,10 +97,10 @@ namespace zdp
     int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const zce_any& val, zds_context_t* ctx);
 
 #define DECLARE_PACK_BUILTIN_ARRAY(TT) \
-    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const std::vector<TT>& val, zds_context_t* ctx);\
-    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const TT* vec, unsigned vec_size, zds_context_t* ctx);
+    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const std::vector<TT>& val, zds_context_t* ctx, bool has_prefix = true);\
+    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const TT* vec, unsigned vec_size, zds_context_t* ctx, bool has_prefix = true);
 
-    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const std::vector<bool>& val, zds_context_t* ctx);
+    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const std::vector<bool>& val, zds_context_t* ctx, bool has_prefix = true);
 
     DECLARE_PACK_BUILTIN_ARRAY(zce_byte)
     DECLARE_PACK_BUILTIN_ARRAY(zce_uint16)
@@ -105,25 +113,25 @@ namespace zdp
     DECLARE_PACK_BUILTIN_ARRAY(zce_float)
     DECLARE_PACK_BUILTIN_ARRAY(zce_double)
 
-    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const zce_dblock& val, zds_context_t* ctx);
+    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const zce_dblock& val, zds_context_t* ctx, bool has_prefix = true);
 
-    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const char* val, zds_context_t* ctx);
+    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const char* val, zds_context_t* ctx, bool has_prefix = true);
 
-    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const std::string& val, zds_context_t* ctx);
+    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const std::string& val, zds_context_t* ctx, bool has_prefix = true);
 
-    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const zce::string_view& val, zds_context_t* ctx);
+    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const zce::string_view& val, zds_context_t* ctx, bool has_prefix = true);
 
-    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const std::vector<std::string>& val, zds_context_t* ctx);
+    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const std::vector<std::string>& val, zds_context_t* ctx, bool has_prefix = true);
 
-    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const std::vector<zce_any>& val, zds_context_t* ctx);
+    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const std::vector<zce_any>& val, zds_context_t* ctx, bool has_prefix = true);
 
-    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const std::map<zce_any, zce_any>& val, zds_context_t* ctx);
+    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const std::map<zce_any, zce_any>& val, zds_context_t* ctx, bool has_prefix = true);
 
-    int ZCE_API zds_pack_struct_header(zce_byte* buf, int size, zce_uint64 struct_prefix, zds_context_t* ctx, bool has_prefix);
+    int ZCE_API zds_pack_struct_header(zce_byte* buf, int size, zce_uint64 struct_prefix, zds_context_t* ctx, bool has_prefix = true);
 
-    int ZCE_API zds_pack_struct_array_header(zce_byte* buf, int size, zce_uint64 array_size, zds_context_t* ctx);
+    int ZCE_API zds_pack_struct_array_header(zce_byte* buf, int size, zce_uint64 array_size, zds_context_t* ctx, bool has_prefix = true);
 
-    int ZCE_API zds_pack_any_array_header(zce_byte* buf, int size, zce_uint64 array_size, zds_context_t* ctx);
+    int ZCE_API zds_pack_any_array_header(zce_byte* buf, int size, zce_uint64 array_size, zds_context_t* ctx, bool has_prefix = true);
 
     ///////////////////////////////////////////////////////////////////////////
 
@@ -232,6 +240,56 @@ namespace zdp
             CHECKLEN_MOVEBUF_ADDRET_DECSIZE;
         }
 
+        return ret;
+    }
+
+    template<typename TKEY, typename TVAL>
+    int  zds_pack_builtin(zce_byte* buf, zce_int32 size, const std::map<TKEY, TVAL>& val, zds_context_t* ctx)
+    {
+        if (buf && size < 1) return ZCE_ERROR_SHRTLEN;
+        zds_prefix_u prefix{ 0 };
+        prefix.prefix.payload = ZDS_PAYLOAD_DICT;
+        prefix.prefix.subtype = ZDS_SUBTYPE_SINGLE;
+        if (val.empty()) {
+            prefix.prefix.isempty = 1;
+            if (buf) buf[0] = prefix.v;
+            return 1;
+        }
+
+        if (buf) buf[0] = prefix.v;
+        int ret = 0, len = 1;
+        CHECKLEN_MOVEBUF_ADDRET_DECSIZE;
+
+        if (buf && size < 2) return ZCE_ERROR_SHRTLEN;
+        static_assert(std::is_same<TKEY, zce_any>::value || is_builtin_type<TKEY>(), "key must be builtin type");
+
+        {
+            zds_prefix_u keyprefix{ 0 };
+            keyprefix.prefix.payload = _get_payload<TKEY>();
+            keyprefix.prefix.subtype = ZDS_SUBTYPE_SINGLE;
+            if (buf) buf[0] = keyprefix.v;
+            zds_prefix_u valprefix{ 0 };
+            valprefix.prefix.payload = _get_payload<TVAL>();
+            valprefix.prefix.subtype = ZDS_SUBTYPE_SINGLE;
+            if (buf) buf[1] = valprefix.v;
+            len = 2;
+            CHECKLEN_MOVEBUF_ADDRET_DECSIZE;
+        }
+        //write multi size
+        len = write_varuint_raw(buf, size, val.size(), ctx);
+        CHECKLEN_MOVEBUF_ADDRET_DECSIZE;
+
+        for (auto it = val.begin(); it != val.end(); ++it) {
+            len = zds_pack_builtin(buf, size, it->first, ctx, std::is_same<TKEY, zce_any>::value);
+            CHECKLEN_MOVEBUF_ADDRET_DECSIZE;
+            if constexpr (is_builtin_type<TVAL>()) {
+                len = zds_pack_builtin(buf, size, it->second, ctx, std::is_same<TKEY, zce_any>::value);
+            }
+            else {
+                len = zds_pack(buf, size, iter->second, ctx, std::is_same<TKEY, zce_any>::value);
+            }
+            CHECKLEN_MOVEBUF_ADDRET_DECSIZE;
+        }
         return ret;
     }
 } //namespace zdp
