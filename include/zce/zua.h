@@ -28,55 +28,37 @@ public:
         return pimpl_ptr_;
     }
 
-    void boot(const zce_smartptr<zce_schedule>&,
-        const zce_smartptr<zce_reactor>&,
-#if ZCE_ISSERVICE_MODE
-        const Ice::CommunicatorPtr&,
-#endif
-        const std::string& path);
-
-    int lpc_call_dblock(const std::string& svrname,
-        const std::string& method,
-        zce_dblock& dblock);
-
     //add your own lib ref here
     //luaL_requiref(L, "xxx", luaopen_xxx, 1);
     virtual void on_load_lib(lua_State* L) {};
 
-    void luas_push(zce_dblock& dblock,
-        const char* v) {
+    void luas_push(zce_dblock& dblock, const char* v) {
         luas_push_string(dblock, v);
     }
 
-    void luas_push(zce_dblock& dblock,
-        const std::string& v) {
+    void luas_push(zce_dblock& dblock, const std::string& v) {
         luas_push_lstring(dblock, v.c_str(), (zce_int32)v.length());
     }
 
 #ifndef WIN32
-    void luas_push(zce_dblock& dblock,
-        long long v) {
+    void luas_push(zce_dblock& dblock, long long v) {
         luas_push_integer(dblock, v);
     }
 #endif
 
-    void luas_push(zce_dblock& dblock,
-        zce_int64 v) {
+    void luas_push(zce_dblock& dblock, zce_int64 v) {
         luas_push_integer(dblock, v);
     }
 
-    void luas_push(zce_dblock& dblock,
-        zce_int32 v) {
+    void luas_push(zce_dblock& dblock, zce_int32 v) {
         luas_push_integer(dblock, v);
     }
 
-    void luas_push(zce_dblock& dblock,
-        bool v) {
+    void luas_push(zce_dblock& dblock, bool v) {
         luas_push_bool(dblock, v);
     }
 
-    void luas_push(zce_dblock& dblock,
-        const void* ctx) {
+    void luas_push(zce_dblock& dblock, const void* ctx) {
         luas_push_lightuserdata(dblock, ctx);
     }
 

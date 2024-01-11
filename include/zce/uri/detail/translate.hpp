@@ -38,6 +38,7 @@ struct translate_impl<const char[N]> {
   std::string operator()(const char *source) const { return source; }
 };
 
+#if 0
 template <>
 struct translate_impl<std::wstring> {
     std::string operator()(const std::wstring &source) const {
@@ -76,6 +77,8 @@ struct translate_impl<const wchar_t *> {
     return impl(source);
   }
 };
+
+#endif
 
 template <typename Source>
 inline std::string translate(const Source &source) {

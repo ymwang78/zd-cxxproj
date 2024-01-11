@@ -49,12 +49,15 @@ inline std::istream &operator>>(std::istream &is, uri &uri_) {
   return is;
 }
 
+#if 0
 inline std::wistream &operator>>(std::wistream &is, uri &uri_) {
   std::wstring uri_string;
   is >> uri_string;
   uri_ = uri(uri_string);
   return is;
 }
+#endif
+
 #endif  // !defined(NETWORK_URI_MSVC)
 
 }  // namespace zce
