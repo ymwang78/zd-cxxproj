@@ -24,7 +24,7 @@ namespace zdp
 {
     class zdp_stream;
 
-    class ZCE_API zdp_resctx : public zce_timer_doozer
+    class ZCE_API zdp_resctx : public zce_object
     {
         unsigned short seq_;
 
@@ -56,7 +56,7 @@ namespace zdp
 
         void cancel_timer();
 
-        virtual void handle_timeout(const zce_any& arg);
+        void handle_timeout(const zce_any& arg);
     };
 
     class ZCE_API zdp_stream : public zce_istream
