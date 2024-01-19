@@ -33,7 +33,7 @@ unsigned        ZCE_API   zxml_ulong_from_attr(const char* val);
 int             ZCE_API   zxml_longlong_to_attr(char* buffer, int size, const char* name, long long val);
 long long       ZCE_API   zxml_longlong_from_attr(const char* val);
 int             ZCE_API   zxml_ulonglong_to_attr(char* buffer, int size, const char* name, unsigned long long val);
-unsigned long long    ZCE_API   zxml_ulonglong_from_attr(const char* val);
+zce_uint64      ZCE_API   zxml_ulonglong_from_attr(const char* val);
 int             ZCE_API   zxml_ip_to_attr(char* buffer, int size, const char* name, unsigned val);
 unsigned        ZCE_API   zxml_ip_from_attr(const char* val);
 int             ZCE_API   zxml_time_to_attr(char* buffer, int size, const char* name, unsigned val);
@@ -76,14 +76,16 @@ int             ZCE_API   zxml_builtin_array_to_elem(char* buffer, int size, con
 int             ZCE_API   zxml_builtin_array_to_elem(char* buffer, int size, const char* name, const std::vector<zce_uint32>& vec, const char* fmt);
 int             ZCE_API   zxml_builtin_array_to_elem(char* buffer, int size, const char* name, const std::vector<zce_int64>& vec, const char* fmt);
 int             ZCE_API   zxml_builtin_array_to_elem(char* buffer, int size, const char* name, const std::string& val, const char* fmt);
+int             ZCE_API   zxml_builtin_array_to_elem(char* buffer, int size, const char* name, const std::vector<std::string>& vec, const char* fmt);
 
-int                ZCE_API    zxml_builtin_array_from_attr(std::vector<zce_char>& vec, const char* val, size_t length);
-int                ZCE_API    zxml_builtin_array_from_attr(std::vector<zce_byte>& vec, const char* val, size_t length);
-int                ZCE_API    zxml_builtin_array_from_attr(std::vector<zce_int16>& vec, const char* val, size_t length);
-int                ZCE_API    zxml_builtin_array_from_attr(std::vector<zce_uint16>& vec, const char* val, size_t length);
-int                ZCE_API    zxml_builtin_array_from_attr(std::vector<zce_int32>& vec, const char* val, size_t length);
-int                ZCE_API    zxml_builtin_array_from_attr(std::vector<zce_uint32>& vec, const char* val, size_t length);
-int                ZCE_API    zxml_builtin_array_from_attr(std::vector<zce_int64>& vec, const char* val, size_t length);
-int                ZCE_API    zxml_builtin_array_from_attr(std::string& str, const char* val, size_t length);
+int             ZCE_API   zxml_builtin_array_from_attr(std::vector<zce_char>& vec, const char* val, size_t length);
+int             ZCE_API   zxml_builtin_array_from_attr(std::vector<zce_byte>& vec, const char* val, size_t length);
+int             ZCE_API   zxml_builtin_array_from_attr(std::vector<zce_int16>& vec, const char* val, size_t length);
+int             ZCE_API   zxml_builtin_array_from_attr(std::vector<zce_uint16>& vec, const char* val, size_t length);
+int             ZCE_API   zxml_builtin_array_from_attr(std::vector<zce_int32>& vec, const char* val, size_t length);
+int             ZCE_API   zxml_builtin_array_from_attr(std::vector<zce_uint32>& vec, const char* val, size_t length);
+int             ZCE_API   zxml_builtin_array_from_attr(std::vector<zce_int64>& vec, const char* val, size_t length);
+int             ZCE_API   zxml_builtin_array_from_attr(std::string& str, const char* val, size_t length);
+int				ZCE_API	  zxml_builtin_array_from_attr(std::vector<std::string>& vec, const char* val, size_t length);
 
 #endif /*__zxml_convertor_h__*/
