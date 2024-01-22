@@ -12,11 +12,6 @@ int NCR(int n, int r)
 {
     if (r == 0) return 1;
 
-    /*
-     Extra computation saving for large R,
-     using property:
-     N choose R = N choose (N-R)
-    */
     if (r > n / 2)
         r = n - r;
 
@@ -33,8 +28,7 @@ int NCR(int n, int r)
 enum item_e {
     T, Q, J,
     A, K,
-    FROG,
-    BIRD,
+    FROG, BIRD,
     PBIRD,
     GBIRD,
     RMAN,
@@ -43,7 +37,9 @@ enum item_e {
     SCATTER
 };
 
-static const int _row_num[] = {5, 6, 6, 6, 6, 5};
+static double _scatter_rate = 0.02;
+
+static const int_vector _row_num = {5, 6, 6, 6, 6, 5};
 
 static int_matrix _peifu_matrix = {
     { 1,  2,  3,  4},
@@ -60,19 +56,18 @@ static int_matrix _peifu_matrix = {
 };
 
 static int_matrix _relative_expect_matrix = {
-    { 1000, 1000, 1000, 1000, 1000, 1000 },
-    { 1000, 1000, 1000, 1000, 1000, 1000 },
-    { 1000, 1000, 1000, 1000, 1000, 1000 },
-    { 800, 800, 800, 800, 800, 800 },
-    { 800, 800, 800, 800, 800, 800 },
-    { 700, 700, 700, 700, 700, 700 },
-    { 700, 700, 700, 700, 700, 700 },
-    { 600, 600, 600, 600, 600, 600 },
+    { 1000, 500, 1000, 500, 1000, 500 },
+    { 1000, 1000, 500, 1000, 500, 1000 },
+    { 1000, 500, 1000, 500, 1000, 500 },
+    { 800, 400, 800, 400, 800, 400 },
+    { 400, 1000, 400, 1000, 400, 1000 },
+    { 700, 400, 1000, 400, 1000, 400 },
+    { 400, 1000, 400, 1000, 400, 1000 },
+    { 600, 600, 1000, 600, 1000, 600 },
     { 400, 400, 400, 400, 400, 400 },
     { 300, 300, 300, 300, 300, 300 },
-    { 200, 200, 200, 200, 200, 200 },
     { 100, 100, 100, 100, 100, 100 },
-    { 100, 100, 100, 100, 100, 100 }
+    { 100, 100, 100, 100, 100, 100 },
 };
 
 template<typename T>
@@ -87,9 +82,14 @@ void print_vec(const std::vector<T>& vec)
 template <typename T>
 void print_vec(const std::vector<std::vector<T>>& vec)
 {
+    std::vector<T> sum_vec(vec[0].size());
     for (auto& v : vec) {
         print_vec(v);
+        for (int i = 0; i < v.size(); ++i) {
+            sum_vec[i] += v[i];
+        }
     }
+    print_vec(sum_vec);
 }
 
 static dbl_matrix _calc_p_matrix(const int_matrix& expect_matrix) 
@@ -101,6 +101,10 @@ static dbl_matrix _calc_p_matrix(const int_matrix& expect_matrix)
             sum_vec[i] += vec[i];
         }
     }
+    for (int i = 0; i < sum_vec.size(); ++i) {
+        sum_vec[i] /= (1 - _scatter_rate);
+    }
+
     for (int i = 0; i < expect_matrix.size(); ++i) {
         p_vec[i].resize(expect_matrix[i].size());
         for (int j = 0; j < expect_matrix[i].size(); ++j) {
@@ -199,7 +203,6 @@ static double _calc_rtp_n(const dbl_vector& p_vec, const dbl_vector& notp_vec, c
     return rtp * peifu_vec[pengcnt - 3];
 }
 
-
 static dbl_vector _calc_rtp_x(const dbl_matrix& p_matrix, const dbl_matrix& notp_matrix)
 {
     dbl_vector rtp_vec(WILD);
@@ -209,6 +212,14 @@ static dbl_vector _calc_rtp_x(const dbl_matrix& p_matrix, const dbl_matrix& notp
         }
     }
     return (rtp_vec);
+}
+
+static double _scatter_n(const dbl_vector& scatter_p_vec, int n)
+{
+    double v = 0;
+    ZCE_ASSERT_RETURN(n >= 3, 0);
+    //int total = ;
+    return v;
 }
 
 void calc_rtp_matrix(const int_matrix& matrix)
@@ -256,7 +267,7 @@ void calc_rtp()
 {
     //calc_rtp_matrix(_relative_expect_matrix);
 
-    int_matrix i2000 = _replace(_relative_expect_matrix, 1000, 1000);
+    int_matrix i2000 = _replace(_relative_expect_matrix, 1000, 2000);
     calc_rtp_matrix(i2000);
 
     //int_matrix i800 = _replace(_relative_expect_matrix, 1000, 800);
