@@ -32,7 +32,8 @@ public:
     zce_timer(const zce_smartptr<zce_reactor>& reactor, 
         const zce_smartptr<zce_task_queue>& syncque,
         unsigned msecond, 
-        bool repeat = true);
+        bool repeat = true,
+        bool noaccumulated = false);
 
     ~zce_timer();
 
@@ -43,5 +44,4 @@ public:
     void handle_timeout();
 
     void on_close();
-
 };

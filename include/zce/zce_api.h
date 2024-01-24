@@ -14,6 +14,7 @@
 
 #include <zce/zce_config.h>
 #include <zce/zce_types.h>
+#include <zce/zce_api.h>
 #include <vector>
 #include <stdarg.h>
 #include <sstream>
@@ -192,6 +193,17 @@ T zce_min(const std::vector<T>& rhs)
             m = rhs[i];
     }
     return m;
+}
+
+template <typename T>
+int zce_count(const std::vector<T>& rhs, T v)
+{
+    int count = 0;
+    for (unsigned i = 0; i < rhs.size(); ++i) {
+        if (rhs[i] == v)
+            ++count;
+    }
+    return count;
 }
 
 template <typename T, typename P, typename Q>
