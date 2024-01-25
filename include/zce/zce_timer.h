@@ -16,9 +16,11 @@
 #include <functional>
 class zce_reactor;
 class zce_task_queue;
+class zce_timer_doozer;
 
 class ZCE_API zce_timer : public zce_object
 {
+    friend class zce_timer_doozer;
     ZCE_OBJECT_DECLARE;
     struct pimpl;
     struct pimpl *pimpl_;
@@ -32,10 +34,11 @@ public:
     zce_timer(const zce_smartptr<zce_reactor>& reactor, 
         const zce_smartptr<zce_task_queue>& syncque,
         unsigned msecond, 
-        bool repeat = true,
-        bool noaccumulated = false);
+        bool repeat = true);
 
     ~zce_timer();
+
+    int start(const zce_smartptr<zce_timer_doozer>& doozer_ptr);
 
     int start(const std::function<void(void)>& cb);
 
@@ -44,4 +47,19 @@ public:
     void handle_timeout();
 
     void on_close();
+};
+
+class ZCE_API zce_timer_doozer : public zce_object
+{
+    friend struct zce_timer::pimpl;
+
+    bool noaccumulated_;
+    zce_atomic_long accum_count_;
+
+    void do_timeout();
+
+public:
+    zce_timer_doozer(bool noaccum = false);
+    virtual bool will_trigger();
+    virtual void handle_timeout() = 0;
 };
