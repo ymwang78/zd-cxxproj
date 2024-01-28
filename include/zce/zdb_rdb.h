@@ -205,6 +205,8 @@ public:
 
     virtual int create_stmt(zce_smartptr<zdb_stmt>& stmt_ptr, const char* sql, bool multi) = 0;
 
+    virtual int backup(const char* arg1, const char* arg2) { ZCE_ASSERT(false); return -1; };
+
 	int execute(zce_smartptr<zdb_stmt>& stmt_ptr, const char* sql, const std::vector<std::string>& vecargs);
 
     int execute_multi(zce_smartptr<zdb_stmt>& stmt_ptr, const char* sql);
@@ -677,7 +679,7 @@ struct zdb_object
 			m.putupdatevars(stmtptr);
 			*stmtptr << zdb_stmt::endl;
 			while (stmtptr->end_row() > 0) {
-				//@todo check here, ubeda do nothing in skip row
+				//@todo check here, zce do nothing in skip row
 				//connptr->skip_row(stmtptr);
 				*stmtptr >> zdb_stmt::_none_ignoreidx;
 			}
@@ -706,7 +708,7 @@ struct zdb_object
 			m.putdeletevars(stmtptr);
 			*stmtptr << zdb_stmt::endl;
 			while (stmtptr->end_row() > 0) {
-				//@todo check here, ubeda do nothing in skip row
+				//@todo check here, zce do nothing in skip row
 				//connptr->skip_row(stmtptr);
 				*stmtptr >> zdb_stmt::_none_ignoreidx;
 			}
@@ -783,5 +785,135 @@ struct zdb_object
 	}
 };
 
+
+template<typename record, bool enable_transaction = true>
+class zdb_table : public zce_object
+{
+    typedef typename record::zdb_update_e record_update_type;
+
+    std::string name_;
+
+    std::string insert_sql_;
+
+public:
+
+    zdb_table(const std::string& name) :name_(name) {
+        insert_sql_ = record::insert_schema(name_);
+    }
+
+    const std::string& name() const noexcept { return name_; };
+
+    const std::string& insert_sql() const noexcept { return insert_sql_; }
+
+    int create(zdb_connection_ptr& connection)
+    {
+        std::string sqltext = record::get_create_schema(name_);
+        return connection->execute(sqltext.c_str(), zdb_stmt::_none, zdb_stmt::_none);
+    }
+
+    int drop(zdb_connection_ptr& connection)
+    {
+        std::string sqltext = record::get_drop_schema(name_);
+        return connection->execute(sqltext.c_str(), zdb_stmt::_none, zdb_stmt::_none);
+    }
+
+    int query(zdb_connection_ptr& connection, record& rec, typename record::zdb_query_e query_type, bool use_transaction = true)
+    {
+        return query(connection, rec, rec.get_query_schema(name_, query_type), use_transaction);
+    }
+
+    int query(zdb_connection_ptr& connection, record& query_tpl, std::vector<record>& rec, typename record::zdb_query_e query_type, bool use_transaction = true)
+    {
+        return execute(connection, query_tpl.get_query_schema(name_, query_type), rec, use_transaction);
+    }
+
+    int execute(zdb_connection_ptr& connection, const std::string& sqltext, bool use_transaction = false)
+    {
+        int ret = connection->execute(sqltext.c_str(), zdb_stmt::_none, zdb_stmt::_none);
+        if (ret < 0)
+            return ret;
+        return 0;
+    }
+
+    int insert(zdb_connection_ptr& connection, const record& rec/*, const std::string& prepsql = std::string(""), bool use_transaction = true*/)
+    {
+        return connection->execute(insert_sql_.c_str(), zdb_stmt::_none, rec);
+    }
+
+    int insert(zdb_connection_ptr& connection, std::vector<record>& rec/*, const std::string& prepsql = std::string(""), bool use_transaction = true*/)
+    {
+        if (rec.empty() )
+            return 0;
+        int rc = 0;
+        connection->begin();
+        typename std::vector<record>::iterator iter = rec.begin();
+        for (; iter != rec.end(); ++iter) {
+            rc = connection->execute(insert_sql_.c_str(), zdb_stmt::_none, *iter);
+            ZCE_ASSERT(rc >= 0);
+        }
+        connection->commit();
+        return 0;
+    }
+
+    int update(zdb_connection_ptr& connection, const record& rec, record_update_type update_type, bool use_transaction = true)const
+    {
+        std::string sqltext = rec.create_update_schema(name_, update_type);
+        return connection->execute(sqltext.c_str(), zdb_stmt::_none, zdb_stmt::_none);
+    }
+
+    int update(zdb_connection_ptr& connection, std::vector<record>& rec, record_update_type update_type, bool use_transaction = true)
+    {
+        if (rec.size() == 0)
+            return 0;
+        std::string sqltext;
+        typename std::vector<record>::iterator iter = rec.begin();
+        for (; iter != rec.end(); ++iter)
+            sqltext += (*iter).create_update_schema(name_, update_type);
+
+        return connection->execute(sqltext.c_str(), zdb_stmt::_none, zdb_stmt::_none);
+    }
+
+    int remove(zdb_connection_ptr& connection, const record& rec, typename record::zdb_delete_e delete_type, bool use_transaction = true)const
+    {
+        std::string sqltext = rec.create_delete_schema(name_, delete_type);
+        return connection->execute(sqltext.c_str(), zdb_stmt::_none, zdb_stmt::_none);
+    }
+
+    int remove(zdb_connection_ptr& connection, std::vector<record>& rec, typename record::zdb_delete_e delete_type, bool use_transaction = true)
+    {
+        if (rec.empty())
+            return 0;
+        std::string sqltext;
+        typename std::vector<record>::iterator iter = rec.begin();
+        for (; iter != rec.end(); ++iter)
+            sqltext += (*iter).create_delete_schema(name_, delete_type);
+
+        return connection->execute(sqltext.c_str(), zdb_stmt::_none, zdb_stmt::_none);
+    }
+
+    template<typename Y>
+    int query(zdb_connection_ptr& connection, Y& rec, const std::string& sql, bool use_transaction = false)
+    {
+        return connection->execute(sql.c_str(), rec, zdb_stmt::_none);
+    }
+
+    template<typename Y>
+    int query(zdb_connection_ptr& connection, Y& rec, zdb_stmt* sql, bool use_transaction = false)
+    {
+        return connection->execute(sql, rec, zdb_stmt::_none);
+    }
+
+    template<typename Y>
+    int execute(zdb_connection_ptr& connection, const std::string& sql, std::vector<Y>& rec, bool use_transaction = false)
+    {
+        return connection->execute(sql.c_str(), rec, zdb_stmt::_none);
+    }
+
+    template<typename Y>
+    int execute(zdb_connection_ptr& connection, zdb_stmt* sql, std::vector<Y>& rec, bool use_transaction = false)
+    {
+        return connection->execute_t<Y>(sql, rec, use_transaction);
+    }
+};
 
 #endif //__ZDB_RDB__H__

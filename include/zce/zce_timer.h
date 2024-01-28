@@ -13,6 +13,7 @@
 #include <zce/zce_config.h>
 #include <zce/zce_object.h>
 #include <zce/zce_object_counter.h>
+#include <zce/zce_task_queue.h>
 #include <functional>
 class zce_reactor;
 class zce_task_queue;

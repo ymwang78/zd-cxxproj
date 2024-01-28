@@ -15,12 +15,23 @@
 #ifndef ZCE_TYPES_DEFINED
 #define ZCE_TYPES_DEFINED
 
+#if !defined(_SSIZE_T_) && !defined(_SSIZE_T_DEFINED)
+typedef intptr_t ssize_t;
+# define _SSIZE_T_
+# define _SSIZE_T_DEFINED
+#endif
+
 #ifdef _WIN32
     typedef DWORD       threadid_t;
     typedef HANDLE      handle_t;
     typedef int         socklen_t;
     typedef long long          int zce_int64;
     typedef unsigned long long int zce_uint64;
+    struct iovec {
+        u_long iov_len;
+        char* iov_base;
+    };
+#   define ZCE_INVALID_HANDLE INVALID_HANDLE_VALUE
 #else
     typedef pthread_t   threadid_t;
     typedef int         handle_t;
@@ -31,7 +42,7 @@
     typedef long long int          zce_int64;
     typedef unsigned long long int zce_uint64;
 #endif
-
+#   define ZCE_INVALID_HANDLE -1
 #endif
 
 typedef char         zce_ntchars;

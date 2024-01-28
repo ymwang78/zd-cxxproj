@@ -15,7 +15,7 @@
 class UBEDA_API usys_transceiver_udp : public usys_transceiver
 {
 public:
-    usys_transceiver_udp(const usys_smartptr<usys_reactor>& reactor, unsigned send_retry_deque_size = 0, unsigned recv_buffer_size = 1500);
+    usys_transceiver_udp(const zce_smartptr<usys_reactor>& reactor, unsigned send_retry_deque_size = 0, unsigned recv_buffer_size = 1500);
     virtual ~usys_transceiver_udp();
 
 	virtual bool readable() { return true; }
