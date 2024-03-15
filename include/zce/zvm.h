@@ -32,7 +32,7 @@ public:
 
     zce_smartptr<zce_object> get_vm(const std::string& svc_name) const;
 
-    void destroy(const std::string& svc_name);
+    void destroy(const zce_smartptr<zce_object>& vm);
 
     int rpc_call_dblock(const zce_smartptr<zce_object>& vmptr,
         zce_int64 objectid,
