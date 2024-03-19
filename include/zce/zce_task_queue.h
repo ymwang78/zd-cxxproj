@@ -25,7 +25,7 @@ class ZCE_API zce_task_queue : public zce_task
     ZCE_OBJECT_DECLARE;
 protected:
 
-    zce_smartptr<zce_schedule> schedule_ptr_;
+    zce_smartptr<zce_schedule> scheduler_ptr_;
 
     zce_atomic_long inque_;
 
@@ -41,7 +41,7 @@ protected:
 
 public:
 
-    zce_task_queue(const zce_smartptr<zce_schedule>& schedule_ptr, unsigned contproc = 10, const char* name = 0);
+    zce_task_queue(const zce_smartptr<zce_schedule>& scheduler_ptr, unsigned contproc = 10, const char* name = 0);
 
     int enqueue(const zce_smartptr<zce_task>& req);
 
