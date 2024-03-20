@@ -23,6 +23,14 @@ class zce_reactor;
 namespace zdp
 {
     class zdp_stream;
+    struct zds_context_t;
+
+    template<typename T>
+    int zds_pack(zce_byte *buffer, int buffer_size, const T& t, zds_context_t* ctx, bool some_flag);
+    template<typename T>
+    int zds_pack_builtin(zce_byte *buffer, int buffer_size, const T& t, zds_context_t* ctx, bool some_flag);
+    template<typename T>
+    constexpr bool is_builtin_type();
 
     class ZCE_API zdp_resctx : public zce_object
     {

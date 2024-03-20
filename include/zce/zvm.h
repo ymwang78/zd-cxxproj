@@ -10,12 +10,18 @@
 // ***************************************************************
 #pragma once
 #include <functional>
+#include <zce/zce_dblock.h>
+#include <zce/zce_mbpool.h>
 class zvm_pimpl;
 
 namespace zdp {
     struct zds_context_t;
     template<typename T>
     int zds_pack(zce_byte *buffer, int buffer_size, const T& t, zds_context_t* ctx, bool some_flag);
+    template<typename T>
+    int zds_pack_builtin(zce_byte *buffer, int buffer_size, const T& t, zds_context_t* ctx, bool some_flag);
+    template<typename T>
+    constexpr bool is_builtin_type();
 }
 
 class zvm : public zce_object
