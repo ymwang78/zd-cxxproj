@@ -7,7 +7,7 @@
 //  This is a part of ZCE lib, which inherited from ubeda/utiny.
 //  Copyright (C) 2012 - All Rights Reserved
 // ***************************************************************
-// add_pool ·ÇÏß³Ì°²È«£¬±ØÐëÔÚ³õÊ¼»¯Ê±È«²¿addÍê³É£¬ÆäËûº¯Êý°²È«
+// add_pool ï¿½ï¿½ï¿½ß³Ì°ï¿½È«ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ú³ï¿½Ê¼ï¿½ï¿½Ê±È«ï¿½ï¿½addï¿½ï¿½É£ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È«
 // ***************************************************************
 #ifndef __zce_mbpool_h__
 #define __zce_mbpool_h__
@@ -54,7 +54,7 @@ class zce_objpool
 public:
 
     zce_objpool()
-        :vt_allocator_(new zce_allocator(sizeof(T), 4096, true)) {
+        :vt_allocator_(new zce_allocator_chunk(sizeof(T), 4096, true)) {
     }
 
     virtual ~zce_objpool() {
