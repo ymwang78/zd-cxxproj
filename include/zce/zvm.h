@@ -12,6 +12,12 @@
 #include <functional>
 class zvm_pimpl;
 
+namespace zdp {
+    struct zds_context_t;
+    template<typename T>
+    int zds_pack(zce_byte *buffer, int buffer_size, const T& t, zds_context_t* ctx, bool some_flag);
+}
+
 class zvm : public zce_object
 {
     zce_smartptr<zvm_pimpl> pimpl_ptr_;

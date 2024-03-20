@@ -1,7 +1,9 @@
 #import sys, os, commands, platform, distutils.sysconfig, os.path, re, types
-#check ZDP
 
-inc_path = ['#', '#include', '#/../../include', '/usr/local/Cellar/boost/1.57.0/include/']
+inc_path = ['#', 
+            '#include', 
+            '#/../../include']
+
 env = Environment(CPPPATH=inc_path)
 
 if env["PLATFORM"]=="win32":
@@ -34,8 +36,8 @@ env['STATIC_AND_SHARED_OBJECTS_ARE_THE_SAME']=1
 
 Export('env')
 
-objs = env.Object(Glob('src/*.c'))
+objs = env.Object(Glob('src/*.c') + Glob('src/*.cpp'))
 
-liblua = env.StaticLibrary('liblua', objs, LIBS=[])
-env.Install('#../../bin/x64/debian', liblua)
+libpbc = env.StaticLibrary('libpbc', objs, LIBS=[])
+env.Install('#../../bin/x64/debian', libpbc)
 env.Alias('install', '#../../bin/x64/debian')
