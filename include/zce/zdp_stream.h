@@ -77,6 +77,7 @@ namespace zdp
 
         int split_pkg(zce_byte* buf, unsigned size);
 
+        int _do_request(const zdp_head& head, const zce_dblock& dblock_ptr, int mstimeout, const zce_any& ctx);
     public:
 
         zdp_stream(const zce_smartptr<zce_reactor>& reactor_ptr, unsigned preserv = 0);
