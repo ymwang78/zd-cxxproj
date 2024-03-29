@@ -909,11 +909,7 @@ public:
         return connection->execute(sql.c_str(), rec, zdb_stmt::_none);
     }
 
-    template<typename Y>
-    int execute(zdb_connection_ptr& connection, zdb_stmt* sql, std::vector<Y>& rec, bool use_transaction = false)
-    {
-        return connection->execute_t<Y>(sql, rec, use_transaction);
-    }
+
 };
 
 #endif //__ZDB_RDB__H__
