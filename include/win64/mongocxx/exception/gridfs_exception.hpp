@@ -14,25 +14,27 @@
 
 #pragma once
 
+#include <mongocxx/exception/gridfs_exception-fwd.hpp>
+
 #include <mongocxx/exception/exception.hpp>
 
 #include <mongocxx/config/prelude.hpp>
 
 namespace mongocxx {
-MONGOCXX_INLINE_NAMESPACE_BEGIN
+namespace v_noabi {
 
 ///
 /// Class representing an error encountered when attempting to perform the requested GridFS
 /// operation.
 ///
-/// @see mongocxx::exception
+/// @see mongocxx::v_noabi::exception
 ///
-class MONGOCXX_API gridfs_exception : public exception {
+class gridfs_exception : public exception {
    public:
     using exception::exception;
 };
 
-MONGOCXX_INLINE_NAMESPACE_END
+}  // namespace v_noabi
 }  // namespace mongocxx
 
 #include <mongocxx/config/postlude.hpp>

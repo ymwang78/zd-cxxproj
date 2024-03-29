@@ -14,6 +14,8 @@
 
 #pragma once
 
+#include <mongocxx/index_model-fwd.hpp>
+
 #include <bsoncxx/document/value.hpp>
 #include <bsoncxx/document/view_or_value.hpp>
 #include <mongocxx/options/index.hpp>
@@ -21,18 +23,18 @@
 #include <mongocxx/config/prelude.hpp>
 
 namespace mongocxx {
-MONGOCXX_INLINE_NAMESPACE_BEGIN
+namespace v_noabi {
 
 ///
 /// Class representing an index on a MongoDB server.
 ///
-class MONGOCXX_API index_model {
+class index_model {
    public:
     ///
-    /// Initializes a new index_model over a mongocxx::collection.
+    /// Initializes a new index_model over a mongocxx::v_noabi::collection.
     ///
-    index_model(const bsoncxx::document::view_or_value& keys,
-                const bsoncxx::document::view_or_value& options = {});
+    index_model(const bsoncxx::v_noabi::document::view_or_value& keys,
+                const bsoncxx::v_noabi::document::view_or_value& options = {});
 
     index_model() = delete;
 
@@ -61,19 +63,19 @@ class MONGOCXX_API index_model {
     ///
     /// Retrieves keys of an index_model.
     ///
-    bsoncxx::document::view keys() const;
+    bsoncxx::v_noabi::document::view keys() const;
 
     ///
     /// Retrieves options of an index_model.
     ///
-    bsoncxx::document::view options() const;
+    bsoncxx::v_noabi::document::view options() const;
 
    private:
-    bsoncxx::document::value _keys;
-    bsoncxx::document::value _options;
+    bsoncxx::v_noabi::document::value _keys;
+    bsoncxx::v_noabi::document::value _options;
 };
 
-MONGOCXX_INLINE_NAMESPACE_END
+}  // namespace v_noabi
 }  // namespace mongocxx
 
 #include <mongocxx/config/postlude.hpp>

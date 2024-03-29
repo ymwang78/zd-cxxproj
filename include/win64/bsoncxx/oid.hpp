@@ -18,12 +18,14 @@
 #include <ctime>
 #include <string>
 
+#include <bsoncxx/oid-fwd.hpp>
+
 #include <bsoncxx/stdx/string_view.hpp>
 
 #include <bsoncxx/config/prelude.hpp>
 
 namespace bsoncxx {
-BSONCXX_INLINE_NAMESPACE_BEGIN
+namespace v_noabi {
 
 ///
 /// Represents a MongoDB ObjectId. As this BSON type is used within the MongoDB server
@@ -33,9 +35,9 @@ BSONCXX_INLINE_NAMESPACE_BEGIN
 /// @note we use 'oid' to refer to this concrete class. We use 'ObjectId' to refer
 /// to the BSON type.
 ///
-/// @see https://docs.mongodb.com/manual/reference/object-id/
+/// @see https://www.mongodb.com/docs/manual/reference/object-id/
 ///
-class BSONCXX_API oid {
+class oid {
    public:
     static constexpr std::size_t k_oid_length = 12;
 
@@ -52,7 +54,7 @@ class BSONCXX_API oid {
     /// @param len
     ///   The length of the buffer. Should be equal to oid::size().
     ///
-    /// @throws bsoncxx::exception if the length is not equal to oid::size().
+    /// @throws bsoncxx::v_noabi::exception if the length is not equal to oid::size().
     ///
     explicit oid(const char* bytes, std::size_t len);
 
@@ -62,10 +64,10 @@ class BSONCXX_API oid {
     /// @param str
     ///   A string of a hexadecimal representation of a valid ObjectId.
     ///
-    /// @throws bsoncxx::exception if the string isn't an OID-sized hex
+    /// @throws bsoncxx::v_noabi::exception if the string isn't an OID-sized hex
     /// string.
     ///
-    explicit oid(const bsoncxx::stdx::string_view& str);
+    explicit oid(const stdx::string_view& str);
 
     ///
     /// Converts this oid to a hexadecimal string.
@@ -120,7 +122,7 @@ class BSONCXX_API oid {
     std::array<char, k_oid_length> _bytes;
 };
 
-BSONCXX_INLINE_NAMESPACE_END
+}  // namespace v_noabi
 }  // namespace bsoncxx
 
 #include <bsoncxx/config/postlude.hpp>

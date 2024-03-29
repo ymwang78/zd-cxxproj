@@ -14,6 +14,8 @@
 
 #pragma once
 
+#include <bsoncxx/builder/stream/array-fwd.hpp>
+
 #include <bsoncxx/array/value.hpp>
 #include <bsoncxx/array/view.hpp>
 #include <bsoncxx/builder/core.hpp>
@@ -25,7 +27,7 @@
 #include <bsoncxx/config/prelude.hpp>
 
 namespace bsoncxx {
-BSONCXX_INLINE_NAMESPACE_BEGIN
+namespace v_noabi {
 namespace builder {
 namespace stream {
 
@@ -34,8 +36,8 @@ namespace stream {
 /// a BSON array.
 ///
 /// @note Use of the stream builder is discouraged. See
-/// http://mongodb.github.io/mongo-cxx-driver/mongocxx-v3/working-with-bson/#stream-builder for more
-/// details.
+/// https://mongocxx.org/mongocxx-v3/working-with-bson/#stream-builder for
+/// more details.
 ///
 class array : public array_context<> {
    public:
@@ -47,14 +49,14 @@ class array : public array_context<> {
     ///
     /// @return A view of the BSON array.
     ///
-    BSONCXX_INLINE bsoncxx::array::view view() const {
+    BSONCXX_INLINE bsoncxx::v_noabi::array::view view() const {
         return _core.view_array();
     }
 
     ///
     /// @return A view of the BSON array.
     ///
-    BSONCXX_INLINE operator bsoncxx::array::view() const {
+    BSONCXX_INLINE operator bsoncxx::v_noabi::array::view() const {
         return view();
     }
 
@@ -67,7 +69,7 @@ class array : public array_context<> {
     ///  After calling extract() it is illegal to call any methods
     ///  on this class, unless it is subsequenly moved into.
     ///
-    BSONCXX_INLINE bsoncxx::array::value extract() {
+    BSONCXX_INLINE bsoncxx::v_noabi::array::value extract() {
         return _core.extract_array();
     }
 
@@ -84,7 +86,7 @@ class array : public array_context<> {
 
 }  // namespace stream
 }  // namespace builder
-BSONCXX_INLINE_NAMESPACE_END
+}  // namespace v_noabi
 }  // namespace bsoncxx
 
 #include <bsoncxx/config/postlude.hpp>

@@ -14,6 +14,9 @@
 
 #pragma once
 
+#include <mongocxx/client_encryption-fwd.hpp>
+#include <mongocxx/options/encrypt-fwd.hpp>
+
 #include <bsoncxx/stdx/optional.hpp>
 #include <bsoncxx/types.hpp>
 #include <bsoncxx/types/bson_value/view_or_value.hpp>
@@ -23,16 +26,13 @@
 #include <mongocxx/config/prelude.hpp>
 
 namespace mongocxx {
-MONGOCXX_INLINE_NAMESPACE_BEGIN
-
-class client_encryption;
-
+namespace v_noabi {
 namespace options {
 
 ///
 /// Class representing options for explicit client-side encryption.
 ///
-class MONGOCXX_API encrypt {
+class encrypt {
    public:
     ///
     /// Sets the key to use for this encryption operation. A key id can be used instead
@@ -48,9 +48,9 @@ class MONGOCXX_API encrypt {
     /// @return
     ///   A reference to this object to facilitate method chaining.
     ///
-    /// @see https://docs.mongodb.com/manual/core/security-client-side-encryption/
+    /// @see https://www.mongodb.com/docs/manual/core/security-client-side-encryption/
     ///
-    encrypt& key_id(bsoncxx::types::bson_value::view_or_value key_id);
+    encrypt& key_id(bsoncxx::v_noabi::types::bson_value::view_or_value key_id);
 
     ///
     /// Gets the key_id.
@@ -58,7 +58,7 @@ class MONGOCXX_API encrypt {
     /// @return
     ///   An optional owning bson_value containing the key_id.
     ///
-    const stdx::optional<bsoncxx::types::bson_value::view_or_value>& key_id() const;
+    const stdx::optional<bsoncxx::v_noabi::types::bson_value::view_or_value>& key_id() const;
 
     ///
     /// Sets a name by which to lookup a key from the key vault collection to use
@@ -70,7 +70,7 @@ class MONGOCXX_API encrypt {
     /// @return
     ///   A reference to this obejct to facilitate method chaining.
     ///
-    /// @see https://docs.mongodb.com/manual/reference/method/getClientEncryption/
+    /// @see https://www.mongodb.com/docs/manual/reference/method/getClientEncryption/
     ///
     encrypt& key_alt_name(std::string name);
 
@@ -138,13 +138,13 @@ class MONGOCXX_API encrypt {
     /// @param algorithm
     ///   An algorithm, either deterministic, random, indexed, or unindexed to use for encryption.
     ///
-    /// @note To insert or query with an indexed encrypted payload, use a mongocxx::client
-    /// configured with mongocxx::options::auto_encryption.
-    /// mongocxx::options::auto_encryption::bypass_query_analysis may be true.
-    /// mongocxx::options::auto_encryption::bypass_auto_encryption must be false.
+    /// @note To insert or query with an indexed encrypted payload, use a mongocxx::v_noabi::client
+    /// configured with mongocxx::v_noabi::options::auto_encryption.
+    /// mongocxx::v_noabi::options::auto_encryption::bypass_query_analysis may be true.
+    /// mongocxx::v_noabi::options::auto_encryption::bypass_auto_encryption must be false.
     ///
     /// @see
-    /// https://docs.mongodb.com/manual/core/security-client-side-encryption/#encryption-algorithms
+    /// https://www.mongodb.com/docs/manual/core/security-client-side-encryption/#encryption-algorithms
     ///
     encrypt& algorithm(encryption_algorithm algorithm);
 
@@ -218,10 +218,11 @@ class MONGOCXX_API encrypt {
     const stdx::optional<options::range>& range_opts() const;
 
    private:
-    friend class mongocxx::client_encryption;
+    friend ::mongocxx::v_noabi::client_encryption;
+
     MONGOCXX_PRIVATE void* convert() const;
 
-    stdx::optional<bsoncxx::types::bson_value::view_or_value> _key_id;
+    stdx::optional<bsoncxx::v_noabi::types::bson_value::view_or_value> _key_id;
     stdx::optional<std::string> _key_alt_name;
     stdx::optional<encryption_algorithm> _algorithm;
     stdx::optional<int64_t> _contention_factor;
@@ -230,7 +231,7 @@ class MONGOCXX_API encrypt {
 };
 
 }  // namespace options
-MONGOCXX_INLINE_NAMESPACE_END
+}  // namespace v_noabi
 }  // namespace mongocxx
 
 #include <mongocxx/config/postlude.hpp>

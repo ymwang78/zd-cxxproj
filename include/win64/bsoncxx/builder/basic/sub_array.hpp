@@ -14,6 +14,8 @@
 
 #pragma once
 
+#include <bsoncxx/builder/basic/sub_array-fwd.hpp>
+
 #include <bsoncxx/builder/basic/helpers.hpp>
 #include <bsoncxx/builder/concatenate.hpp>
 #include <bsoncxx/builder/core.hpp>
@@ -21,7 +23,7 @@
 #include <bsoncxx/config/prelude.hpp>
 
 namespace bsoncxx {
-BSONCXX_INLINE_NAMESPACE_BEGIN
+namespace v_noabi {
 namespace builder {
 namespace basic {
 
@@ -80,7 +82,7 @@ class sub_array {
 
 }  // namespace basic
 }  // namespace builder
-BSONCXX_INLINE_NAMESPACE_END
+}  // namespace v_noabi
 }  // namespace bsoncxx
 
 #include <bsoncxx/config/postlude.hpp>

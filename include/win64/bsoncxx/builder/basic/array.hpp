@@ -14,6 +14,8 @@
 
 #pragma once
 
+#include <bsoncxx/builder/basic/array-fwd.hpp>
+
 #include <bsoncxx/array/value.hpp>
 #include <bsoncxx/array/view.hpp>
 #include <bsoncxx/builder/basic/impl.hpp>
@@ -24,7 +26,7 @@
 #include <bsoncxx/config/prelude.hpp>
 
 namespace bsoncxx {
-BSONCXX_INLINE_NAMESPACE_BEGIN
+namespace v_noabi {
 namespace builder {
 namespace basic {
 
@@ -55,7 +57,7 @@ class array : public sub_array {
     ///
     /// @return A view of the BSON array.
     ///
-    BSONCXX_INLINE bsoncxx::array::view view() const {
+    BSONCXX_INLINE bsoncxx::v_noabi::array::view view() const {
         return _core.view_array();
     }
 
@@ -65,7 +67,7 @@ class array : public sub_array {
     ///
     /// @return A view of the current builder contents.
     ///
-    BSONCXX_INLINE operator bsoncxx::array::view() const {
+    BSONCXX_INLINE operator bsoncxx::v_noabi::array::view() const {
         return view();
     }
 
@@ -78,7 +80,7 @@ class array : public sub_array {
     ///  After calling extract() it is illegal to call any methods
     ///  on this class, unless it is subsequenly moved into.
     ///
-    BSONCXX_INLINE bsoncxx::array::value extract() {
+    BSONCXX_INLINE bsoncxx::v_noabi::array::value extract() {
         return _core.extract_array();
     }
 
@@ -101,19 +103,28 @@ class array : public sub_array {
 ///   builder::basic::sub_array::append accepts.
 ///
 /// @return
-///   A bsoncxx::array::value containing the elements.
+///   A bsoncxx::v_noabi::array::value containing the elements.
 ///
 template <typename... Args>
-bsoncxx::array::value BSONCXX_CALL make_array(Args&&... args) {
-    basic::array array;
+bsoncxx::v_noabi::array::value BSONCXX_CALL make_array(Args&&... args) {
+    array array;
     array.append(std::forward<Args>(args)...);
-
     return array.extract();
 }
 
 }  // namespace basic
 }  // namespace builder
-BSONCXX_INLINE_NAMESPACE_END
+}  // namespace v_noabi
+}  // namespace bsoncxx
+
+namespace bsoncxx {
+namespace builder {
+namespace basic {
+
+using ::bsoncxx::v_noabi::builder::basic::make_array;
+
+}  // namespace basic
+}  // namespace builder
 }  // namespace bsoncxx
 
 #include <bsoncxx/config/postlude.hpp>

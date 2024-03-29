@@ -16,6 +16,13 @@
 
 #include <memory>
 
+#include <mongocxx/client-fwd.hpp>
+#include <mongocxx/collection-fwd.hpp>
+#include <mongocxx/database-fwd.hpp>
+#include <mongocxx/options/transaction-fwd.hpp>
+#include <mongocxx/read_concern-fwd.hpp>
+#include <mongocxx/uri-fwd.hpp>
+
 #include <bsoncxx/document/value.hpp>
 #include <bsoncxx/stdx/optional.hpp>
 #include <bsoncxx/stdx/string_view.hpp>
@@ -25,12 +32,7 @@
 #include <mongocxx/config/prelude.hpp>
 
 namespace mongocxx {
-MONGOCXX_INLINE_NAMESPACE_BEGIN
-
-class client;
-class collection;
-class database;
-class uri;
+namespace v_noabi {
 
 ///
 /// A class to represent the read concern. Read concern can be set at the client, database, or
@@ -49,14 +51,14 @@ class uri;
 /// a single document. Note that writes must be made with majority write concern in order for reads
 /// to be linearizable.
 ///
-/// @see https://docs.mongodb.com/manual/reference/read-concern/
+/// @see https://www.mongodb.com/docs/manual/reference/read-concern/
 ///
-class MONGOCXX_API read_concern {
+class read_concern {
    public:
     ///
     /// A class to represent the read concern level.
     ///
-    /// @see https://docs.mongodb.com/manual/reference/read-concern/#read-concern-levels
+    /// @see https://www.mongodb.com/docs/manual/reference/read-concern/#read-concern-levels
     ///
     enum class level {
         k_local,
@@ -109,7 +111,7 @@ class MONGOCXX_API read_concern {
     ///   Either k_local, k_majority, k_linearizable, or k_server_default.
     ///
     /// @throws
-    ///   mongocxx::exception if rc_level is not k_local, k_majority, k_linearizable, or
+    ///   mongocxx::v_noabi::exception if rc_level is not k_local, k_majority, k_linearizable, or
     ///   k_server_default.
     ///
     void acknowledge_level(level rc_level);
@@ -151,15 +153,14 @@ class MONGOCXX_API read_concern {
     /// @return
     ///   Document representation of this read_concern.
     ///
-    bsoncxx::document::value to_document() const;
+    bsoncxx::v_noabi::document::value to_document() const;
 
    private:
-    friend client;
-    friend collection;
-    friend database;
-    /// \relates mongocxx::options::transaction
-    friend mongocxx::options::transaction;
-    friend uri;
+    friend ::mongocxx::v_noabi::client;
+    friend ::mongocxx::v_noabi::collection;
+    friend ::mongocxx::v_noabi::database;
+    friend ::mongocxx::v_noabi::options::transaction;
+    friend ::mongocxx::v_noabi::uri;
 
     ///
     /// @{
@@ -181,7 +182,7 @@ class MONGOCXX_API read_concern {
     std::unique_ptr<impl> _impl;
 };
 
-MONGOCXX_INLINE_NAMESPACE_END
+}  // namespace v_noabi
 }  // namespace mongocxx
 
 #include <mongocxx/config/postlude.hpp>

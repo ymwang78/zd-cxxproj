@@ -16,42 +16,37 @@
 
 #include <bsoncxx/builder/basic/sub_array.hpp>
 #include <bsoncxx/builder/basic/sub_document.hpp>
-#include <bsoncxx/util/functor.hpp>
+#include <bsoncxx/stdx/type_traits.hpp>
 
 #include <bsoncxx/config/prelude.hpp>
 
 namespace bsoncxx {
-BSONCXX_INLINE_NAMESPACE_BEGIN
+namespace v_noabi {
 namespace builder {
 namespace basic {
 namespace impl {
 
 template <typename T>
-using takes_document = typename util::is_functor<T, void(sub_document)>;
-
-template <typename T>
-using takes_array = typename util::is_functor<T, void(sub_array)>;
-
-template <typename T>
-BSONCXX_INLINE typename std::enable_if<takes_document<T>::value, void>::type generic_append(
-    core* core, T&& func) {
+BSONCXX_INLINE detail::requires_t<void, detail::is_invocable<T, sub_document>>  //
+generic_append(core* core, T&& func) {
     core->open_document();
-    func(sub_document(core));
+    detail::invoke(std::forward<T>(func), sub_document(core));
     core->close_document();
 }
 
-template <typename T>
-BSONCXX_INLINE typename std::enable_if<takes_array<T>::value, void>::type generic_append(core* core,
-                                                                                         T&& func) {
+template <typename T, typename Placeholder = void>  // placeholder 'void' for VS2015 compat
+BSONCXX_INLINE detail::requires_t<void, detail::is_invocable<T, sub_array>>  //
+generic_append(core* core, T&& func) {
     core->open_array();
-    func(sub_array(core));
+    detail::invoke(std::forward<T>(func), sub_array(core));
     core->close_array();
 }
 
-template <typename T>
-BSONCXX_INLINE
-    typename std::enable_if<!takes_document<T>::value && !takes_array<T>::value, void>::type
-    generic_append(core* core, T&& t) {
+template <typename T, typename = void, typename = void>
+BSONCXX_INLINE detail::requires_not_t<void,  //
+                                      detail::is_invocable<T, sub_document>,
+                                      detail::is_invocable<T, sub_array>>
+generic_append(core* core, T&& t) {
     core->append(std::forward<T>(t));
 }
 
@@ -63,7 +58,7 @@ BSONCXX_INLINE void value_append(core* core, T&& t) {
 }  // namespace impl
 }  // namespace basic
 }  // namespace builder
-BSONCXX_INLINE_NAMESPACE_END
+}  // namespace v_noabi
 }  // namespace bsoncxx
 
 #include <bsoncxx/config/postlude.hpp>

@@ -14,6 +14,8 @@
 
 #pragma once
 
+#include <mongocxx/hint-fwd.hpp>
+
 #include <bsoncxx/document/value.hpp>
 #include <bsoncxx/document/view_or_value.hpp>
 #include <bsoncxx/stdx/optional.hpp>
@@ -24,12 +26,12 @@
 #include <mongocxx/config/prelude.hpp>
 
 namespace mongocxx {
-MONGOCXX_INLINE_NAMESPACE_BEGIN
+namespace v_noabi {
 
 ///
 /// Class representing a hint to be passed to a database operation.
 ///
-class MONGOCXX_API hint {
+class hint {
    public:
     ///
     /// Constructs a new hint.
@@ -40,7 +42,7 @@ class MONGOCXX_API hint {
     /// @param index
     ///   Document view or value representing the index to be used.
     ///
-    hint(bsoncxx::document::view_or_value index);
+    hint(bsoncxx::v_noabi::document::view_or_value index);
 
     ///
     /// Constructs a new hint.
@@ -48,7 +50,7 @@ class MONGOCXX_API hint {
     /// @param index
     ///   String representing the name of the index to be used.
     ///
-    explicit hint(bsoncxx::string::view_or_value index);
+    explicit hint(bsoncxx::v_noabi::string::view_or_value index);
 
     ///
     /// @{
@@ -60,7 +62,7 @@ class MONGOCXX_API hint {
     friend MONGOCXX_API bool MONGOCXX_CALL operator==(const hint& index_hint, std::string index);
 
     friend MONGOCXX_API bool MONGOCXX_CALL operator==(const hint& index_hint,
-                                                      bsoncxx::document::view index);
+                                                      bsoncxx::v_noabi::document::view index);
     ///
     /// @}
     ///
@@ -72,7 +74,7 @@ class MONGOCXX_API hint {
     /// not outlive
     /// the hint object that it was created from.
     ///
-    bsoncxx::types::bson_value::view to_value() const;
+    bsoncxx::v_noabi::types::bson_value::view to_value() const;
 
     ///
     /// Returns a types::bson_value::view representing this hint.
@@ -81,11 +83,11 @@ class MONGOCXX_API hint {
     /// not outlive
     /// the hint object that it was created from.
     ///
-    MONGOCXX_INLINE operator bsoncxx::types::bson_value::view() const;
+    MONGOCXX_INLINE operator bsoncxx::v_noabi::types::bson_value::view() const;
 
    private:
-    stdx::optional<bsoncxx::document::view_or_value> _index_doc;
-    stdx::optional<bsoncxx::string::view_or_value> _index_string;
+    stdx::optional<bsoncxx::v_noabi::document::view_or_value> _index_doc;
+    stdx::optional<bsoncxx::v_noabi::string::view_or_value> _index_string;
 };
 
 ///
@@ -119,7 +121,8 @@ MONGOCXX_API bool MONGOCXX_CALL operator!=(std::string index, const hint& index_
 ///
 /// @relates hint
 ///
-MONGOCXX_API bool MONGOCXX_CALL operator==(bsoncxx::document::view index, const hint& index_hint);
+MONGOCXX_API bool MONGOCXX_CALL operator==(bsoncxx::v_noabi::document::view index,
+                                           const hint& index_hint);
 
 ///
 /// @{
@@ -131,17 +134,26 @@ MONGOCXX_API bool MONGOCXX_CALL operator==(bsoncxx::document::view index, const 
 ///
 /// @relates hint
 ///
-MONGOCXX_API bool MONGOCXX_CALL operator!=(const hint& index_hint, bsoncxx::document::view index);
-MONGOCXX_API bool MONGOCXX_CALL operator!=(bsoncxx::document::view index, const hint& index_hint);
+MONGOCXX_API bool MONGOCXX_CALL operator!=(const hint& index_hint,
+                                           bsoncxx::v_noabi::document::view index);
+MONGOCXX_API bool MONGOCXX_CALL operator!=(bsoncxx::v_noabi::document::view index,
+                                           const hint& index_hint);
 ///
 /// @}
 ///
 
-MONGOCXX_INLINE hint::operator bsoncxx::types::bson_value::view() const {
+MONGOCXX_INLINE hint::operator bsoncxx::v_noabi::types::bson_value::view() const {
     return to_value();
 }
 
-MONGOCXX_INLINE_NAMESPACE_END
+}  // namespace v_noabi
+}  // namespace mongocxx
+
+namespace mongocxx {
+
+using ::mongocxx::v_noabi::operator==;
+using ::mongocxx::v_noabi::operator!=;
+
 }  // namespace mongocxx
 
 #include <mongocxx/config/postlude.hpp>

@@ -18,6 +18,8 @@
 #include <map>
 #include <vector>
 
+#include <mongocxx/result/bulk_write-fwd.hpp>
+
 #include <bsoncxx/document/value.hpp>
 #include <bsoncxx/document/view.hpp>
 #include <bsoncxx/types.hpp>
@@ -25,18 +27,18 @@
 #include <mongocxx/config/prelude.hpp>
 
 namespace mongocxx {
-MONGOCXX_INLINE_NAMESPACE_BEGIN
+namespace v_noabi {
 namespace result {
 
 ///
 /// Class representing the result of a MongoDB bulk write operation.
 ///
-class MONGOCXX_API bulk_write {
+class bulk_write {
    public:
-    using id_map = std::map<std::size_t, bsoncxx::document::element>;
+    using id_map = std::map<std::size_t, bsoncxx::v_noabi::document::element>;
 
     // This constructor is public for testing purposes only
-    explicit bulk_write(bsoncxx::document::value raw_response);
+    explicit bulk_write(bsoncxx::v_noabi::document::value raw_response);
 
     ///
     /// Gets the number of documents that were inserted during this operation.
@@ -84,16 +86,16 @@ class MONGOCXX_API bulk_write {
     id_map upserted_ids() const;
 
    private:
-    MONGOCXX_PRIVATE bsoncxx::document::view view() const;
+    MONGOCXX_PRIVATE bsoncxx::v_noabi::document::view view() const;
 
-    bsoncxx::document::value _response;
+    bsoncxx::v_noabi::document::value _response;
 
     friend MONGOCXX_API bool MONGOCXX_CALL operator==(const bulk_write&, const bulk_write&);
     friend MONGOCXX_API bool MONGOCXX_CALL operator!=(const bulk_write&, const bulk_write&);
 };
 
 }  // namespace result
-MONGOCXX_INLINE_NAMESPACE_END
+}  // namespace v_noabi
 }  // namespace mongocxx
 
 #include <mongocxx/config/postlude.hpp>

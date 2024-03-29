@@ -22,7 +22,7 @@
 #include <mongocxx/config/prelude.hpp>
 
 namespace mongocxx {
-MONGOCXX_INLINE_NAMESPACE_BEGIN
+namespace v_noabi {
 namespace options {
 
 ///
@@ -46,7 +46,7 @@ class MONGOCXX_API create_collection_deprecated {
     ///   A reference to the object on which this member function is being called.  This facilitates
     ///   method chaining.
     ///
-    /// @see https://docs.mongodb.com/manual/reference/glossary/#term-capped-collection
+    /// @see https://www.mongodb.com/docs/manual/reference/glossary/#term-capped-collection
     ///
     create_collection_deprecated& capped(bool capped);
 
@@ -56,7 +56,7 @@ class MONGOCXX_API create_collection_deprecated {
     /// @return
     ///   Whether or not this collection will be capped.
     ///
-    /// @see https://docs.mongodb.com/manual/reference/glossary/#term-capped-collection
+    /// @see https://www.mongodb.com/docs/manual/reference/glossary/#term-capped-collection
     ///
     const stdx::optional<bool>& capped() const;
 
@@ -71,9 +71,9 @@ class MONGOCXX_API create_collection_deprecated {
     ///   method chaining.
     ///
     /// @see
-    ///   https://docs.mongodb.com/manual/reference/collation/
+    ///   https://www.mongodb.com/docs/manual/reference/collation/
     ///
-    create_collection_deprecated& collation(bsoncxx::document::view_or_value collation);
+    create_collection_deprecated& collation(bsoncxx::v_noabi::document::view_or_value collation);
 
     ///
     /// Gets the default collation for this collection.
@@ -82,9 +82,9 @@ class MONGOCXX_API create_collection_deprecated {
     ///   The default collation for the collection.
     ///
     /// @see
-    ///   https://docs.mongodb.com/manual/reference/collation/
+    ///   https://www.mongodb.com/docs/manual/reference/collation/
     ///
-    const stdx::optional<bsoncxx::document::view_or_value>& collation() const;
+    const stdx::optional<bsoncxx::v_noabi::document::view_or_value>& collation() const;
 
     ///
     /// The maximum number of documents allowed in the capped collection.
@@ -114,7 +114,7 @@ class MONGOCXX_API create_collection_deprecated {
     ///
     /// When true, disables the power of 2 sizes allocation for the collection.
     ///
-    /// @see https://docs.mongodb.com/manual/reference/command/create/
+    /// @see https://www.mongodb.com/docs/manual/reference/command/create/
     ///
     /// @param no_padding
     ///   When true, disables power of 2 sizing for this collection.
@@ -128,7 +128,7 @@ class MONGOCXX_API create_collection_deprecated {
     ///
     /// Gets the current value of the "no padding" option for the collection.
     ///
-    /// @see https://docs.mongodb.com/manual/reference/command/create/
+    /// @see https://www.mongodb.com/docs/manual/reference/command/create/
     ///
     /// @return
     ///   When true, power of 2 sizing is disabled for this collection.
@@ -173,7 +173,7 @@ class MONGOCXX_API create_collection_deprecated {
     ///   method chaining.
     ///
     create_collection_deprecated& storage_engine(
-        bsoncxx::document::view_or_value storage_engine_opts);
+        bsoncxx::v_noabi::document::view_or_value storage_engine_opts);
 
     ///
     /// Gets the current storage engine configuration for this collection.
@@ -181,7 +181,7 @@ class MONGOCXX_API create_collection_deprecated {
     /// @return
     ///   Configuration options specific to the storage engine.
     ///
-    const stdx::optional<bsoncxx::document::view_or_value>& storage_engine() const;
+    const stdx::optional<bsoncxx::v_noabi::document::view_or_value>& storage_engine() const;
 
     ///
     /// Specify validation criteria for this collection.
@@ -193,9 +193,10 @@ class MONGOCXX_API create_collection_deprecated {
     ///   A reference to the object on which this member function is being called.  This facilitates
     ///   method chaining.
     ///
-    /// @see https://docs.mongodb.com/manual/core/document-validation/
+    /// @see https://www.mongodb.com/docs/manual/core/document-validation/
     ///
-    create_collection_deprecated& validation_criteria(class validation_criteria validation);
+    create_collection_deprecated& validation_criteria(
+        mongocxx::v_noabi::validation_criteria validation);
 
     ///
     /// Gets the current validation criteria for this collection.
@@ -203,9 +204,9 @@ class MONGOCXX_API create_collection_deprecated {
     /// @return
     ///   Validation criteria for this collection.
     ///
-    /// @see https://docs.mongodb.com/manual/core/document-validation/
+    /// @see https://www.mongodb.com/docs/manual/core/document-validation/
     ///
-    const stdx::optional<class validation_criteria>& validation_criteria() const;
+    const stdx::optional<mongocxx::v_noabi::validation_criteria>& validation_criteria() const;
 
     ///
     /// Return a bson document representing the options set on this object.
@@ -216,34 +217,43 @@ class MONGOCXX_API create_collection_deprecated {
     ///
     /// @return Options, as a document.
     ///
-    MONGOCXX_DEPRECATED bsoncxx::document::value to_document() const;
-    bsoncxx::document::value to_document_deprecated() const;
+    MONGOCXX_DEPRECATED bsoncxx::v_noabi::document::value to_document() const;
+    bsoncxx::v_noabi::document::value to_document_deprecated() const;
 
     ///
     /// @deprecated
     ///   This method is deprecated. To determine which options are set on this object, use the
     ///   provided accessors instead.
     ///
-    MONGOCXX_DEPRECATED MONGOCXX_INLINE operator bsoncxx::document::value() const;
+    MONGOCXX_DEPRECATED MONGOCXX_INLINE operator bsoncxx::v_noabi::document::value() const;
 
    private:
     stdx::optional<bool> _capped;
-    stdx::optional<bsoncxx::document::view_or_value> _collation;
+    stdx::optional<bsoncxx::v_noabi::document::view_or_value> _collation;
     stdx::optional<std::int64_t> _max_documents;
     stdx::optional<std::int64_t> _max_size;
     stdx::optional<bool> _no_padding;
-    stdx::optional<bsoncxx::document::view_or_value> _storage_engine_opts;
-    stdx::optional<class validation_criteria> _validation;
+    stdx::optional<bsoncxx::v_noabi::document::view_or_value> _storage_engine_opts;
+    stdx::optional<mongocxx::v_noabi::validation_criteria> _validation;
 };
 
 MONGOCXX_DEPRECATED typedef create_collection_deprecated create_collection;
 
-MONGOCXX_INLINE create_collection_deprecated::operator bsoncxx::document::value() const {
+MONGOCXX_INLINE create_collection_deprecated::operator bsoncxx::v_noabi::document::value() const {
     return to_document_deprecated();
 }
 
 }  // namespace options
-MONGOCXX_INLINE_NAMESPACE_END
+}  // namespace v_noabi
+}  // namespace mongocxx
+
+namespace mongocxx {
+namespace options {
+
+using ::mongocxx::v_noabi::options::create_collection;
+using ::mongocxx::v_noabi::options::create_collection_deprecated;
+
+}  // namespace options
 }  // namespace mongocxx
 
 #include <mongocxx/config/postlude.hpp>

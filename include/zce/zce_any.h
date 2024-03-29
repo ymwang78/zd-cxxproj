@@ -13,7 +13,6 @@
 #include <zce/zce_object.h>
 #include <map>
 #include <vector>
-#include <zce/zce_bits.h>
 
 class zce_object;
 class zce_dblock;

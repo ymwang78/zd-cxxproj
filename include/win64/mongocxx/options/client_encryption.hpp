@@ -16,6 +16,10 @@
 
 #include <string>
 
+#include <mongocxx/client-fwd.hpp>
+#include <mongocxx/client_encryption-fwd.hpp>
+#include <mongocxx/options/client_encryption-fwd.hpp>
+
 #include <bsoncxx/document/view_or_value.hpp>
 #include <bsoncxx/stdx/optional.hpp>
 #include <mongocxx/stdx.hpp>
@@ -23,17 +27,13 @@
 #include <mongocxx/config/prelude.hpp>
 
 namespace mongocxx {
-MONGOCXX_INLINE_NAMESPACE_BEGIN
-
-class client;
-class client_encryption;
-
+namespace v_noabi {
 namespace options {
 
 ///
 /// Class representing options for the object managing explicit client-side encryption.
 ///
-class MONGOCXX_API client_encryption {
+class client_encryption {
    public:
     ///
     /// When the key vault collection is on a separate MongoDB cluster,
@@ -46,9 +46,9 @@ class MONGOCXX_API client_encryption {
     /// @return
     ///   A reference to this object to facilitate method chaining.
     ///
-    /// @see https://docs.mongodb.com/manual/core/security-client-side-encryption/
+    /// @see https://www.mongodb.com/docs/manual/core/security-client-side-encryption/
     ///
-    client_encryption& key_vault_client(mongocxx::client* client);
+    client_encryption& key_vault_client(mongocxx::v_noabi::client* client);
 
     ///
     /// Gets the key vault client.
@@ -56,7 +56,7 @@ class MONGOCXX_API client_encryption {
     /// @return
     ///   An optional pointer to the key vault client.
     ///
-    const stdx::optional<mongocxx::client*>& key_vault_client() const;
+    const stdx::optional<mongocxx::v_noabi::client*>& key_vault_client() const;
 
     ///
     /// Sets the namespace to use to access the key vault collection, which
@@ -72,7 +72,7 @@ class MONGOCXX_API client_encryption {
     /// @return
     ///   A reference to this object to facilitate method chaining.
     ///
-    /// @see https://docs.mongodb.com/manual/core/security-client-side-encryption/
+    /// @see https://www.mongodb.com/docs/manual/core/security-client-side-encryption/
     ///
     using ns_pair = std::pair<std::string, std::string>;
     client_encryption& key_vault_namespace(ns_pair ns);
@@ -93,6 +93,7 @@ class MONGOCXX_API client_encryption {
     /// "aws", "azure", "gcp", "kmip", and "local". The kmsProviders map values differ
     /// by provider:
     ///
+    /// @code{.unparsed}
     ///    aws: {
     ///      accessKeyId: String,
     ///      secretAccessKey: String
@@ -118,6 +119,7 @@ class MONGOCXX_API client_encryption {
     ///    local: {
     ///      key: byte[96] // The master key used to encrypt/decrypt data keys.
     ///    }
+    /// @endcode
     ///
     /// @param kms_providers
     ///   A document containing the KMS providers.
@@ -125,9 +127,9 @@ class MONGOCXX_API client_encryption {
     /// @return
     ///   A reference to this object to facilitate method chaining.
     ///
-    /// @see https://docs.mongodb.com/manual/core/security-client-side-encryption/
+    /// @see https://www.mongodb.com/docs/manual/core/security-client-side-encryption/
     ///
-    client_encryption& kms_providers(bsoncxx::document::view_or_value kms_providers);
+    client_encryption& kms_providers(bsoncxx::v_noabi::document::view_or_value kms_providers);
 
     ///
     /// Gets the KMS providers.
@@ -135,7 +137,7 @@ class MONGOCXX_API client_encryption {
     /// @return
     ///   An optional document containing the KMS providers.
     ///
-    const stdx::optional<bsoncxx::document::view_or_value>& kms_providers() const;
+    const stdx::optional<bsoncxx::v_noabi::document::view_or_value>& kms_providers() const;
 
     ///
     /// Sets the TLS options to use for client side encryption with a given KMS provider.
@@ -143,11 +145,13 @@ class MONGOCXX_API client_encryption {
     /// Multiple KMS providers may be specified. Supported KMS providers are "aws", "azure", "gcp",
     /// and "kmip". The map value has the same form for all supported providers:
     ///
+    /// @code{.unparsed}
     ///    <KMS provider name>: {
     ///        tlsCaFile: Optional<String>
     ///        tlsCertificateKeyFile: Optional<String>
     ///        tlsCertificateKeyFilePassword: Optional<String>
     ///    }
+    /// @endcode
     ///
     /// @param tls_opts
     ///   A document containing the TLS options.
@@ -155,9 +159,9 @@ class MONGOCXX_API client_encryption {
     /// @return
     ///   A reference to this object to facilitate method chaining.
     ///
-    /// @see https://docs.mongodb.com/manual/core/security-client-side-encryption/
+    /// @see https://www.mongodb.com/docs/manual/core/security-client-side-encryption/
     ///
-    client_encryption& tls_opts(bsoncxx::document::view_or_value tls_opts);
+    client_encryption& tls_opts(bsoncxx::v_noabi::document::view_or_value tls_opts);
 
     ///
     /// Gets the TLS options.
@@ -165,21 +169,21 @@ class MONGOCXX_API client_encryption {
     /// @return
     ///   An optional document containing the TLS options.
     ///
-    const stdx::optional<bsoncxx::document::view_or_value>& tls_opts() const;
+    const stdx::optional<bsoncxx::v_noabi::document::view_or_value>& tls_opts() const;
 
    private:
-    friend class mongocxx::client_encryption;
+    friend ::mongocxx::v_noabi::client_encryption;
 
     MONGOCXX_PRIVATE void* convert() const;
 
-    stdx::optional<mongocxx::client*> _key_vault_client;
+    stdx::optional<mongocxx::v_noabi::client*> _key_vault_client;
     stdx::optional<ns_pair> _key_vault_namespace;
-    stdx::optional<bsoncxx::document::view_or_value> _kms_providers;
-    stdx::optional<bsoncxx::document::view_or_value> _tls_opts;
+    stdx::optional<bsoncxx::v_noabi::document::view_or_value> _kms_providers;
+    stdx::optional<bsoncxx::v_noabi::document::view_or_value> _tls_opts;
 };
 
 }  // namespace options
-MONGOCXX_INLINE_NAMESPACE_END
+}  // namespace v_noabi
 }  // namespace mongocxx
 
 #include <mongocxx/config/postlude.hpp>

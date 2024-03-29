@@ -14,6 +14,8 @@
 
 #pragma once
 
+#include <mongocxx/result/insert_one-fwd.hpp>
+
 #include <bsoncxx/array/value.hpp>
 #include <bsoncxx/types.hpp>
 #include <bsoncxx/types/bson_value/view.hpp>
@@ -22,14 +24,14 @@
 #include <mongocxx/config/prelude.hpp>
 
 namespace mongocxx {
-MONGOCXX_INLINE_NAMESPACE_BEGIN
+namespace v_noabi {
 namespace result {
 
 /// Class representing the result of a MongoDB insert operation.
-class MONGOCXX_API insert_one {
+class insert_one {
    public:
     // This constructor is public for testing purposes only
-    insert_one(result::bulk_write result, bsoncxx::types::bson_value::view inserted_id);
+    insert_one(result::bulk_write result, bsoncxx::v_noabi::types::bson_value::view inserted_id);
 
     ///
     /// Returns the bulk write result for this insert operation.
@@ -43,23 +45,23 @@ class MONGOCXX_API insert_one {
     ///
     /// @return The value of the _id field for the inserted document.
     ///
-    const bsoncxx::types::bson_value::view& inserted_id() const;
+    const bsoncxx::v_noabi::types::bson_value::view& inserted_id() const;
 
    private:
     result::bulk_write _result;
 
     // Array with a single element, containing the value of the _id field for the inserted document.
-    bsoncxx::array::value _inserted_id_owned;
+    bsoncxx::v_noabi::array::value _inserted_id_owned;
 
     // Points into _inserted_id_owned.
-    bsoncxx::types::bson_value::view _inserted_id;
+    bsoncxx::v_noabi::types::bson_value::view _inserted_id;
 
     friend MONGOCXX_API bool MONGOCXX_CALL operator==(const insert_one&, const insert_one&);
     friend MONGOCXX_API bool MONGOCXX_CALL operator!=(const insert_one&, const insert_one&);
 };
 
 }  // namespace result
-MONGOCXX_INLINE_NAMESPACE_END
+}  // namespace v_noabi
 }  // namespace mongocxx
 
 #include <mongocxx/config/postlude.hpp>

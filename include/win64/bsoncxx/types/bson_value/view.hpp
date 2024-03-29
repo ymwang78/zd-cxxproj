@@ -18,22 +18,19 @@
 #include <cstdint>
 #include <type_traits>
 
+#include <bsoncxx/document/element-fwd.hpp>
+#include <bsoncxx/types/bson_value/value-fwd.hpp>
+#include <bsoncxx/types/bson_value/view-fwd.hpp>
+
+#include <bsoncxx/stdx/type_traits.hpp>
 #include <bsoncxx/types.hpp>
 
 #include <bsoncxx/config/prelude.hpp>
 
 namespace bsoncxx {
-BSONCXX_INLINE_NAMESPACE_BEGIN
-
-namespace document {
-class element;
-}  // namespace document
-
+namespace v_noabi {
 namespace types {
 namespace bson_value {
-
-class value;
-
 ///
 /// A view-only variant that can contain any BSON type.
 ///
@@ -41,7 +38,7 @@ class value;
 ///   Calling the wrong get_<type> method will cause an exception
 ///   to be thrown.
 ///
-class BSONCXX_API view {
+class view {
    public:
 ///
 /// Construct a bson_value::view from any of the various BSON types. Defines
@@ -90,7 +87,7 @@ class BSONCXX_API view {
     ///
     /// @return The type of the underlying BSON value stored in this object.
     ///
-    bsoncxx::type type() const;
+    bsoncxx::v_noabi::type type() const;
 
     ///
     /// @return The underlying BSON double value.
@@ -271,8 +268,8 @@ class BSONCXX_API view {
     const b_maxkey& get_maxkey() const;
 
    private:
-    friend class document::element;
-    friend class bson_value::value;
+    friend ::bsoncxx::v_noabi::types::bson_value::value;
+    friend ::bsoncxx::v_noabi::document::element;
 
     view(const std::uint8_t* raw, std::uint32_t length, std::uint32_t offset, std::uint32_t keylen);
     view(void* internal_value) noexcept;
@@ -281,7 +278,8 @@ class BSONCXX_API view {
 
     void BSONCXX_PRIVATE destroy() noexcept;
 
-    bsoncxx::type _type;
+    bsoncxx::v_noabi::type _type;
+
     union {
         struct b_double _b_double;
         struct b_string _b_string;
@@ -307,39 +305,53 @@ class BSONCXX_API view {
     };
 };
 
-// sfinae in the bool return to avoid competing with the value == value
-// operators.
 template <typename T>
-using not_view = typename std::enable_if<
-    std::is_constructible<bson_value::view, T>::value &&
-        !std::is_same<typename std::decay<T>::type, bson_value::view>::value &&
-        !std::is_same<typename std::decay<T>::type, bson_value::value>::value,
-    bool>::type;
+using is_bson_view_compatible = detail::conjunction<
+    std::is_constructible<bson_value::view, T>,
+    detail::negation<detail::disjunction<detail::is_alike<T, bson_value::view>,
+                                         detail::is_alike<T, bson_value::value>>>>;
 
 template <typename T>
-BSONCXX_INLINE not_view<T> operator==(const bson_value::view& lhs, T&& rhs) {
+using not_view = is_bson_view_compatible<T>;
+
+template <typename T>
+BSONCXX_INLINE detail::requires_t<bool, is_bson_view_compatible<T>>  //
+operator==(const bson_value::view& lhs, T&& rhs) {
     return lhs == bson_value::view{std::forward<T>(rhs)};
 }
 
 template <typename T>
-BSONCXX_INLINE not_view<T> operator==(T&& lhs, const bson_value::view& rhs) {
+BSONCXX_INLINE detail::requires_t<bool, is_bson_view_compatible<T>>  //
+operator==(T&& lhs, const bson_value::view& rhs) {
     return bson_value::view{std::forward<T>(lhs)} == rhs;
 }
 
 template <typename T>
-BSONCXX_INLINE not_view<T> operator!=(const bson_value::view& lhs, T&& rhs) {
+BSONCXX_INLINE detail::requires_t<bool, is_bson_view_compatible<T>>  //
+operator!=(const bson_value::view& lhs, T&& rhs) {
     return lhs != bson_value::view{std::forward<T>(rhs)};
 }
 
 template <typename T>
-BSONCXX_INLINE not_view<T> operator!=(T&& lhs, const bson_value::view& rhs) {
+BSONCXX_INLINE detail::requires_t<bool, is_bson_view_compatible<T>>  //
+operator!=(T&& lhs, const bson_value::view& rhs) {
     return bson_value::view{std::forward<T>(lhs)} != rhs;
 }
 
 }  // namespace bson_value
 }  // namespace types
+}  // namespace v_noabi
+}  // namespace bsoncxx
 
-BSONCXX_INLINE_NAMESPACE_END
+namespace bsoncxx {
+namespace types {
+namespace bson_value {
+
+using ::bsoncxx::v_noabi::types::bson_value::operator==;
+using ::bsoncxx::v_noabi::types::bson_value::operator!=;
+
+}  // namespace bson_value
+}  // namespace types
 }  // namespace bsoncxx
 
 #include <bsoncxx/config/postlude.hpp>

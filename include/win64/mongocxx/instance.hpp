@@ -16,12 +16,13 @@
 
 #include <memory>
 
+#include <mongocxx/instance-fwd.hpp>
+#include <mongocxx/logger-fwd.hpp>
+
 #include <mongocxx/config/prelude.hpp>
 
 namespace mongocxx {
-MONGOCXX_INLINE_NAMESPACE_BEGIN
-
-class logger;
+namespace v_noabi {
 
 ///
 /// Class representing an instance of the MongoDB driver.
@@ -44,8 +45,8 @@ class logger;
 /// #include <mongocxx/uri.hpp>
 ///
 /// int main() {
-///     mongocxx::instance inst{};
-///     mongocxx::client conn{mongocxx::uri{}};
+///     mongocxx::v_noabi::instance inst{};
+///     mongocxx::v_noabi::client conn{mongocxx::v_noabi::uri{}};
 ///     ...
 /// }
 ///
@@ -60,14 +61,14 @@ class logger;
 /// #include <mongocxx/uri.hpp>
 ///
 /// client get_client() {
-///     mongocxx::instance inst{};
-///     mongocxx::client conn{mongocxx::uri{}};
+///     mongocxx::v_noabi::instance inst{};
+///     mongocxx::v_noabi::client conn{mongocxx::v_noabi::uri{}};
 ///
 ///     return client;
 /// } // ERROR! The instance is no longer alive after this function returns.
 ///
 /// int main() {
-///     mongocxx::client conn = get_client();
+///     mongocxx::v_noabi::client conn = get_client();
 ///     ...
 /// }
 ///
@@ -76,7 +77,7 @@ class logger;
 /// For examples of more advanced usage of instance, see
 /// `examples/mongocxx/instance_management.cpp`.
 ///
-class MONGOCXX_API instance {
+class instance {
    public:
     ///
     /// Creates an instance of the driver.
@@ -87,7 +88,7 @@ class MONGOCXX_API instance {
     /// Creates an instance of the driver with a user provided log handler.
     ///  @param logger The logger that the driver will direct log messages to.
     ///
-    /// @throws mongocxx::logic_error if an instance already exists.
+    /// @throws mongocxx::v_noabi::logic_error if an instance already exists.
     ///
     instance(std::unique_ptr<logger> logger);
 
@@ -128,7 +129,7 @@ class MONGOCXX_API instance {
     std::unique_ptr<impl> _impl;
 };
 
-MONGOCXX_INLINE_NAMESPACE_END
+}  // namespace v_noabi
 }  // namespace mongocxx
 
 #include <mongocxx/config/postlude.hpp>

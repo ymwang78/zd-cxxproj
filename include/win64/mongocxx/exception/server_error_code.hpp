@@ -17,10 +17,12 @@
 #include <cstdint>
 #include <system_error>
 
+#include <mongocxx/exception/server_error_code-fwd.hpp>
+
 #include <mongocxx/config/prelude.hpp>
 
 namespace mongocxx {
-MONGOCXX_INLINE_NAMESPACE_BEGIN
+namespace v_noabi {
 
 ///
 /// Enum representing the various errors types that can be returned from the server. As this list
@@ -38,9 +40,9 @@ enum class server_error_code : std::int32_t {
 MONGOCXX_API const std::error_category& MONGOCXX_CALL server_error_category();
 
 ///
-/// Translate a mongocxx::server_error_code into a std::error_code.
+/// Translate a mongocxx::v_noabi::server_error_code into a std::error_code.
 ///
-/// @param error A mongocxx::error_code
+/// @param error A mongocxx::v_noabi::error_code
 ///
 /// @return A std::error_code
 ///
@@ -48,13 +50,22 @@ MONGOCXX_INLINE std::error_code make_error_code(server_error_code error) {
     return {static_cast<int>(error), server_error_category()};
 }
 
-MONGOCXX_INLINE_NAMESPACE_END
+}  // namespace v_noabi
+}  // namespace mongocxx
+
+namespace mongocxx {
+
+using ::mongocxx::v_noabi::make_error_code;
+using ::mongocxx::v_noabi::server_error_category;
+
 }  // namespace mongocxx
 
 #include <mongocxx/config/postlude.hpp>
 
 namespace std {
+
 // Specialize is_error_code_enum so we get simpler std::error_code construction
 template <>
-struct is_error_code_enum<mongocxx::server_error_code> : public true_type {};
+struct is_error_code_enum<::mongocxx::v_noabi::server_error_code> : std::true_type {};
+
 }  // namespace std

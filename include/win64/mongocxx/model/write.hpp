@@ -16,6 +16,8 @@
 
 #include <cstdint>
 
+#include <mongocxx/model/write-fwd.hpp>
+
 #include <bsoncxx/stdx/optional.hpp>
 #include <mongocxx/model/delete_many.hpp>
 #include <mongocxx/model/delete_one.hpp>
@@ -28,13 +30,13 @@
 #include <mongocxx/config/prelude.hpp>
 
 namespace mongocxx {
-MONGOCXX_INLINE_NAMESPACE_BEGIN
+namespace v_noabi {
 namespace model {
 
 ///
-/// Models a single write operation within a mongocxx::bulk_write.
+/// Models a single write operation within a mongocxx::v_noabi::bulk_write.
 ///
-class MONGOCXX_API write {
+class write {
    public:
     ///
     /// Constructs a write from a model::insert_one.
@@ -148,7 +150,7 @@ class MONGOCXX_API write {
 };
 
 }  // namespace model
-MONGOCXX_INLINE_NAMESPACE_END
+}  // namespace v_noabi
 }  // namespace mongocxx
 
 #include <mongocxx/config/postlude.hpp>

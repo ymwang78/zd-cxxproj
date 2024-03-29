@@ -19,6 +19,14 @@
 #include <memory>
 #include <stdexcept>
 
+#include <mongocxx/bulk_write-fwd.hpp>
+#include <mongocxx/client-fwd.hpp>
+#include <mongocxx/collection-fwd.hpp>
+#include <mongocxx/database-fwd.hpp>
+#include <mongocxx/options/transaction-fwd.hpp>
+#include <mongocxx/uri-fwd.hpp>
+#include <mongocxx/write_concern-fwd.hpp>
+
 #include <bsoncxx/document/value.hpp>
 #include <bsoncxx/stdx/optional.hpp>
 #include <bsoncxx/stdx/string_view.hpp>
@@ -28,13 +36,7 @@
 #include <mongocxx/config/prelude.hpp>
 
 namespace mongocxx {
-MONGOCXX_INLINE_NAMESPACE_BEGIN
-
-class bulk_write;
-class client;
-class collection;
-class database;
-class uri;
+namespace v_noabi {
 
 ///
 /// Class representing the server-side requirement for reporting the success of a write
@@ -51,13 +53,13 @@ class uri;
 /// critical operations, clients can adjust the write concern to ensure better performance
 /// rather than persistence to the entire deployment.
 ///
-/// @see https://docs.mongodb.com/manual/core/write-concern/
+/// @see https://www.mongodb.com/docs/manual/core/write-concern/
 ///
-class MONGOCXX_API write_concern {
+class write_concern {
    public:
     ///
     /// A class to represent the special case values for write_concern::nodes.
-    /// @see https://docs.mongodb.com/manual/reference/write-concern/#w-option
+    /// @see https://www.mongodb.com/docs/manual/reference/write-concern/#w-option
     ///
     enum class level { k_default, k_majority, k_tag, k_unacknowledged, k_acknowledged };
 
@@ -120,7 +122,7 @@ class MONGOCXX_API write_concern {
 
     ///
     /// Sets the acknowledge level.
-    /// @see https://docs.mongodb.com/manual/reference/write-concern/#w-option
+    /// @see https://www.mongodb.com/docs/manual/reference/write-concern/#w-option
     ///
     /// @param confirm_level
     ///   Either level::k_unacknowledged, level::k_acknowledged, level::k_default, or
@@ -138,7 +140,8 @@ class MONGOCXX_API write_concern {
     ///   pre-5.0 servers.
     ///
     /// @exception
-    ///   Throws mongocxx::exception for setting a tag acknowledge level. Use tag() instead.
+    ///   Throws mongocxx::v_noabi::exception for setting a tag acknowledge level. Use tag()
+    ///   instead.
     ///
     void acknowledge_level(level confirm_level);
 
@@ -150,7 +153,7 @@ class MONGOCXX_API write_concern {
     ///   The amount of time to wait before the write operation times out if it cannot reach
     ///   the majority of nodes in the replica set. If the value is zero, then no timeout is set.
     ///
-    /// @throws mongocxx::logic_error for an invalid timeout value.
+    /// @throws mongocxx::v_noabi::logic_error for an invalid timeout value.
     ///
     void majority(std::chrono::milliseconds timeout);
 
@@ -173,7 +176,7 @@ class MONGOCXX_API write_concern {
     ///   The timeout (in milliseconds) for this write concern. If the value is zero, then no
     ///   timeout is set.
     ///
-    /// @throws mongocxx::logic_error for an invalid timeout value.
+    /// @throws mongocxx::v_noabi::logic_error for an invalid timeout value.
     ///
     void timeout(std::chrono::milliseconds timeout);
 
@@ -190,7 +193,7 @@ class MONGOCXX_API write_concern {
     ///
     /// This is unset by default.
     ///
-    /// @see https://docs.mongodb.com/manual/reference/write-concern/#w-option
+    /// @see https://www.mongodb.com/docs/manual/reference/write-concern/#w-option
     ///
     /// @return The number of required nodes.
     ///
@@ -199,7 +202,7 @@ class MONGOCXX_API write_concern {
     ///
     /// Gets the current acknowledgment level.
     ///
-    /// @see https://docs.mongodb.com/manual/reference/write-concern/#w-option
+    /// @see https://www.mongodb.com/docs/manual/reference/write-concern/#w-option
     ///
     /// @return The acknowledgment level.
     ///
@@ -239,16 +242,15 @@ class MONGOCXX_API write_concern {
     /// @return
     ///   Document representation of this write_concern.
     ///
-    bsoncxx::document::value to_document() const;
+    bsoncxx::v_noabi::document::value to_document() const;
 
    private:
-    friend bulk_write;
-    friend client;
-    friend collection;
-    friend database;
-    /// \relates mongocxx::options::transaction
-    friend mongocxx::options::transaction;
-    friend uri;
+    friend ::mongocxx::v_noabi::bulk_write;
+    friend ::mongocxx::v_noabi::client;
+    friend ::mongocxx::v_noabi::collection;
+    friend ::mongocxx::v_noabi::database;
+    friend ::mongocxx::v_noabi::options::transaction;
+    friend ::mongocxx::v_noabi::uri;
 
     ///
     /// @{
@@ -270,7 +272,7 @@ class MONGOCXX_API write_concern {
     std::unique_ptr<impl> _impl;
 };
 
-MONGOCXX_INLINE_NAMESPACE_END
+}  // namespace v_noabi
 }  // namespace mongocxx
 
 #include <mongocxx/config/postlude.hpp>

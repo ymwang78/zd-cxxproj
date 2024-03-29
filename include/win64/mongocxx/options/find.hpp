@@ -17,6 +17,8 @@
 #include <chrono>
 #include <cstdint>
 
+#include <mongocxx/options/find-fwd.hpp>
+
 #include <bsoncxx/document/view_or_value.hpp>
 #include <bsoncxx/stdx/optional.hpp>
 #include <bsoncxx/string/view_or_value.hpp>
@@ -28,13 +30,13 @@
 #include <mongocxx/config/prelude.hpp>
 
 namespace mongocxx {
-MONGOCXX_INLINE_NAMESPACE_BEGIN
+namespace v_noabi {
 namespace options {
 
 ///
 /// Class representing the optional arguments to a MongoDB query.
 ///
-class MONGOCXX_API find {
+class find {
    public:
     ///
     /// Enables writing to temporary files on the server. When set to true, the server
@@ -51,7 +53,7 @@ class MONGOCXX_API find {
     /// @return
     ///   A reference to this object to facilitate method chaining.
     ///
-    /// @see https://docs.mongodb.com/manual/reference/command/find/
+    /// @see https://www.mongodb.com/docs/manual/reference/command/find/
     ///
     find& allow_disk_use(bool allow_disk_use);
 
@@ -75,7 +77,7 @@ class MONGOCXX_API find {
     ///   A reference to the object on which this member function is being called.  This facilitates
     ///   method chaining.
     ///
-    /// @see https://docs.mongodb.com/manual/reference/command/find/
+    /// @see https://www.mongodb.com/docs/manual/reference/command/find/
     ///
     find& allow_partial_results(bool allow_partial);
 
@@ -84,7 +86,7 @@ class MONGOCXX_API find {
     ///
     /// @return Whether partial results from mongos are allowed.
     ///
-    /// @see https://docs.mongodb.com/manual/reference/command/find/
+    /// @see https://www.mongodb.com/docs/manual/reference/command/find/
     ///
     const stdx::optional<bool>& allow_partial_results() const;
 
@@ -98,7 +100,7 @@ class MONGOCXX_API find {
     ///   A reference to the object on which this member function is being called.  This facilitates
     ///   method chaining.
     ///
-    /// @see https://docs.mongodb.com/manual/reference/command/find/
+    /// @see https://www.mongodb.com/docs/manual/reference/command/find/
     ///
     find& batch_size(std::int32_t batch_size);
 
@@ -107,7 +109,7 @@ class MONGOCXX_API find {
     ///
     /// @return The current batch size.
     ///
-    /// @see https://docs.mongodb.com/manual/reference/command/find/
+    /// @see https://www.mongodb.com/docs/manual/reference/command/find/
     ///
     const stdx::optional<std::int32_t>& batch_size() const;
 
@@ -121,9 +123,9 @@ class MONGOCXX_API find {
     ///   A reference to the object on which this member function is being called.  This facilitates
     ///   method chaining.
     ///
-    /// @see https://docs.mongodb.com/manual/reference/command/find/
+    /// @see https://www.mongodb.com/docs/manual/reference/command/find/
     ///
-    find& collation(bsoncxx::document::view_or_value collation);
+    find& collation(bsoncxx::v_noabi::document::view_or_value collation);
 
     ///
     /// Retrieves the current collation for this operation.
@@ -131,9 +133,9 @@ class MONGOCXX_API find {
     /// @return
     ///   The current collation.
     ///
-    /// @see https://docs.mongodb.com/manual/reference/command/find/
+    /// @see https://www.mongodb.com/docs/manual/reference/command/find/
     ///
-    const stdx::optional<bsoncxx::document::view_or_value>& collation() const;
+    const stdx::optional<bsoncxx::v_noabi::document::view_or_value>& collation() const;
 
     ///
     /// Attaches a comment to the query. If $comment also exists in the modifiers document then
@@ -148,9 +150,9 @@ class MONGOCXX_API find {
     ///   A reference to the object on which this member function is being called.  This facilitates
     ///   method chaining.
     ///
-    /// @see https://docs.mongodb.com/manual/reference/command/find/
+    /// @see https://www.mongodb.com/docs/manual/reference/command/find/
     ///
-    find& comment(bsoncxx::string::view_or_value comment);
+    find& comment(bsoncxx::v_noabi::string::view_or_value comment);
 
     ///
     /// Gets the current comment attached to this query.
@@ -159,9 +161,9 @@ class MONGOCXX_API find {
     ///
     /// @return The comment attached to this query.
     ///
-    /// @see https://docs.mongodb.com/manual/reference/command/find/
+    /// @see https://www.mongodb.com/docs/manual/reference/command/find/
     ///
-    const stdx::optional<bsoncxx::string::view_or_value>& comment() const;
+    const stdx::optional<bsoncxx::v_noabi::string::view_or_value>& comment() const;
 
     ///
     /// Indicates the type of cursor to use for this query.
@@ -173,7 +175,7 @@ class MONGOCXX_API find {
     ///   A reference to the object on which this member function is being called.  This facilitates
     ///   method chaining.
     ///
-    /// @see https://docs.mongodb.com/manual/reference/command/find/
+    /// @see https://www.mongodb.com/docs/manual/reference/command/find/
     ///
     find& cursor_type(cursor::type cursor_type);
 
@@ -182,14 +184,14 @@ class MONGOCXX_API find {
     ///
     /// @return The current cursor type.
     ///
-    /// @see https://docs.mongodb.com/manual/reference/command/find/
+    /// @see https://www.mongodb.com/docs/manual/reference/command/find/
     ///
     const stdx::optional<cursor::type>& cursor_type() const;
 
     ///
     /// Sets the index to use for this operation.
     ///
-    /// @see https://docs.mongodb.com/manual/reference/command/find/
+    /// @see https://www.mongodb.com/docs/manual/reference/command/find/
     ///
     /// @note if the server already has a cached shape for this query, it may
     /// ignore a hint.
@@ -201,16 +203,16 @@ class MONGOCXX_API find {
     ///   A reference to the object on which this member function is being called.  This facilitates
     ///   method chaining.
     ///
-    find& hint(class hint index_hint);
+    find& hint(mongocxx::v_noabi::hint index_hint);
 
     ///
     /// Gets the current hint.
     ///
     /// @return The current hint, if one is set.
     ///
-    /// @see https://docs.mongodb.com/manual/reference/command/find/
+    /// @see https://www.mongodb.com/docs/manual/reference/command/find/
     ///
-    const stdx::optional<class hint>& hint() const;
+    const stdx::optional<mongocxx::v_noabi::hint>& hint() const;
 
     ///
     /// Set the value of the let option.
@@ -222,9 +224,9 @@ class MONGOCXX_API find {
     ///   A reference to the object on which this member function is being called.  This facilitates
     ///   method chaining.
     ///
-    /// @see https://docs.mongodb.com/manual/reference/command/find/
+    /// @see https://www.mongodb.com/docs/manual/reference/command/find/
     ///
-    find& let(bsoncxx::document::view_or_value let);
+    find& let(bsoncxx::v_noabi::document::view_or_value let);
 
     ///
     /// Gets the current value of the let option.
@@ -232,9 +234,9 @@ class MONGOCXX_API find {
     /// @return
     ///  The current let option.
     ///
-    /// @see https://docs.mongodb.com/manual/reference/command/find/
+    /// @see https://www.mongodb.com/docs/manual/reference/command/find/
     ///
-    const stdx::optional<bsoncxx::document::view_or_value> let() const;
+    const stdx::optional<bsoncxx::v_noabi::document::view_or_value> let() const;
 
     ///
     /// Set the value of the comment option.
@@ -248,9 +250,9 @@ class MONGOCXX_API find {
     ///   A reference to the object on which this member function is being called.  This facilitates
     ///   method chaining.
     ///
-    /// @see https://docs.mongodb.com/manual/reference/command/find/
+    /// @see https://www.mongodb.com/docs/manual/reference/command/find/
     ///
-    find& comment_option(bsoncxx::types::bson_value::view_or_value comment);
+    find& comment_option(bsoncxx::v_noabi::types::bson_value::view_or_value comment);
 
     ///
     /// Gets the current value of the comment option.
@@ -260,9 +262,10 @@ class MONGOCXX_API find {
     /// @return
     ///  The current comment option.
     ///
-    /// @see https://docs.mongodb.com/manual/reference/command/find/
+    /// @see https://www.mongodb.com/docs/manual/reference/command/find/
     ///
-    const stdx::optional<bsoncxx::types::bson_value::view_or_value>& comment_option() const;
+    const stdx::optional<bsoncxx::v_noabi::types::bson_value::view_or_value>& comment_option()
+        const;
 
     ///
     /// Sets maximum number of documents to return.
@@ -273,7 +276,7 @@ class MONGOCXX_API find {
     /// @return
     ///   A reference to the object on which this member function is being called.  This facilitates
     ///   method chaining.
-    /// @see https://docs.mongodb.com/manual/reference/command/find/
+    /// @see https://www.mongodb.com/docs/manual/reference/command/find/
     ///
     find& limit(std::int64_t limit);
 
@@ -282,7 +285,7 @@ class MONGOCXX_API find {
     ///
     /// @return The current limit.
     ///
-    /// @see https://docs.mongodb.com/manual/reference/command/find/
+    /// @see https://www.mongodb.com/docs/manual/reference/command/find/
     ///
     const stdx::optional<std::int64_t>& limit() const;
 
@@ -296,18 +299,18 @@ class MONGOCXX_API find {
     ///   A reference to the object on which this member function is being called.  This facilitates
     ///   method chaining.
     ///
-    /// @see https://docs.mongodb.com/manual/reference/command/find/
+    /// @see https://www.mongodb.com/docs/manual/reference/command/find/
     ///
-    find& max(bsoncxx::document::view_or_value max);
+    find& max(bsoncxx::v_noabi::document::view_or_value max);
 
     ///
     /// Sets the current exclusive upper bound for a specific index.
     ///
     /// @return The exclusive upper bound for a specific index.
     ///
-    /// @see https://docs.mongodb.com/manual/reference/command/find/
+    /// @see https://www.mongodb.com/docs/manual/reference/command/find/
     ///
-    const stdx::optional<bsoncxx::document::view_or_value>& max() const;
+    const stdx::optional<bsoncxx::v_noabi::document::view_or_value>& max() const;
 
     ///
     /// The maximum amount of time for the server to wait on new documents to satisfy a tailable
@@ -324,7 +327,7 @@ class MONGOCXX_API find {
     ///   A reference to the object on which this member function is being called.  This facilitates
     ///   method chaining.
     ///
-    /// @see https://docs.mongodb.com/manual/reference/command/find/
+    /// @see https://www.mongodb.com/docs/manual/reference/command/find/
     ///
     find& max_await_time(std::chrono::milliseconds max_await_time);
 
@@ -334,7 +337,7 @@ class MONGOCXX_API find {
     ///
     /// @return The current max await time (in milliseconds).
     ///
-    /// @see https://docs.mongodb.com/manual/reference/command/find/
+    /// @see https://www.mongodb.com/docs/manual/reference/command/find/
     ///
     const stdx::optional<std::chrono::milliseconds>& max_await_time() const;
 
@@ -348,7 +351,7 @@ class MONGOCXX_API find {
     ///   A reference to the object on which this member function is being called.  This facilitates
     ///   method chaining.
     ///
-    /// @see https://docs.mongodb.com/manual/reference/command/find/
+    /// @see https://www.mongodb.com/docs/manual/reference/command/find/
     ///
     find& max_time(std::chrono::milliseconds max_time);
 
@@ -357,7 +360,7 @@ class MONGOCXX_API find {
     ///
     /// @return The current max time (in milliseconds).
     ///
-    /// @see https://docs.mongodb.com/manual/reference/command/find/
+    /// @see https://www.mongodb.com/docs/manual/reference/command/find/
     ///
     const stdx::optional<std::chrono::milliseconds>& max_time() const;
 
@@ -371,18 +374,18 @@ class MONGOCXX_API find {
     ///   A reference to the object on which this member function is being called.  This facilitates
     ///   method chaining.
     ///
-    /// @see https://docs.mongodb.com/manual/reference/command/find/
+    /// @see https://www.mongodb.com/docs/manual/reference/command/find/
     ///
-    find& min(bsoncxx::document::view_or_value min);
+    find& min(bsoncxx::v_noabi::document::view_or_value min);
 
     ///
     /// Sets the current inclusive lower bound for a specific index.
     ///
     /// @return The inclusive lower bound for a specific index.
     ///
-    /// @see https://docs.mongodb.com/manual/reference/command/find/
+    /// @see https://www.mongodb.com/docs/manual/reference/command/find/
     ///
-    const stdx::optional<bsoncxx::document::view_or_value>& min() const;
+    const stdx::optional<bsoncxx::v_noabi::document::view_or_value>& min() const;
 
     ///
     /// Sets the cursor flag to prevent cursor from timing out server-side due to a period of
@@ -395,7 +398,7 @@ class MONGOCXX_API find {
     ///   A reference to the object on which this member function is being called.  This facilitates
     ///   method chaining.
     ///
-    /// @see https://docs.mongodb.com/manual/reference/command/find/
+    /// @see https://www.mongodb.com/docs/manual/reference/command/find/
     ///
     find& no_cursor_timeout(bool no_cursor_timeout);
 
@@ -404,7 +407,7 @@ class MONGOCXX_API find {
     ///
     /// @return The current no_cursor_timeout setting.
     ///
-    /// @see https://docs.mongodb.com/manual/reference/command/find/
+    /// @see https://www.mongodb.com/docs/manual/reference/command/find/
     ///
     const stdx::optional<bool>& no_cursor_timeout() const;
 
@@ -418,18 +421,18 @@ class MONGOCXX_API find {
     ///   A reference to the object on which this member function is being called.  This facilitates
     ///   method chaining.
     ///
-    /// @see https://docs.mongodb.com/manual/reference/command/find/
+    /// @see https://www.mongodb.com/docs/manual/reference/command/find/
     ///
-    find& projection(bsoncxx::document::view_or_value projection);
+    find& projection(bsoncxx::v_noabi::document::view_or_value projection);
 
     ///
     /// Gets the current projection set on this query.
     ///
     /// @return The current projection.
     ///
-    /// @see https://docs.mongodb.com/manual/reference/command/find/
+    /// @see https://www.mongodb.com/docs/manual/reference/command/find/
     ///
-    const stdx::optional<bsoncxx::document::view_or_value>& projection() const;
+    const stdx::optional<bsoncxx::v_noabi::document::view_or_value>& projection() const;
 
     ///
     /// Sets the read_preference for this operation.
@@ -441,9 +444,9 @@ class MONGOCXX_API find {
     ///   A reference to the object on which this member function is being called.  This facilitates
     ///   method chaining.
     ///
-    /// @see https://docs.mongodb.com/manual/reference/command/find/
+    /// @see https://www.mongodb.com/docs/manual/reference/command/find/
     ///
-    find& read_preference(class read_preference rp);
+    find& read_preference(mongocxx::v_noabi::read_preference rp);
 
     ///
     /// The current read_preference for this operation.
@@ -451,9 +454,9 @@ class MONGOCXX_API find {
     /// @return
     ///   The current read_preference.
     ///
-    /// @see https://docs.mongodb.com/manual/reference/command/find/
+    /// @see https://www.mongodb.com/docs/manual/reference/command/find/
     ///
-    const stdx::optional<class read_preference>& read_preference() const;
+    const stdx::optional<mongocxx::v_noabi::read_preference>& read_preference() const;
 
     ///
     /// Sets whether to return the index keys associated with the query results, instead of the
@@ -467,7 +470,7 @@ class MONGOCXX_API find {
     ///   A reference to the object on which this member function is being called.  This facilitates
     ///   method chaining.
     ///
-    /// @see https://docs.mongodb.com/manual/reference/command/find/
+    /// @see https://www.mongodb.com/docs/manual/reference/command/find/
     ///
     find& return_key(bool return_key);
 
@@ -479,7 +482,7 @@ class MONGOCXX_API find {
     ///   Whether index keys associated with the query results are returned, instead of the actual
     ///   query results themselves.
     ///
-    /// @see https://docs.mongodb.com/manual/reference/command/find/
+    /// @see https://www.mongodb.com/docs/manual/reference/command/find/
     ///
     const stdx::optional<bool>& return_key() const;
 
@@ -493,7 +496,7 @@ class MONGOCXX_API find {
     ///   A reference to the object on which this member function is being called.  This facilitates
     ///   method chaining.
     ///
-    /// @see https://docs.mongodb.com/manual/reference/command/find/
+    /// @see https://www.mongodb.com/docs/manual/reference/command/find/
     ///
     find& show_record_id(bool show_record_id);
 
@@ -504,7 +507,7 @@ class MONGOCXX_API find {
     /// @return
     ///   Whether the record identifier is included.
     ///
-    /// @see https://docs.mongodb.com/manual/reference/command/find/
+    /// @see https://www.mongodb.com/docs/manual/reference/command/find/
     ///
     const stdx::optional<bool>& show_record_id() const;
 
@@ -518,7 +521,7 @@ class MONGOCXX_API find {
     ///   A reference to the object on which this member function is being called.  This facilitates
     ///   method chaining.
     ///
-    /// @see https://docs.mongodb.com/manual/reference/command/find/
+    /// @see https://www.mongodb.com/docs/manual/reference/command/find/
     ///
     find& skip(std::int64_t skip);
 
@@ -527,7 +530,7 @@ class MONGOCXX_API find {
     ///
     /// @return The number of documents to skip.
     ///
-    /// @see https://docs.mongodb.com/manual/reference/command/find/
+    /// @see https://www.mongodb.com/docs/manual/reference/command/find/
     ///
     const stdx::optional<std::int64_t>& skip() const;
 
@@ -542,45 +545,45 @@ class MONGOCXX_API find {
     ///   A reference to the object on which this member function is being called.  This facilitates
     ///   method chaining.
     ///
-    /// @see https://docs.mongodb.com/manual/reference/command/find/
+    /// @see https://www.mongodb.com/docs/manual/reference/command/find/
     ///
-    find& sort(bsoncxx::document::view_or_value ordering);
+    find& sort(bsoncxx::v_noabi::document::view_or_value ordering);
 
     ///
     /// Gets the current sort ordering for this query.
     ///
     /// @return The current sort ordering.
     ///
-    /// @see https://docs.mongodb.com/manual/reference/command/find/
+    /// @see https://www.mongodb.com/docs/manual/reference/command/find/
     ///
-    const stdx::optional<bsoncxx::document::view_or_value>& sort() const;
+    const stdx::optional<bsoncxx::v_noabi::document::view_or_value>& sort() const;
 
    private:
     stdx::optional<bool> _allow_disk_use;
     stdx::optional<bool> _allow_partial_results;
     stdx::optional<std::int32_t> _batch_size;
-    stdx::optional<bsoncxx::document::view_or_value> _collation;
-    stdx::optional<bsoncxx::string::view_or_value> _comment;
+    stdx::optional<bsoncxx::v_noabi::document::view_or_value> _collation;
+    stdx::optional<bsoncxx::v_noabi::string::view_or_value> _comment;
     stdx::optional<cursor::type> _cursor_type;
-    stdx::optional<class hint> _hint;
-    stdx::optional<bsoncxx::document::view_or_value> _let;
-    stdx::optional<bsoncxx::types::bson_value::view_or_value> _comment_option;
+    stdx::optional<mongocxx::v_noabi::hint> _hint;
+    stdx::optional<bsoncxx::v_noabi::document::view_or_value> _let;
+    stdx::optional<bsoncxx::v_noabi::types::bson_value::view_or_value> _comment_option;
     stdx::optional<std::int64_t> _limit;
-    stdx::optional<bsoncxx::document::view_or_value> _max;
+    stdx::optional<bsoncxx::v_noabi::document::view_or_value> _max;
     stdx::optional<std::chrono::milliseconds> _max_await_time;
     stdx::optional<std::chrono::milliseconds> _max_time;
-    stdx::optional<bsoncxx::document::view_or_value> _min;
+    stdx::optional<bsoncxx::v_noabi::document::view_or_value> _min;
     stdx::optional<bool> _no_cursor_timeout;
-    stdx::optional<bsoncxx::document::view_or_value> _projection;
-    stdx::optional<class read_preference> _read_preference;
+    stdx::optional<bsoncxx::v_noabi::document::view_or_value> _projection;
+    stdx::optional<mongocxx::v_noabi::read_preference> _read_preference;
     stdx::optional<bool> _return_key;
     stdx::optional<bool> _show_record_id;
     stdx::optional<std::int64_t> _skip;
-    stdx::optional<bsoncxx::document::view_or_value> _ordering;
+    stdx::optional<bsoncxx::v_noabi::document::view_or_value> _ordering;
 };
 
 }  // namespace options
-MONGOCXX_INLINE_NAMESPACE_END
+}  // namespace v_noabi
 }  // namespace mongocxx
 
 #include <mongocxx/config/postlude.hpp>

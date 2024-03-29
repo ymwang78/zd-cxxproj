@@ -16,6 +16,8 @@
 
 #include <cstdint>
 
+#include <mongocxx/options/range-fwd.hpp>
+
 #include <bsoncxx/types.hpp>
 #include <bsoncxx/types/bson_value/view_or_value.hpp>
 #include <mongocxx/stdx.hpp>
@@ -23,8 +25,7 @@
 #include <mongocxx/config/prelude.hpp>
 
 namespace mongocxx {
-MONGOCXX_INLINE_NAMESPACE_BEGIN
-
+namespace v_noabi {
 namespace options {
 
 ///
@@ -39,23 +40,23 @@ namespace options {
 ///
 /// @warning The Range algorithm is experimental only. It is not intended for public use. It is
 /// subject to breaking changes.
-class MONGOCXX_API range {
+class range {
    public:
     /// @brief Sets `RangeOpts.min`.
     /// @note Required if @ref precision is set.
-    range& min(bsoncxx::types::bson_value::view_or_value value);
+    range& min(bsoncxx::v_noabi::types::bson_value::view_or_value value);
 
     /// @brief Gets `RangeOpts.min`.
     /// @note Required if @ref precision is set.
-    const stdx::optional<bsoncxx::types::bson_value::view_or_value>& min() const;
+    const stdx::optional<bsoncxx::v_noabi::types::bson_value::view_or_value>& min() const;
 
     /// @brief Sets `RangeOpts.max`.
     /// @note Required if @ref precision is set.
-    range& max(bsoncxx::types::bson_value::view_or_value value);
+    range& max(bsoncxx::v_noabi::types::bson_value::view_or_value value);
 
     /// @brief Gets `RangeOpts.max`.
     /// @note Required if @ref precision is set.
-    const stdx::optional<bsoncxx::types::bson_value::view_or_value>& max() const;
+    const stdx::optional<bsoncxx::v_noabi::types::bson_value::view_or_value>& max() const;
 
     /// @brief Sets `RangeOpts.sparsity`.
     range& sparsity(std::int64_t value);
@@ -72,13 +73,17 @@ class MONGOCXX_API range {
     const stdx::optional<std::int32_t>& precision() const;
 
    private:
-    stdx::optional<bsoncxx::types::bson_value::view_or_value> _min;
-    stdx::optional<bsoncxx::types::bson_value::view_or_value> _max;
+    stdx::optional<bsoncxx::v_noabi::types::bson_value::view_or_value> _min;
+    stdx::optional<bsoncxx::v_noabi::types::bson_value::view_or_value> _max;
     stdx::optional<std::int64_t> _sparsity;
     stdx::optional<std::int32_t> _precision;
 };
 
 }  // namespace options
-
-MONGOCXX_INLINE_NAMESPACE_END
+}  // namespace v_noabi
 }  // namespace mongocxx
+
+// CXX-2770: missing include of postlude header.
+#if defined(MONGOCXX_TEST_MACRO_GUARDS_FIX_MISSING_POSTLUDE)
+#include <mongocxx/config/postlude.hpp>
+#endif

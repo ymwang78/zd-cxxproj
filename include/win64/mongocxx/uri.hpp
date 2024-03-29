@@ -18,6 +18,10 @@
 #include <string>
 #include <vector>
 
+#include <mongocxx/client-fwd.hpp>
+#include <mongocxx/pool-fwd.hpp>
+#include <mongocxx/uri-fwd.hpp>
+
 #include <bsoncxx/document/view.hpp>
 #include <bsoncxx/string/view_or_value.hpp>
 #include <mongocxx/read_concern.hpp>
@@ -27,7 +31,7 @@
 #include <mongocxx/config/prelude.hpp>
 
 namespace mongocxx {
-MONGOCXX_INLINE_NAMESPACE_BEGIN
+namespace v_noabi {
 
 ///
 /// Class representing a MongoDB connection string URI.
@@ -36,11 +40,11 @@ MONGOCXX_INLINE_NAMESPACE_BEGIN
 /// a case of an empty option explicitly present in the URI and the option being omitted. Also
 /// change getters that return a std::string to return a string_view since a copy is not necessary.
 ///
-/// @see https://docs.mongodb.com/manual/reference/connection-string/
-/// @see http://mongoc.org/libmongoc/current/mongoc_uri_t.html for more information on supported URI
-/// options.
+/// @see https://www.mongodb.com/docs/manual/reference/connection-string/
+/// @see https://mongoc.org/libmongoc/current/mongoc_uri_t.html for more information on supported
+/// URI options.
 ///
-class MONGOCXX_API uri {
+class uri {
    public:
     /// A host.
     struct host {
@@ -57,12 +61,12 @@ class MONGOCXX_API uri {
     ///
     /// @see The documentation for the version of libmongoc used for the list of supported
     ///   URI options. For the latest libmongoc release:
-    ///   http://mongoc.org/libmongoc/current/mongoc_uri_t.html
+    ///   https://mongoc.org/libmongoc/current/mongoc_uri_t.html
     ///
     /// @param uri_string
     ///   String representing a MongoDB connection string URI, defaults to k_default_uri.
     ///
-    uri(bsoncxx::string::view_or_value uri_string = k_default_uri);
+    uri(bsoncxx::v_noabi::string::view_or_value uri_string = k_default_uri);
 
     ///
     /// Move constructs a uri.
@@ -116,7 +120,7 @@ class MONGOCXX_API uri {
     ///
     /// @return A document view containing other options.
     ///
-    bsoncxx::document::view options() const;
+    bsoncxx::v_noabi::document::view options() const;
 
     ///
     /// Returns the password from the uri.
@@ -130,14 +134,14 @@ class MONGOCXX_API uri {
     ///
     /// @return A read_concern that represents what was specified in the uri.
     ///
-    class read_concern read_concern() const;
+    mongocxx::v_noabi::read_concern read_concern() const;
 
     ///
     /// Returns the read preference from the uri.
     ///
     /// @return A read_preference that represents what was specified in the uri.
     ///
-    class read_preference read_preference() const;
+    mongocxx::v_noabi::read_preference read_preference() const;
 
     ///
     /// Returns the replica set specified in the uri.
@@ -181,7 +185,7 @@ class MONGOCXX_API uri {
     ///
     /// @return A write_concern that represents what was specified in the uri.
     ///
-    class write_concern write_concern() const;
+    mongocxx::v_noabi::write_concern write_concern() const;
 
     ///
     /// Returns the value of the option "appname" if present in the uri.
@@ -193,16 +197,16 @@ class MONGOCXX_API uri {
     ///
     /// Returns the value of the option "authMechanismProperties" if present in the uri.
     ///
-    /// @return An optional bsoncxx::document::view
+    /// @return An optional bsoncxx::v_noabi::document::view
     ///
-    stdx::optional<bsoncxx::document::view> auth_mechanism_properties() const;
+    stdx::optional<bsoncxx::v_noabi::document::view> auth_mechanism_properties() const;
 
     ///
     /// Returns the value of the option credentials if present in the uri.
     ///
-    /// @return An optional bsoncxx::document::view
+    /// @return An optional bsoncxx::v_noabi::document::view
     ///
-    stdx::optional<bsoncxx::document::view> credentials();
+    stdx::optional<bsoncxx::v_noabi::document::view> credentials();
 
     ///
     /// Returns the value of the option "srvMaxHosts" if present in the uri.
@@ -361,8 +365,8 @@ class MONGOCXX_API uri {
     stdx::optional<std::int32_t> zlib_compression_level() const;
 
    private:
-    friend class client;
-    friend class pool;
+    friend ::mongocxx::v_noabi::client;
+    friend ::mongocxx::v_noabi::pool;
 
     class MONGOCXX_PRIVATE impl;
 
@@ -371,7 +375,7 @@ class MONGOCXX_API uri {
     std::unique_ptr<impl> _impl;
 };
 
-MONGOCXX_INLINE_NAMESPACE_END
+}  // namespace v_noabi
 }  // namespace mongocxx
 
 #include <mongocxx/config/postlude.hpp>

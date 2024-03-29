@@ -24,12 +24,7 @@ class ZCE_API zce_timer : public zce_object
     friend class zce_timer_doozer;
     ZCE_OBJECT_DECLARE;
     struct pimpl;
-    struct pimpl *pimpl_;
-
-    class zce_timer_delegate;
-    class zce_timer_handler;
-
-    void do_delegate(bool bstart);
+    zce_smartptr<pimpl> pimpl_;
 
 public:
     zce_timer(const zce_smartptr<zce_reactor>& reactor, 
@@ -45,9 +40,6 @@ public:
 
     void cancel();
 
-    void handle_timeout();
-
-    void on_close();
 };
 
 class ZCE_API zce_timer_doozer : public zce_object

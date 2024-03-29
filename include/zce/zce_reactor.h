@@ -70,10 +70,12 @@ int zce_reactor::delegate(bool bwait, F f)
 {
 	class Fr_task : public zce_task
 	{
+        zce_smartptr<zce_reactor> reactor_ptr_;
+		zce_semaphore* sem_;
 		F f_;
-        zce_semaphore* sem_;
 	public:
-		Fr_task(zce_semaphore* sem, F f) : zce_task("Fr_task"), sem_(sem), f_(f) {
+		Fr_task(zce_reactor* reactor_ptr, zce_semaphore* sem, F f)
+            : zce_task("Fr_task"), reactor_ptr_(reactor_ptr), sem_(sem), f_(f) {
             if (sem_) {
                 bool wait = sem_->try_acquire();
                 ZCE_ASSERT_TEXT(wait, "deadlock detected!");
@@ -93,7 +95,7 @@ int zce_reactor::delegate(bool bwait, F f)
     }
 
     zce_tss::global_t* tss = bwait ? zce_tss::get_global() : 0;
-    Fr_task* task = new Fr_task(bwait ? tss->sem_ : 0, f);
+    Fr_task* task = new Fr_task(this, bwait ? tss->sem_ : 0, f);
 	zce_smartptr<zce_task> task_ptr(task);
 	int ret = delegate_task(task_ptr);
     if (ret >= 0 && bwait) {

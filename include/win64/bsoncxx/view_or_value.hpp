@@ -16,12 +16,14 @@
 
 #include <type_traits>
 
+#include <bsoncxx/view_or_value-fwd.hpp>
+
 #include <bsoncxx/stdx/optional.hpp>
 
 #include <bsoncxx/config/prelude.hpp>
 
 namespace bsoncxx {
-BSONCXX_INLINE_NAMESPACE_BEGIN
+namespace v_noabi {
 
 ///
 /// Class representing a view-or-value variant type.
@@ -209,7 +211,14 @@ BSONCXX_INLINE bool operator!=(const Value& lhs, const view_or_value<View, Value
 /// @}
 ///
 
-BSONCXX_INLINE_NAMESPACE_END
+}  // namespace v_noabi
+}  // namespace bsoncxx
+
+namespace bsoncxx {
+
+using ::bsoncxx::v_noabi::operator==;
+using ::bsoncxx::v_noabi::operator!=;
+
 }  // namespace bsoncxx
 
 #include <bsoncxx/config/postlude.hpp>

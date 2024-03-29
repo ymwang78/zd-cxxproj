@@ -14,6 +14,8 @@
 
 #pragma once
 
+#include <bsoncxx/builder/stream/document-fwd.hpp>
+
 #include <bsoncxx/builder/core.hpp>
 #include <bsoncxx/builder/stream/key_context.hpp>
 #include <bsoncxx/builder/stream/single_context.hpp>
@@ -23,7 +25,7 @@
 #include <bsoncxx/config/prelude.hpp>
 
 namespace bsoncxx {
-BSONCXX_INLINE_NAMESPACE_BEGIN
+namespace v_noabi {
 namespace builder {
 namespace stream {
 
@@ -32,8 +34,8 @@ namespace stream {
 /// a BSON document.
 ///
 /// @note Use of the stream builder is discouraged. See
-/// http://mongodb.github.io/mongo-cxx-driver/mongocxx-v3/working-with-bson/#stream-builder for more
-/// details.
+/// https://mongocxx.org/mongocxx-v3/working-with-bson/#stream-builder for
+/// more details.
 ///
 class document : public key_context<> {
    public:
@@ -45,14 +47,14 @@ class document : public key_context<> {
     ///
     /// @return A view of the BSON document.
     ///
-    BSONCXX_INLINE bsoncxx::document::view view() const {
+    BSONCXX_INLINE bsoncxx::v_noabi::document::view view() const {
         return _core.view_document();
     }
 
     ///
     /// @return A view of the BSON document.
     ///
-    BSONCXX_INLINE operator bsoncxx::document::view() const {
+    BSONCXX_INLINE operator bsoncxx::v_noabi::document::view() const {
         return view();
     }
 
@@ -65,7 +67,7 @@ class document : public key_context<> {
     ///  After calling extract() it is illegal to call any methods
     ///  on this class, unless it is subsequenly moved into.
     ///
-    BSONCXX_INLINE bsoncxx::document::value extract() {
+    BSONCXX_INLINE bsoncxx::v_noabi::document::value extract() {
         return _core.extract_document();
     }
 
@@ -82,7 +84,7 @@ class document : public key_context<> {
 
 }  // namespace stream
 }  // namespace builder
-BSONCXX_INLINE_NAMESPACE_END
+}  // namespace v_noabi
 }  // namespace bsoncxx
 
 #include <bsoncxx/config/postlude.hpp>

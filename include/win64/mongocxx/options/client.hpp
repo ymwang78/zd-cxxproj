@@ -16,6 +16,8 @@
 
 #include <string>
 
+#include <mongocxx/options/client-fwd.hpp>
+
 #include <bsoncxx/stdx/optional.hpp>
 #include <mongocxx/options/apm.hpp>
 #include <mongocxx/options/auto_encryption.hpp>
@@ -25,7 +27,7 @@
 #include <mongocxx/config/prelude.hpp>
 
 namespace mongocxx {
-MONGOCXX_INLINE_NAMESPACE_BEGIN
+namespace v_noabi {
 namespace options {
 
 // NOTE: client options interface still evolving
@@ -33,7 +35,7 @@ namespace options {
 ///
 /// Class representing the optional arguments to a MongoDB driver client object.
 ///
-class MONGOCXX_API client {
+class client {
    public:
     ///
     /// Sets the SSL-related options.
@@ -146,7 +148,7 @@ class MONGOCXX_API client {
 };
 
 }  // namespace options
-MONGOCXX_INLINE_NAMESPACE_END
+}  // namespace v_noabi
 }  // namespace mongocxx
 
 #include <mongocxx/config/postlude.hpp>

@@ -17,6 +17,9 @@
 #include <cstdint>
 #include <map>
 
+#include <mongocxx/collection-fwd.hpp>
+#include <mongocxx/result/insert_many-fwd.hpp>
+
 #include <bsoncxx/array/value.hpp>
 #include <bsoncxx/types.hpp>
 #include <mongocxx/result/bulk_write.hpp>
@@ -24,21 +27,18 @@
 #include <mongocxx/config/prelude.hpp>
 
 namespace mongocxx {
-MONGOCXX_INLINE_NAMESPACE_BEGIN
-
-class collection;
-
+namespace v_noabi {
 namespace result {
 
 ///
 /// Class representing the result of a MongoDB insert many operation
 /// (executed as a bulk write).
 ///
-class MONGOCXX_API insert_many {
+class insert_many {
    public:
-    using id_map = std::map<std::size_t, bsoncxx::document::element>;
+    using id_map = std::map<std::size_t, bsoncxx::v_noabi::document::element>;
 
-    insert_many(result::bulk_write result, bsoncxx::array::value inserted_ids);
+    insert_many(result::bulk_write result, bsoncxx::v_noabi::array::value inserted_ids);
 
     insert_many(const insert_many&);
     insert_many(insert_many&&) = default;
@@ -70,7 +70,7 @@ class MONGOCXX_API insert_many {
     id_map inserted_ids() const;
 
    private:
-    friend collection;
+    friend ::mongocxx::v_noabi::collection;
 
     // Construct _inserted_ids from _inserted_ids_owned
     MONGOCXX_PRIVATE void _buildInsertedIds();
@@ -79,7 +79,7 @@ class MONGOCXX_API insert_many {
 
     // Array containing documents with the values of the _id field for the inserted documents. This
     // array is in the following format: [{"_id": ...}, {"_id": ...}, ...].
-    bsoncxx::array::value _inserted_ids_owned;
+    bsoncxx::v_noabi::array::value _inserted_ids_owned;
 
     // Points into _inserted_ids_owned.
     id_map _inserted_ids;
@@ -89,7 +89,7 @@ class MONGOCXX_API insert_many {
 };
 
 }  // namespace result
-MONGOCXX_INLINE_NAMESPACE_END
+}  // namespace v_noabi
 }  // namespace mongocxx
 
 #include <mongocxx/config/postlude.hpp>

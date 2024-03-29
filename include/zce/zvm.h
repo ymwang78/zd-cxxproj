@@ -1,4 +1,4 @@
-// ***************************************************************
+// *s**************************************************************
 //  zvm   version:  1.0   -  date: 2016/3/12
 //  -------------------------------------------------------------
 //  Yongming Wang(wangym@gmail.com)
@@ -12,9 +12,22 @@
 #include <functional>
 #include <zce/zce_dblock.h>
 #include <zce/zce_mbpool.h>
-#include <zce/zds_schema.h>
-
 class zvm_pimpl;
+
+extern "C" {
+    typedef struct lua_State lua_State;
+	typedef void (*lpfn_lual_openlibs)(lua_State* L);
+}
+
+namespace zdp {
+    struct zds_context_t;
+    template<typename T>
+    int zds_pack(zce_byte *buffer, int buffer_size, const T& t, zds_context_t* ctx, bool some_flag);
+    template<typename T>
+    int zds_pack_builtin(zce_byte *buffer, int buffer_size, const T& t, zds_context_t* ctx, bool some_flag);
+    template<typename T>
+    constexpr bool is_builtin_type();
+}
 
 class zvm : public zce_object
 {
@@ -26,6 +39,9 @@ public:
         const zce_smartptr<zce_reactor>&);
 
     ~zvm();
+
+
+    static void set_zua_hook(lpfn_lual_openlibs openlibs);
 
     zce_smartptr<zce_object> boot(const std::string& svc_name,
         const std::string& path);

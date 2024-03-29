@@ -20,16 +20,16 @@
 #include <bsoncxx/config/prelude.hpp>
 
 namespace bsoncxx {
-BSONCXX_INLINE_NAMESPACE_BEGIN
+namespace v_noabi {
 namespace builder {
 namespace stream {
 
-using bsoncxx::builder::concatenate;
+using ::bsoncxx::v_noabi::builder::concatenate;  // Deprecated.
 
 ///
 /// The type of a stream manipulator to open a subdocument.
 ///
-struct BSONCXX_API open_document_type {
+struct open_document_type {
     constexpr open_document_type() {}
 };
 
@@ -41,7 +41,7 @@ constexpr open_document_type open_document;
 ///
 /// The type of a stream manipulator to close a subdocument.
 ///
-struct BSONCXX_API close_document_type {
+struct close_document_type {
     constexpr close_document_type() {}
 };
 
@@ -53,14 +53,14 @@ constexpr close_document_type close_document;
 ///
 /// The type of a stream manipulator to open a subarray.
 ///
-struct BSONCXX_API open_array_type {
+struct open_array_type {
     constexpr open_array_type() {}
 };
 
 ///
 /// A stream manipulator to open a subarray.
 ///
-/// @see https://mongodb.github.io/mongo-cxx-driver/mongocxx-v3/working-with-bson/#builders for help
+/// @see https://mongocxx.org/mongocxx-v3/working-with-bson/#builders for help
 /// building arrays in loops.
 ///
 constexpr open_array_type open_array;
@@ -68,7 +68,7 @@ constexpr open_array_type open_array;
 ///
 /// The type of a stream manipulator to close a subarray.
 ///
-struct BSONCXX_API close_array_type {
+struct close_array_type {
     constexpr close_array_type() {}
 };
 
@@ -80,7 +80,7 @@ constexpr close_array_type close_array;
 ///
 /// The type of a stream manipulator to finalize a document.
 ///
-struct BSONCXX_API finalize_type {
+struct finalize_type {
     constexpr finalize_type() {}
 };
 
@@ -92,7 +92,23 @@ constexpr finalize_type finalize;
 
 }  // namespace stream
 }  // namespace builder
-BSONCXX_INLINE_NAMESPACE_END
+}  // namespace v_noabi
+}  // namespace bsoncxx
+
+namespace bsoncxx {
+namespace builder {
+namespace stream {
+
+using ::bsoncxx::v_noabi::builder::stream::concatenate;  // Deprecated.
+
+using ::bsoncxx::v_noabi::builder::stream::close_array;
+using ::bsoncxx::v_noabi::builder::stream::close_document;
+using ::bsoncxx::v_noabi::builder::stream::finalize;
+using ::bsoncxx::v_noabi::builder::stream::open_array;
+using ::bsoncxx::v_noabi::builder::stream::open_document;
+
+}  // namespace stream
+}  // namespace builder
 }  // namespace bsoncxx
 
 #include <bsoncxx/config/postlude.hpp>

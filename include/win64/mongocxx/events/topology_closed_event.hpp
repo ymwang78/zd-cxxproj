@@ -14,13 +14,14 @@
 
 #pragma once
 
+#include <mongocxx/events/topology_closed_event-fwd.hpp>
+
 #include <bsoncxx/oid.hpp>
 
 #include <mongocxx/config/prelude.hpp>
 
 namespace mongocxx {
-MONGOCXX_INLINE_NAMESPACE_BEGIN
-
+namespace v_noabi {
 namespace events {
 
 ///
@@ -28,9 +29,9 @@ namespace events {
 /// description.
 ///
 /// @see "TopologyClosedEvent" in
-/// https://github.com/mongodb/specifications/blob/master/source/server-discovery-and-monitoring/server-discovery-and-monitoring-monitoring.rst
+/// https://github.com/mongodb/specifications/blob/master/source/server-discovery-and-monitoring/server-discovery-and-monitoring.rst
 ///
-class MONGOCXX_API topology_closed_event {
+class topology_closed_event {
    public:
     MONGOCXX_PRIVATE explicit topology_closed_event(const void* event);
 
@@ -40,18 +41,19 @@ class MONGOCXX_API topology_closed_event {
     ~topology_closed_event();
 
     ///
-    /// An opaque id, unique to this topology for this mongocxx::client or mongocxx::pool.
+    /// An opaque id, unique to this topology for this mongocxx::v_noabi::client or
+    /// mongocxx::v_noabi::pool.
     ///
     /// @return The id.
     ///
-    bsoncxx::oid topology_id() const;
+    bsoncxx::v_noabi::oid topology_id() const;
 
    private:
     const void* _event;
 };
 
 }  // namespace events
-MONGOCXX_INLINE_NAMESPACE_END
+}  // namespace v_noabi
 }  // namespace mongocxx
 
 #include <mongocxx/config/postlude.hpp>

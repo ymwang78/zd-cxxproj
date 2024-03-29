@@ -14,6 +14,9 @@
 
 #pragma once
 
+#include <mongocxx/bulk_write-fwd.hpp>
+#include <mongocxx/collection-fwd.hpp>
+
 #include <mongocxx/client_session.hpp>
 #include <mongocxx/model/write.hpp>
 #include <mongocxx/options/bulk_write.hpp>
@@ -22,9 +25,7 @@
 #include <mongocxx/config/prelude.hpp>
 
 namespace mongocxx {
-MONGOCXX_INLINE_NAMESPACE_BEGIN
-
-class collection;
+namespace v_noabi {
 
 ///
 /// Class representing a batch of write operations that can be sent to the server as a group.
@@ -37,10 +38,10 @@ class collection;
 /// method. Options that you would typically specify for individual write operations (such as write
 /// concern) are instead specified for the aggregate operation.
 ///
-/// @see https://docs.mongodb.com/manual/core/crud/
-/// @see https://docs.mongodb.com/manual/core/bulk-write-operations/
+/// @see https://www.mongodb.com/docs/manual/core/crud/
+/// @see https://www.mongodb.com/docs/manual/core/bulk-write-operations/
 ///
-class MONGOCXX_API bulk_write {
+class bulk_write {
    public:
     ///
     /// Move constructs a bulk write operation.
@@ -77,23 +78,23 @@ class MONGOCXX_API bulk_write {
     ///   A reference to the object on which this member function is being called. This facilitates
     ///   method chaining.
     ///
-    /// @throws mongocxx::logic_error if the given operation is invalid.
+    /// @throws mongocxx::v_noabi::logic_error if the given operation is invalid.
     ///
     bulk_write& append(const model::write& operation);
 
     ///
     /// Executes a bulk write.
     ///
-    /// @throws mongocxx::bulk_write_exception when there are errors processing the writes.
+    /// @throws mongocxx::v_noabi::bulk_write_exception when there are errors processing the writes.
     ///
     /// @return The optional result of the bulk operation execution, a result::bulk_write.
     ///
-    /// @see https://docs.mongodb.com/manual/core/bulk-write-operations/
+    /// @see https://www.mongodb.com/docs/manual/core/bulk-write-operations/
     ///
     stdx::optional<result::bulk_write> execute() const;
 
    private:
-    friend class collection;
+    friend ::mongocxx::v_noabi::collection;
 
     class MONGOCXX_PRIVATE impl;
 
@@ -105,7 +106,7 @@ class MONGOCXX_API bulk_write {
     std::unique_ptr<impl> _impl;
 };
 
-MONGOCXX_INLINE_NAMESPACE_END
+}  // namespace v_noabi
 }  // namespace mongocxx
 
 #include <mongocxx/config/postlude.hpp>

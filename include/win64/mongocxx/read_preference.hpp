@@ -19,6 +19,15 @@
 #include <memory>
 #include <string>
 
+#include <mongocxx/client-fwd.hpp>
+#include <mongocxx/collection-fwd.hpp>
+#include <mongocxx/database-fwd.hpp>
+#include <mongocxx/events/topology_description-fwd.hpp>
+#include <mongocxx/options/transaction-fwd.hpp>
+#include <mongocxx/read_preference-fwd.hpp>
+#include <mongocxx/search_index_view-fwd.hpp>
+#include <mongocxx/uri-fwd.hpp>
+
 #include <bsoncxx/array/view_or_value.hpp>
 #include <bsoncxx/document/view_or_value.hpp>
 #include <bsoncxx/stdx/optional.hpp>
@@ -28,16 +37,7 @@
 #include <mongocxx/config/prelude.hpp>
 
 namespace mongocxx {
-MONGOCXX_INLINE_NAMESPACE_BEGIN
-
-class client;
-class collection;
-class database;
-class uri;
-
-namespace events {
-class topology_description;
-}
+namespace v_noabi {
 
 ///
 /// Class representing a preference for how the driver routes read operations to members of a
@@ -58,9 +58,9 @@ class topology_description;
 /// in order to perform read operations on a direct connection to a secondary member of a replica
 /// set, you must set a read preference that allows reading from secondaries.
 ///
-/// @see https://docs.mongodb.com/manual/core/read-preference/
+/// @see https://www.mongodb.com/docs/manual/core/read-preference/
 ///
-class MONGOCXX_API read_preference {
+class read_preference {
    public:
     ///
     /// Determines which members in a replica set are acceptable to read from.
@@ -71,7 +71,7 @@ class MONGOCXX_API read_preference {
     /// replicate operations from the primary with some delay. Ensure that your application
     /// can tolerate stale data if you choose to use a non-primary mode.
     ///
-    /// @see https://docs.mongodb.com/manual/core/read-preference/#read-preference-modes
+    /// @see https://www.mongodb.com/docs/manual/core/read-preference/#read-preference-modes
     ///
     enum class read_mode : std::uint8_t {
         ///
@@ -126,12 +126,13 @@ class MONGOCXX_API read_preference {
     /// @param tags
     ///   A document representing tags to use for the read_preference.
     ///
-    /// @see https://docs.mongodb.com/manual/core/read-preference/#tag-sets
+    /// @see https://www.mongodb.com/docs/manual/core/read-preference/#tag-sets
     ///
     /// @deprecated The tags() method should be used instead.
     ///
-    MONGOCXX_DEPRECATED read_preference(read_mode mode, bsoncxx::document::view_or_value tags);
-    read_preference(read_mode mode, bsoncxx::document::view_or_value tags, deprecated_tag);
+    MONGOCXX_DEPRECATED read_preference(read_mode mode,
+                                        bsoncxx::v_noabi::document::view_or_value tags);
+    read_preference(read_mode mode, bsoncxx::v_noabi::document::view_or_value tags, deprecated_tag);
 
     ///
     /// Copy constructs a read_preference.
@@ -180,7 +181,7 @@ class MONGOCXX_API read_preference {
     ///
     /// Sets or updates the tag set list for this read_preference.
     ///
-    /// @param tags
+    /// @param tag_set_list
     ///   Document representing the tag set list.
     ///
     /// @see https://www.mongodb.com/docs/manual/core/read-preference-tags/
@@ -189,12 +190,12 @@ class MONGOCXX_API read_preference {
     ///   A reference to the object on which this member function is being called.  This facilitates
     ///   method chaining.
     ///
-    read_preference& tags(bsoncxx::document::view_or_value tag_set_list);
+    read_preference& tags(bsoncxx::v_noabi::document::view_or_value tag_set_list);
 
     ///
     /// Sets or updates the tag set list for this read_preference.
     ///
-    /// @param tags
+    /// @param tag_set_list
     ///   Array of tag sets.
     ///
     /// @see https://www.mongodb.com/docs/manual/core/read-preference-tags/
@@ -203,7 +204,7 @@ class MONGOCXX_API read_preference {
     ///   A reference to the object on which this member function is being called.  This facilitates
     ///   method chaining.
     ///
-    read_preference& tags(bsoncxx::array::view_or_value tag_set_list);
+    read_preference& tags(bsoncxx::v_noabi::array::view_or_value tag_set_list);
 
     ///
     /// Sets or updates the tag set list for this read_preference.
@@ -212,7 +213,7 @@ class MONGOCXX_API read_preference {
     ///
     /// @see https://www.mongodb.com/docs/manual/core/read-preference-tags/
     ///
-    stdx::optional<bsoncxx::document::view> tags() const;
+    stdx::optional<bsoncxx::v_noabi::document::view> tags() const;
 
     ///
     /// Sets the max staleness setting for this read_preference.  Secondary
@@ -242,7 +243,7 @@ class MONGOCXX_API read_preference {
     ///   A reference to the object on which this member function is being called.  This facilitates
     ///   method chaining.
     ///
-    /// @throws mongocxx::logic_error if the argument is invalid.
+    /// @throws mongocxx::v_noabi::logic_error if the argument is invalid.
     ///
     read_preference& max_staleness(std::chrono::seconds max_staleness);
 
@@ -271,24 +272,23 @@ class MONGOCXX_API read_preference {
     /// @return A reference to the object on which this member function is being called. This
     /// facilitates method chaining.
     ///
-    read_preference& hedge(bsoncxx::document::view_or_value hedge);
+    read_preference& hedge(bsoncxx::v_noabi::document::view_or_value hedge);
 
     ///
     /// Gets the current hedge document to be used for the read preference.
     ///
     /// @return A hedge document if one was set.
     ///
-    const stdx::optional<bsoncxx::document::view> hedge() const;
+    const stdx::optional<bsoncxx::v_noabi::document::view> hedge() const;
 
    private:
-    friend client;
-    friend collection;
-    friend database;
-    /// \relates mongocxx::options::transaction
-    friend mongocxx::options::transaction;
-    /// \relates mongocxx::events::topology_description
-    friend mongocxx::events::topology_description;
-    friend uri;
+    friend ::mongocxx::v_noabi::client;
+    friend ::mongocxx::v_noabi::collection;
+    friend ::mongocxx::v_noabi::database;
+    friend ::mongocxx::v_noabi::events::topology_description;
+    friend ::mongocxx::v_noabi::options::transaction;
+    friend ::mongocxx::v_noabi::search_index_view;
+    friend ::mongocxx::v_noabi::uri;
 
     ///
     /// @{
@@ -312,7 +312,7 @@ class MONGOCXX_API read_preference {
     std::unique_ptr<impl> _impl;
 };
 
-MONGOCXX_INLINE_NAMESPACE_END
+}  // namespace v_noabi
 }  // namespace mongocxx
 
 #include <mongocxx/config/postlude.hpp>

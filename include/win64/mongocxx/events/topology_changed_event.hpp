@@ -14,14 +14,15 @@
 
 #pragma once
 
+#include <mongocxx/events/topology_changed_event-fwd.hpp>
+
 #include <bsoncxx/oid.hpp>
 #include <mongocxx/events/topology_description.hpp>
 
 #include <mongocxx/config/prelude.hpp>
 
 namespace mongocxx {
-MONGOCXX_INLINE_NAMESPACE_BEGIN
-
+namespace v_noabi {
 namespace events {
 
 ///
@@ -29,9 +30,9 @@ namespace events {
 /// connected to or a change in the overall server topology.
 ///
 /// @see "TopologyDescriptionChangedEvent" in
-/// https://github.com/mongodb/specifications/blob/master/source/server-discovery-and-monitoring/server-discovery-and-monitoring-monitoring.rst
+/// https://github.com/mongodb/specifications/blob/master/source/server-discovery-and-monitoring/server-discovery-and-monitoring.rst
 ///
-class MONGOCXX_API topology_changed_event {
+class topology_changed_event {
    public:
     MONGOCXX_PRIVATE explicit topology_changed_event(const void* event);
 
@@ -41,11 +42,12 @@ class MONGOCXX_API topology_changed_event {
     ~topology_changed_event();
 
     ///
-    /// An opaque id, unique to this topology for this mongocxx::client or mongocxx::pool.
+    /// An opaque id, unique to this topology for this mongocxx::v_noabi::client or
+    /// mongocxx::v_noabi::pool.
     ///
     /// @return The id.
     ///
-    bsoncxx::oid topology_id() const;
+    bsoncxx::v_noabi::oid topology_id() const;
 
     ///
     /// The server's description before it changed.
@@ -66,7 +68,7 @@ class MONGOCXX_API topology_changed_event {
 };
 
 }  // namespace events
-MONGOCXX_INLINE_NAMESPACE_END
+}  // namespace v_noabi
 }  // namespace mongocxx
 
 #include <mongocxx/config/postlude.hpp>

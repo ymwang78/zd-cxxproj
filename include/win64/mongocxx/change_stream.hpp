@@ -16,22 +16,23 @@
 
 #include <memory>
 
+#include <mongocxx/change_stream-fwd.hpp>
+#include <mongocxx/client-fwd.hpp>
+#include <mongocxx/collection-fwd.hpp>
+#include <mongocxx/database-fwd.hpp>
+
 #include <bsoncxx/document/view.hpp>
 #include <bsoncxx/stdx/optional.hpp>
 
 #include <mongocxx/config/prelude.hpp>
 
 namespace mongocxx {
-MONGOCXX_INLINE_NAMESPACE_BEGIN
-
-class client;
-class collection;
-class database;
+namespace v_noabi {
 
 ///
 /// Class representing a MongoDB change stream.
 ///
-class MONGOCXX_API change_stream {
+class change_stream {
    public:
     /// A change stream iterator.
     class MONGOCXX_API iterator;
@@ -69,7 +70,7 @@ class MONGOCXX_API change_stream {
     /// @return
     ///   The change_stream::iterator
     /// @exception
-    ///   Throws mongocxx::query_exception if the query failed.
+    ///   Throws mongocxx::v_noabi::query_exception if the query failed.
     ///
     iterator begin() const;
 
@@ -105,13 +106,14 @@ class MONGOCXX_API change_stream {
     /// @return
     ///   The token.
     ///
-    bsoncxx::stdx::optional<bsoncxx::document::view> get_resume_token() const;
+    bsoncxx::v_noabi::stdx::optional<bsoncxx::v_noabi::document::view> get_resume_token() const;
 
    private:
-    friend class client;
-    friend class collection;
-    friend class database;
-    friend class change_stream::iterator;
+    friend ::mongocxx::v_noabi::client;
+    friend ::mongocxx::v_noabi::collection;
+    friend ::mongocxx::v_noabi::database;
+
+    friend ::mongocxx::v_noabi::change_stream::iterator;
 
     MONGOCXX_PRIVATE change_stream(void* change_stream_ptr);
 
@@ -122,11 +124,11 @@ class MONGOCXX_API change_stream {
 ///
 /// Class representing a MongoDB change stream iterator.
 ///
-class MONGOCXX_API change_stream::iterator {
+class change_stream::iterator {
    public:
     // Support input-iterator (caveat of post-increment returning void)
     using difference_type = std::int64_t;
-    using value_type = const bsoncxx::document::view;
+    using value_type = const bsoncxx::v_noabi::document::view;
     using pointer = std::add_pointer<value_type>::type;
     using reference = std::add_lvalue_reference<value_type>::type;
     using iterator_category = std::input_iterator_tag;
@@ -144,7 +146,7 @@ class MONGOCXX_API change_stream::iterator {
     /// The returned document::view is valid until the iterator is incremented. The value may be
     /// copied to extend its lifetime.
     ///
-    const bsoncxx::document::view& operator*() const;
+    const bsoncxx::v_noabi::document::view& operator*() const;
 
     ///
     /// Accesses a member of the dereferenced document currently being pointed to.
@@ -152,7 +154,7 @@ class MONGOCXX_API change_stream::iterator {
     /// The returned document::view is valid until the iterator is incremented. The value may be
     /// copied to extend its lifetime.
     ///
-    const bsoncxx::document::view* operator->() const;
+    const bsoncxx::v_noabi::document::view* operator->() const;
 
     ///
     /// Pre-increments the iterator to move to the next document.
@@ -165,7 +167,7 @@ class MONGOCXX_API change_stream::iterator {
     /// If no notification is available, callers may call change_stream::begin() to check for more
     /// notifications.
     ///
-    /// @throws mongocxx::query_exception if the query failed
+    /// @throws mongocxx::v_noabi::query_exception if the query failed
     ///
     iterator& operator++();
 
@@ -180,12 +182,13 @@ class MONGOCXX_API change_stream::iterator {
     /// If no notification is available, callers may call change_stream::begin() to check for more
     /// notifications.
     ///
-    /// @throws mongocxx::query_exception if the query failed
+    /// @throws mongocxx::v_noabi::query_exception if the query failed
     ///
     void operator++(int);
 
    private:
-    friend class change_stream;
+    friend ::mongocxx::v_noabi::change_stream;
+
     enum class iter_type { k_tracking, k_default_constructed, k_end };
 
     MONGOCXX_PRIVATE explicit iterator(iter_type type, const change_stream* change_stream);
@@ -214,7 +217,7 @@ class MONGOCXX_API change_stream::iterator {
     const change_stream* _change_stream;
 };
 
-MONGOCXX_INLINE_NAMESPACE_END
+}  // namespace v_noabi
 }  // namespace mongocxx
 
 #include <mongocxx/config/postlude.hpp>
