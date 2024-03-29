@@ -9,7 +9,6 @@
 #pragma once
 
 #include "zce/zdp_base_proto.h"
-#include "zce/zdp_base_pack.h"
 #include <zce/zce_config.h>
 #include <zce/zce_object.h>
 #include <zce/zce_types.h>
