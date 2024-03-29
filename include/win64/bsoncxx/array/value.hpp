@@ -17,13 +17,15 @@
 #include <cstdlib>
 #include <memory>
 
+#include <bsoncxx/array/value-fwd.hpp>
+
 #include <bsoncxx/array/view.hpp>
 #include <bsoncxx/document/value.hpp>
 
 #include <bsoncxx/config/prelude.hpp>
 
 namespace bsoncxx {
-BSONCXX_INLINE_NAMESPACE_BEGIN
+namespace v_noabi {
 namespace array {
 
 ///
@@ -31,7 +33,7 @@ namespace array {
 /// out of scope, the underlying buffer is freed. Generally this class should be used
 /// sparingly; array::view should be used instead wherever possible.
 ///
-class BSONCXX_API value {
+class value {
    public:
     using deleter_type = void (*)(std::uint8_t*);
     using unique_ptr_type = std::unique_ptr<uint8_t[], deleter_type>;
@@ -114,7 +116,7 @@ BSONCXX_INLINE value::operator array::view() const noexcept {
 }
 
 }  // namespace array
-BSONCXX_INLINE_NAMESPACE_END
+}  // namespace v_noabi
 }  // namespace bsoncxx
 
 #include <bsoncxx/config/postlude.hpp>

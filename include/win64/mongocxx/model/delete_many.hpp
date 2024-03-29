@@ -14,6 +14,8 @@
 
 #pragma once
 
+#include <mongocxx/model/delete_many-fwd.hpp>
+
 #include <bsoncxx/document/view_or_value.hpp>
 #include <bsoncxx/stdx/optional.hpp>
 #include <mongocxx/hint.hpp>
@@ -22,13 +24,13 @@
 #include <mongocxx/config/prelude.hpp>
 
 namespace mongocxx {
-MONGOCXX_INLINE_NAMESPACE_BEGIN
+namespace v_noabi {
 namespace model {
 
 ///
 /// Class representing a MongoDB delete operation that removes multiple documents.
 ///
-class MONGOCXX_API delete_many {
+class delete_many {
    public:
     ///
     /// Constructs a delete operation that will delete all documents matching the filter.
@@ -36,14 +38,14 @@ class MONGOCXX_API delete_many {
     /// @param filter
     ///   Document representing the criteria for deletion.
     ///
-    explicit delete_many(bsoncxx::document::view_or_value filter);
+    explicit delete_many(bsoncxx::v_noabi::document::view_or_value filter);
 
     ///
     /// Gets the filter for this delete operation.
     ///
     /// @return The filter to be used for the delete operation.
     ///
-    const bsoncxx::document::view_or_value& filter() const;
+    const bsoncxx::v_noabi::document::view_or_value& filter() const;
 
     ///
     /// Sets the collation for this delete operation.
@@ -56,9 +58,9 @@ class MONGOCXX_API delete_many {
     ///   method chaining.
     ///
     /// @see
-    ///   https://docs.mongodb.com/manual/reference/collation/
+    ///   https://www.mongodb.com/docs/manual/reference/collation/
     ///
-    delete_many& collation(bsoncxx::document::view_or_value collation);
+    delete_many& collation(bsoncxx::v_noabi::document::view_or_value collation);
 
     ///
     /// Gets the collation option for this delete operation.
@@ -67,9 +69,9 @@ class MONGOCXX_API delete_many {
     ///   The optional value of the collation option.
     ///
     /// @see
-    ///   https://docs.mongodb.com/manual/reference/collation/
+    ///   https://www.mongodb.com/docs/manual/reference/collation/
     ///
-    const stdx::optional<bsoncxx::document::view_or_value>& collation() const;
+    const stdx::optional<bsoncxx::v_noabi::document::view_or_value>& collation() const;
 
     /// Sets the index to use for this operation.
     ///
@@ -83,24 +85,24 @@ class MONGOCXX_API delete_many {
     ///   A reference to the object on which this member function is being called.  This facilitates
     ///   method chaining.
     ///
-    delete_many& hint(class hint index_hint);
+    delete_many& hint(mongocxx::v_noabi::hint index_hint);
 
     ///
     /// Gets the current hint.
     ///
     /// @return The current hint, if one is set.
     ///
-    const stdx::optional<class hint>& hint() const;
+    const stdx::optional<mongocxx::v_noabi::hint>& hint() const;
 
    private:
-    bsoncxx::document::view_or_value _filter;
+    bsoncxx::v_noabi::document::view_or_value _filter;
 
-    stdx::optional<bsoncxx::document::view_or_value> _collation;
-    stdx::optional<class hint> _hint;
+    stdx::optional<bsoncxx::v_noabi::document::view_or_value> _collation;
+    stdx::optional<mongocxx::v_noabi::hint> _hint;
 };
 
 }  // namespace model
-MONGOCXX_INLINE_NAMESPACE_END
+}  // namespace v_noabi
 }  // namespace mongocxx
 
 #include <mongocxx/config/postlude.hpp>

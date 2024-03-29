@@ -14,6 +14,8 @@
 
 #pragma once
 
+#include <mongocxx/options/insert-fwd.hpp>
+
 #include <bsoncxx/document/view.hpp>
 #include <bsoncxx/stdx/optional.hpp>
 #include <bsoncxx/types/bson_value/view_or_value.hpp>
@@ -23,13 +25,13 @@
 #include <mongocxx/config/prelude.hpp>
 
 namespace mongocxx {
-MONGOCXX_INLINE_NAMESPACE_BEGIN
+namespace v_noabi {
 namespace options {
 
 ///
 /// Class representing the optional arguments to a MongoDB insert operation
 ///
-class MONGOCXX_API insert {
+class insert {
    public:
     ///
     /// Sets the bypass_document_validation option.
@@ -61,22 +63,22 @@ class MONGOCXX_API insert {
     /// @param wc
     ///   The new write_concern.
     ///
-    /// @see https://docs.mongodb.com/manual/core/write-concern/
+    /// @see https://www.mongodb.com/docs/manual/core/write-concern/
     ///
     /// @return
     ///   A reference to the object on which this member function is being called.  This facilitates
     ///   method chaining.
     ///
-    insert& write_concern(class write_concern wc);
+    insert& write_concern(mongocxx::v_noabi::write_concern wc);
 
     ///
     /// The current write_concern for this operation.
     ///
     /// @return The current write_concern.
     ///
-    /// @see https://docs.mongodb.com/manual/core/write-concern/
+    /// @see https://www.mongodb.com/docs/manual/core/write-concern/
     ///
-    const stdx::optional<class write_concern>& write_concern() const;
+    const stdx::optional<mongocxx::v_noabi::write_concern>& write_concern() const;
 
     ///
     /// @note: This applies only to insert_many and is ignored for insert_one.
@@ -93,7 +95,7 @@ class MONGOCXX_API insert {
     ///   A reference to the object on which this member function is being called.  This facilitates
     ///   method chaining.
     ///
-    /// @see https://docs.mongodb.com/manual/reference/command/insert/
+    /// @see https://www.mongodb.com/docs/manual/reference/command/insert/
     ///
     insert& ordered(bool ordered);
 
@@ -102,7 +104,7 @@ class MONGOCXX_API insert {
     ///
     /// @return The current ordered value.
     ///
-    /// @see https://docs.mongodb.com/manual/reference/command/insert/
+    /// @see https://www.mongodb.com/docs/manual/reference/command/insert/
     ///
     const stdx::optional<bool>& ordered() const;
 
@@ -112,32 +114,32 @@ class MONGOCXX_API insert {
     /// @param comment
     ///   The new comment.
     ///
-    /// @see https://docs.mongodb.com/manual/reference/command/insert/
+    /// @see https://www.mongodb.com/docs/manual/reference/command/insert/
     ///
     /// @return
     ///   A reference to the object on which this member function is being called.  This facilitates
     ///   method chaining.
     ///
-    insert& comment(bsoncxx::types::bson_value::view_or_value comment);
+    insert& comment(bsoncxx::v_noabi::types::bson_value::view_or_value comment);
 
     ///
     /// The current comment for this operation.
     ///
     /// @return The current comment.
     ///
-    /// @see https://docs.mongodb.com/manual/reference/command/insert/
+    /// @see https://www.mongodb.com/docs/manual/reference/command/insert/
     ///
-    const stdx::optional<bsoncxx::types::bson_value::view_or_value>& comment() const;
+    const stdx::optional<bsoncxx::v_noabi::types::bson_value::view_or_value>& comment() const;
 
    private:
-    stdx::optional<class write_concern> _write_concern;
+    stdx::optional<mongocxx::v_noabi::write_concern> _write_concern;
     stdx::optional<bool> _ordered;
     stdx::optional<bool> _bypass_document_validation;
-    stdx::optional<bsoncxx::types::bson_value::view_or_value> _comment;
+    stdx::optional<bsoncxx::v_noabi::types::bson_value::view_or_value> _comment;
 };
 
 }  // namespace options
-MONGOCXX_INLINE_NAMESPACE_END
+}  // namespace v_noabi
 }  // namespace mongocxx
 
 #include <mongocxx/config/postlude.hpp>

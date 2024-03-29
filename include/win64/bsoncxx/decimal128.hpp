@@ -17,17 +17,19 @@
 #include <cstdint>
 #include <string>
 
+#include <bsoncxx/decimal128-fwd.hpp>
+
 #include <bsoncxx/stdx/string_view.hpp>
 
 #include <bsoncxx/config/prelude.hpp>
 
 namespace bsoncxx {
-BSONCXX_INLINE_NAMESPACE_BEGIN
+namespace v_noabi {
 
 ///
 /// Represents an IEEE 754-2008 BSON Decimal128 value in a platform-independent way.
 ///
-class BSONCXX_API decimal128 {
+class decimal128 {
    public:
     ///
     /// Constructs a BSON Decimal128 value representing zero.
@@ -50,7 +52,7 @@ class BSONCXX_API decimal128 {
     /// @param str
     ///     A string representation of a decimal number.
     ///
-    /// @throws bsoncxx::exception if the string isn't a valid BSON Decimal128
+    /// @throws bsoncxx::v_noabi::exception if the string isn't a valid BSON Decimal128
     /// representation.
     ///
     explicit decimal128(stdx::string_view str);
@@ -94,7 +96,7 @@ class BSONCXX_API decimal128 {
     uint64_t _low = 0;
 };
 
-BSONCXX_INLINE_NAMESPACE_END
+}  // namespace v_noabi
 }  // namespace bsoncxx
 
 #include <bsoncxx/config/postlude.hpp>

@@ -14,24 +14,26 @@
 
 #pragma once
 
+#include <mongocxx/exception/write_exception-fwd.hpp>
+
 #include <mongocxx/exception/operation_exception.hpp>
 
 #include <mongocxx/config/prelude.hpp>
 
 namespace mongocxx {
-MONGOCXX_INLINE_NAMESPACE_BEGIN
+namespace v_noabi {
 
 ///
 /// Class representing an exception during a write operation.
 ///
-/// @see mongocxx::operation_exception
+/// @see mongocxx::v_noabi::operation_exception
 ///
-class MONGOCXX_API write_exception : public operation_exception {
+class write_exception : public operation_exception {
    public:
     using operation_exception::operation_exception;
 };
 
-MONGOCXX_INLINE_NAMESPACE_END
+}  // namespace v_noabi
 }  // namespace mongocxx
 
 #include <mongocxx/config/postlude.hpp>

@@ -90,6 +90,10 @@ void ZCE_API zdb_mgo_getarray(std::vector<zce_byte>& v, const bsoncxx::document:
 
 void ZCE_API zdb_mgo_getarray(std::vector<std::string>& v, const bsoncxx::document::view& doc, const std::string& field);
 
+void ZCE_API zdb_mgo_getarray(std::vector<zce_bytevec>& v, const bsoncxx::document::view& doc, const std::string& field);
+
+void ZCE_API zdb_mgo_append_subarray(bsoncxx::builder::basic::sub_array& v, const std::vector<zce_byte>& arr);
+
 int ZCE_API  zdb_mgo_getobjarray(const bsoncxx::document::view& doc, const std::string& field,
     std::function<int(const bsoncxx::document::view& subv)> f);
 

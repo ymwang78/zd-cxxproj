@@ -14,6 +14,10 @@
 
 #pragma once
 
+#include <mongocxx/client_encryption-fwd.hpp>
+#include <mongocxx/collection-fwd.hpp>
+#include <mongocxx/database-fwd.hpp>
+
 #include <bsoncxx/types/bson_value/value.hpp>
 #include <bsoncxx/types/bson_value/view.hpp>
 #include <mongocxx/cursor.hpp>
@@ -28,15 +32,12 @@
 #include <mongocxx/config/prelude.hpp>
 
 namespace mongocxx {
-MONGOCXX_INLINE_NAMESPACE_BEGIN
-
-class database;
-class collection;
+namespace v_noabi {
 
 ///
 /// Class supporting operations for MongoDB Client-Side Field Level Encryption.
 ///
-class MONGOCXX_API client_encryption {
+class client_encryption {
    public:
     ///
     /// Creates a client_encryption object.
@@ -44,7 +45,8 @@ class MONGOCXX_API client_encryption {
     /// @param opts
     ///   An object representing encryption options.
     ///
-    /// @see https://docs.mongodb.com/ecosystem/use-cases/client-side-field-level-encryption-guide
+    /// @see
+    /// https://www.mongodb.com/docs/ecosystem/use-cases/client-side-field-level-encryption-guide
     ///
     client_encryption(options::client_encryption opts);
 
@@ -78,13 +80,13 @@ class MONGOCXX_API client_encryption {
     /// @return The id of the created document as a bson_value::value containing
     ///   a UUID (BSON binary subtype 4).
     ///
-    /// @throws mongocxx::exception if there is an error creating the key.
+    /// @throws mongocxx::v_noabi::exception if there is an error creating the key.
     ///
     /// @see
-    /// https://docs.mongodb.com/ecosystem/use-cases/client-side-field-level-encryption-guide/#b-create-a-data-encryption-key
+    /// https://www.mongodb.com/docs/ecosystem/use-cases/client-side-field-level-encryption-guide/#b-create-a-data-encryption-key
     ///
-    bsoncxx::types::bson_value::value create_data_key(std::string kms_provider,
-                                                      const options::data_key& opts = {});
+    bsoncxx::v_noabi::types::bson_value::value create_data_key(std::string kms_provider,
+                                                               const options::data_key& opts = {});
 
     /**
      * @brief Create a collection with client-side-encryption enabled, automatically filling any
@@ -103,10 +105,10 @@ class MONGOCXX_API client_encryption {
     collection create_encrypted_collection(
         const database& db,
         const std::string& coll_name,
-        const bsoncxx::document::view& options,
-        bsoncxx::document::value& out_options,
+        const bsoncxx::v_noabi::document::view& options,
+        bsoncxx::v_noabi::document::value& out_options,
         const std::string& kms_provider,
-        const stdx::optional<bsoncxx::document::view>& masterkey = stdx::nullopt);
+        const stdx::optional<bsoncxx::v_noabi::document::view>& masterkey = stdx::nullopt);
 
     ///
     /// Encrypts a BSON value with a given key and algorithm.
@@ -119,13 +121,13 @@ class MONGOCXX_API client_encryption {
     ///
     /// @return The encrypted value (BSON binary subtype 6).
     ///
-    /// @throws mongocxx::exception if there is an error encrypting the value.
+    /// @throws mongocxx::v_noabi::exception if there is an error encrypting the value.
     ///
     /// @see
-    /// https://docs.mongodb.com/manual/reference/method/ClientEncryption.encrypt/#ClientEncryption.encrypt
+    /// https://www.mongodb.com/docs/manual/reference/method/ClientEncryption.encrypt/#ClientEncryption.encrypt
     ///
-    bsoncxx::types::bson_value::value encrypt(bsoncxx::types::bson_value::view value,
-                                              const options::encrypt& opts);
+    bsoncxx::v_noabi::types::bson_value::value encrypt(
+        bsoncxx::v_noabi::types::bson_value::view value, const options::encrypt& opts);
 
     ///
     /// Encrypts a Match Expression or Aggregate Expression to query a range index.
@@ -140,8 +142,8 @@ class MONGOCXX_API client_encryption {
     ///
     /// @warning The Range algorithm is experimental only. It is not intended for public use. It is
     /// subject to breaking changes.
-    bsoncxx::document::value encrypt_expression(bsoncxx::document::view_or_value expr,
-                                                const options::encrypt& opts);
+    bsoncxx::v_noabi::document::value encrypt_expression(
+        bsoncxx::v_noabi::document::view_or_value expr, const options::encrypt& opts);
 
     ///
     /// Decrypts an encrypted value (BSON binary of subtype 6).
@@ -151,12 +153,13 @@ class MONGOCXX_API client_encryption {
     ///
     /// @return The original BSON value.
     ///
-    /// @throws mongocxx::exception if there is an error decrypting the value.
+    /// @throws mongocxx::v_noabi::exception if there is an error decrypting the value.
     ///
     /// @see
-    /// https://docs.mongodb.com/manual/reference/method/ClientEncryption.decrypt/#ClientEncryption.decrypt
+    /// https://www.mongodb.com/docs/manual/reference/method/ClientEncryption.decrypt/#ClientEncryption.decrypt
     ///
-    bsoncxx::types::bson_value::value decrypt(bsoncxx::types::bson_value::view value);
+    bsoncxx::v_noabi::types::bson_value::value decrypt(
+        bsoncxx::v_noabi::types::bson_value::view value);
 
     ///
     /// Decrypts multiple data keys and (re-)encrypts them with a new masterKey,
@@ -174,13 +177,13 @@ class MONGOCXX_API client_encryption {
     ///
     /// @return a RewrapManyDataKeyResult.
     ///
-    /// @throws mongocxx::exception if there is an error rewrapping the key.
+    /// @throws mongocxx::v_noabi::exception if there is an error rewrapping the key.
     ///
     /// @see
     /// https://www.mongodb.com/docs/manual/reference/method/KeyVault.rewrapManyDataKey/
     ///
-    result::rewrap_many_datakey rewrap_many_datakey(bsoncxx::document::view_or_value filter,
-                                                    const options::rewrap_many_datakey& opts);
+    result::rewrap_many_datakey rewrap_many_datakey(
+        bsoncxx::v_noabi::document::view_or_value filter, const options::rewrap_many_datakey& opts);
 
     ///
     /// Removes the key document with the given UUID (BSON binary subtype 0x04)
@@ -188,37 +191,38 @@ class MONGOCXX_API client_encryption {
     ///
     /// @param id Binary id of which key to delete
     ///
-    /// @throws mongocxx::exception if there is an error deleting the key.
+    /// @throws mongocxx::v_noabi::exception if there is an error deleting the key.
     ///
     /// @return the result of the internal deleteOne() operation on the key vault collection.
     ///
     /// @see https://www.mongodb.com/docs/manual/reference/method/KeyVault.deleteKey/
     ///
-    result::delete_result delete_key(bsoncxx::types::bson_value::view_or_value id);
+    result::delete_result delete_key(bsoncxx::v_noabi::types::bson_value::view_or_value id);
 
     ///
     /// Finds a single key document with the given UUID (BSON binary subtype 0x04).
     ///
     /// @param id Binary id of which key to delete
     ///
-    /// @throws mongocxx::exception if there is an error getting the key.
+    /// @throws mongocxx::v_noabi::exception if there is an error getting the key.
     ///
     /// @return The result of the internal find() operation on the key vault collection.
     ///
     /// @see https://www.mongodb.com/docs/manual/reference/method/KeyVault.getKey/
     ///
-    stdx::optional<bsoncxx::document::value> get_key(bsoncxx::types::bson_value::view_or_value id);
+    stdx::optional<bsoncxx::v_noabi::document::value> get_key(
+        bsoncxx::v_noabi::types::bson_value::view_or_value id);
 
     ///
     /// Finds all documents in the key vault collection.
     ///
-    /// @throws mongocxx::exception if there is an error getting the keys.
+    /// @throws mongocxx::v_noabi::exception if there is an error getting the keys.
     ///
     /// @return the result of the internal find() operation on the key vault collection.
     ///
     /// @see https://www.mongodb.com/docs/manual/reference/method/KeyVault.getKeys/
     ///
-    mongocxx::cursor get_keys();
+    mongocxx::v_noabi::cursor get_keys();
 
     ///
     /// Adds a keyAltName to the keyAltNames array of the key document in the
@@ -228,14 +232,15 @@ class MONGOCXX_API client_encryption {
     ///
     /// @param key_alt_name String alternative name for the key
     ///
-    /// @throws mongocxx::exception if there is an error adding the key alt name.
+    /// @throws mongocxx::v_noabi::exception if there is an error adding the key alt name.
     ///
     /// @return the previous version of the key document.
     ///
     /// @see https://www.mongodb.com/docs/manual/reference/method/KeyVault.addKeyAlternateName/
     ///
-    stdx::optional<bsoncxx::document::value> add_key_alt_name(
-        bsoncxx::types::bson_value::view_or_value id, bsoncxx::string::view_or_value key_alt_name);
+    stdx::optional<bsoncxx::v_noabi::document::value> add_key_alt_name(
+        bsoncxx::v_noabi::types::bson_value::view_or_value id,
+        bsoncxx::v_noabi::string::view_or_value key_alt_name);
 
     ///
     /// Removes a keyAltName from the keyAltNames array of the key document in
@@ -245,28 +250,29 @@ class MONGOCXX_API client_encryption {
     ///
     /// @param key_alt_name String alternative name for the key
     ///
-    /// @throws mongocxx::exception if there is an error removing the key alt name.
+    /// @throws mongocxx::v_noabi::exception if there is an error removing the key alt name.
     ///
     /// @return The previous version of the key document.
     ///
     /// @see https://www.mongodb.com/docs/manual/reference/method/KeyVault.removeKeyAlternateName/
     ///
-    stdx::optional<bsoncxx::document::value> remove_key_alt_name(
-        bsoncxx::types::bson_value::view_or_value id, bsoncxx::string::view_or_value key_alt_name);
+    stdx::optional<bsoncxx::v_noabi::document::value> remove_key_alt_name(
+        bsoncxx::v_noabi::types::bson_value::view_or_value id,
+        bsoncxx::v_noabi::string::view_or_value key_alt_name);
 
     ///
     /// Get the key document from the key vault collection with the provided name.
     ///
     /// @param key_alt_name String alternative name for the key
     ///
-    /// @throws mongocxx::exception if there is an error getting the key by alt name.
+    /// @throws mongocxx::v_noabi::exception if there is an error getting the key by alt name.
     ///
     /// @return A key document in the key vault collection with the given keyAltName.
     ///
     /// @see https://www.mongodb.com/docs/manual/reference/method/KeyVault.getKeyByAltName/
     ///
-    stdx::optional<bsoncxx::document::value> get_key_by_alt_name(
-        bsoncxx::string::view_or_value key_alt_name);
+    stdx::optional<bsoncxx::v_noabi::document::value> get_key_by_alt_name(
+        bsoncxx::v_noabi::string::view_or_value key_alt_name);
 
    private:
     class MONGOCXX_PRIVATE impl;
@@ -274,7 +280,7 @@ class MONGOCXX_API client_encryption {
     std::unique_ptr<impl> _impl;
 };
 
-MONGOCXX_INLINE_NAMESPACE_END
+}  // namespace v_noabi
 }  // namespace mongocxx
 
 #include <mongocxx/config/postlude.hpp>

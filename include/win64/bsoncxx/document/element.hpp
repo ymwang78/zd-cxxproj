@@ -17,51 +17,20 @@
 #include <cstddef>
 #include <cstdint>
 
+#include <bsoncxx/array/element-fwd.hpp>
+#include <bsoncxx/document/element-fwd.hpp>
+#include <bsoncxx/document/view-fwd.hpp>
+#include <bsoncxx/types-fwd.hpp>
+#include <bsoncxx/types/bson_value/value-fwd.hpp>
+#include <bsoncxx/types/bson_value/view-fwd.hpp>
+
+#include <bsoncxx/stdx/optional.hpp>
 #include <bsoncxx/stdx/string_view.hpp>
 
 #include <bsoncxx/config/prelude.hpp>
 
 namespace bsoncxx {
-BSONCXX_INLINE_NAMESPACE_BEGIN
-
-enum class type : std::uint8_t;
-enum class binary_sub_type : std::uint8_t;
-
-namespace types {
-struct b_eod;
-struct b_double;
-struct b_string;
-struct b_document;
-struct b_array;
-struct b_binary;
-struct b_undefined;
-struct b_oid;
-struct b_bool;
-struct b_date;
-struct b_null;
-struct b_regex;
-struct b_dbpointer;
-struct b_code;
-struct b_symbol;
-struct b_codewscope;
-struct b_int32;
-struct b_timestamp;
-struct b_int64;
-struct b_decimal128;
-struct b_minkey;
-struct b_maxkey;
-
-namespace bson_value {
-class value;
-class view;
-}  // namespace bson_value
-
-}  // namespace types
-
-namespace array {
-class element;
-}  // namespace array
-
+namespace v_noabi {
 namespace document {
 
 ///
@@ -73,7 +42,7 @@ namespace document {
 ///
 /// @relatesalso array::element
 ///
-class BSONCXX_API element {
+class element {
    public:
     ///
     /// Construct an invalid element.
@@ -115,16 +84,16 @@ class BSONCXX_API element {
     ///
     /// @return the element's type.
     ///
-    /// @throws bsoncxx::exception if this element is invalid.
+    /// @throws bsoncxx::v_noabi::exception if this element is invalid.
     ///
-    bsoncxx::type type() const;
+    bsoncxx::v_noabi::type type() const;
 
     ///
     /// Getter for the element's key.
     ///
     /// @return the element's key.
     ///
-    /// @throws bsoncxx::exception if this element is invalid.
+    /// @throws bsoncxx::v_noabi::exception if this element is invalid.
     ///
     stdx::string_view key() const;
 
@@ -138,7 +107,7 @@ class BSONCXX_API element {
     ///
     /// Getter for elements of the b_double type.
     ///
-    /// @throws bsoncxx::exception if this element is not a b_double.
+    /// @throws bsoncxx::v_noabi::exception if this element is not a b_double.
     ///
     /// @return the element's value.
     ///
@@ -149,7 +118,7 @@ class BSONCXX_API element {
     ///
     /// @deprecated use document::element::get_string() instead.
     ///
-    /// @throws bsoncxx::exception if this element is not a b_string.
+    /// @throws bsoncxx::v_noabi::exception if this element is not a b_string.
     ///
     /// @return the element's value.
     ///
@@ -158,7 +127,7 @@ class BSONCXX_API element {
     ///
     /// Getter for elements of the b_string type.
     ///
-    /// @throws bsoncxx::exception if this element is not a b_string.
+    /// @throws bsoncxx::v_noabi::exception if this element is not a b_string.
     ///
     /// @return the element's value.
     ///
@@ -167,7 +136,7 @@ class BSONCXX_API element {
     ///
     /// Getter for elements of the b_document type.
     ///
-    /// @throws bsoncxx::exception if this element is not a b_document.
+    /// @throws bsoncxx::v_noabi::exception if this element is not a b_document.
     ///
     /// @return the element's value.
     ///
@@ -176,7 +145,7 @@ class BSONCXX_API element {
     ///
     /// Getter for elements of the b_array type.
     ///
-    /// @throws bsoncxx::exception if this element is not a b_array.
+    /// @throws bsoncxx::v_noabi::exception if this element is not a b_array.
     ///
     /// @return the element's value.
     ///
@@ -185,7 +154,7 @@ class BSONCXX_API element {
     ///
     /// Getter for elements of the b_binary type.
     ///
-    /// @throws bsoncxx::exception if this element is not a b_binary.
+    /// @throws bsoncxx::v_noabi::exception if this element is not a b_binary.
     ///
     /// @return the element's value.
     ///
@@ -194,7 +163,7 @@ class BSONCXX_API element {
     ///
     /// Getter for elements of the b_undefined type.
     ///
-    /// @throws bsoncxx::exception if this element is not a b_undefined.
+    /// @throws bsoncxx::v_noabi::exception if this element is not a b_undefined.
     ///
     /// @return the element's value.
     ///
@@ -203,7 +172,7 @@ class BSONCXX_API element {
     ///
     /// Getter for elements of the b_oid type.
     ///
-    /// @throws bsoncxx::exception if this element is not a b_oid.
+    /// @throws bsoncxx::v_noabi::exception if this element is not a b_oid.
     ///
     /// @return the element's value.
     ///
@@ -212,7 +181,7 @@ class BSONCXX_API element {
     ///
     /// Getter for elements of the b_bool type.
     ///
-    /// @throws bsoncxx::exception if this element is not a b_bool.
+    /// @throws bsoncxx::v_noabi::exception if this element is not a b_bool.
     ///
     /// @return the element's value.
     ///
@@ -221,7 +190,7 @@ class BSONCXX_API element {
     ///
     /// Getter for elements of the b_date type.
     ///
-    /// @throws bsoncxx::exception if this element is not a b_date.
+    /// @throws bsoncxx::v_noabi::exception if this element is not a b_date.
     ///
     /// @return the element's value.
     ///
@@ -230,7 +199,7 @@ class BSONCXX_API element {
     ///
     /// Getter for elements of the b_null type.
     ///
-    /// @throws bsoncxx::exception if this element is not a b_null.
+    /// @throws bsoncxx::v_noabi::exception if this element is not a b_null.
     ///
     /// @return the element's value.
     ///
@@ -239,7 +208,7 @@ class BSONCXX_API element {
     ///
     /// Getter for elements of the b_regex type.
     ///
-    /// @throws bsoncxx::exception if this element is not a b_regex.
+    /// @throws bsoncxx::v_noabi::exception if this element is not a b_regex.
     ///
     /// @return the element's value.
     ///
@@ -248,7 +217,7 @@ class BSONCXX_API element {
     ///
     /// Getter for elements of the b_dbpointer type.
     ///
-    /// @throws bsoncxx::exception if this element is not a b_dbpointer.
+    /// @throws bsoncxx::v_noabi::exception if this element is not a b_dbpointer.
     ///
     /// @return the element's value.
     ///
@@ -257,7 +226,7 @@ class BSONCXX_API element {
     ///
     /// Getter for elements of the b_code type.
     ///
-    /// @throws bsoncxx::exception if this element is not a b_code.
+    /// @throws bsoncxx::v_noabi::exception if this element is not a b_code.
     ///
     /// @return the element's value.
     ///
@@ -266,7 +235,7 @@ class BSONCXX_API element {
     ///
     /// Getter for elements of the b_symbol type.
     ///
-    /// @throws bsoncxx::exception if this element is not a b_symbol.
+    /// @throws bsoncxx::v_noabi::exception if this element is not a b_symbol.
     ///
     /// @return the element's value.
     ///
@@ -275,7 +244,7 @@ class BSONCXX_API element {
     ///
     /// Getter for elements of the b_codewscope type.
     ///
-    /// @throws bsoncxx::exception if this element is not a b_codewscope.
+    /// @throws bsoncxx::v_noabi::exception if this element is not a b_codewscope.
     ///
     /// @return the element's value.
     ///
@@ -284,7 +253,7 @@ class BSONCXX_API element {
     ///
     /// Getter for elements of the b_int32 type.
     ///
-    /// @throws bsoncxx::exception if this element is not a b_int32.
+    /// @throws bsoncxx::v_noabi::exception if this element is not a b_int32.
     ///
     /// @return the element's value.
     ///
@@ -293,7 +262,7 @@ class BSONCXX_API element {
     ///
     /// Getter for elements of the b_timestamp type.
     ///
-    /// @throws bsoncxx::exception if this element is not a b_timestamp.
+    /// @throws bsoncxx::v_noabi::exception if this element is not a b_timestamp.
     ///
     /// @return the element's value.
     ///
@@ -302,7 +271,7 @@ class BSONCXX_API element {
     ///
     /// Getter for elements of the b_int64 type.
     ///
-    /// @throws bsoncxx::exception if this element is not a b_int64.
+    /// @throws bsoncxx::v_noabi::exception if this element is not a b_int64.
     ///
     /// @return the element's value.
     ///
@@ -311,7 +280,7 @@ class BSONCXX_API element {
     ///
     /// Getter for elements of the b_decimal128 type.
     ///
-    /// @throws bsoncxx::exception if this element is not a b_decimal128.
+    /// @throws bsoncxx::v_noabi::exception if this element is not a b_decimal128.
     ///
     /// @return the element's value.
     ///
@@ -320,7 +289,7 @@ class BSONCXX_API element {
     ///
     /// Getter for elements of the b_minkey type.
     ///
-    /// @throws bsoncxx::exception if this element is not a b_minkey.
+    /// @throws bsoncxx::v_noabi::exception if this element is not a b_minkey.
     ///
     /// @return the element's value.
     ///
@@ -329,7 +298,7 @@ class BSONCXX_API element {
     ///
     /// Getter for elements of the b_maxkey type.
     ///
-    /// @throws bsoncxx::exception if this element is not a b_maxkey.
+    /// @throws bsoncxx::v_noabi::exception if this element is not a b_maxkey.
     ///
     /// @return the element's value.
     ///
@@ -401,13 +370,20 @@ class BSONCXX_API element {
                                      std::uint32_t offset,
                                      std::uint32_t keylen);
 
-    friend class view;
-    friend class array::element;
+    // Construct an invalid element with a key. Useful for exceptions.
+    BSONCXX_PRIVATE explicit element(const stdx::string_view key);
+
+    friend ::bsoncxx::v_noabi::array::element;
+    friend ::bsoncxx::v_noabi::document::view;
 
     const std::uint8_t* _raw;
     std::uint32_t _length;
     std::uint32_t _offset;
     std::uint32_t _keylen;
+    // _key will only exist when a caller attempts to find a key in the BSON but is unsuccessful.
+    // The key is stored for a more helpful error message if the user tries to access the value of
+    // a key that does not exist.
+    stdx::optional<stdx::string_view> _key;
 };
 
 ///
@@ -441,8 +417,16 @@ BSONCXX_API bool BSONCXX_CALL operator!=(const types::bson_value::view& v, const
 ///
 
 }  // namespace document
+}  // namespace v_noabi
+}  // namespace bsoncxx
 
-BSONCXX_INLINE_NAMESPACE_END
+namespace bsoncxx {
+namespace document {
+
+using ::bsoncxx::v_noabi::document::operator==;
+using ::bsoncxx::v_noabi::document::operator!=;
+
+}  // namespace document
 }  // namespace bsoncxx
 
 #include <bsoncxx/config/postlude.hpp>

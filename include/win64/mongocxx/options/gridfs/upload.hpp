@@ -14,6 +14,8 @@
 
 #pragma once
 
+#include <mongocxx/options/gridfs/upload-fwd.hpp>
+
 #include <bsoncxx/document/view_or_value.hpp>
 #include <bsoncxx/stdx/optional.hpp>
 #include <mongocxx/stdx.hpp>
@@ -21,14 +23,14 @@
 #include <mongocxx/config/prelude.hpp>
 
 namespace mongocxx {
-MONGOCXX_INLINE_NAMESPACE_BEGIN
+namespace v_noabi {
 namespace options {
 namespace gridfs {
 
 ///
 /// Class representing the optional arguments to a MongoDB GridFS upload operation.
 ///
-class MONGOCXX_API upload {
+class upload {
    public:
     ///
     /// Sets the chunk size of the GridFS file being uploaded. Defaults to the chunk size specified
@@ -62,7 +64,7 @@ class MONGOCXX_API upload {
     ///   A reference to the object on which this member function is being called. This facilitates
     ///   method chaining.
     ///
-    upload& metadata(bsoncxx::document::view_or_value metadata);
+    upload& metadata(bsoncxx::v_noabi::document::view_or_value metadata);
 
     ///
     /// Gets the metadata of the GridFS file being uploaded.
@@ -70,16 +72,16 @@ class MONGOCXX_API upload {
     /// @return
     ///   The metadata document of the GridFS file.
     ///
-    const stdx::optional<bsoncxx::document::view_or_value>& metadata() const;
+    const stdx::optional<bsoncxx::v_noabi::document::view_or_value>& metadata() const;
 
    private:
     stdx::optional<std::int32_t> _chunk_size_bytes;
-    stdx::optional<bsoncxx::document::view_or_value> _metadata;
+    stdx::optional<bsoncxx::v_noabi::document::view_or_value> _metadata;
 };
 
 }  // namespace gridfs
 }  // namespace options
-MONGOCXX_INLINE_NAMESPACE_END
+}  // namespace v_noabi
 }  // namespace mongocxx
 
 #include <mongocxx/config/postlude.hpp>

@@ -17,6 +17,10 @@
 #include <functional>
 #include <memory>
 
+#include <mongocxx/client-fwd.hpp>
+#include <mongocxx/options/auto_encryption-fwd.hpp>
+#include <mongocxx/pool-fwd.hpp>
+
 #include <bsoncxx/stdx/optional.hpp>
 #include <mongocxx/options/pool.hpp>
 #include <mongocxx/stdx.hpp>
@@ -25,9 +29,7 @@
 #include <mongocxx/config/prelude.hpp>
 
 namespace mongocxx {
-MONGOCXX_INLINE_NAMESPACE_BEGIN
-
-class client;
+namespace v_noabi {
 
 ///
 /// A pool of @c client objects associated with a MongoDB deployment.
@@ -35,7 +37,7 @@ class client;
 /// For interoperability with other MongoDB drivers, the minimum and maximum number of connections
 /// in the pool is configured using the 'minPoolSize' and 'maxPoolSize' connection string options.
 ///
-/// @see https://docs.mongodb.com/manual/reference/connection-string/#connection-string-options
+/// @see https://www.mongodb.com/docs/manual/reference/connection-string/#connection-string-options
 ///
 /// @remark When connecting to a replica set, it is @b much more efficient to use a pool as opposed
 /// to manually constructing @c client objects. The pool will use a single background thread per
@@ -44,7 +46,7 @@ class client;
 /// to check the status of the cluster. Because of this, if multiple threads are available, a
 /// connection pool should be used even if the application itself is single-threaded.
 ///
-class MONGOCXX_API pool {
+class pool {
    public:
     ///
     /// Creates a pool associated with a connection string.
@@ -54,9 +56,10 @@ class MONGOCXX_API pool {
     /// @param options
     ///  Options to use when connecting to the MongoDB deployment.
     ///
-    /// @throws mongocxx::exception if invalid options are provided (whether from the URI or
+    /// @throws mongocxx::v_noabi::exception if invalid options are provided (whether from the URI
+    /// or
     ///  provided client options).
-    explicit pool(const uri& mongodb_uri = mongocxx::uri(),
+    explicit pool(const uri& mongodb_uri = mongocxx::v_noabi::uri(),
                   const options::pool& options = options::pool());
 
     ///
@@ -88,7 +91,7 @@ class MONGOCXX_API pool {
         explicit operator bool() const noexcept;
 
        private:
-        friend class pool;
+        friend ::mongocxx::v_noabi::pool;
 
         using unique_client = std::unique_ptr<client, std::function<void MONGOCXX_CALL(client*)>>;
 
@@ -110,7 +113,7 @@ class MONGOCXX_API pool {
     stdx::optional<entry> try_acquire();
 
    private:
-    friend class options::auto_encryption;
+    friend ::mongocxx::v_noabi::options::auto_encryption;
 
     MONGOCXX_PRIVATE void _release(client* client);
 
@@ -118,7 +121,7 @@ class MONGOCXX_API pool {
     const std::unique_ptr<impl> _impl;
 };
 
-MONGOCXX_INLINE_NAMESPACE_END
+}  // namespace v_noabi
 }  // namespace mongocxx
 
 #include <mongocxx/config/postlude.hpp>

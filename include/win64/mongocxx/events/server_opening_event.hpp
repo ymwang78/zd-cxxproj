@@ -16,13 +16,14 @@
 
 #include <cstdint>
 
+#include <mongocxx/events/server_opening_event-fwd.hpp>
+
 #include <bsoncxx/oid.hpp>
 
 #include <mongocxx/config/prelude.hpp>
 
 namespace mongocxx {
-MONGOCXX_INLINE_NAMESPACE_BEGIN
-
+namespace v_noabi {
 namespace events {
 
 ///
@@ -30,9 +31,9 @@ namespace events {
 /// and begins monitoring it.
 ///
 /// @see "ServerOpeningEvent" in
-/// https://github.com/mongodb/specifications/blob/master/source/server-discovery-and-monitoring/server-discovery-and-monitoring-monitoring.rst
+/// https://github.com/mongodb/specifications/blob/master/source/server-discovery-and-monitoring/server-discovery-and-monitoring.rst
 ///
-class MONGOCXX_API server_opening_event {
+class server_opening_event {
    public:
     MONGOCXX_PRIVATE explicit server_opening_event(const void* event);
 
@@ -46,7 +47,7 @@ class MONGOCXX_API server_opening_event {
     ///
     /// @return The host name.
     ///
-    bsoncxx::stdx::string_view host() const;
+    bsoncxx::v_noabi::stdx::string_view host() const;
 
     ///
     /// Returns the server port.
@@ -56,18 +57,19 @@ class MONGOCXX_API server_opening_event {
     std::uint16_t port() const;
 
     ///
-    /// An opaque id, unique to this topology for this mongocxx::client or mongocxx::pool.
+    /// An opaque id, unique to this topology for this mongocxx::v_noabi::client or
+    /// mongocxx::v_noabi::pool.
     ///
     /// @return The id.
     ///
-    const bsoncxx::oid topology_id() const;
+    const bsoncxx::v_noabi::oid topology_id() const;
 
    private:
     const void* _event;
 };
 
 }  // namespace events
-MONGOCXX_INLINE_NAMESPACE_END
+}  // namespace v_noabi
 }  // namespace mongocxx
 
 #include <mongocxx/config/postlude.hpp>

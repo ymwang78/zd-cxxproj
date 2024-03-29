@@ -14,20 +14,21 @@
 
 #pragma once
 
+#include <mongocxx/events/server_description-fwd.hpp>
+
 #include <bsoncxx/document/view.hpp>
 #include <bsoncxx/stdx/string_view.hpp>
 
 #include <mongocxx/config/prelude.hpp>
 
 namespace mongocxx {
-MONGOCXX_INLINE_NAMESPACE_BEGIN
-
+namespace v_noabi {
 namespace events {
 
 ///
 /// Class representing what the driver knows about a MongoDB server.
 ///
-class MONGOCXX_API server_description {
+class server_description {
    public:
     MONGOCXX_PRIVATE explicit server_description(const void* event);
 
@@ -37,7 +38,8 @@ class MONGOCXX_API server_description {
     ~server_description();
 
     ///
-    /// An opaque id, unique to this server for this mongocxx::client or mongocxx::pool.
+    /// An opaque id, unique to this server for this mongocxx::v_noabi::client or
+    /// mongocxx::v_noabi::pool.
     ///
     /// @return The id.
     ///
@@ -56,14 +58,14 @@ class MONGOCXX_API server_description {
     ///
     /// @return The type as a short-lived string view.
     ///
-    bsoncxx::stdx::string_view type() const;
+    bsoncxx::v_noabi::stdx::string_view type() const;
 
     ///
     /// @return The response as a short-lived document view.
     ///
     /// @deprecated use hello instead.
     ///
-    MONGOCXX_DEPRECATED bsoncxx::document::view is_master() const;
+    MONGOCXX_DEPRECATED bsoncxx::v_noabi::document::view is_master() const;
 
     ///
     /// The server's last response to the "hello" command, or an empty document if the driver
@@ -71,14 +73,14 @@ class MONGOCXX_API server_description {
     ///
     /// @return The response as a short-lived document view.
     ///
-    bsoncxx::document::view hello() const;
+    bsoncxx::v_noabi::document::view hello() const;
 
     ///
     /// Returns the server host name.
     ///
     /// @return The host name.
     ///
-    bsoncxx::stdx::string_view host() const;
+    bsoncxx::v_noabi::stdx::string_view host() const;
 
     ///
     /// Returns the server port.
@@ -92,7 +94,7 @@ class MONGOCXX_API server_description {
 };
 
 }  // namespace events
-MONGOCXX_INLINE_NAMESPACE_END
+}  // namespace v_noabi
 }  // namespace mongocxx
 
 #include <mongocxx/config/postlude.hpp>

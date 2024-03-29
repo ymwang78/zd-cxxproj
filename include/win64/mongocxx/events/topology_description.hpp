@@ -16,6 +16,8 @@
 
 #include <vector>
 
+#include <mongocxx/events/topology_description-fwd.hpp>
+
 #include <bsoncxx/stdx/string_view.hpp>
 #include <mongocxx/events/server_description.hpp>
 #include <mongocxx/read_preference.hpp>
@@ -23,17 +25,16 @@
 #include <mongocxx/config/prelude.hpp>
 
 namespace mongocxx {
-MONGOCXX_INLINE_NAMESPACE_BEGIN
-
+namespace v_noabi {
 namespace events {
 
-using mongocxx::read_preference;
+using mongocxx::v_noabi::read_preference;
 
 ///
 /// Class representing what the driver knows about a topology of MongoDB servers: either a
 /// standalone, a replica set, or a sharded cluster.
 ///
-class MONGOCXX_API topology_description {
+class topology_description {
    public:
     ///
     /// An array of server_description instances.
@@ -101,9 +102,11 @@ class MONGOCXX_API topology_description {
         std::size_t size() const noexcept;
 
        private:
-        friend topology_description;
+        friend ::mongocxx::v_noabi::events::topology_description;
+
         MONGOCXX_PRIVATE explicit server_descriptions(void* sds, std::size_t size);
         MONGOCXX_PRIVATE void swap(server_descriptions& other) noexcept;
+
         container _container;
         void* _sds;
         std::size_t _size;
@@ -122,7 +125,7 @@ class MONGOCXX_API topology_description {
     ///
     /// @return The type as a short-lived string view.
     ///
-    bsoncxx::stdx::string_view type() const;
+    bsoncxx::v_noabi::stdx::string_view type() const;
 
     ///
     /// Determines if the topology has a readable server available. Servers are
@@ -133,7 +136,7 @@ class MONGOCXX_API topology_description {
     ///
     /// @return Whether there is a readable server available.
     ///
-    bool has_readable_server(const mongocxx::read_preference& pref) const;
+    bool has_readable_server(const mongocxx::v_noabi::read_preference& pref) const;
 
     ///
     /// Determines if the topology has a writable server available, such as a
@@ -159,7 +162,15 @@ class MONGOCXX_API topology_description {
 };
 
 }  // namespace events
-MONGOCXX_INLINE_NAMESPACE_END
+}  // namespace v_noabi
+}  // namespace mongocxx
+
+namespace mongocxx {
+namespace events {
+
+using ::mongocxx::v_noabi::events::read_preference;  // Deprecated.
+
+}  // namespace events
 }  // namespace mongocxx
 
 #include <mongocxx/config/postlude.hpp>

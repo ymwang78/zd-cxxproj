@@ -18,6 +18,9 @@
 #include <cstdint>
 #include <memory>
 
+#include <mongocxx/gridfs/bucket-fwd.hpp>
+#include <mongocxx/gridfs/downloader-fwd.hpp>
+
 #include <bsoncxx/document/value.hpp>
 #include <bsoncxx/document/view.hpp>
 #include <bsoncxx/stdx/optional.hpp>
@@ -28,9 +31,12 @@
 #include <mongocxx/config/prelude.hpp>
 
 namespace mongocxx {
-MONGOCXX_INLINE_NAMESPACE_BEGIN
+namespace v_noabi {
 namespace gridfs {
 
+///
+/// Class used to specify the offset from which to start reading the chunks of the file.
+///
 struct chunks_and_bytes_offset {
     std::int32_t chunks_offset = 0;
     std::int32_t bytes_offset = 0;
@@ -39,7 +45,7 @@ struct chunks_and_bytes_offset {
 ///
 /// Class used to download a GridFS file.
 ///
-class MONGOCXX_API downloader {
+class downloader {
    public:
     ///
     /// Default constructs a downloader object. The downloader is equivalent to the state of a moved
@@ -86,11 +92,11 @@ class MONGOCXX_API downloader {
     ///   The number of bytes actually read. If zero, the downloader has reached the end of the
     ///   file.
     ///
-    /// @throws mongocxx::logic_error if the download stream was already closed.
+    /// @throws mongocxx::v_noabi::logic_error if the download stream was already closed.
     ///
-    /// @throws mongocxx::gridfs_exception if the requested file has been corrupted.
+    /// @throws mongocxx::v_noabi::gridfs_exception if the requested file has been corrupted.
     ///
-    /// @throws mongocxx::query_exception
+    /// @throws mongocxx::v_noabi::query_exception
     ///   if an error occurs when reading chunk data from the database for the requested file.
     ///
     std::size_t read(std::uint8_t* buffer, std::size_t length);
@@ -98,7 +104,7 @@ class MONGOCXX_API downloader {
     ///
     /// Closes the downloader stream.
     ///
-    /// @throws mongocxx::logic_error if the download stream was already closed.
+    /// @throws mongocxx::v_noabi::logic_error if the download stream was already closed.
     ///
     void close();
 
@@ -124,10 +130,10 @@ class MONGOCXX_API downloader {
     /// @return
     ///    A view to the files collection document of the file being downloaded.
     ///
-    bsoncxx::document::view files_document() const;
+    bsoncxx::v_noabi::document::view files_document() const;
 
    private:
-    friend class bucket;
+    friend ::mongocxx::v_noabi::gridfs::bucket;
 
     //
     // Constructs a new downloader stream.
@@ -152,7 +158,7 @@ class MONGOCXX_API downloader {
                                 chunks_and_bytes_offset start,
                                 std::int32_t chunk_size,
                                 std::int64_t file_len,
-                                bsoncxx::document::value files_doc);
+                                bsoncxx::v_noabi::document::value files_doc);
 
     MONGOCXX_PRIVATE void fetch_chunk();
 
@@ -165,5 +171,10 @@ class MONGOCXX_API downloader {
 };
 
 }  // namespace gridfs
-MONGOCXX_INLINE_NAMESPACE_END
+}  // namespace v_noabi
 }  // namespace mongocxx
+
+// CXX-2770: missing include of postlude header.
+#if defined(MONGOCXX_TEST_MACRO_GUARDS_FIX_MISSING_POSTLUDE)
+#include <mongocxx/config/postlude.hpp>
+#endif

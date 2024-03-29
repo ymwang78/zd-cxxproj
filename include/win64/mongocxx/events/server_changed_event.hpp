@@ -14,6 +14,8 @@
 
 #pragma once
 
+#include <mongocxx/events/server_changed_event-fwd.hpp>
+
 #include <bsoncxx/oid.hpp>
 #include <bsoncxx/stdx/string_view.hpp>
 #include <mongocxx/events/server_description.hpp>
@@ -21,8 +23,7 @@
 #include <mongocxx/config/prelude.hpp>
 
 namespace mongocxx {
-MONGOCXX_INLINE_NAMESPACE_BEGIN
-
+namespace v_noabi {
 namespace events {
 
 ///
@@ -30,9 +31,9 @@ namespace events {
 /// connected to.
 ///
 /// @see "ServerDescriptionChangedEvent" in
-/// https://github.com/mongodb/specifications/blob/master/source/server-discovery-and-monitoring/server-discovery-and-monitoring-monitoring.rst
+/// https://github.com/mongodb/specifications/blob/master/source/server-discovery-and-monitoring/server-discovery-and-monitoring.rst
 ///
-class MONGOCXX_API server_changed_event {
+class server_changed_event {
    public:
     MONGOCXX_PRIVATE explicit server_changed_event(const void* event);
 
@@ -46,7 +47,7 @@ class MONGOCXX_API server_changed_event {
     ///
     /// @return The host name.
     ///
-    bsoncxx::stdx::string_view host() const;
+    bsoncxx::v_noabi::stdx::string_view host() const;
 
     ///
     /// Returns the server port.
@@ -56,11 +57,12 @@ class MONGOCXX_API server_changed_event {
     std::uint16_t port() const;
 
     ///
-    /// An opaque id, unique to this topology for this mongocxx::client or mongocxx::pool.
+    /// An opaque id, unique to this topology for this mongocxx::v_noabi::client or
+    /// mongocxx::v_noabi::pool.
     ///
     /// @return The id.
     ///
-    const bsoncxx::oid topology_id() const;
+    const bsoncxx::v_noabi::oid topology_id() const;
 
     ///
     /// The server's description before it changed.
@@ -81,7 +83,7 @@ class MONGOCXX_API server_changed_event {
 };
 
 }  // namespace events
-MONGOCXX_INLINE_NAMESPACE_END
+}  // namespace v_noabi
 }  // namespace mongocxx
 
 #include <mongocxx/config/postlude.hpp>

@@ -14,14 +14,14 @@
 
 #pragma once
 
+#include <bsoncxx/builder/core-fwd.hpp>
+#include <bsoncxx/builder/stream/closed_context-fwd.hpp>
+
 #include <bsoncxx/config/prelude.hpp>
 
 namespace bsoncxx {
-BSONCXX_INLINE_NAMESPACE_BEGIN
+namespace v_noabi {
 namespace builder {
-
-class core;
-
 namespace stream {
 
 ///
@@ -37,7 +37,7 @@ struct closed_context {
 
 }  // namespace stream
 }  // namespace builder
-BSONCXX_INLINE_NAMESPACE_END
+}  // namespace v_noabi
 }  // namespace bsoncxx
 
 #include <bsoncxx/config/postlude.hpp>

@@ -14,16 +14,18 @@
 
 #pragma once
 
+#include <bsoncxx/builder/stream/value_context-fwd.hpp>
+
 #include <bsoncxx/builder/core.hpp>
 #include <bsoncxx/builder/stream/array_context.hpp>
 #include <bsoncxx/builder/stream/closed_context.hpp>
 #include <bsoncxx/builder/stream/helpers.hpp>
-#include <bsoncxx/util/functor.hpp>
+#include <bsoncxx/stdx/type_traits.hpp>
 
 #include <bsoncxx/config/prelude.hpp>
 
 namespace bsoncxx {
-BSONCXX_INLINE_NAMESPACE_BEGIN
+namespace v_noabi {
 namespace builder {
 namespace stream {
 
@@ -63,9 +65,8 @@ class value_context {
     ///   The value to append
     ///
     template <class T>
-    BSONCXX_INLINE
-        typename std::enable_if<!util::is_functor<T, void(single_context)>::value, base>::type
-        operator<<(T&& t) {
+    BSONCXX_INLINE detail::requires_not_t<base, detail::is_invocable<T, single_context>>  //
+    operator<<(T&& t) {
         _core->append(std::forward<T>(t));
         return unwrap();
     }
@@ -78,18 +79,16 @@ class value_context {
     ///   The callback to invoke
     ///
     template <typename T>
-    BSONCXX_INLINE
-        typename std::enable_if<util::is_functor<T, void(single_context)>::value, base>::type
-        operator<<(T&& func) {
-        func(*this);
+    BSONCXX_INLINE detail::requires_t<base, detail::is_invocable<T, single_context>>  //
+    operator<<(T&& func) {
+        detail::invoke(std::forward<T>(func), *this);
         return unwrap();
     }
 
     ///
     /// << operator for opening a new subdocument in the core builder.
     ///
-    /// @param _
-    ///   An open_document_type token
+    /// The argument must be an open_document_type token (it is otherwise ignored).
     ///
     BSONCXX_INLINE key_context<base> operator<<(const open_document_type) {
         _core->open_document();
@@ -99,8 +98,7 @@ class value_context {
     ///
     /// << operator for opening a new subarray in the core builder.
     ///
-    /// @param _
-    ///   An open_array_type token
+    /// The argument must be an open_array_type token (it is otherwise ignored).
     ///
     BSONCXX_INLINE array_context<base> operator<<(const open_array_type) {
         _core->open_array();
@@ -139,7 +137,7 @@ class value_context {
 
 }  // namespace stream
 }  // namespace builder
-BSONCXX_INLINE_NAMESPACE_END
+}  // namespace v_noabi
 }  // namespace bsoncxx
 
 #include <bsoncxx/config/postlude.hpp>

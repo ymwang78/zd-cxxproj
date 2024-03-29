@@ -13,27 +13,29 @@
 // limitations under the License.
 
 #pragma once
-#if defined(__clang__)
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wfloat-equal"
-#elif defined(__GNUC__)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wfloat-equal"
-#endif
 
 #include <chrono>
 #include <cstring>
+
+#include <bsoncxx/types-fwd.hpp>
 
 #include <bsoncxx/array/view.hpp>
 #include <bsoncxx/decimal128.hpp>
 #include <bsoncxx/document/view.hpp>
 #include <bsoncxx/oid.hpp>
 #include <bsoncxx/stdx/string_view.hpp>
+#include <bsoncxx/stdx/type_traits.hpp>
 
 #include <bsoncxx/config/prelude.hpp>
 
+#pragma push_macro("BSONCXX_ENUM")
+#undef BSONCXX_ENUM
+
+BSONCXX_PUSH_WARNINGS();
+BSONCXX_DISABLE_WARNING(GNU("-Wfloat-equal"));
+
 namespace bsoncxx {
-BSONCXX_INLINE_NAMESPACE_BEGIN
+namespace v_noabi {
 
 ///
 /// An enumeration of each BSON type.
@@ -94,7 +96,7 @@ namespace types {
 ///
 /// A BSON double value.
 ///
-struct BSONCXX_API b_double {
+struct b_double {
     static constexpr auto type_id = type::k_double;
 
     double value;
@@ -119,7 +121,7 @@ BSONCXX_INLINE bool operator==(const b_double& lhs, const b_double& rhs) {
 ///
 /// A BSON UTF-8 encoded string value.
 ///
-struct BSONCXX_API b_string {
+struct b_string {
     static constexpr auto type_id = type::k_string;
 
     ///
@@ -128,9 +130,7 @@ struct BSONCXX_API b_string {
     /// @param t
     ///   The value to wrap.
     ///
-    template <typename T,
-              typename std::enable_if<!std::is_same<b_string, typename std::decay<T>::type>::value,
-                                      int>::type = 0>
+    template <typename T, detail::requires_not_t<int, detail::is_alike<b_string, T>> = 0>
     BSONCXX_INLINE explicit b_string(T&& t) : value(std::forward<T>(t)) {}
 
     stdx::string_view value;
@@ -162,7 +162,7 @@ BSONCXX_DEPRECATED typedef b_string b_utf8;
 ///
 /// A BSON document value.
 ///
-struct BSONCXX_API b_document {
+struct b_document {
     static constexpr auto type_id = type::k_document;
 
     document::view value;
@@ -194,7 +194,7 @@ BSONCXX_INLINE bool operator==(const b_document& lhs, const b_document& rhs) {
 ///
 /// A BSON array value.
 ///
-struct BSONCXX_API b_array {
+struct b_array {
     static constexpr auto type_id = type::k_array;
 
     array::view value;
@@ -219,7 +219,7 @@ BSONCXX_INLINE bool operator==(const b_array& lhs, const b_array& rhs) {
 ///
 /// A BSON binary data value.
 ///
-struct BSONCXX_API b_binary {
+struct b_binary {
     static constexpr auto type_id = type::k_binary;
 
     binary_sub_type sub_type;
@@ -243,7 +243,7 @@ BSONCXX_INLINE bool operator==(const b_binary& lhs, const b_binary& rhs) {
 /// @deprecated
 ///   This BSON type is deprecated and use by clients is discouraged.
 ///
-struct BSONCXX_API b_undefined {
+struct b_undefined {
     static constexpr auto type_id = type::k_undefined;
 };
 
@@ -259,7 +259,7 @@ BSONCXX_INLINE bool operator==(const b_undefined&, const b_undefined&) {
 ///
 /// A BSON ObjectId value.
 ///
-struct BSONCXX_API b_oid {
+struct b_oid {
     static constexpr auto type_id = type::k_oid;
 
     oid value;
@@ -277,7 +277,7 @@ BSONCXX_INLINE bool operator==(const b_oid& lhs, const b_oid& rhs) {
 ///
 /// A BSON boolean value.
 ///
-struct BSONCXX_API b_bool {
+struct b_bool {
     static constexpr auto type_id = type::k_bool;
 
     bool value;
@@ -302,7 +302,7 @@ BSONCXX_INLINE bool operator==(const b_bool& lhs, const b_bool& rhs) {
 ///
 /// A BSON date value.
 ///
-struct BSONCXX_API b_date {
+struct b_date {
     static constexpr auto type_id = type::k_date;
 
     ///
@@ -361,7 +361,7 @@ BSONCXX_INLINE bool operator==(const b_date& lhs, const b_date& rhs) {
 ///
 /// A BSON null value.
 ///
-struct BSONCXX_API b_null {
+struct b_null {
     static constexpr auto type_id = type::k_null;
 };
 
@@ -377,7 +377,7 @@ BSONCXX_INLINE bool operator==(const b_null&, const b_null&) {
 ///
 /// A BSON regex value.
 ///
-struct BSONCXX_API b_regex {
+struct b_regex {
     static constexpr auto type_id = type::k_regex;
 
     ///
@@ -391,8 +391,7 @@ struct BSONCXX_API b_regex {
     ///
     template <typename T,
               typename U = stdx::string_view,
-              typename std::enable_if<!std::is_same<b_regex, typename std::decay<T>::type>::value,
-                                      int>::type = 0>
+              detail::requires_not_t<int, detail::is_alike<b_regex, T>> = 0>
     BSONCXX_INLINE explicit b_regex(T&& regex, U&& options = U{})
         : regex(std::forward<T>(regex)), options(std::forward<U>(options)) {}
 
@@ -415,7 +414,7 @@ BSONCXX_INLINE bool operator==(const b_regex& lhs, const b_regex& rhs) {
 /// @deprecated
 ///   A BSON DBPointer (aka DBRef) is still supported but deprecated.
 ///
-struct BSONCXX_API b_dbpointer {
+struct b_dbpointer {
     static constexpr auto type_id = type::k_dbpointer;
 
     stdx::string_view collection;
@@ -434,7 +433,7 @@ BSONCXX_INLINE bool operator==(const b_dbpointer& lhs, const b_dbpointer& rhs) {
 ///
 /// A BSON JavaScript code value.
 ///
-struct BSONCXX_API b_code {
+struct b_code {
     static constexpr auto type_id = type::k_code;
 
     ///
@@ -443,9 +442,7 @@ struct BSONCXX_API b_code {
     /// @param t
     ///   The js code
     ///
-    template <typename T,
-              typename std::enable_if<!std::is_same<b_code, typename std::decay<T>::type>::value,
-                                      int>::type = 0>
+    template <typename T, detail::requires_not_t<int, detail::is_alike<b_code, T>> = 0>
     BSONCXX_INLINE explicit b_code(T&& t) : code(std::forward<T>(t)) {}
 
     stdx::string_view code;
@@ -473,7 +470,7 @@ BSONCXX_INLINE bool operator==(const b_code& lhs, const b_code& rhs) {
 /// @deprecated
 ///   This BSON type is deprecated and use by clients is discouraged.
 ///
-struct BSONCXX_API b_symbol {
+struct b_symbol {
     static constexpr auto type_id = type::k_symbol;
 
     ///
@@ -482,9 +479,7 @@ struct BSONCXX_API b_symbol {
     /// @param t
     ///   The symbol.
     ///
-    template <typename T,
-              typename std::enable_if<!std::is_same<b_symbol, typename std::decay<T>::type>::value,
-                                      int>::type = 0>
+    template <typename T, detail::requires_not_t<int, detail::is_alike<b_symbol, T>> = 0>
     BSONCXX_INLINE explicit b_symbol(T&& t) : symbol(std::forward<T>(t)) {}
 
     stdx::string_view symbol;
@@ -509,7 +504,7 @@ BSONCXX_INLINE bool operator==(const b_symbol& lhs, const b_symbol& rhs) {
 ///
 /// A BSON JavaScript code with scope value.
 ///
-struct BSONCXX_API b_codewscope {
+struct b_codewscope {
     static constexpr auto type_id = type::k_codewscope;
 
     ///
@@ -521,11 +516,9 @@ struct BSONCXX_API b_codewscope {
     /// @param scope
     ///   A bson document view holding the scope environment.
     ///
-    template <
-        typename T,
-        typename U,
-        typename std::enable_if<!std::is_same<b_codewscope, typename std::decay<T>::type>::value,
-                                int>::type = 0>
+    template <typename T,
+              typename U,
+              detail::requires_not_t<int, detail::is_alike<b_codewscope, T>> = 0>
     BSONCXX_INLINE explicit b_codewscope(T&& code, U&& scope)
         : code(std::forward<T>(code)), scope(std::forward<U>(scope)) {}
 
@@ -545,7 +538,7 @@ BSONCXX_INLINE bool operator==(const b_codewscope& lhs, const b_codewscope& rhs)
 ///
 /// A BSON signed 32-bit integer value.
 ///
-struct BSONCXX_API b_int32 {
+struct b_int32 {
     static constexpr auto type_id = type::k_int32;
 
     int32_t value;
@@ -570,11 +563,7 @@ BSONCXX_INLINE bool operator==(const b_int32& lhs, const b_int32& rhs) {
 ///
 /// A BSON replication timestamp value.
 ///
-/// @warning
-///   This BSON type is used internally by the MongoDB server - use by clients
-///   is discouraged.
-///
-struct BSONCXX_API b_timestamp {
+struct b_timestamp {
     static constexpr auto type_id = type::k_timestamp;
 
     uint32_t increment;
@@ -593,7 +582,7 @@ BSONCXX_INLINE bool operator==(const b_timestamp& lhs, const b_timestamp& rhs) {
 ///
 /// A BSON 64-bit signed integer value.
 ///
-struct BSONCXX_API b_int64 {
+struct b_int64 {
     static constexpr auto type_id = type::k_int64;
 
     int64_t value;
@@ -618,7 +607,7 @@ BSONCXX_INLINE bool operator==(const b_int64& lhs, const b_int64& rhs) {
 ///
 /// A BSON Decimal128 value.
 ///
-struct BSONCXX_API b_decimal128 {
+struct b_decimal128 {
     static constexpr auto type_id = type::k_decimal128;
 
     decimal128 value;
@@ -629,10 +618,7 @@ struct BSONCXX_API b_decimal128 {
     /// @param t
     ///   The value to wrap.
     ///
-    template <
-        typename T,
-        typename std::enable_if<!std::is_same<b_decimal128, typename std::decay<T>::type>::value,
-                                int>::type = 0>
+    template <typename T, detail::requires_not_t<int, detail::is_alike<b_decimal128, T>> = 0>
     BSONCXX_INLINE explicit b_decimal128(T&& t) : value(std::forward<T>(t)) {}
 };
 
@@ -648,7 +634,7 @@ BSONCXX_INLINE bool operator==(const b_decimal128& lhs, const b_decimal128& rhs)
 ///
 /// A BSON min-key value.
 ///
-struct BSONCXX_API b_minkey {
+struct b_minkey {
     static constexpr auto type_id = type::k_minkey;
 };
 
@@ -664,7 +650,7 @@ BSONCXX_INLINE bool operator==(const b_minkey&, const b_minkey&) {
 ///
 /// A BSON max-key value.
 ///
-struct BSONCXX_API b_maxkey {
+struct b_maxkey {
     static constexpr auto type_id = type::k_maxkey;
 };
 
@@ -685,13 +671,31 @@ BSONCXX_INLINE bool operator==(const b_maxkey&, const b_maxkey&) {
 #undef BSONCXX_ENUM
 
 }  // namespace types
-BSONCXX_INLINE_NAMESPACE_END
+}  // namespace v_noabi
 }  // namespace bsoncxx
 
-#include <bsoncxx/config/postlude.hpp>
+BSONCXX_POP_WARNINGS();
 
-#if defined(__clang__)
-#pragma clang diagnostic pop
-#elif defined(__GNUC__)
-#pragma GCC diagnostic pop
+namespace bsoncxx {
+
+using ::bsoncxx::v_noabi::to_string;
+
+}  // namespace bsoncxx
+
+namespace bsoncxx {
+namespace types {
+
+using ::bsoncxx::v_noabi::types::b_utf8;  // Deprecated.
+
+using ::bsoncxx::v_noabi::types::operator==;
+using ::bsoncxx::v_noabi::types::operator!=;
+
+}  // namespace types
+}  // namespace bsoncxx
+
+#ifdef BSONCXX_ENUM
+static_assert(false, "BSONCXX_ENUM must be undef'ed");
 #endif
+#pragma pop_macro("BSONCXX_ENUM")
+
+#include <bsoncxx/config/postlude.hpp>

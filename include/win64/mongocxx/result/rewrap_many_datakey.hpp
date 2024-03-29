@@ -14,6 +14,8 @@
 
 #pragma once
 
+#include <mongocxx/result/rewrap_many_datakey-fwd.hpp>
+
 #include <bsoncxx/document/value.hpp>
 #include <bsoncxx/stdx/optional.hpp>
 #include <mongocxx/bulk_write.hpp>
@@ -21,29 +23,29 @@
 #include <mongocxx/config/prelude.hpp>
 
 namespace mongocxx {
-MONGOCXX_INLINE_NAMESPACE_BEGIN
+namespace v_noabi {
 namespace result {
 
 /// Class representing the result of a MongoDB rewrap_many_datakey operation.
-class MONGOCXX_API rewrap_many_datakey {
+class rewrap_many_datakey {
    public:
     rewrap_many_datakey() = default;
 
-    explicit rewrap_many_datakey(mongocxx::result::bulk_write bulk_write_result_doc);
+    explicit rewrap_many_datakey(mongocxx::v_noabi::result::bulk_write bulk_write_result_doc);
 
     ///
     /// Returns the bulk write result for this rewrap_many_datakey operation.
     ///
     /// @return The raw bulk write result.
     ///
-    const bsoncxx::stdx::optional<mongocxx::result::bulk_write>& result();
+    const bsoncxx::v_noabi::stdx::optional<mongocxx::v_noabi::result::bulk_write>& result();
 
    private:
-    bsoncxx::stdx::optional<mongocxx::result::bulk_write> _result;
+    bsoncxx::v_noabi::stdx::optional<mongocxx::v_noabi::result::bulk_write> _result;
 };
 
 }  // namespace result
-MONGOCXX_INLINE_NAMESPACE_END
+}  // namespace v_noabi
 }  // namespace mongocxx
 
 #include <mongocxx/config/postlude.hpp>

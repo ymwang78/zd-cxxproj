@@ -16,6 +16,10 @@
 
 #include <string>
 
+#include <mongocxx/client-fwd.hpp>
+#include <mongocxx/options/auto_encryption-fwd.hpp>
+#include <mongocxx/pool-fwd.hpp>
+
 #include <bsoncxx/document/view_or_value.hpp>
 #include <bsoncxx/stdx/optional.hpp>
 #include <mongocxx/stdx.hpp>
@@ -23,17 +27,13 @@
 #include <mongocxx/config/prelude.hpp>
 
 namespace mongocxx {
-MONGOCXX_INLINE_NAMESPACE_BEGIN
-
-class client;
-class pool;
-
+namespace v_noabi {
 namespace options {
 
 ///
 /// Class representing options for automatic client-side encryption.
 ///
-class MONGOCXX_API auto_encryption {
+class auto_encryption {
    public:
     ///
     /// Default constructs a new auto_encryption object.
@@ -54,9 +54,9 @@ class MONGOCXX_API auto_encryption {
     /// @return
     ///   A reference to this object to facilitate method chaining.
     ///
-    /// @see https://docs.mongodb.com/manual/core/security-client-side-encryption/
+    /// @see https://www.mongodb.com/docs/manual/core/security-client-side-encryption/
     ///
-    auto_encryption& key_vault_client(client* client);
+    auto_encryption& key_vault_client(mongocxx::v_noabi::client* client);
 
     ///
     /// Gets the key vault client.
@@ -64,7 +64,7 @@ class MONGOCXX_API auto_encryption {
     /// @return
     ///   An optional pointer to the key vault client.
     ///
-    const stdx::optional<client*>& key_vault_client() const;
+    const stdx::optional<mongocxx::v_noabi::client*>& key_vault_client() const;
 
     ///
     /// When the key vault collection is on a separate MongoDB cluster,
@@ -84,9 +84,9 @@ class MONGOCXX_API auto_encryption {
     /// @return
     ///   A reference to this object to facilitate method chaining.
     ///
-    /// @see https://docs.mongodb.com/manual/core/security-client-side-encryption/
+    /// @see https://www.mongodb.com/docs/manual/core/security-client-side-encryption/
     ///
-    auto_encryption& key_vault_pool(pool* pool);
+    auto_encryption& key_vault_pool(mongocxx::v_noabi::pool* pool);
 
     ///
     /// Gets the key vault pool.
@@ -94,7 +94,7 @@ class MONGOCXX_API auto_encryption {
     /// @return
     ///   An optional pointer to the key vault pool.
     ///
-    const stdx::optional<pool*>& key_vault_pool() const;
+    const stdx::optional<mongocxx::v_noabi::pool*>& key_vault_pool() const;
 
     ///
     /// Sets the namespace to use to access the key vault collection, which
@@ -110,7 +110,7 @@ class MONGOCXX_API auto_encryption {
     /// @return
     ///   A reference to this object to facilitate method chaining.
     ///
-    /// @see https://docs.mongodb.com/manual/core/security-client-side-encryption/
+    /// @see https://www.mongodb.com/docs/manual/core/security-client-side-encryption/
     ///
     using ns_pair = std::pair<std::string, std::string>;
     auto_encryption& key_vault_namespace(ns_pair ns);
@@ -131,6 +131,7 @@ class MONGOCXX_API auto_encryption {
     /// supported: "aws", "azure", "gcp", "kmip", and "local". The kmsProviders map values differ
     /// by provider:
     ///
+    /// @code{.unparsed}
     ///    aws: {
     ///      accessKeyId: String,
     ///      secretAccessKey: String
@@ -156,6 +157,7 @@ class MONGOCXX_API auto_encryption {
     ///    local: {
     ///      key: byte[96] // The master key used to encrypt/decrypt data keys.
     ///    }
+    /// @endcode
     ///
     /// @param kms_providers
     ///   A document containing the KMS providers.
@@ -163,9 +165,9 @@ class MONGOCXX_API auto_encryption {
     /// @return
     ///   A reference to this object to facilitate method chaining.
     ///
-    /// @see https://docs.mongodb.com/manual/core/security-client-side-encryption/
+    /// @see https://www.mongodb.com/docs/manual/core/security-client-side-encryption/
     ///
-    auto_encryption& kms_providers(bsoncxx::document::view_or_value kms_providers);
+    auto_encryption& kms_providers(bsoncxx::v_noabi::document::view_or_value kms_providers);
 
     ///
     /// Gets the KMS providers.
@@ -173,7 +175,7 @@ class MONGOCXX_API auto_encryption {
     /// @return
     ///   An optional document containing the KMS providers.
     ///
-    const stdx::optional<bsoncxx::document::view_or_value>& kms_providers() const;
+    const stdx::optional<bsoncxx::v_noabi::document::view_or_value>& kms_providers() const;
 
     ///
     /// Sets the TLS options to use for client side encryption with a given KMS provider.
@@ -181,11 +183,13 @@ class MONGOCXX_API auto_encryption {
     /// Multiple KMS providers may be specified. Supported KMS providers are "aws", "azure", "gcp",
     /// and "kmip". The map value has the same form for all supported providers:
     ///
+    /// @code{.unparsed}
     ///    <KMS provider name>: {
     ///        tlsCaFile: Optional<String>
     ///        tlsCertificateKeyFile: Optional<String>
     ///        tlsCertificateKeyFilePassword: Optional<String>
     ///    }
+    /// @endcode
     ///
     /// @param tls_opts
     ///   A document containing the TLS options.
@@ -193,9 +197,9 @@ class MONGOCXX_API auto_encryption {
     /// @return
     ///   A reference to this object to facilitate method chaining.
     ///
-    /// @see https://docs.mongodb.com/manual/core/security-client-side-encryption/
+    /// @see https://www.mongodb.com/docs/manual/core/security-client-side-encryption/
     ///
-    auto_encryption& tls_opts(bsoncxx::document::view_or_value tls_opts);
+    auto_encryption& tls_opts(bsoncxx::v_noabi::document::view_or_value tls_opts);
 
     ///
     /// Gets the TLS options.
@@ -203,7 +207,7 @@ class MONGOCXX_API auto_encryption {
     /// @return
     ///   An optional document containing the TLS options.
     ///
-    const stdx::optional<bsoncxx::document::view_or_value>& tls_opts() const;
+    const stdx::optional<bsoncxx::v_noabi::document::view_or_value>& tls_opts() const;
 
     ///
     /// Sets a local JSON schema.
@@ -225,9 +229,9 @@ class MONGOCXX_API auto_encryption {
     /// @return
     ///   A reference to this object to facilitate method chaining.
     ///
-    /// @see https://docs.mongodb.com/manual/core/security-client-side-encryption/
+    /// @see https://www.mongodb.com/docs/manual/core/security-client-side-encryption/
     ///
-    auto_encryption& schema_map(bsoncxx::document::view_or_value schema_map);
+    auto_encryption& schema_map(bsoncxx::v_noabi::document::view_or_value schema_map);
 
     ///
     /// Gets the schema map.
@@ -235,7 +239,7 @@ class MONGOCXX_API auto_encryption {
     /// @return
     ///   An optional document containing the schema map.
     ///
-    const stdx::optional<bsoncxx::document::view_or_value>& schema_map() const;
+    const stdx::optional<bsoncxx::v_noabi::document::view_or_value>& schema_map() const;
 
     ///
     /// Sets the local encrypted fields map.
@@ -247,14 +251,15 @@ class MONGOCXX_API auto_encryption {
     /// @param encrypted_fields_map
     ///   The mapping of which fields to encrypt.
     ///
-    /// @see https://docs.mongodb.com/manual/core/security-client-side-encryption/
+    /// @see https://www.mongodb.com/docs/manual/core/security-client-side-encryption/
     ///
     /// @return
     ///   A reference to this object to facilitate method chaining.
     ///
-    /// @see https://docs.mongodb.com/manual/core/security-client-side-encryption/
+    /// @see https://www.mongodb.com/docs/manual/core/security-client-side-encryption/
     ///
-    auto_encryption& encrypted_fields_map(bsoncxx::document::view_or_value encrypted_fields_map);
+    auto_encryption& encrypted_fields_map(
+        bsoncxx::v_noabi::document::view_or_value encrypted_fields_map);
 
     ///
     /// Get encrypted fields map
@@ -262,7 +267,7 @@ class MONGOCXX_API auto_encryption {
     /// @return
     ///   An optional document containing the encrypted fields map
     ///
-    const stdx::optional<bsoncxx::document::view_or_value>& encrypted_fields_map() const;
+    const stdx::optional<bsoncxx::v_noabi::document::view_or_value>& encrypted_fields_map() const;
 
     ///
     /// Automatic encryption is disabled when the 'bypassAutoEncryption'
@@ -274,7 +279,7 @@ class MONGOCXX_API auto_encryption {
     /// @return
     ///   A reference to this object to facilitate method chaining.
     ///
-    /// @see https://docs.mongodb.com/manual/core/security-client-side-encryption/
+    /// @see https://www.mongodb.com/docs/manual/core/security-client-side-encryption/
     ///
     auto_encryption& bypass_auto_encryption(bool should_bypass);
 
@@ -296,7 +301,7 @@ class MONGOCXX_API auto_encryption {
     /// @return
     ///   A reference to this object to facilitate method chaining.
     ///
-    /// @see https://docs.mongodb.com/manual/core/security-client-side-encryption/
+    /// @see https://www.mongodb.com/docs/manual/core/security-client-side-encryption/
     ///
     auto_encryption& bypass_query_analysis(bool should_bypass);
 
@@ -355,9 +360,9 @@ class MONGOCXX_API auto_encryption {
     /// @return
     ///   A reference to this object to facilitate method chaining.
     ///
-    /// @see https://docs.mongodb.com/manual/core/security-client-side-encryption/
+    /// @see https://www.mongodb.com/docs/manual/core/security-client-side-encryption/
     ///
-    auto_encryption& extra_options(bsoncxx::document::view_or_value extra);
+    auto_encryption& extra_options(bsoncxx::v_noabi::document::view_or_value extra);
 
     ///
     /// Gets extra options related to the mongocryptd process.
@@ -365,26 +370,31 @@ class MONGOCXX_API auto_encryption {
     /// @return
     ///   An optional document containing the extra options.
     ///
-    const stdx::optional<bsoncxx::document::view_or_value>& extra_options() const;
+    const stdx::optional<bsoncxx::v_noabi::document::view_or_value>& extra_options() const;
 
    private:
-    friend class mongocxx::client;
-    friend class mongocxx::pool;
+    friend ::mongocxx::v_noabi::client;
+    friend ::mongocxx::v_noabi::pool;
 
     MONGOCXX_PRIVATE void* convert() const;
 
     bool _bypass;
     bool _bypass_query_analysis;
-    stdx::optional<mongocxx::client*> _key_vault_client;
-    stdx::optional<mongocxx::pool*> _key_vault_pool;
+    stdx::optional<mongocxx::v_noabi::client*> _key_vault_client;
+    stdx::optional<mongocxx::v_noabi::pool*> _key_vault_pool;
     stdx::optional<ns_pair> _key_vault_namespace;
-    stdx::optional<bsoncxx::document::view_or_value> _kms_providers;
-    stdx::optional<bsoncxx::document::view_or_value> _tls_opts;
-    stdx::optional<bsoncxx::document::view_or_value> _schema_map;
-    stdx::optional<bsoncxx::document::view_or_value> _encrypted_fields_map;
-    stdx::optional<bsoncxx::document::view_or_value> _extra_options;
+    stdx::optional<bsoncxx::v_noabi::document::view_or_value> _kms_providers;
+    stdx::optional<bsoncxx::v_noabi::document::view_or_value> _tls_opts;
+    stdx::optional<bsoncxx::v_noabi::document::view_or_value> _schema_map;
+    stdx::optional<bsoncxx::v_noabi::document::view_or_value> _encrypted_fields_map;
+    stdx::optional<bsoncxx::v_noabi::document::view_or_value> _extra_options;
 };
 
 }  // namespace options
-MONGOCXX_INLINE_NAMESPACE_END
+}  // namespace v_noabi
 }  // namespace mongocxx
+
+// CXX-2770: missing include of postlude header.
+#if defined(MONGOCXX_TEST_MACRO_GUARDS_FIX_MISSING_POSTLUDE)
+#include <mongocxx/config/postlude.hpp>
+#endif

@@ -16,16 +16,18 @@
 
 #include <memory>
 
+#include <mongocxx/logger-fwd.hpp>
+
 #include <bsoncxx/stdx/string_view.hpp>
 #include <mongocxx/stdx.hpp>
 
 #include <mongocxx/config/prelude.hpp>
 
 namespace mongocxx {
-MONGOCXX_INLINE_NAMESPACE_BEGIN
+namespace v_noabi {
 
 ///
-/// The log level of a message passed to a mongocxx::logger.
+/// The log level of a message passed to a mongocxx::v_noabi::logger.
 ///
 enum class log_level {
     k_error,
@@ -50,7 +52,7 @@ MONGOCXX_API stdx::string_view MONGOCXX_CALL to_string(log_level level);
 ///
 /// The interface that all user-defined loggers must implement.
 ///
-class MONGOCXX_API logger {
+class logger {
    public:
     virtual ~logger();
 
@@ -75,7 +77,13 @@ class MONGOCXX_API logger {
     logger();
 };
 
-MONGOCXX_INLINE_NAMESPACE_END
+}  // namespace v_noabi
+}  // namespace mongocxx
+
+namespace mongocxx {
+
+using ::mongocxx::v_noabi::to_string;
+
 }  // namespace mongocxx
 
 #include <mongocxx/config/postlude.hpp>

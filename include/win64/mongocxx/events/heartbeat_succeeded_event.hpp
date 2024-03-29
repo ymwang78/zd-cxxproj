@@ -14,14 +14,15 @@
 
 #pragma once
 
+#include <mongocxx/events/heartbeat_succeeded_event-fwd.hpp>
+
 #include <bsoncxx/document/view.hpp>
 #include <bsoncxx/stdx/string_view.hpp>
 
 #include <mongocxx/config/prelude.hpp>
 
 namespace mongocxx {
-MONGOCXX_INLINE_NAMESPACE_BEGIN
-
+namespace v_noabi {
 namespace events {
 
 ///
@@ -29,9 +30,9 @@ namespace events {
 /// of a server.
 ///
 /// @see "ServerHeartbeatSucceededEvent" in
-/// https://github.com/mongodb/specifications/blob/master/source/server-discovery-and-monitoring/server-discovery-and-monitoring-monitoring.rst
+/// https://github.com/mongodb/specifications/blob/master/source/server-discovery-and-monitoring/server-discovery-and-monitoring.rst
 ///
-class MONGOCXX_API heartbeat_succeeded_event {
+class heartbeat_succeeded_event {
    public:
     MONGOCXX_PRIVATE explicit heartbeat_succeeded_event(const void* event);
 
@@ -45,7 +46,7 @@ class MONGOCXX_API heartbeat_succeeded_event {
     ///
     /// @return The reply.
     ///
-    bsoncxx::document::view reply() const;
+    bsoncxx::v_noabi::document::view reply() const;
 
     ///
     /// Returns the duration of the successful operation.
@@ -59,7 +60,7 @@ class MONGOCXX_API heartbeat_succeeded_event {
     ///
     /// @return The host name.
     ///
-    bsoncxx::stdx::string_view host() const;
+    bsoncxx::v_noabi::stdx::string_view host() const;
 
     ///
     /// Returns the port.
@@ -80,7 +81,7 @@ class MONGOCXX_API heartbeat_succeeded_event {
 };
 
 }  // namespace events
-MONGOCXX_INLINE_NAMESPACE_END
+}  // namespace v_noabi
 }  // namespace mongocxx
 
 #include <mongocxx/config/postlude.hpp>

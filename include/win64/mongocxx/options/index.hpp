@@ -17,6 +17,9 @@
 #include <chrono>
 #include <memory>
 
+#include <mongocxx/collection-fwd.hpp>
+#include <mongocxx/options/index-fwd.hpp>
+
 #include <bsoncxx/document/value.hpp>
 #include <bsoncxx/document/view.hpp>
 #include <bsoncxx/document/view_or_value.hpp>
@@ -27,18 +30,15 @@
 #include <mongocxx/config/prelude.hpp>
 
 namespace mongocxx {
-MONGOCXX_INLINE_NAMESPACE_BEGIN
-
-class collection;
-
+namespace v_noabi {
 namespace options {
 
 ///
 /// Class representing the optional arguments to a MongoDB create index operation.
 ///
-/// @see https://docs.mongodb.com/manual/reference/command/createIndexes
+/// @see https://www.mongodb.com/docs/manual/reference/command/createIndexes
 ///
-class MONGOCXX_API index {
+class index {
    public:
     ///
     /// Base class representing the optional storage engine options for indexes.
@@ -48,7 +48,8 @@ class MONGOCXX_API index {
         virtual ~base_storage_options();
 
        private:
-        friend class options::index;
+        friend ::mongocxx::v_noabi::options::index;
+
         MONGOCXX_PRIVATE virtual int type() const = 0;
     };
 
@@ -65,19 +66,21 @@ class MONGOCXX_API index {
         /// @param config_string
         ///   The WiredTiger configuration string.
         ///
-        void config_string(bsoncxx::string::view_or_value config_string);
+        void config_string(bsoncxx::v_noabi::string::view_or_value config_string);
 
         ///
         /// The current config_string setting.
         ///
         /// @return The current config_string.
         ///
-        const stdx::optional<bsoncxx::string::view_or_value>& config_string() const;
+        const stdx::optional<bsoncxx::v_noabi::string::view_or_value>& config_string() const;
 
        private:
-        friend collection;
+        friend ::mongocxx::v_noabi::collection;
+
         MONGOCXX_PRIVATE int type() const override;
-        stdx::optional<bsoncxx::string::view_or_value> _config_string;
+
+        stdx::optional<bsoncxx::v_noabi::string::view_or_value> _config_string;
     };
 
     index();
@@ -93,7 +96,7 @@ class MONGOCXX_API index {
     ///   A reference to the object on which this member function is being called.  This facilitates
     ///   method chaining.
     ///
-    /// @see https://docs.mongodb.com/manual/tutorial/build-indexes-in-the-background/
+    /// @see https://www.mongodb.com/docs/manual/tutorial/build-indexes-in-the-background/
     ///
     index& background(bool background);
 
@@ -115,7 +118,7 @@ class MONGOCXX_API index {
     ///   A reference to the object on which this member function is being called.  This facilitates
     ///   method chaining.
     ///
-    /// @see https://docs.mongodb.com/manual/core/index-unique/
+    /// @see https://www.mongodb.com/docs/manual/core/index-unique/
     ///
     index& unique(bool unique);
 
@@ -137,7 +140,7 @@ class MONGOCXX_API index {
     ///   A reference to the object on which this member function is being called.  This facilitates
     ///   method chaining.
     ///
-    /// @see https://docs.mongodb.com/manual/core/index-hidden/
+    /// @see https://www.mongodb.com/docs/manual/core/index-hidden/
     ///
     index& hidden(bool hidden);
 
@@ -158,14 +161,14 @@ class MONGOCXX_API index {
     ///   A reference to the object on which this member function is being called.  This facilitates
     ///   method chaining.
     ///
-    index& name(bsoncxx::string::view_or_value name);
+    index& name(bsoncxx::v_noabi::string::view_or_value name);
 
     ///
     /// The current name setting.
     ///
     /// @return The current name.
     ///
-    const stdx::optional<bsoncxx::string::view_or_value>& name() const;
+    const stdx::optional<bsoncxx::v_noabi::string::view_or_value>& name() const;
 
     ///
     /// Sets the collation for this index.
@@ -178,9 +181,9 @@ class MONGOCXX_API index {
     ///   method chaining.
     ///
     /// @see
-    ///   https://docs.mongodb.com/manual/reference/collation/
+    ///   https://www.mongodb.com/docs/manual/reference/collation/
     ///
-    index& collation(bsoncxx::document::view collation);
+    index& collation(bsoncxx::v_noabi::document::view collation);
 
     ///
     /// Retrieves the current collation for this index.
@@ -189,9 +192,9 @@ class MONGOCXX_API index {
     ///   The current collation.
     ///
     /// @see
-    ///   https://docs.mongodb.com/manual/reference/collation/
+    ///   https://www.mongodb.com/docs/manual/reference/collation/
     ///
-    const stdx::optional<bsoncxx::document::view>& collation() const;
+    const stdx::optional<bsoncxx::v_noabi::document::view>& collation() const;
 
     ///
     /// Whether or not to create a sparse index. Sparse indexes only reference documents with the
@@ -204,7 +207,7 @@ class MONGOCXX_API index {
     ///   A reference to the object on which this member function is being called.  This facilitates
     ///   method chaining.
     ///
-    /// @see https://docs.mongodb.com/manual/core/index-sparse/
+    /// @see https://www.mongodb.com/docs/manual/core/index-sparse/
     ///
     index& sparse(bool sparse);
 
@@ -248,7 +251,7 @@ class MONGOCXX_API index {
     ///   A reference to the object on which this member function is being called.  This facilitates
     ///   method chaining.
     ///
-    /// @see https://docs.mongodb.com/manual/core/index-ttl/
+    /// @see https://www.mongodb.com/docs/manual/core/index-ttl/
     ///
     index& expire_after(std::chrono::seconds seconds);
 
@@ -289,14 +292,14 @@ class MONGOCXX_API index {
     ///   A reference to the object on which this member function is being called.  This facilitates
     ///   method chaining.
     ///
-    index& weights(bsoncxx::document::view weights);
+    index& weights(bsoncxx::v_noabi::document::view weights);
 
     ///
     /// The current weights setting.
     ///
     /// @return The current weights.
     ///
-    const stdx::optional<bsoncxx::document::view>& weights() const;
+    const stdx::optional<bsoncxx::v_noabi::document::view>& weights() const;
 
     ///
     /// For text indexes, the language that determines the list of stop words and the rules for the
@@ -309,14 +312,14 @@ class MONGOCXX_API index {
     ///   A reference to the object on which this member function is being called.  This facilitates
     ///   method chaining.
     ///
-    index& default_language(bsoncxx::string::view_or_value default_language);
+    index& default_language(bsoncxx::v_noabi::string::view_or_value default_language);
 
     ///
     /// The current default_language setting.
     ///
     /// @return The current default_language.
     ///
-    const stdx::optional<bsoncxx::string::view_or_value>& default_language() const;
+    const stdx::optional<bsoncxx::v_noabi::string::view_or_value>& default_language() const;
 
     ///
     /// For text indexes, the name of the field, in the collection’s documents, that contains the
@@ -329,14 +332,14 @@ class MONGOCXX_API index {
     ///   A reference to the object on which this member function is being called.  This facilitates
     ///   method chaining.
     ///
-    index& language_override(bsoncxx::string::view_or_value language_override);
+    index& language_override(bsoncxx::v_noabi::string::view_or_value language_override);
 
     ///
     /// The current name of the field that contains the override language for text indexes.
     ///
     /// @return The name of the field that contains the override language for text indexes.
     ///
-    const stdx::optional<bsoncxx::string::view_or_value>& language_override() const;
+    const stdx::optional<bsoncxx::v_noabi::string::view_or_value>& language_override() const;
 
     ///
     /// Sets the document for the partial filter expression for partial indexes.
@@ -348,14 +351,14 @@ class MONGOCXX_API index {
     ///   A reference to the object on which this member function is being called.  This facilitates
     ///   method chaining.
     ///
-    index& partial_filter_expression(bsoncxx::document::view partial_filter_expression);
+    index& partial_filter_expression(bsoncxx::v_noabi::document::view partial_filter_expression);
 
     ///
     /// The current partial_filter_expression setting.
     ///
     /// @return The current partial_filter_expression.
     ///
-    const stdx::optional<bsoncxx::document::view>& partial_filter_expression() const;
+    const stdx::optional<bsoncxx::v_noabi::document::view>& partial_filter_expression() const;
 
     ///
     /// For 2dsphere indexes, the 2dsphere index version number. Version can be either 1 or 2.
@@ -438,7 +441,7 @@ class MONGOCXX_API index {
     /// values; i.e. group in the same bucket those location values that are within the specified
     /// number of units to each other.
     ///
-    /// @see https://docs.mongodb.com/manual/core/geohaystack/
+    /// @see https://www.mongodb.com/docs/manual/core/geohaystack/
     ///
     /// @param haystack_bucket_size
     ///   The geoHaystack bucket size.
@@ -467,28 +470,29 @@ class MONGOCXX_API index {
     ///
     /// Conversion operator that provides a view of the options in document form.
     ///
-    /// @exception mongocxx::logic_error if an invalid expireAfterSeconds field is provided.
+    /// @exception mongocxx::v_noabi::logic_error if an invalid expireAfterSeconds field is
+    /// provided.
     ///
     /// @return A view of the current builder contents.
     ///
-    operator bsoncxx::document::view_or_value();
+    operator bsoncxx::v_noabi::document::view_or_value();
 
    private:
-    friend collection;
+    friend ::mongocxx::v_noabi::collection;
 
     stdx::optional<bool> _background;
     stdx::optional<bool> _unique;
     stdx::optional<bool> _hidden;
-    stdx::optional<bsoncxx::string::view_or_value> _name;
-    stdx::optional<bsoncxx::document::view> _collation;
+    stdx::optional<bsoncxx::v_noabi::string::view_or_value> _name;
+    stdx::optional<bsoncxx::v_noabi::document::view> _collation;
     stdx::optional<bool> _sparse;
     std::unique_ptr<base_storage_options> _storage_options;
     stdx::optional<std::chrono::seconds> _expire_after;
     stdx::optional<std::int32_t> _version;
-    stdx::optional<bsoncxx::document::view> _weights;
-    stdx::optional<bsoncxx::string::view_or_value> _default_language;
-    stdx::optional<bsoncxx::string::view_or_value> _language_override;
-    stdx::optional<bsoncxx::document::view> _partial_filter_expression;
+    stdx::optional<bsoncxx::v_noabi::document::view> _weights;
+    stdx::optional<bsoncxx::v_noabi::string::view_or_value> _default_language;
+    stdx::optional<bsoncxx::v_noabi::string::view_or_value> _language_override;
+    stdx::optional<bsoncxx::v_noabi::document::view> _partial_filter_expression;
     stdx::optional<std::uint8_t> _twod_sphere_version;
     stdx::optional<std::uint8_t> _twod_bits_precision;
     stdx::optional<double> _twod_location_min;
@@ -502,7 +506,7 @@ class MONGOCXX_API index {
 };
 
 }  // namespace options
-MONGOCXX_INLINE_NAMESPACE_END
+}  // namespace v_noabi
 }  // namespace mongocxx
 
 #include <mongocxx/config/postlude.hpp>

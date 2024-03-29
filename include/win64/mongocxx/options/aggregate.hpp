@@ -17,6 +17,10 @@
 #include <chrono>
 #include <cstdint>
 
+#include <mongocxx/collection-fwd.hpp>
+#include <mongocxx/database-fwd.hpp>
+#include <mongocxx/options/aggregate-fwd.hpp>
+
 #include <bsoncxx/builder/basic/document.hpp>
 #include <bsoncxx/document/view_or_value.hpp>
 #include <bsoncxx/stdx/optional.hpp>
@@ -30,13 +34,13 @@
 #include <mongocxx/config/prelude.hpp>
 
 namespace mongocxx {
-MONGOCXX_INLINE_NAMESPACE_BEGIN
+namespace v_noabi {
 namespace options {
 
 ///
 /// Class representing the optional arguments to a MongoDB aggregation operation.
 ///
-class MONGOCXX_API aggregate {
+class aggregate {
    public:
     ///
     /// Enables writing to temporary files. When set to @c true, aggregation stages can write data
@@ -49,7 +53,7 @@ class MONGOCXX_API aggregate {
     ///   A reference to the object on which this member function is being called. This facilitates
     ///   method chaining.
     ///
-    /// @see https://docs.mongodb.com/manual/reference/command/aggregate/
+    /// @see https://www.mongodb.com/docs/manual/reference/command/aggregate/
     ///
     aggregate& allow_disk_use(bool allow_disk_use);
 
@@ -58,7 +62,7 @@ class MONGOCXX_API aggregate {
     ///
     /// @return Whether disk use is allowed.
     ///
-    /// @see https://docs.mongodb.com/manual/reference/command/aggregate/
+    /// @see https://www.mongodb.com/docs/manual/reference/command/aggregate/
     ///
     const stdx::optional<bool>& allow_disk_use() const;
 
@@ -72,7 +76,7 @@ class MONGOCXX_API aggregate {
     ///   A reference to the object on which this member function is being called. This facilitates
     ///   method chaining.
     ///
-    /// @see https://docs.mongodb.com/manual/reference/command/aggregate/
+    /// @see https://www.mongodb.com/docs/manual/reference/command/aggregate/
     ///
     aggregate& batch_size(std::int32_t batch_size);
 
@@ -81,7 +85,7 @@ class MONGOCXX_API aggregate {
     ///
     /// @return The current batch size.
     ///
-    /// @see https://docs.mongodb.com/manual/reference/command/aggregate/
+    /// @see https://www.mongodb.com/docs/manual/reference/command/aggregate/
     ///
     const stdx::optional<std::int32_t>& batch_size() const;
 
@@ -95,9 +99,9 @@ class MONGOCXX_API aggregate {
     ///   A reference to the object on which this member function is being called. This facilitates
     ///   method chaining.
     ///
-    /// @see https://docs.mongodb.com/manual/reference/command/aggregate/
+    /// @see https://www.mongodb.com/docs/manual/reference/command/aggregate/
     ///
-    aggregate& collation(bsoncxx::document::view_or_value collation);
+    aggregate& collation(bsoncxx::v_noabi::document::view_or_value collation);
 
     ///
     /// Retrieves the current collation for this operation.
@@ -105,9 +109,9 @@ class MONGOCXX_API aggregate {
     /// @return
     ///   The current collation.
     ///
-    /// @see https://docs.mongodb.com/manual/reference/command/aggregate/
+    /// @see https://www.mongodb.com/docs/manual/reference/command/aggregate/
     ///
-    const stdx::optional<bsoncxx::document::view_or_value>& collation() const;
+    const stdx::optional<bsoncxx::v_noabi::document::view_or_value>& collation() const;
 
     ///
     /// Sets the variable mapping for this operation.
@@ -119,9 +123,9 @@ class MONGOCXX_API aggregate {
     ///   A reference to the object on which this member function is being called. This facilitates
     ///   method chaining.
     ///
-    /// @see https://docs.mongodb.com/manual/reference/command/aggregate/
+    /// @see https://www.mongodb.com/docs/manual/reference/command/aggregate/
     ///
-    aggregate& let(bsoncxx::document::view_or_value let);
+    aggregate& let(bsoncxx::v_noabi::document::view_or_value let);
 
     ///
     /// Retrieves the current variable mapping for this operation.
@@ -129,9 +133,9 @@ class MONGOCXX_API aggregate {
     /// @return
     ///   The current variable mapping.
     ///
-    /// @see https://docs.mongodb.com/manual/reference/command/aggregate/
+    /// @see https://www.mongodb.com/docs/manual/reference/command/aggregate/
     ///
-    const stdx::optional<bsoncxx::document::view_or_value>& let() const;
+    const stdx::optional<bsoncxx::v_noabi::document::view_or_value>& let() const;
 
     ///
     /// Sets the maximum amount of time for this operation to run server-side in milliseconds.
@@ -143,7 +147,7 @@ class MONGOCXX_API aggregate {
     ///   A reference to the object on which this member function is being called. This facilitates
     ///   method chaining.
     ///
-    /// @see https://docs.mongodb.com/manual/reference/command/aggregate/
+    /// @see https://www.mongodb.com/docs/manual/reference/command/aggregate/
     ///
     aggregate& max_time(std::chrono::milliseconds max_time);
 
@@ -153,7 +157,7 @@ class MONGOCXX_API aggregate {
     /// @return
     ///   The current max time (in milliseconds).
     ///
-    /// @see https://docs.mongodb.com/manual/reference/command/aggregate/
+    /// @see https://www.mongodb.com/docs/manual/reference/command/aggregate/
     ///
     const stdx::optional<std::chrono::milliseconds>& max_time() const;
 
@@ -166,18 +170,18 @@ class MONGOCXX_API aggregate {
     ///   A reference to the object on which this member function is being called. This facilitates
     ///   method chaining.
     ///
-    /// @see https://docs.mongodb.com/manual/reference/command/aggregate/
+    /// @see https://www.mongodb.com/docs/manual/reference/command/aggregate/
     ///
-    aggregate& read_preference(class read_preference rp);
+    aggregate& read_preference(mongocxx::v_noabi::read_preference rp);
 
     ///
     /// The current read_preference for this operation.
     ///
     /// @return the current read_preference
     ///
-    /// @see https://docs.mongodb.com/manual/reference/command/aggregate/
+    /// @see https://www.mongodb.com/docs/manual/reference/command/aggregate/
     ///
-    const stdx::optional<class read_preference>& read_preference() const;
+    const stdx::optional<mongocxx::v_noabi::read_preference>& read_preference() const;
 
     ///
     /// Sets whether the $out stage should bypass document validation.
@@ -195,14 +199,14 @@ class MONGOCXX_API aggregate {
     ///
     /// @return the current bypass_document_validation setting
     ///
-    /// @see https://docs.mongodb.com/manual/reference/command/aggregate/
+    /// @see https://www.mongodb.com/docs/manual/reference/command/aggregate/
     ///
     const stdx::optional<bool>& bypass_document_validation() const;
 
     ///
     /// Sets the index to use for this operation.
     ///
-    /// @see https://docs.mongodb.com/manual/reference/command/aggregate/
+    /// @see https://www.mongodb.com/docs/manual/reference/command/aggregate/
     ///
     /// @note if the server already has a cached shape for this query, it may
     /// ignore a hint.
@@ -214,23 +218,23 @@ class MONGOCXX_API aggregate {
     ///   A reference to the object on which this member function is being called.  This facilitates
     ///   method chaining.
     ///
-    aggregate& hint(class hint index_hint);
+    aggregate& hint(mongocxx::v_noabi::hint index_hint);
 
     ///
     /// Gets the current hint.
     ///
     /// @return The current hint, if one is set.
     ///
-    /// @see https://docs.mongodb.com/manual/reference/command/aggregate/
+    /// @see https://www.mongodb.com/docs/manual/reference/command/aggregate/
     ///
-    const stdx::optional<class hint>& hint() const;
+    const stdx::optional<mongocxx::v_noabi::hint>& hint() const;
 
     ///
     /// Sets the write concern to use for this operation. Only has an effect if $out is a part of
     /// the pipeline.
     ///
     /// @see
-    ///   https://docs.mongodb.com/manual/reference/command/aggregate/
+    ///   https://www.mongodb.com/docs/manual/reference/command/aggregate/
     ///
     /// @param write_concern
     ///   Object representing the write_concern.
@@ -239,7 +243,7 @@ class MONGOCXX_API aggregate {
     ///   A reference to the object on which this member function is being called.  This facilitates
     ///   method chaining.
     ///
-    aggregate& write_concern(class write_concern write_concern);
+    aggregate& write_concern(mongocxx::v_noabi::write_concern write_concern);
 
     ///
     /// Gets the current write concern.
@@ -248,15 +252,15 @@ class MONGOCXX_API aggregate {
     ///   The current write concern, if it is set.
     ///
     /// @see
-    ///   https://docs.mongodb.com/manual/reference/command/aggregate/
+    ///   https://www.mongodb.com/docs/manual/reference/command/aggregate/
     ///
-    const stdx::optional<class write_concern>& write_concern() const;
+    const stdx::optional<mongocxx::v_noabi::write_concern>& write_concern() const;
 
     ///
     /// Sets the read concern to use for this operation.
     ///
     /// @see
-    ///   https://docs.mongodb.com/manual/reference/command/aggregate/
+    ///   https://www.mongodb.com/docs/manual/reference/command/aggregate/
     ///
     /// @param read_concern
     ///   Object representing the read_concern.
@@ -264,7 +268,7 @@ class MONGOCXX_API aggregate {
     /// @return
     ///   A reference to the object on which this member function is being called.
     ///
-    aggregate& read_concern(class read_concern read_concern);
+    aggregate& read_concern(mongocxx::v_noabi::read_concern read_concern);
 
     ///
     /// Gets the current read concern.
@@ -273,15 +277,15 @@ class MONGOCXX_API aggregate {
     ///   The current read concern, if it is set.
     ///
     /// @see
-    ///   https://docs.mongodb.com/manual/reference/command/aggregate/
+    ///   https://www.mongodb.com/docs/manual/reference/command/aggregate/
     ///
-    const stdx::optional<class read_concern>& read_concern() const;
+    const stdx::optional<mongocxx::v_noabi::read_concern>& read_concern() const;
 
     ///
     /// Sets the comment to use for this operation.
     ///
     /// @see
-    ///   https://docs.mongodb.com/manual/reference/command/aggregate/
+    ///   https://www.mongodb.com/docs/manual/reference/command/aggregate/
     ///
     /// @param comment
     ///   Object representing the comment.
@@ -289,7 +293,7 @@ class MONGOCXX_API aggregate {
     /// @return
     ///   A reference to the object on which this member function is being called.
     ///
-    aggregate& comment(bsoncxx::types::bson_value::view_or_value comment);
+    aggregate& comment(bsoncxx::v_noabi::types::bson_value::view_or_value comment);
 
     ///
     /// Gets the current comment.
@@ -298,31 +302,31 @@ class MONGOCXX_API aggregate {
     ///   The current comment, if it is set.
     ///
     /// @see
-    ///   https://docs.mongodb.com/manual/reference/command/aggregate/
+    ///   https://www.mongodb.com/docs/manual/reference/command/aggregate/
     ///
-    const stdx::optional<bsoncxx::types::bson_value::view_or_value>& comment() const;
+    const stdx::optional<bsoncxx::v_noabi::types::bson_value::view_or_value>& comment() const;
 
    private:
-    friend class ::mongocxx::database;
-    friend class ::mongocxx::collection;
+    friend ::mongocxx::v_noabi::collection;
+    friend ::mongocxx::v_noabi::database;
 
-    void append(bsoncxx::builder::basic::document& builder) const;
+    void append(bsoncxx::v_noabi::builder::basic::document& builder) const;
 
     stdx::optional<bool> _allow_disk_use;
     stdx::optional<std::int32_t> _batch_size;
-    stdx::optional<bsoncxx::document::view_or_value> _collation;
-    stdx::optional<bsoncxx::document::view_or_value> _let;
+    stdx::optional<bsoncxx::v_noabi::document::view_or_value> _collation;
+    stdx::optional<bsoncxx::v_noabi::document::view_or_value> _let;
     stdx::optional<std::chrono::milliseconds> _max_time;
-    stdx::optional<class read_preference> _read_preference;
+    stdx::optional<mongocxx::v_noabi::read_preference> _read_preference;
     stdx::optional<bool> _bypass_document_validation;
-    stdx::optional<class hint> _hint;
-    stdx::optional<class write_concern> _write_concern;
-    stdx::optional<class read_concern> _read_concern;
-    stdx::optional<bsoncxx::types::bson_value::view_or_value> _comment;
+    stdx::optional<mongocxx::v_noabi::hint> _hint;
+    stdx::optional<mongocxx::v_noabi::write_concern> _write_concern;
+    stdx::optional<mongocxx::v_noabi::read_concern> _read_concern;
+    stdx::optional<bsoncxx::v_noabi::types::bson_value::view_or_value> _comment;
 };
 
 }  // namespace options
-MONGOCXX_INLINE_NAMESPACE_END
+}  // namespace v_noabi
 }  // namespace mongocxx
 
 #include <mongocxx/config/postlude.hpp>

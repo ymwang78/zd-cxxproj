@@ -16,6 +16,8 @@
 
 #include <string>
 
+#include <bsoncxx/json-fwd.hpp>
+
 #include <bsoncxx/array/view.hpp>
 #include <bsoncxx/document/value.hpp>
 #include <bsoncxx/document/view.hpp>
@@ -23,16 +25,8 @@
 
 #include <bsoncxx/config/prelude.hpp>
 
-///
-/// Top level namespace for MongoDB C++ BSON functionality.
-///
 namespace bsoncxx {
-BSONCXX_INLINE_NAMESPACE_BEGIN
-
-// Placing this variable between the `BSONCXX_INLINE_NAMESPACE_BEGIN` and the Doxygen documentation
-// for `to_json` suppressed the macro name from being shown as part of the return type in the
-// generated documentation pages.
-extern const bool k_silence_doxygen;
+namespace v_noabi {
 
 ///
 /// An enumeration of the types of Extended JSON that the to_json function accepts
@@ -50,7 +44,7 @@ enum class ExtendedJsonMode : std::uint8_t {
 /// @param mode
 ///   An optional JSON representation mode.
 ///
-/// @throws bsoncxx::exception with error details if the conversion failed.
+/// @throws bsoncxx::v_noabi::exception with error details if the conversion failed.
 ///
 /// @returns An extended JSON string.
 ///
@@ -68,7 +62,7 @@ BSONCXX_API std::string BSONCXX_CALL to_json(array::view view,
 ///
 /// @returns A document::value if conversion worked.
 ///
-/// @throws bsoncxx::exception with error details if the conversion failed.
+/// @throws bsoncxx::v_noabi::exception with error details if the conversion failed.
 ///
 BSONCXX_API document::value BSONCXX_CALL from_json(stdx::string_view json);
 
@@ -84,11 +78,20 @@ BSONCXX_API document::value BSONCXX_CALL from_json(stdx::string_view json);
 ///
 /// @returns A document::value if conversion worked.
 ///
-/// @throws bsoncxx::exception with error details if the conversion failed.
+/// @throws bsoncxx::v_noabi::exception with error details if the conversion failed.
 ///
-BSONCXX_API document::value BSONCXX_CALL operator"" _bson(const char* json, size_t len);
+BSONCXX_API document::value BSONCXX_CALL operator""_bson(const char* json, size_t len);
 
-BSONCXX_INLINE_NAMESPACE_END
+}  // namespace v_noabi
+}  // namespace bsoncxx
+
+namespace bsoncxx {
+
+using ::bsoncxx::v_noabi::from_json;
+using ::bsoncxx::v_noabi::to_json;
+
+using ::bsoncxx::v_noabi::operator""_bson;
+
 }  // namespace bsoncxx
 
 #include <bsoncxx/config/postlude.hpp>

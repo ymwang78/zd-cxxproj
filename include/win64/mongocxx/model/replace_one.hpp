@@ -14,6 +14,8 @@
 
 #pragma once
 
+#include <mongocxx/model/replace_one-fwd.hpp>
+
 #include <bsoncxx/document/view_or_value.hpp>
 #include <bsoncxx/stdx/optional.hpp>
 #include <mongocxx/hint.hpp>
@@ -22,13 +24,13 @@
 #include <mongocxx/config/prelude.hpp>
 
 namespace mongocxx {
-MONGOCXX_INLINE_NAMESPACE_BEGIN
+namespace v_noabi {
 namespace model {
 
 ///
 /// Class representing a MongoDB update operation that replaces a single document.
 ///
-class MONGOCXX_API replace_one {
+class replace_one {
    public:
     ///
     /// Constructs an update operation that will replace a single document matching the filter.
@@ -38,22 +40,22 @@ class MONGOCXX_API replace_one {
     /// @param replacement
     ///   Document that will serve as the replacement.
     ///
-    replace_one(bsoncxx::document::view_or_value filter,
-                bsoncxx::document::view_or_value replacement);
+    replace_one(bsoncxx::v_noabi::document::view_or_value filter,
+                bsoncxx::v_noabi::document::view_or_value replacement);
 
     ///
     /// Gets the filter for replacement.
     ///
     /// @return The filter to be used for the replacement operation.
     ///
-    const bsoncxx::document::view_or_value& filter() const;
+    const bsoncxx::v_noabi::document::view_or_value& filter() const;
 
     ///
     /// Gets the replacement document.
     ///
     /// @return The document that will replace the original selected document.
     ///
-    const bsoncxx::document::view_or_value& replacement() const;
+    const bsoncxx::v_noabi::document::view_or_value& replacement() const;
 
     ///
     /// Sets the collation for this replacement operation.
@@ -62,9 +64,9 @@ class MONGOCXX_API replace_one {
     ///   The new collation.
     ///
     /// @see
-    ///   https://docs.mongodb.com/manual/reference/collation/
+    ///   https://www.mongodb.com/docs/manual/reference/collation/
     ///
-    replace_one& collation(bsoncxx::document::view_or_value collation);
+    replace_one& collation(bsoncxx::v_noabi::document::view_or_value collation);
 
     ///
     /// Gets the collation option for this replacement operation.
@@ -73,9 +75,9 @@ class MONGOCXX_API replace_one {
     ///   The optional value of the collation option.
     ///
     /// @see
-    ///   https://docs.mongodb.com/manual/reference/collation/
+    ///   https://www.mongodb.com/docs/manual/reference/collation/
     ///
-    const stdx::optional<bsoncxx::document::view_or_value>& collation() const;
+    const stdx::optional<bsoncxx::v_noabi::document::view_or_value>& collation() const;
 
     ///
     /// Sets the upsert option.
@@ -112,26 +114,26 @@ class MONGOCXX_API replace_one {
     ///   A reference to the object on which this member function is being called.  This facilitates
     ///   method chaining.
     ///
-    replace_one& hint(class hint index_hint);
+    replace_one& hint(mongocxx::v_noabi::hint index_hint);
 
     ///
     /// Gets the current hint.
     ///
     /// @return The current hint, if one is set.
     ///
-    const stdx::optional<class hint>& hint() const;
+    const stdx::optional<mongocxx::v_noabi::hint>& hint() const;
 
    private:
-    bsoncxx::document::view_or_value _filter;
-    bsoncxx::document::view_or_value _replacement;
+    bsoncxx::v_noabi::document::view_or_value _filter;
+    bsoncxx::v_noabi::document::view_or_value _replacement;
 
-    stdx::optional<bsoncxx::document::view_or_value> _collation;
+    stdx::optional<bsoncxx::v_noabi::document::view_or_value> _collation;
     stdx::optional<bool> _upsert;
-    stdx::optional<class hint> _hint;
+    stdx::optional<mongocxx::v_noabi::hint> _hint;
 };
 
 }  // namespace model
-MONGOCXX_INLINE_NAMESPACE_END
+}  // namespace v_noabi
 }  // namespace mongocxx
 
 #include <mongocxx/config/postlude.hpp>

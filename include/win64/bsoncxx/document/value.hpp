@@ -16,14 +16,18 @@
 
 #include <cstdlib>
 #include <memory>
+#include <type_traits>
+
+#include <bsoncxx/document/value-fwd.hpp>
 
 #include <bsoncxx/array/view.hpp>
 #include <bsoncxx/document/view.hpp>
+#include <bsoncxx/stdx/type_traits.hpp>
 
 #include <bsoncxx/config/prelude.hpp>
 
 namespace bsoncxx {
-BSONCXX_INLINE_NAMESPACE_BEGIN
+namespace v_noabi {
 namespace document {
 
 ///
@@ -31,7 +35,7 @@ namespace document {
 /// out of scope, the underlying buffer is freed. Generally this class should be used
 /// sparingly; document::view should be used instead wherever possible.
 ///
-class BSONCXX_API value {
+class value {
    public:
     using deleter_type = void (*)(std::uint8_t*);
     using unique_ptr_type = std::unique_ptr<uint8_t[], deleter_type>;
@@ -79,13 +83,13 @@ class BSONCXX_API value {
 
     ///
     /// Constructor used for serialization of user objects. This uses argument-dependent lookup
-    /// to find the function declaration `void to_bson(T& t, bsoncxx::document::value doc)`.
+    /// to find the function declaration
+    /// `void to_bson(T& t, bsoncxx::v_noabi::document::value doc)`.
     ///
     /// @param t
     ///   A user-defined object to serialize into a BSON object.
     ///
-    template <typename T,
-              typename std::enable_if<!std::is_same<T, typename array::view>::value, int>::type = 0>
+    template <typename T, detail::requires_not_t<int, std::is_same<T, array::view>> = 0>
     explicit value(const T& t) : value({}) {
         to_bson(t, *this);
     }
@@ -184,7 +188,7 @@ class BSONCXX_API value {
     ///
     /// Constructs an object of type T from this document object. This method uses
     /// argument-dependent lookup to find the function declaration
-    /// `void from_bson(T& t, const bsoncxx::document::view& doc)`.
+    /// `void from_bson(T& t, const bsoncxx::v_noabi::document::view& doc)`.
     ///
     /// @note Type T must be default-constructible. Otherwise, use `void get(T& t)`.
     ///
@@ -198,7 +202,7 @@ class BSONCXX_API value {
     ///
     /// Constructs an object of type T from this document object. This method uses
     /// argument-dependent lookup to find the function declaration
-    /// `void from_bson(T& t, const bsoncxx::document::view& doc)`.
+    /// `void from_bson(T& t, const bsoncxx::v_noabi::document::view& doc)`.
     ///
     /// @param t
     ///   The object to construct. The contents of the document object will be deserialized
@@ -231,17 +235,13 @@ class BSONCXX_API value {
     std::size_t _length{0};
 };
 
-#if defined(__GNUC__) && (__cplusplus >= 201709L)
-// Silence false positive with g++ 10.2.1 on Debian 11.
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
-#endif
 BSONCXX_INLINE document::view value::view() const noexcept {
+    // Silence false positive with g++ 10.2.1 on Debian 11.
+    BSONCXX_PUSH_WARNINGS();
+    BSONCXX_DISABLE_WARNING(GCC("-Wmaybe-uninitialized"));
     return document::view{static_cast<uint8_t*>(_data.get()), _length};
+    BSONCXX_POP_WARNINGS();
 }
-#if defined(__GNUC__) && (__cplusplus >= 201709L)
-#pragma GCC diagnostic pop
-#endif
 
 BSONCXX_INLINE value::operator document::view() const noexcept {
     return view();
@@ -267,7 +267,16 @@ BSONCXX_INLINE bool operator!=(const value& lhs, const value& rhs) {
 ///
 
 }  // namespace document
-BSONCXX_INLINE_NAMESPACE_END
+}  // namespace v_noabi
+}  // namespace bsoncxx
+
+namespace bsoncxx {
+namespace document {
+
+using ::bsoncxx::v_noabi::document::operator==;
+using ::bsoncxx::v_noabi::document::operator!=;
+
+}  // namespace document
 }  // namespace bsoncxx
 
 #include <bsoncxx/config/postlude.hpp>

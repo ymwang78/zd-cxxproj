@@ -16,6 +16,8 @@
 
 #include <memory>
 
+#include <mongocxx/events/command_started_event-fwd.hpp>
+
 #include <bsoncxx/document/view.hpp>
 #include <bsoncxx/oid.hpp>
 #include <bsoncxx/stdx/optional.hpp>
@@ -23,17 +25,16 @@
 #include <mongocxx/config/prelude.hpp>
 
 namespace mongocxx {
-MONGOCXX_INLINE_NAMESPACE_BEGIN
-
+namespace v_noabi {
 namespace events {
 
 ///
 /// An event notification sent when the driver begins executing a MongoDB command.
 ///
 /// @see "CommandStartedEvent" in
-/// https://github.com/mongodb/specifications/blob/master/source/command-monitoring/command-monitoring.rst
+/// https://github.com/mongodb/specifications/blob/master/source/command-logging-and-monitoring/command-logging-and-monitoring.rst
 ///
-class MONGOCXX_API command_started_event {
+class command_started_event {
    public:
     MONGOCXX_PRIVATE explicit command_started_event(const void* event);
 
@@ -47,21 +48,21 @@ class MONGOCXX_API command_started_event {
     ///
     /// @return The command.
     ///
-    bsoncxx::document::view command() const;
+    bsoncxx::v_noabi::document::view command() const;
 
     ///
     /// Returns the name of the database.
     ///
     /// @return The database name.
     ///
-    bsoncxx::stdx::string_view database_name() const;
+    bsoncxx::v_noabi::stdx::string_view database_name() const;
 
     ///
     /// Returns the name of the command.
     ///
     /// @return The command name.
     ///
-    bsoncxx::stdx::string_view command_name() const;
+    bsoncxx::v_noabi::stdx::string_view command_name() const;
 
     ///
     /// Returns the request id.
@@ -82,14 +83,14 @@ class MONGOCXX_API command_started_event {
     ///
     /// @return No contained value, or contains the service id if load balancing is enabled.
     ///
-    bsoncxx::stdx::optional<bsoncxx::oid> service_id() const;
+    bsoncxx::v_noabi::stdx::optional<bsoncxx::v_noabi::oid> service_id() const;
 
     ///
     /// Returns the host name.
     ///
     /// @return The host name.
     ///
-    bsoncxx::stdx::string_view host() const;
+    bsoncxx::v_noabi::stdx::string_view host() const;
 
     ///
     /// Returns the port.
@@ -103,7 +104,7 @@ class MONGOCXX_API command_started_event {
 };
 
 }  // namespace events
-MONGOCXX_INLINE_NAMESPACE_END
+}  // namespace v_noabi
 }  // namespace mongocxx
 
 #include <mongocxx/config/postlude.hpp>

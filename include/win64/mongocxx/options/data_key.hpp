@@ -17,6 +17,9 @@
 #include <string>
 #include <vector>
 
+#include <mongocxx/client_encryption-fwd.hpp>
+#include <mongocxx/options/data_key-fwd.hpp>
+
 #include <bsoncxx/document/view_or_value.hpp>
 #include <bsoncxx/stdx/optional.hpp>
 #include <mongocxx/stdx.hpp>
@@ -24,16 +27,13 @@
 #include <mongocxx/config/prelude.hpp>
 
 namespace mongocxx {
-MONGOCXX_INLINE_NAMESPACE_BEGIN
-
-class client_encryption;
-
+namespace v_noabi {
 namespace options {
 
 ///
 /// Class representing options for data key generation for encryption.
 ///
-class MONGOCXX_API data_key {
+class data_key {
    public:
     ///
     /// Sets a KMS-specific key used to encrypt the new data key.
@@ -86,9 +86,10 @@ class MONGOCXX_API data_key {
     /// @return
     ///   A reference to this object.
     ///
-    /// @see https://docs.mongodb.com/manual/core/security-client-side-encryption-key-management/
+    /// @see
+    /// https://www.mongodb.com/docs/manual/core/security-client-side-encryption-key-management/
     ///
-    data_key& master_key(bsoncxx::document::view_or_value master_key);
+    data_key& master_key(bsoncxx::v_noabi::document::view_or_value master_key);
 
     ///
     /// Gets the master key.
@@ -96,7 +97,7 @@ class MONGOCXX_API data_key {
     /// @return
     ///   An optional document containing the master key.
     ///
-    const stdx::optional<bsoncxx::document::view_or_value>& master_key() const;
+    const stdx::optional<bsoncxx::v_noabi::document::view_or_value>& master_key() const;
 
     ///
     /// Sets an optional list of string alternate names used to reference the key.
@@ -109,7 +110,7 @@ class MONGOCXX_API data_key {
     /// @return
     ///   A reference to this object.
     ///
-    /// @see https://docs.mongodb.com/manual/reference/method/getClientEncryption/
+    /// @see https://www.mongodb.com/docs/manual/reference/method/getClientEncryption/
     ///
     data_key& key_alt_names(std::vector<std::string> key_alt_names);
 
@@ -153,15 +154,20 @@ class MONGOCXX_API data_key {
     const stdx::optional<key_material_type>& key_material();
 
    private:
-    friend class mongocxx::client_encryption;
+    friend ::mongocxx::v_noabi::client_encryption;
+
     MONGOCXX_PRIVATE void* convert() const;
 
-    stdx::optional<bsoncxx::document::view_or_value> _master_key;
+    stdx::optional<bsoncxx::v_noabi::document::view_or_value> _master_key;
     std::vector<std::string> _key_alt_names;
     stdx::optional<key_material_type> _key_material;
 };
 
 }  // namespace options
-
-MONGOCXX_INLINE_NAMESPACE_END
+}  // namespace v_noabi
 }  // namespace mongocxx
+
+// CXX-2770: missing include of postlude header.
+#if defined(MONGOCXX_TEST_MACRO_GUARDS_FIX_MISSING_POSTLUDE)
+#include <mongocxx/config/postlude.hpp>
+#endif

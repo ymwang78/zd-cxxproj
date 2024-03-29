@@ -16,6 +16,10 @@
 
 #include <string>
 
+#include <mongocxx/client-fwd.hpp>
+#include <mongocxx/options/server_api-fwd.hpp>
+#include <mongocxx/pool-fwd.hpp>
+
 #include <bsoncxx/stdx/optional.hpp>
 #include <bsoncxx/stdx/string_view.hpp>
 #include <mongocxx/stdx.hpp>
@@ -23,17 +27,13 @@
 #include <mongocxx/config/prelude.hpp>
 
 namespace mongocxx {
-MONGOCXX_INLINE_NAMESPACE_BEGIN
-
-class client;
-class pool;
-
+namespace v_noabi {
 namespace options {
 
 ///
 /// Class representing options for server API.
 ///
-class MONGOCXX_API server_api {
+class server_api {
    public:
     ///
     /// Enum representing the possible values for server API version.
@@ -59,7 +59,7 @@ class MONGOCXX_API server_api {
     /// @param version
     ///   The enum value to convert to a string.
     ///
-    /// @throws mongocxx::logic_error on an invalid argument
+    /// @throws mongocxx::v_noabi::logic_error on an invalid argument
     ///
     /// @return
     ///   The string value of the given enum value.
@@ -72,7 +72,7 @@ class MONGOCXX_API server_api {
     /// @param version
     ///   The string to convert to an enum value.
     ///
-    /// @throws mongocxx::logic_error on an invalid argument
+    /// @throws mongocxx::v_noabi::logic_error on an invalid argument
     ///
     /// @return
     ///   The enum value of the given string.
@@ -128,8 +128,8 @@ class MONGOCXX_API server_api {
     version get_version() const;
 
    private:
-    friend class mongocxx::client;
-    friend class mongocxx::pool;
+    friend ::mongocxx::v_noabi::client;
+    friend ::mongocxx::v_noabi::pool;
 
     version _version;
     stdx::optional<bool> _strict;
@@ -137,7 +137,7 @@ class MONGOCXX_API server_api {
 };
 
 }  // namespace options
-MONGOCXX_INLINE_NAMESPACE_END
+}  // namespace v_noabi
 }  // namespace mongocxx
 
 #include <mongocxx/config/postlude.hpp>

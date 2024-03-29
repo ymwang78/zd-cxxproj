@@ -14,24 +14,23 @@
 
 #pragma once
 
+#include <bsoncxx/builder/stream/array_context-fwd.hpp>
+#include <bsoncxx/builder/stream/key_context-fwd.hpp>
+#include <bsoncxx/builder/stream/single_context-fwd.hpp>
+
 #include <bsoncxx/array/value.hpp>
 #include <bsoncxx/builder/concatenate.hpp>
 #include <bsoncxx/builder/core.hpp>
 #include <bsoncxx/builder/stream/closed_context.hpp>
 #include <bsoncxx/builder/stream/helpers.hpp>
-#include <bsoncxx/util/functor.hpp>
+#include <bsoncxx/stdx/type_traits.hpp>
 
 #include <bsoncxx/config/prelude.hpp>
 
 namespace bsoncxx {
-BSONCXX_INLINE_NAMESPACE_BEGIN
+namespace v_noabi {
 namespace builder {
 namespace stream {
-
-template <class T>
-class key_context;
-
-class single_context;
 
 ///
 /// A stream context which expects any number of values.
@@ -48,7 +47,7 @@ class single_context;
 ///
 /// This builds a bson array with successively higher index keys
 ///
-template <class base = closed_context>
+template <class base>
 class array_context {
    public:
     ///
@@ -67,11 +66,10 @@ class array_context {
     ///   The value to append
     ///
     template <class T>
-    BSONCXX_INLINE typename std::enable_if<
-        !(util::is_functor<T, void(array_context<>)>::value ||
-          util::is_functor<T, void(single_context)>::value ||
-          std::is_same<typename std::remove_reference<T>::type, const finalize_type>::value),
-        array_context>::type&
+    BSONCXX_INLINE detail::requires_not_t<array_context&,
+                                          detail::is_invocable<T, array_context<>>,
+                                          detail::is_invocable<T, single_context>,
+                                          detail::is_alike<T, finalize_type>>
     operator<<(T&& t) {
         _core->append(std::forward<T>(t));
         return *this;
@@ -86,11 +84,12 @@ class array_context {
     ///   The callback to invoke
     ///
     template <typename Func>
-    BSONCXX_INLINE typename std::enable_if<(util::is_functor<Func, void(array_context<>)>::value ||
-                                            util::is_functor<Func, void(single_context)>::value),
-                                           array_context>::type&
-    operator<<(Func&& func) {
-        func(*this);
+    BSONCXX_INLINE
+        detail::requires_t<array_context&,
+                           detail::disjunction<detail::is_invocable<Func, array_context>,
+                                               detail::is_invocable<Func, single_context>>>
+        operator<<(Func&& func) {
+        detail::invoke(std::forward<Func>(func), *this);
         return *this;
     }
 
@@ -100,18 +99,15 @@ class array_context {
     /// This operation finishes all processing necessary to fully encode the
     /// bson bytes and returns an owning value.
     ///
-    /// @param _
-    ///   A finalize_type token
+    /// The argument must be a finalize_type token (it is otherwise ignored).
     ///
     /// @return A value type which holds the complete bson document.
     ///
     template <typename T>
-    BSONCXX_INLINE typename std::enable_if<
-        std::is_same<base, closed_context>::value &&
-            std::is_same<typename std::remove_reference<T>::type, const finalize_type>::value,
-        // TODO(MSVC): This should just be 'array::value', but
-        // VS2015U1 can't resolve the name.
-        bsoncxx::array::value>::type
+    BSONCXX_INLINE detail::requires_t<bsoncxx::v_noabi::array::value,
+                                      std::is_same<base, closed_context>,
+                                      detail::is_alike<T, finalize_type>>
+    // VS2015U1 can't resolve the name.
     operator<<(T&&) {
         return _core->extract_array();
     }
@@ -119,8 +115,7 @@ class array_context {
     ///
     /// << operator for opening a new subdocument in the core builder.
     ///
-    /// @param _
-    ///   An open_document_type token
+    /// The argument must be an open_document_type token (it is otherwise ignored).
     ///
     BSONCXX_INLINE key_context<array_context> operator<<(const open_document_type) {
         _core->open_document();
@@ -144,8 +139,7 @@ class array_context {
     ///
     /// << operator for opening a new subarray in the core builder.
     ///
-    /// @param _
-    ///   An open_document_type token
+    /// The argument must be an open_document_type token (it is otherwise ignored).
     ///
     BSONCXX_INLINE array_context<array_context> operator<<(const open_array_type) {
         _core->open_array();
@@ -155,8 +149,7 @@ class array_context {
     ///
     /// << operator for closing a subarray in the core builder.
     ///
-    /// @param _
-    ///   A close_array_type token
+    /// The argument must be a close_array_type token (it is otherwise ignored).
     ///
     BSONCXX_INLINE base operator<<(const close_array_type) {
         _core->close_array();
@@ -196,7 +189,7 @@ class array_context {
 
 }  // namespace stream
 }  // namespace builder
-BSONCXX_INLINE_NAMESPACE_END
+}  // namespace v_noabi
 }  // namespace bsoncxx
 
 #include <bsoncxx/config/postlude.hpp>

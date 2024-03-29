@@ -18,6 +18,9 @@
 #include <cstdint>
 #include <memory>
 
+#include <mongocxx/gridfs/bucket-fwd.hpp>
+#include <mongocxx/gridfs/uploader-fwd.hpp>
+
 #include <bsoncxx/document/value.hpp>
 #include <bsoncxx/stdx/optional.hpp>
 #include <bsoncxx/stdx/string_view.hpp>
@@ -31,13 +34,13 @@
 #include <mongocxx/config/prelude.hpp>
 
 namespace mongocxx {
-MONGOCXX_INLINE_NAMESPACE_BEGIN
+namespace v_noabi {
 namespace gridfs {
 
 ///
 /// Class used to upload a GridFS file.
 ///
-class MONGOCXX_API uploader {
+class uploader {
    public:
     ///
     /// Default constructs an uploader object. The uploader is equivalent to the state of a moved
@@ -79,12 +82,12 @@ class MONGOCXX_API uploader {
     /// @param length
     ///   The number of bytes to write.
     ///
-    /// @throws mongocxx::logic_error if the upload stream was already closed.
+    /// @throws mongocxx::v_noabi::logic_error if the upload stream was already closed.
     ///
-    /// @throws mongocxx::bulk_write_exception
+    /// @throws mongocxx::v_noabi::bulk_write_exception
     ///   if an error occurs when writing chunk data to the database.
     ///
-    /// @throws mongocxx::gridfs_exception
+    /// @throws mongocxx::v_noabi::gridfs_exception
     ///   if the uploader requires more than 2^31-1 chunks to store the file at the requested chunk
     ///   size.
     ///
@@ -93,12 +96,12 @@ class MONGOCXX_API uploader {
     ///
     /// Closes the uploader stream.
     ///
-    /// @throws mongocxx::logic_error if the upload stream was already closed.
+    /// @throws mongocxx::v_noabi::logic_error if the upload stream was already closed.
     ///
-    /// @throws mongocxx::bulk_write_exception
+    /// @throws mongocxx::v_noabi::bulk_write_exception
     ///   if an error occurs when writing chunk data or file metadata to the database.
     ///
-    /// @throws mongocxx::gridfs_exception
+    /// @throws mongocxx::v_noabi::gridfs_exception
     ///   if the uploader requires more than 2^31-1 chunks to store the file at the requested chunk
     ///   size.
     ///
@@ -107,9 +110,9 @@ class MONGOCXX_API uploader {
     ///
     /// Aborts uploading the file.
     ///
-    /// @throws mongocxx::logic_error if the upload stream was already closed.
+    /// @throws mongocxx::v_noabi::logic_error if the upload stream was already closed.
     ///
-    /// @throws mongocxx::bulk_write_exception
+    /// @throws mongocxx::v_noabi::bulk_write_exception
     ///   if an error occurs when removing chunk data from the database.
     ///
     void abort();
@@ -123,7 +126,7 @@ class MONGOCXX_API uploader {
     std::int32_t chunk_size() const;
 
    private:
-    friend class bucket;
+    friend ::mongocxx::v_noabi::gridfs::bucket;
 
     //
     // Constructs a new uploader stream.
@@ -146,13 +149,14 @@ class MONGOCXX_API uploader {
     // @param metadata
     //   Optional metadata field of the files collection document.
     //
-    MONGOCXX_PRIVATE uploader(const client_session* session,
-                              bsoncxx::types::bson_value::view id,
-                              stdx::string_view filename,
-                              collection files,
-                              collection chunks,
-                              std::int32_t chunk_size,
-                              stdx::optional<bsoncxx::document::view_or_value> metadata = {});
+    MONGOCXX_PRIVATE uploader(
+        const client_session* session,
+        bsoncxx::v_noabi::types::bson_value::view id,
+        stdx::string_view filename,
+        collection files,
+        collection chunks,
+        std::int32_t chunk_size,
+        stdx::optional<bsoncxx::v_noabi::document::view_or_value> metadata = {});
 
     MONGOCXX_PRIVATE void finish_chunk();
     MONGOCXX_PRIVATE void flush_chunks();
@@ -166,5 +170,10 @@ class MONGOCXX_API uploader {
 };
 
 }  // namespace gridfs
-MONGOCXX_INLINE_NAMESPACE_END
+}  // namespace v_noabi
 }  // namespace mongocxx
+
+// CXX-2770: missing include of postlude header.
+#if defined(MONGOCXX_TEST_MACRO_GUARDS_FIX_MISSING_POSTLUDE)
+#include <mongocxx/config/postlude.hpp>
+#endif

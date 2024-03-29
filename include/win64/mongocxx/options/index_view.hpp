@@ -16,19 +16,21 @@
 
 #include <chrono>
 
+#include <mongocxx/options/index_view-fwd.hpp>
+
 #include <bsoncxx/stdx/optional.hpp>
 #include <mongocxx/write_concern.hpp>
 
 #include <mongocxx/config/prelude.hpp>
 
 namespace mongocxx {
-MONGOCXX_INLINE_NAMESPACE_BEGIN
+namespace v_noabi {
 namespace options {
 
 ///
 /// Class representing optional arguments to IndexView operations
 ///
-class MONGOCXX_API index_view {
+class index_view {
    public:
     index_view();
 
@@ -43,7 +45,7 @@ class MONGOCXX_API index_view {
     ///   method chaining.
     ///
     /// @see
-    ///   https://docs.mongodb.com/manual/reference/command/findAndModify/
+    ///   https://www.mongodb.com/docs/manual/reference/command/findAndModify/
     ///
     index_view& max_time(std::chrono::milliseconds max_time);
 
@@ -54,9 +56,9 @@ class MONGOCXX_API index_view {
     ///   The current max allowed running time (in milliseconds).
     ///
     /// @see
-    ///   https://docs.mongodb.com/manual/reference/command/findAndModify/
+    ///   https://www.mongodb.com/docs/manual/reference/command/findAndModify/
     ///
-    const bsoncxx::stdx::optional<std::chrono::milliseconds>& max_time() const;
+    const bsoncxx::v_noabi::stdx::optional<std::chrono::milliseconds>& max_time() const;
 
     ///
     /// Sets the write concern for this operation.
@@ -69,9 +71,9 @@ class MONGOCXX_API index_view {
     ///   method chaining.
     ///
     /// @see
-    ///   https://docs.mongodb.com/manual/reference/command/findAndModify/
+    ///   https://www.mongodb.com/docs/manual/reference/command/findAndModify/
     ///
-    index_view& write_concern(mongocxx::write_concern write_concern);
+    index_view& write_concern(mongocxx::v_noabi::write_concern write_concern);
 
     ///
     /// Gets the current write concern.
@@ -80,9 +82,9 @@ class MONGOCXX_API index_view {
     ///   The current write concern.
     ///
     /// @see
-    ///   https://docs.mongodb.com/manual/reference/command/findAndModify/
+    ///   https://www.mongodb.com/docs/manual/reference/command/findAndModify/
     ///
-    const bsoncxx::stdx::optional<mongocxx::write_concern>& write_concern() const;
+    const bsoncxx::v_noabi::stdx::optional<mongocxx::v_noabi::write_concern>& write_concern() const;
 
     ///
     /// Sets the commit quorum for this operation.
@@ -99,7 +101,7 @@ class MONGOCXX_API index_view {
     ///   method chaining.
     ///
     /// @see
-    ///   https://docs.mongodb.com/manual/reference/command/createIndexes
+    ///   https://www.mongodb.com/docs/manual/reference/command/createIndexes
     ///
     index_view& commit_quorum(std::int32_t commit_quorum);
 
@@ -118,7 +120,7 @@ class MONGOCXX_API index_view {
     ///   method chaining.
     ///
     /// @see
-    ///   https://docs.mongodb.com/manual/reference/command/createIndexes
+    ///   https://www.mongodb.com/docs/manual/reference/command/createIndexes
     ///
     index_view& commit_quorum(std::string commit_quorum);
 
@@ -131,18 +133,18 @@ class MONGOCXX_API index_view {
     ///   The current commitQuorum setting.
     ///
     /// @see
-    ///   https://docs.mongodb.com/manual/reference/command/createIndexes
+    ///   https://www.mongodb.com/docs/manual/reference/command/createIndexes
     ///
-    const stdx::optional<bsoncxx::document::value> commit_quorum() const;
+    const stdx::optional<bsoncxx::v_noabi::document::value> commit_quorum() const;
 
    private:
-    bsoncxx::stdx::optional<std::chrono::milliseconds> _max_time;
-    bsoncxx::stdx::optional<mongocxx::write_concern> _write_concern;
-    bsoncxx::stdx::optional<bsoncxx::document::value> _commit_quorum;
+    bsoncxx::v_noabi::stdx::optional<std::chrono::milliseconds> _max_time;
+    bsoncxx::v_noabi::stdx::optional<mongocxx::v_noabi::write_concern> _write_concern;
+    bsoncxx::v_noabi::stdx::optional<bsoncxx::v_noabi::document::value> _commit_quorum;
 };
 
 }  // namespace options
-MONGOCXX_INLINE_NAMESPACE_END
+}  // namespace v_noabi
 }  // namespace mongocxx
 
 #include <mongocxx/config/postlude.hpp>

@@ -14,24 +14,26 @@
 
 #pragma once
 
+#include <mongocxx/exception/logic_error-fwd.hpp>
+
 #include <mongocxx/exception/exception.hpp>
 
 #include <mongocxx/config/prelude.hpp>
 
 namespace mongocxx {
-MONGOCXX_INLINE_NAMESPACE_BEGIN
+namespace v_noabi {
 
 ///
 /// Class representing an exception caused by using the mongocxx API improperly.
 ///
-/// @see mongocxx::exception
+/// @see mongocxx::v_noabi::exception
 ///
-class MONGOCXX_API logic_error : public exception {
+class logic_error : public exception {
    public:
     using exception::exception;
 };
 
-MONGOCXX_INLINE_NAMESPACE_END
+}  // namespace v_noabi
 }  // namespace mongocxx
 
 #include <mongocxx/config/postlude.hpp>

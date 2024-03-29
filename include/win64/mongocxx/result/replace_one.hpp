@@ -16,6 +16,8 @@
 
 #include <cstdint>
 
+#include <mongocxx/result/replace_one-fwd.hpp>
+
 #include <bsoncxx/stdx/optional.hpp>
 #include <bsoncxx/types.hpp>
 #include <mongocxx/result/bulk_write.hpp>
@@ -24,11 +26,11 @@
 #include <mongocxx/config/prelude.hpp>
 
 namespace mongocxx {
-MONGOCXX_INLINE_NAMESPACE_BEGIN
+namespace v_noabi {
 namespace result {
 
 /// Class representing the result of a MongoDB replace_one operation.
-class MONGOCXX_API replace_one {
+class replace_one {
    public:
     // This constructor is public for testing purposes only
     explicit replace_one(result::bulk_write result);
@@ -59,7 +61,7 @@ class MONGOCXX_API replace_one {
     ///
     /// @return The value of the _id field for upserted document.
     ///
-    stdx::optional<bsoncxx::document::element> upserted_id() const;
+    stdx::optional<bsoncxx::v_noabi::document::element> upserted_id() const;
 
    private:
     result::bulk_write _result;
@@ -69,7 +71,7 @@ class MONGOCXX_API replace_one {
 };
 
 }  // namespace result
-MONGOCXX_INLINE_NAMESPACE_END
+}  // namespace v_noabi
 }  // namespace mongocxx
 
 #include <mongocxx/config/postlude.hpp>

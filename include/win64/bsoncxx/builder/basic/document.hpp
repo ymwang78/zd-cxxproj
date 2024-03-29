@@ -14,6 +14,9 @@
 
 #pragma once
 
+#include <bsoncxx/builder/basic/array-fwd.hpp>
+#include <bsoncxx/builder/basic/document-fwd.hpp>
+
 #include <bsoncxx/builder/basic/impl.hpp>
 #include <bsoncxx/builder/basic/kvp.hpp>
 #include <bsoncxx/builder/basic/sub_document.hpp>
@@ -24,11 +27,9 @@
 #include <bsoncxx/config/prelude.hpp>
 
 namespace bsoncxx {
-BSONCXX_INLINE_NAMESPACE_BEGIN
+namespace v_noabi {
 namespace builder {
 namespace basic {
-
-class array;
 
 ///
 /// A traditional builder-style interface for constructing
@@ -58,7 +59,7 @@ class document : public sub_document {
     ///
     /// @return A view of the BSON document.
     ///
-    BSONCXX_INLINE bsoncxx::document::view view() const {
+    BSONCXX_INLINE bsoncxx::v_noabi::document::view view() const {
         return _core.view_document();
     }
 
@@ -68,7 +69,7 @@ class document : public sub_document {
     ///
     /// @return A view of the current builder contents.
     ///
-    BSONCXX_INLINE operator bsoncxx::document::view() const {
+    BSONCXX_INLINE operator bsoncxx::v_noabi::document::view() const {
         return view();
     }
 
@@ -81,7 +82,7 @@ class document : public sub_document {
     ///  After calling extract() it is illegal to call any methods
     ///  on this class, unless it is subsequently moved into.
     ///
-    BSONCXX_INLINE bsoncxx::document::value extract() {
+    BSONCXX_INLINE bsoncxx::v_noabi::document::value extract() {
         return _core.extract_document();
     }
 
@@ -104,19 +105,28 @@ class document : public sub_document {
 ///   builder::basic::sub_document::append accepts.
 ///
 /// @return
-///   A bsoncxx::document::value containing the elements.
+///   A bsoncxx::v_noabi::document::value containing the elements.
 ///
 template <typename... Args>
-bsoncxx::document::value BSONCXX_CALL make_document(Args&&... args) {
-    basic::document document;
+bsoncxx::v_noabi::document::value BSONCXX_CALL make_document(Args&&... args) {
+    document document;
     document.append(std::forward<Args>(args)...);
-
     return document.extract();
 }
 
 }  // namespace basic
 }  // namespace builder
-BSONCXX_INLINE_NAMESPACE_END
+}  // namespace v_noabi
+}  // namespace bsoncxx
+
+namespace bsoncxx {
+namespace builder {
+namespace basic {
+
+using ::bsoncxx::v_noabi::builder::basic::make_document;
+
+}  // namespace basic
+}  // namespace builder
 }  // namespace bsoncxx
 
 #include <bsoncxx/config/postlude.hpp>

@@ -14,6 +14,8 @@
 
 #pragma once
 
+#include <mongocxx/exception/operation_exception-fwd.hpp>
+
 #include <bsoncxx/document/value.hpp>
 #include <bsoncxx/stdx/optional.hpp>
 #include <mongocxx/exception/exception.hpp>
@@ -22,15 +24,15 @@
 #include <mongocxx/config/prelude.hpp>
 
 namespace mongocxx {
-MONGOCXX_INLINE_NAMESPACE_BEGIN
+namespace v_noabi {
 
 ///
 /// Class representing an exception received from a MongoDB server.  It includes the server-provided
 /// error code, if one was available.
 ///
-/// @see mongocxx::exception
+/// @see mongocxx::v_noabi::exception
 ///
-class MONGOCXX_API operation_exception : public exception {
+class operation_exception : public exception {
    public:
     using exception::exception;
 
@@ -45,7 +47,7 @@ class MONGOCXX_API operation_exception : public exception {
     ///   An optional message to be returned by `what`.
     ///
     operation_exception(std::error_code ec,
-                        bsoncxx::document::value&& raw_server_error,
+                        bsoncxx::v_noabi::document::value&& raw_server_error,
                         std::string what_arg = "");
 
     ///
@@ -55,8 +57,8 @@ class MONGOCXX_API operation_exception : public exception {
     ///
     /// @returns The raw server error, if it is available.
     ///
-    const stdx::optional<bsoncxx::document::value>& raw_server_error() const;
-    stdx::optional<bsoncxx::document::value>& raw_server_error();
+    const stdx::optional<bsoncxx::v_noabi::document::value>& raw_server_error() const;
+    stdx::optional<bsoncxx::v_noabi::document::value>& raw_server_error();
     ///
     /// @}
     ///
@@ -72,10 +74,10 @@ class MONGOCXX_API operation_exception : public exception {
     bool has_error_label(stdx::string_view label) const;
 
    private:
-    stdx::optional<bsoncxx::document::value> _raw_server_error;
+    stdx::optional<bsoncxx::v_noabi::document::value> _raw_server_error;
 };
 
-MONGOCXX_INLINE_NAMESPACE_END
+}  // namespace v_noabi
 }  // namespace mongocxx
 
 #include <mongocxx/config/postlude.hpp>

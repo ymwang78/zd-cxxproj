@@ -17,15 +17,15 @@
 #include <cstdint>
 #include <memory>
 
+#include <bsoncxx/validate-fwd.hpp>
+
 #include <bsoncxx/document/view.hpp>
 #include <bsoncxx/stdx/optional.hpp>
 
 #include <bsoncxx/config/prelude.hpp>
 
 namespace bsoncxx {
-BSONCXX_INLINE_NAMESPACE_BEGIN
-
-class validator;
+namespace v_noabi {
 
 ///
 /// Validates a BSON document. This is a simplified overload that will
@@ -69,11 +69,12 @@ validate(const std::uint8_t* data,
          std::size_t length,
          const validator& validator,
          std::size_t* invalid_offset = nullptr);
+
 ///
 /// A validator is used to enable or disable specific checks that can be
 /// performed during BSON validation.
 ///
-class BSONCXX_API validator {
+class validator {
    public:
     ///
     /// Constructs a validator.
@@ -156,7 +157,13 @@ class BSONCXX_API validator {
     std::unique_ptr<impl> _impl;
 };
 
-BSONCXX_INLINE_NAMESPACE_END
+}  // namespace v_noabi
+}  // namespace bsoncxx
+
+namespace bsoncxx {
+
+using ::bsoncxx::v_noabi::validate;
+
 }  // namespace bsoncxx
 
 #include <bsoncxx/config/postlude.hpp>

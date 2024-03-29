@@ -14,18 +14,20 @@
 
 #pragma once
 
+#include <mongocxx/model/insert_one-fwd.hpp>
+
 #include <bsoncxx/document/view_or_value.hpp>
 
 #include <mongocxx/config/prelude.hpp>
 
 namespace mongocxx {
-MONGOCXX_INLINE_NAMESPACE_BEGIN
+namespace v_noabi {
 namespace model {
 
 ///
 /// Class representing a MongoDB insert operation that creates a single document.
 ///
-class MONGOCXX_API insert_one {
+class insert_one {
    public:
     ///
     /// Constructs an insert operation that will create a single document.
@@ -33,21 +35,21 @@ class MONGOCXX_API insert_one {
     /// @param document
     ///   The document to insert.
     ///
-    insert_one(bsoncxx::document::view_or_value document);
+    insert_one(bsoncxx::v_noabi::document::view_or_value document);
 
     ///
     /// Gets the document to be inserted.
     ///
     /// @return The document to be inserted.
     ///
-    const bsoncxx::document::view_or_value& document() const;
+    const bsoncxx::v_noabi::document::view_or_value& document() const;
 
    private:
-    bsoncxx::document::view_or_value _document;
+    bsoncxx::v_noabi::document::view_or_value _document;
 };
 
 }  // namespace model
-MONGOCXX_INLINE_NAMESPACE_END
+}  // namespace v_noabi
 }  // namespace mongocxx
 
 #include <mongocxx/config/postlude.hpp>
