@@ -44,7 +44,7 @@ namespace zdp
 
     enum ERV_ZDS_SUBTYPE : zce_byte {
         ZDS_SUBTYPE_SINGLE, //one item
-        ZDS_SUBTYPE_VEC,    //vector item  矩阵应当通过其他变量来描述每个维度的长度从而实现把一位数组转换为矩阵
+        ZDS_SUBTYPE_VEC,    //vector item  锟斤拷锟斤拷应锟斤拷通锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷锟斤拷每锟斤拷维锟饺的筹拷锟饺从讹拷实锟街帮拷一位锟斤拷锟斤拷转锟斤拷为锟斤拷锟斤拷
     };
 
     struct zds_context_t
@@ -336,4 +336,8 @@ namespace zdp
         }
         return ret;
     }
+
+    struct _dummy_t{}; //treat linux compiler
+    inline int zds_pack(zce_byte* buf, int size, const _dummy_t& _t, zds_context_t* ctx, bool has_prefix) { return -1;};
+    inline int zds_unpack(_dummy_t& _t, const zce_byte* buf, int size, zds_context_t* ctx, bool has_prefix) { return -1;};
 } //namespace zdp

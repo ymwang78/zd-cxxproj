@@ -82,7 +82,10 @@
 #   else
 #       define ZCE_ZDB_MYSQL 1
 #       define ZCE_ZDB_PGSQL 1
-#       define ZCE_ISSERVICE_MODE  1
+#       define ZCE_ISSERVICE_MODE  0
+#       define ZCE_SUPPORT_PYVM  0
+#       define ZCE_SUPPORT_LUAVM 1
+#       define ZCE_SUPPORT_SSL 1
 #   endif
 #endif
 

@@ -14,6 +14,7 @@
 
 #include <zce/zce_handler.h>
 #include <zce/zdp_schema.h>
+#include <zce/zds_schema.h>
 #include <zce/zce_timer.h>
 #include <zce/zce_any.h>
 
@@ -23,6 +24,7 @@ class zce_reactor;
 namespace zdp
 {
     class zdp_stream;
+    struct zds_context_t;
 
     class ZCE_API zdp_resctx : public zce_object
     {
@@ -157,7 +159,7 @@ namespace zdp
     int zdp_serialize(zce_dblock& dblock_ptr, zce_uint32 seq, const T& msg, zce_byte rev,
         ERV_ZCE_COMPRESS cps = ZCE_COMPRESS_NONE, int preserv = 0) 
     {
-        int bodylen = zds_pack(0, 0, msg, 0, true);
+        int bodylen = zdp::zds_pack(0, 0, msg, 0, true);
         ZCE_MBACQUIRE(dblock_ptr, preserv + zdp_headlen(rev) + bodylen);
         if (dblock_ptr.space() <= 0)
             return ZCE_ERROR_MALLOC;
