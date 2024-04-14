@@ -23,7 +23,6 @@
 extern "C"
 {
 #endif
-    typedef union _zce_sockaddr_t zce_sockaddr_t;
 
     int ZCE_API zce_init();
 
@@ -41,7 +40,13 @@ extern "C"
 
     int ZCE_API zce_timespec_str(char* buf, int size, struct timespec*, bool msec);
 
-    unsigned  ZCE_API zce_thread_id();
+    zce_timestamp ZCE_API zce_to_timestamp(time_t t);
+
+    time_t ZCE_API zce_to_timet(zce_timestamp ts);
+
+    zce_timestamp ZCE_API zce_timestamp_from_asc(const char* timestr);
+
+    unsigned ZCE_API zce_thread_id();
 
     void ZCE_API zce_oom_adjust(int adjust);
 
@@ -76,6 +81,7 @@ extern "C"
 
     //inet api
 	int ZCE_API zce_inet_isip(const char* ip);
+    int ZCE_API zce_inet_isloopback(const zce_sockaddr_t& addr);
 
     int ZCE_API zce_inet_ntop4(const unsigned char* src, char* dst, size_t size);
     int ZCE_API zce_inet_ntop6(const unsigned char* src, char* dst, size_t size);
@@ -102,13 +108,15 @@ int ZCE_API zce_symbol_read(const char* buf, int size, std::string& val, char sp
 
 int ZCE_API zce_symbol_read_linefeed(const char* buf, int size, std::string& val);
 
+int ZCE_API zce_list_ip(std::vector<std::string>& ip_list);
+
 void ZCE_API zce_str2addrvec(std::vector<zce_addr_t>& tsock_vec, const std::string& addrs);
+
+zce_bytevec ZCE_API zce_from_hex(const std::string& in);
 
 std::string ZCE_API zce_to_hex(const unsigned char* p, size_t size);
 
 std::string ZCE_API zce_to_hex(const std::vector<zce_byte>& vec);
-
-std::vector<unsigned char> ZCE_API zce_from_hex(const std::string& in);
 
 std::string ZCE_API zce_md5sum(const char* fname);
 
@@ -116,13 +124,11 @@ std::string ZCE_API zce_md5_encode(const char* input, size_t inputlen, unsigned 
 
 std::string ZCE_API zce_string_format(unsigned length, const char* format, ...);
 
-std::string ZCE_API zce_trim(const std::string& str,
-	const std::string& whitespace = " \t");
+std::string ZCE_API zce_trim(const std::string& str, const std::string& whitespace = " \t\r\n");
 
+std::string ZCE_API zce_localtime_str(bool msec);
 
-int ZCE_API zce_list_ip(std::vector<std::string>& ip_list);
-
-std::string zce_localtime_str(bool msec);
+std::string ZCE_API zce_timestamp_to_asc(zce_timestamp ts);
 
 template<typename T>
 inline T zce_min(T v1, T v2) 
@@ -139,7 +145,7 @@ inline T zce_max(T v1, T v2)
 template<typename T>
 inline T zce_abs(const T& iValue)
 {
-    return iValue > 0 ? iValue : -iValue;
+    return iValue >= 0 ? iValue : -iValue;
 }
 
 template<typename T>
@@ -232,21 +238,21 @@ int zce_div(std::vector<double>& res, const std::vector<T>& lhs, P sum)
 
 #ifdef _WIN32
 
-HRESULT zce_createinstance(const wchar_t* dllname, REFCLSID rclsid, REFIID riid, LPVOID* ppv);
+HRESULT ZCE_API zce_createinstance(const wchar_t* dllname, REFCLSID rclsid, REFIID riid, LPVOID* ppv);
 
-std::string zce_getharddrv();
+std::string ZCE_API zce_getharddrv();
 
-std::string zce_getimei();
+std::string ZCE_API zce_getimei();
 
 class zce_dblock;
 
-int zce_getmblock(zce_dblock& dblock);
+int ZCE_API zce_getmblock(zce_dblock& dblock);
 
-void zce_setmblock(zce_dblock& dblock);
+void ZCE_API zce_setmblock(zce_dblock& dblock);
 
-std::string zce_to_utf8(const wchar_t* src, unsigned len);
+std::string ZCE_API zce_to_utf8(const wchar_t* src, unsigned len);
 
-std::wstring zce_to_utf16(const char* src, unsigned len);
+std::wstring ZCE_API zce_to_utf16(const char* src, unsigned len);
 
 extern "C" {
     char* ZCE_API strptime(const char *buf, const char *fmt, struct tm *tm);

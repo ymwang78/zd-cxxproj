@@ -15,7 +15,7 @@
 #       define ZCE_ZDB_PGSQL 1
 #       define ZCE_ISSERVICE_MODE  0
 #       define ZCE_SUPPORT_PYVM  1
-#       define ZCE_SUPPORT_LUAVM 1
+#       define ZCE_SUPPORT_LUAVM 0
 #       define ZCE_SUPPORT_SSL 1
 #   endif
 #   include <winsock2.h>

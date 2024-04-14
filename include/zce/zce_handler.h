@@ -82,7 +82,7 @@ public:
         }
     }
 
-    virtual void on_open(bool passive, const char* peerip, zce_uint16 peerport);
+    virtual void on_open(bool passive, const zce_sockaddr_t& remote);
 
     virtual void on_read(const zce_dblock& dblock, const zce_any&);
 
@@ -132,7 +132,7 @@ protected:
 
 public:
 
-    virtual void on_open(bool passive, const char* peerip, zce_uint16 peerport);
+    virtual void on_open(bool passive, const zce_sockaddr_t& remote);
 
     virtual void close();
 
@@ -262,7 +262,7 @@ public:
     //////////////////////////////////////////////////////////////////////////
     virtual void close();
 
-    virtual void on_open(bool passive, const  char* peerip, zce_uint16 peerport);
+    virtual void on_open(bool passive, const zce_sockaddr_t& remote);
 
     virtual void on_close();
 
@@ -403,7 +403,7 @@ public:
 
     virtual int do_match_queue(zce_smartptr<zce_task_queue>&, const zce_dblock& dblock, const zce_any& ctx) { return 0; };
 
-    virtual void on_open(bool passive, const char* peerip, zce_uint16 peerport);
+    virtual void on_open(bool passive, const zce_sockaddr_t& remote);
 
     virtual void on_read(const zce_dblock& dblock, const zce_any&);
 
@@ -438,7 +438,7 @@ public:
 
     zce_proxy_socks(const std::string& realip, zce_uint16 realport, const std::string& user, const std::string& pass);
 
-    virtual void on_open(bool passive, const char* peerip, zce_uint16 peerport);
+    virtual void on_open(bool passive, const zce_sockaddr_t& remote);
 
     virtual void on_read(const zce_dblock& dblock, const zce_any&);
 };

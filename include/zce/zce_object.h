@@ -42,23 +42,23 @@ protected:
 
 public:
 
-	inline zce_int64 __get_oid() const {
+	inline zce_int64 __get_oid() const noexcept {
 		return obj_idx_;
 	}
 
-    inline bool __isvalid() {
+    inline bool __isvalid() noexcept {
         return true;
     }
 
-    inline void __set_allocator(zce_allocator* alloc) {
+    inline void __set_allocator(zce_allocator* alloc) noexcept {
         zce_alloc_ = alloc;
     }
 
-    inline void __addref() {
+    inline void __addref() noexcept {
         ++this->ref_count_;
     }
 
-    inline void __decref() {
+    inline void __decref() noexcept {
         if (--this->ref_count_ == 0) {
             if (zce_alloc_ == 0)
                 delete this;
@@ -67,7 +67,7 @@ public:
         }
     }
 
-    inline long __get_ref_count() const {
+    inline long __get_ref_count() const noexcept {
         return this->ref_count_.value();
     }
 

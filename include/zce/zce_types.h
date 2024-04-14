@@ -9,57 +9,59 @@
 // ***************************************************************
 // 
 // ***************************************************************
-#ifndef __zce_types_h__
-#define __zce_types_h__
 
+//fix defines in different platform
 #ifndef ZCE_TYPES_DEFINED
 #define ZCE_TYPES_DEFINED
 
-#if !defined(_SSIZE_T_) && !defined(_SSIZE_T_DEFINED)
-typedef intptr_t ssize_t;
-# define _SSIZE_T_
-# define _SSIZE_T_DEFINED
-#endif
+#   if !defined(_SSIZE_T_) && !defined(_SSIZE_T_DEFINED)
+        typedef intptr_t ssize_t;
+#       define _SSIZE_T_
+#       define _SSIZE_T_DEFINED
+#   endif
 
-#ifdef _WIN32
-    typedef DWORD       threadid_t;
-    typedef HANDLE      handle_t;
-    typedef int         socklen_t;
-    typedef long long          int zce_int64;
-    typedef unsigned long long int zce_uint64;
-    struct iovec {
-        u_long iov_len;
-        char* iov_base;
-    };
-#   define ZCE_INVALID_HANDLE INVALID_HANDLE_VALUE
-#else
-    typedef pthread_t   threadid_t;
-    typedef int         handle_t;
-#if defined(__GNUC__) && (__WORDSIZE == 64)
-    typedef long int          zce_int64;
-    typedef unsigned long int zce_uint64;
-#else
-    typedef long long int          zce_int64;
-    typedef unsigned long long int zce_uint64;
-#endif
-#   define ZCE_INVALID_HANDLE -1
-#endif
-
-typedef char         zce_ntchars;
-typedef char         zce_char;
-typedef char         zce_int8;
-typedef short        zce_int16;
-typedef int          zce_int32;
-typedef unsigned char       zce_byte;
-typedef unsigned char       zce_uint8;
-typedef unsigned short      zce_uint16;
-typedef unsigned int        zce_uint32;
-typedef float               zce_float;
-typedef double              zce_double;
-typedef int                 zce_serial;
-typedef struct timespec timespec_t;
+#   ifdef _WIN32
+	    typedef DWORD threadid_t;
+	    typedef HANDLE handle_t;
+	    typedef int socklen_t;
+	    struct iovec {
+		    u_long iov_len;
+		    char* iov_base;
+	    };
+#   else
+	    typedef pthread_t   threadid_t;
+	    typedef int         handle_t;
+#   endif
 
 #endif //ZCE_TYPES_DEFINED
+
+#ifdef _WIN32
+#   define ZCE_INVALID_HANDLE INVALID_HANDLE_VALUE
+	typedef long long int zce_int64;
+	typedef unsigned long long int zce_uint64;
+#else
+#   define ZCE_INVALID_HANDLE -1
+#   if defined(__GNUC__) && (__WORDSIZE == 64)
+        typedef long int zce_int64;
+        typedef unsigned long int zce_uint64;
+#   else
+        typedef long long int zce_int64;
+        typedef unsigned long long int zce_uint64;
+#   endif
+#endif
+
+typedef char    zce_char;
+typedef char    zce_int8;
+typedef short   zce_int16;
+typedef int     zce_int32;
+typedef unsigned char   zce_byte;
+typedef unsigned char   zce_uint8;
+typedef unsigned short  zce_uint16;
+typedef unsigned int    zce_uint32;
+typedef float           zce_float;
+typedef double          zce_double;
+typedef struct timespec zce_timespec_t;
+typedef zce_int64       zce_timestamp;  //same as pgsql timestamp, microsecond from 2000-1-1 00:00:00
 
 //to simplify type cast or type safety
 typedef union _zce_sockaddr_t
@@ -80,24 +82,21 @@ typedef struct _zce_addr_t
 #ifdef __cplusplus
 #   include <string>
 #   include <vector>
-#   ifdef _UNICODE
-    typedef std::wstring    zce_string;
-    typedef wchar_t         zce_tchar;
-#   else //_UNICODE
-    typedef std::string     zce_string;
-    typedef char            zce_tchar;
-#   endif //_UNICODE
-    typedef std::wstring    zce_wstring;
-    typedef std::string     zce_astring;
-    typedef std::vector<zce_byte> zce_bytevec;
 
-    typedef zce_string zce_str;
-    typedef zce_astring zce_astr;
-    typedef zce_wstring zce_wstr;
-    typedef std::vector<zce_string> zce_strvec;
-    typedef std::vector<zce_astring> zce_astrvec;
+#   ifdef _UNICODE
+        typedef std::wstring zce_tstring;
+        typedef wchar_t      zce_tchar;
+#   else //_UNICODE
+        typedef std::string  zce_tstring;
+        typedef char         zce_tchar;
+#   endif //_UNICODE
+
+    typedef std::string  zce_string;
+	typedef std::string  zce_astring;
+    typedef std::wstring zce_wstring;
+	typedef std::vector<zce_byte>    zce_bytevec;
+	typedef std::vector<zce_string>  zce_strvec;
+	typedef std::vector<zce_astring> zce_astrvec;
+    typedef std::vector<zce_tstring> zce_tstrvec;
     typedef std::vector<zce_wstring> zce_wstrvec;
 #endif //__cplusplus
-
-#endif // __zce_types_h__
-

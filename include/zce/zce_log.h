@@ -176,6 +176,8 @@ public:
             ost << splitter_;
     }
 
+    void log_args(std::ostream& ost, const zce_sockaddr_t& t);
+
     template<typename T, typename... Args>
     void log_args(std::ostream& ost, const T& t, const Args&... args) {
         log_args(ost, t);

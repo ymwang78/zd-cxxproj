@@ -24,10 +24,12 @@ class zce_allocator;
 class ZCE_API zce_dtblock : public zce_object
 {
     zce_byte* buffer_;
-    size_t size_;
     zce_object_counter* obj_;       //for alloc position statistics
     zce_allocator* alloc_;
-    bool ownbuf_;           //will take response of free buffer
+    struct _size_t {
+		zce_uint64 refbuf : 1;
+        zce_uint64 len : 63;
+	} size_;
 
     friend class zce_dblock;
 
@@ -40,8 +42,12 @@ public:
     
     ~zce_dtblock();
 
+    inline size_t size() const noexcept {
+		return size_.len;
+	}
+
     bool manbuf() const {
-        return ownbuf_;
+        return !size_.refbuf;
     }
 };
 

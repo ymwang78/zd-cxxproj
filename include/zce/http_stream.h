@@ -144,15 +144,15 @@ public:
 
 public:
 
-    virtual void on_open(bool passive, const char* peerip, zce_uint16 peerport);
+    void on_open(bool passive, const zce_sockaddr_t& remote) override;
 
-    virtual void on_read(const zce_dblock& dblock, const zce_any&);
+    void on_read(const zce_dblock& dblock, const zce_any&) override;
 
-    virtual void on_http_request(const zce_smartptr<ZCE_HTTP_REQUEST>&, const zce_dblock& dblock);
+	virtual void on_http_request(const zce_smartptr<ZCE_HTTP_REQUEST>&, const zce_dblock& dblock);
 
-    virtual void on_http_continue(zce_dblock& dblock) {};
+	virtual void on_http_continue(zce_dblock& dblock) {};
 
-    virtual void on_prepare_nextreq();
+	virtual void on_prepare_nextreq();
 
 	int write_ack(unsigned code, const zce_byte* buf, size_t length, std::map<std::string, std::string>& paramdict);
 };
@@ -202,15 +202,15 @@ public:
 
 	zce_websocket_stream(int opcode = OPCODE_BIN);
 
-	virtual void on_open(bool passive, const char* peerip, zce_uint16 peerport);
+	void on_open(bool passive, const zce_sockaddr_t& remote) override;
 
-	virtual void on_http_request(const zce_smartptr<ZCE_HTTP_REQUEST>& request, const zce_dblock& dblock);
+	void on_http_request(const zce_smartptr<ZCE_HTTP_REQUEST>& request, const zce_dblock& dblock) override;
 
-	virtual void on_http_continue(zce_dblock& dblock);
+	void on_http_continue(zce_dblock& dblock) override;
 
-	virtual int  write(const zce_dblock& dblock, ERV_ISTREAM_WRITEOPT opt);
+	int  write(const zce_dblock& dblock, ERV_ISTREAM_WRITEOPT opt) override;
 
-	virtual void on_prepare_nextreq() {}; //websocket just continue process
+	void on_prepare_nextreq() override {}; //websocket just continue process
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -233,9 +233,7 @@ class zce_websocket_client : public zce_istream
 
     std::string path_;
 
-    std::string peerip_;
-
-    zce_uint16 peerport_;
+	zce_sockaddr_t remote_;
 
     int opcode_;
 
@@ -244,15 +242,15 @@ public:
 
     zce_websocket_client(const std::string& host, const std::string& path = "/", int opcode = OPCODE_BIN);
 
-    virtual void on_open(bool passive, const char* peerip, zce_uint16 peerport);
+    void on_open(bool passive, const zce_sockaddr_t& remote) override;
 
-    virtual void on_read(const zce_dblock& dblock, const zce_any& ctx);
+    void on_read(const zce_dblock& dblock, const zce_any& ctx) override;
 
-    virtual void on_http_response(const ZCE_HTTP_RESPONSE& header, const zce_dblock& dblock) ;
+    void on_http_response(const ZCE_HTTP_RESPONSE& header, const zce_dblock& dblock);
 
-    virtual void on_http_continue(zce_dblock& dblock);
+    void on_http_continue(zce_dblock& dblock);
 
-    virtual int  write(const zce_dblock& dblock, ERV_ISTREAM_WRITEOPT opt);
+    int  write(const zce_dblock& dblock, ERV_ISTREAM_WRITEOPT opt) override;
 };
 
 ///////////////////////////////////////////////////////////////////////////////

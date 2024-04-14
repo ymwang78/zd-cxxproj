@@ -50,7 +50,7 @@ public:
 
     static SSL_CTX* init_ssl_ctx(bool isserver, const char* verifycrt, const char* cert, const char* key);
 
-    virtual void on_open(bool passive, const char* peerip, zce_uint16 peerport);
+    virtual void on_open(bool passive, const zce_sockaddr_t& remote);
 
     virtual void on_read(const zce_dblock& dblock, void*);
 

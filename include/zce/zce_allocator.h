@@ -46,7 +46,7 @@ class ZCE_API zce_allocator : public zce_object
 public:
     virtual void* alloc(size_t nbytes, size_t* nreal) = 0;
 
-    virtual void zfree(void* item) = 0; //fuck off the macro
+    virtual void zfree(void* item) noexcept = 0; //fuck off the macro
 };
 
 class ZCE_API zce_allocator_chunk : public zce_allocator
@@ -87,7 +87,7 @@ public:
 
     void *alloc(size_t nbytes, size_t* nreal) override;
 
-    void zfree(void* item) override;
+    void zfree(void* item) noexcept override;
 };
 
 class ZCE_API zce_allocator_v2 : public zce_allocator
@@ -110,6 +110,6 @@ public:
 
     void* alloc(size_t nbytes, size_t* nreal) override;
 
-    void zfree(void* item) override;
+    void zfree(void* item) noexcept override;
 };
 #endif // __zce_allocator_h__
