@@ -31,7 +31,7 @@ protected:
 		:zce_alloc_(0), ref_count_(1), obj_idx_(zce_tss::get_global()->next_oid()) {
     };
 
-    zce_object& operator= (const zce_object& rhs) {
+    zce_object& operator= (const zce_object& /*rhs*/) {
         return *this;
     };
 
