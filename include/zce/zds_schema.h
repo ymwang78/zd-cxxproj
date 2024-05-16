@@ -44,7 +44,7 @@ namespace zdp
 
     enum ERV_ZDS_SUBTYPE : zce_byte {
         ZDS_SUBTYPE_SINGLE, //one item
-        ZDS_SUBTYPE_VEC,    //vector item  ����Ӧ��ͨ����������������ÿ��ά�ȵĳ��ȴӶ�ʵ�ְ�һλ����ת��Ϊ����
+        ZDS_SUBTYPE_VEC,    //vector item  矩阵应当通过其他变量来描述每个维度的长度从而实现把一位数组转换为矩阵
     };
 
     struct zds_context_t

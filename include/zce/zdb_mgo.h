@@ -2,15 +2,17 @@
 
 #include <zce/zce_task.h>
 #include <zce/zce_bytes.h>
-#include <mongocxx/client.hpp>
+#include <functional>
 #include <bsoncxx/document/view.hpp>
 #include <bsoncxx/builder/stream/document.hpp>
 #include <bsoncxx/builder/stream/array.hpp>
 #include <bsoncxx/builder/basic/kvp.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
 #include <bsoncxx/builder/basic/array.hpp>
-
 class zce_dblock;
+
+#if ZCE_ZDB_MONGODB
+#include <mongocxx/client.hpp>
 
 class ZCE_API zdb_mgo_connection : public zce_object, public mongocxx::v_noabi::client
 {
@@ -47,6 +49,8 @@ public:
 
     zce_smartptr<zdb_mgo_connection> get_connection();
 };
+
+#endif //ZCE_ZDB_MONGODB
 
 zce_int64 ZCE_API zdb_mgo_getintfield(const bsoncxx::document::view& p, const std::string& field, zce_int64 defaultval);
 

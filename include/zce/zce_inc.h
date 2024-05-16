@@ -4,6 +4,7 @@
 #   define NOMINMAX
 #   if defined(_UNICODE)
 #       //include <vld.h>
+#       define ZCE_ZDB_MONGODB 0
 #       define ZCE_ZDB_MYSQL 0
 #       define ZCE_ZDB_PGSQL 0
 #       define ZCE_ISSERVICE_MODE  0
@@ -11,11 +12,12 @@
 #       define ZCE_SUPPORT_LUAVM 0
 #       define ZCE_SUPPORT_SSL 0
 #   else
+#       define ZCE_ZDB_MONGODB 0
 #       define ZCE_ZDB_MYSQL 0
 #       define ZCE_ZDB_PGSQL 1
 #       define ZCE_ISSERVICE_MODE  0
 #       define ZCE_SUPPORT_PYVM  1
-#       define ZCE_SUPPORT_LUAVM 0
+#       define ZCE_SUPPORT_LUAVM 1
 #       define ZCE_SUPPORT_SSL 1
 #   endif
 #   include <winsock2.h>
@@ -80,10 +82,11 @@
 #       define HASNOT_UUID 1
 #       define ZCE_API __attribute__ ((visibility ("default")))
 #   else
-#       define ZCE_ZDB_MYSQL 1
+#       define ZCE_ZDB_MONGODB 0
+#       define ZCE_ZDB_MYSQL 0
 #       define ZCE_ZDB_PGSQL 1
 #       define ZCE_ISSERVICE_MODE  0
-#       define ZCE_SUPPORT_PYVM  0
+#       define ZCE_SUPPORT_PYVM  1
 #       define ZCE_SUPPORT_LUAVM 1
 #       define ZCE_SUPPORT_SSL 1
 #   endif
@@ -126,12 +129,12 @@ enum ERV_ZCE_ERROR
 {
     ZCE_ERROR_OK = 0,
 
-    ZDB_SUCCE_COMMON = 0x2000000, //ZDB SUCCESS
+    ZDB_SUCCE_COMMON = 0x2000000,   //ZDB SUCCESS
     ZDB_SUCCE_MULTIRESPONSE,
 
-    ZCE_ERROR_BASE = 0x81000000, //keep for stdc error
+    ZCE_ERROR_BASE = 0x81000000,    //keep for stdc error
 
-    ZCE_ERROR_COMMON = 0x81010000, //ZCE ERROR
+    ZCE_ERROR_COMMON = 0x81010000,  //ZCE ERROR
     ZCE_ERROR_MALLOC,  //内存分配错误
     ZCE_ERROR_UNSUPPORT,//遇到未支持的功能要求
     ZCE_ERROR_SHRTLEN,  //数据比要求的太短

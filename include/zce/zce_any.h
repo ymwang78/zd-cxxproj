@@ -11,6 +11,7 @@
 // ***************************************************************
 #include <zce/zce_types.h>
 #include <zce/zce_object.h>
+#include <zce/zce_bits.h>
 #include <map>
 #include <vector>
 

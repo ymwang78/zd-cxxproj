@@ -54,7 +54,7 @@ class zce_objpool
 public:
 
     zce_objpool()
-        :vt_allocator_(new zce_allocator(sizeof(T), 4096, true)) {
+        :vt_allocator_(new zce_allocator_chunk(sizeof(T), 4096, true)) {
     }
 
     virtual ~zce_objpool() {
