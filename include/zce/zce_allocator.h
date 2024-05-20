@@ -83,7 +83,7 @@ public:
 
     zce_allocator_chunk(size_t chunk_size, size_t n_chunks, bool lock);
 
-    virtual ~zce_allocator_chunk();
+    ~zce_allocator_chunk() override;
 
     void *alloc(size_t nbytes, size_t* nreal) override;
 
@@ -104,7 +104,7 @@ public:
     
     zce_allocator_v2(size_t atmoic_size, bool islock = true);
 
-    virtual ~zce_allocator_v2();
+    ~zce_allocator_v2() override;
 
     int init_pool(size_t malloc_size);
 

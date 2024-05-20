@@ -104,7 +104,7 @@ public:
 
     void swap(zce_dblock& rhs);
 
-    void merge(const zce_dblock& rhs);
+    void merge(zce_dblock& rhs);
 
     void preserv(size_t len);
 

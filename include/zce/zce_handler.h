@@ -84,7 +84,7 @@ public:
 
     virtual void on_open(bool passive, const zce_sockaddr_t& remote);
 
-    virtual void on_read(const zce_dblock& dblock, const zce_any&);
+    virtual void on_read(zce_dblock& dblock, const zce_any&);
 
     virtual void on_close();
 
@@ -405,7 +405,7 @@ public:
 
     virtual void on_open(bool passive, const zce_sockaddr_t& remote);
 
-    virtual void on_read(const zce_dblock& dblock, const zce_any&);
+    virtual void on_read(zce_dblock& dblock, const zce_any&);
 
     virtual void on_close();
 
@@ -440,7 +440,7 @@ public:
 
     virtual void on_open(bool passive, const zce_sockaddr_t& remote);
 
-    virtual void on_read(const zce_dblock& dblock, const zce_any&);
+    virtual void on_read(zce_dblock& dblock, const zce_any&);
 };
 
 #endif //__zce_handler_h__

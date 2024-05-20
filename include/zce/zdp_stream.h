@@ -63,8 +63,6 @@ namespace zdp
 
     class ZCE_API zdp_stream : public zce_istream
     {
-        enum { READ_HEAD, READ_BODY } status_;
-
         zce_dblock dblock_;
 
         zce_smartptr<zce_reactor> reactor_ptr_;
@@ -99,11 +97,11 @@ namespace zdp
 
         //////////////////////////////////////////////////////////////////////////
 
-        virtual void on_read(const zce_dblock& dblock_ptr, const zce_any&);
+        void on_read(zce_dblock& dblock_ptr, const zce_any&) override;
 
-        virtual int write(const zce_dblock& dblock_ptr, zce_istream::ERV_ISTREAM_WRITEOPT opt = zce_istream::ERV_ISTREAM_DEFAULT);
+        int write(const zce_dblock& dblock_ptr, zce_istream::ERV_ISTREAM_WRITEOPT opt = zce_istream::ERV_ISTREAM_DEFAULT) override;
 
-        virtual void close();
+        void close() override;
 
         //////////////////////////////////////////////////////////////////////////
 

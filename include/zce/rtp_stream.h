@@ -23,7 +23,7 @@ public:
 
     ~rtp_stream();
 
-    virtual void on_read(const zce_dblock& dblock_ptr, const zce_any&);
+    void on_read(zce_dblock& dblock_ptr, const zce_any&) override;
 
-    virtual int write(const zce_dblock& dblock_ptr, zce_istream::ERV_ISTREAM_WRITEOPT opt);
+    int write(const zce_dblock& dblock_ptr, zce_istream::ERV_ISTREAM_WRITEOPT opt) override;
 };

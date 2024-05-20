@@ -327,4 +327,32 @@ public:
             return nullptr;
         }
     }
+
+    inline bool is_addr() const noexcept {
+        return data_.type_ == any_ipv6 || data_.type_ == any_int64;
+    }
+
+    inline bool is_ipv4() const noexcept {
+        return data_.type_ == any_ipv4;
+    }
+
+    inline bool is_ipv6() const noexcept {
+        return data_.type_ == any_ipv6;
+    }
+
+    inline const struct in_addr& ipv4() const noexcept {
+        static const struct in_addr _empty {};
+        ZCE_ASSERT_RETURN(data_.type_ == any_ipv4, _empty);
+        return data_.u_.ipv4_;
+    }
+
+    inline const struct in6_addr& ipv6() const noexcept {
+        static const struct in6_addr _empty {};
+        ZCE_ASSERT_RETURN(data_.type_ == any_ipv6, _empty);
+        return data_.u_.ipv6_;
+    }
+
+    inline unsigned short port() const noexcept {
+        return data_.len_or_port_;
+    }
 };

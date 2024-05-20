@@ -146,7 +146,7 @@ public:
 
     void on_open(bool passive, const zce_sockaddr_t& remote) override;
 
-    void on_read(const zce_dblock& dblock, const zce_any&) override;
+    void on_read(zce_dblock& dblock, const zce_any&) override;
 
 	virtual void on_http_request(const zce_smartptr<ZCE_HTTP_REQUEST>&, const zce_dblock& dblock);
 
@@ -168,7 +168,7 @@ class ZCE_API zce_http_client : public zce_istream
 	zce_dblock cont_dblock_;
 public:
 
-	virtual void on_read(const zce_dblock& dblock, const zce_any&);
+	virtual void on_read(zce_dblock& dblock, const zce_any&);
 
 	virtual void on_http_response(const ZCE_HTTP_RESPONSE& header, const zce_dblock& dblock) = 0;
 
@@ -244,7 +244,7 @@ public:
 
     void on_open(bool passive, const zce_sockaddr_t& remote) override;
 
-    void on_read(const zce_dblock& dblock, const zce_any& ctx) override;
+    void on_read(zce_dblock& dblock, const zce_any& ctx) override;
 
     void on_http_response(const ZCE_HTTP_RESPONSE& header, const zce_dblock& dblock);
 

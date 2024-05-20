@@ -52,7 +52,7 @@ public:
 
     virtual void on_open(bool passive, const zce_sockaddr_t& remote);
 
-    virtual void on_read(const zce_dblock& dblock, void*);
+    virtual void on_read(zce_dblock& dblock, void*);
 
     virtual void close();
 
