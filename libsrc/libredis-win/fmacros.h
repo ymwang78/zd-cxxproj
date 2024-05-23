@@ -1,16 +1,14 @@
 #ifndef __HIREDIS_FMACRO_H
 #define __HIREDIS_FMACRO_H
 
-#if !defined(_BSD_SOURCE)
-#define _BSD_SOURCE
+#ifndef _AIX
+#define _XOPEN_SOURCE 600
+#define _POSIX_C_SOURCE 200112L
 #endif
 
-#if defined(__sun__)
-#define _POSIX_C_SOURCE 200112L
-#elif defined(__linux__)
-#define _XOPEN_SOURCE 600
-#else
-#define _XOPEN_SOURCE
+#if defined(__APPLE__) && defined(__MACH__)
+/* Enable TCP_KEEPALIVE */
+#define _DARWIN_C_SOURCE
 #endif
 
 #endif

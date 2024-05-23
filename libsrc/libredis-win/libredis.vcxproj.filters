@@ -30,7 +30,13 @@
     <ClCompile Include="sds.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="dll.c">
+    <ClCompile Include="alloc.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="read.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="sockcompat.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -55,6 +61,15 @@
     </ClInclude>
     <ClInclude Include="sds.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="alloc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="read.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sockcompat.h">
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
