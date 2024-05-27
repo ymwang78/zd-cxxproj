@@ -12,8 +12,7 @@
 #include <zce/zce_string.h>
 #ifndef CHECKLEN_MOVEBUF_ADDRET_DECSIZE
     #define CHECKLEN_MOVEBUF_ADDRET_DECSIZE do{\
-            if (len < 0) \
-                return len;\
+            if (len < 0) return len;\
             if (buf) buf += len;\
             ret += len;\
             size -= len;\
@@ -25,7 +24,6 @@ typedef struct _object PyObject;
 
 namespace zdp
 {
-
     enum ERV_ZDS_PAYLOAD : zce_byte {
         ZDS_PAYLOAD_SIMPBINT,
         ZDS_PAYLOAD_VARUINT,
@@ -40,6 +38,7 @@ namespace zdp
         ZDS_PAYLOAD_DICT,
 
         ZDS_PAYLOAD_ANY,
+        ZDS_PAYLOAD_PTR,
     };
 
     enum ERV_ZDS_SUBTYPE : zce_byte {
@@ -92,6 +91,8 @@ namespace zdp
     int ZCE_API write_varuint_raw(zce_byte* buf, int size, zce_uint64 val, zds_context_t* ctx);
 
     int ZCE_API read_varuint_raw(zce_uint64& val, const zce_byte* buf, int size, zds_context_t* ctx);
+
+    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const void* val, zds_context_t* ctx, bool has_prefix = true);
 
     int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, bool val, zds_context_t* ctx, bool has_prefix = true);
 
@@ -158,6 +159,8 @@ namespace zdp
     int ZCE_API zds_pack_any_array_header(zce_byte* buf, int size, zce_uint64 array_size, zds_context_t* ctx, bool has_prefix = true);
 
     ///////////////////////////////////////////////////////////////////////////
+
+    int ZCE_API zds_unpack_builtin(void*& val, const zce_byte* buf, zce_int32 size, zds_context_t* ctx);
 
     int ZCE_API zds_unpack_builtin(zce_int64& val, const zce_byte* buf, zce_int32 size, zds_context_t* ctx);
 

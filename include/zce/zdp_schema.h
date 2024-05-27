@@ -77,19 +77,16 @@ namespace zdp
 #ifndef CHECKLEN_MOVEBUF_ADDRET_DECSIZE
 
 #define CHECKLEN_MOVEBUF_ADDRET_DECSIZE do{\
-            if (len < 0) \
-                return len;\
-            buf += len;\
+            if (len < 0) return len;\
+            if (buf) buf += len;\
             ret += len;\
             size -= len;\
     }while(0)
 
 #define CHECKCHAR_MOVEBUF_ADDDATA_DECSIZE(LTR) \
     do { \
-        if (size == 0) \
-            return ZCE_ERROR_MALLOC; \
-        if (*buf != LTR) \
-            return ZCE_ERROR_SYNTAX; \
+        if (size == 0) return ZCE_ERROR_MALLOC; \
+        if (*buf != LTR) return ZCE_ERROR_SYNTAX; \
         ret = 1; \
         buf += ret; \
         len += ret; \

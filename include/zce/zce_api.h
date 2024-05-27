@@ -120,7 +120,7 @@ std::string ZCE_API zce_to_hex(const std::vector<zce_byte>& vec);
 
 std::string ZCE_API zce_md5sum(const char* fname);
 
-std::string ZCE_API zce_md5_encode(const char* input, size_t inputlen, unsigned char binout[16], bool upper = false);
+std::string ZCE_API zce_hash_md5(const char* input, size_t inputlen, unsigned char binout[16], bool upper = false);
 
 std::string ZCE_API zce_string_format(unsigned length, const char* format, ...);
 

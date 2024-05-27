@@ -42,19 +42,19 @@ public:
 
     ~zdb_redis_ptr();
 
-    inline operator redisReply*() const {
+    inline operator redisReply*() const noexcept {
         return this->reply_;
     }
 
-    inline redisReply* operator->() const {
+    inline redisReply* operator->() const noexcept {
         return this->reply_;
     }
 
-    inline bool operator == (redisReply* right) const {
+    inline bool operator == (redisReply* right) const noexcept {
         return (this->reply_ == right);
     }
 
-    inline bool operator != (redisReply* right) const {
+    inline bool operator != (redisReply* right) const noexcept {
         return !(this->reply_ == right);
     }
 };

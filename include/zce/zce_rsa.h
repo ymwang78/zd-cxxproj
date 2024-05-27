@@ -24,13 +24,13 @@ int ZCE_API zce_rsa_public_encrypt(zce_dblock& dblock,
     const char* key,
     size_t keylen);
 
-int ZCE_API zce_rsa_public_decrypt(zce_dblock& dblock,
+int ZCE_API zce_rsa_public_verify(zce_dblock& dblock,
     const zce_byte* input,
     size_t inputlen,
     const char* key,
     size_t keylen);
 
-int ZCE_API zce_rsa_private_encrypt(zce_dblock& dblock,
+int ZCE_API zce_rsa_private_sign(zce_dblock& dblock,
     const zce_byte* input,
     size_t inputlen,
     const char* key,

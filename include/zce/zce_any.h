@@ -176,6 +176,10 @@ public:
 
     static zce_any create_dblock();
 
+    inline bool get_type() const noexcept {
+        return data_.type_;
+    }
+
     inline bool is_i64() const noexcept {
         return data_.type_ == any_int64;
     }
