@@ -1,0 +1,17 @@
+namespace zlicense
+{
+struct name_value_t
+{
+	astring name[~];
+	byte value[~];
+};
+
+struct license_t
+{
+	astring app[~];
+	astrvec vecmac;
+	astrvec vechd;
+	int expire;
+	struct name_value_t nv[~];
+};
+}

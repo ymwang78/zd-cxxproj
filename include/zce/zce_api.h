@@ -16,6 +16,7 @@
 #include <zce/zce_types.h>
 #include <zce/zce_api.h>
 #include <vector>
+#include <set>
 #include <stdarg.h>
 #include <sstream>
 
@@ -54,10 +55,14 @@ extern "C"
 
     int ZCE_API zce_from_hex(char* out, size_t out_size, const char* in, size_t in_size);
 
-    int ZCE_API zce_base64_decode(const unsigned char* input, size_t inputlen, unsigned char* result);
+    int ZCE_API zce_base64_decode(unsigned char* result, const unsigned char* input, size_t inputlen);
 
     int ZCE_API zce_base64_encode(unsigned char* buffer, const unsigned char* input, size_t input_len);
-    
+
+    int ZCE_API zce_base32_encode(char* output, const zce_byte* data, size_t length);
+
+    int ZCE_API zce_base32_decode(zce_byte* output, const char* encoded, size_t length);
+
     size_t ZCE_API zce_base64_length(const char* input);
 
     bool ZCE_API zce_interrupted();
@@ -94,10 +99,6 @@ extern "C"
     int ZCE_API zce_inet_aton(zce_sockaddr_t*, const char* addr, int port);
     int ZCE_API zce_inet_ntoa(char* ip, unsigned len, const zce_sockaddr_t* addr, bool bport);
 
-    #if defined(_WIN32)
-        int zce_getmac(char mac[20], zce_byte addr[6]);
-    #endif //defined(_WIN32) && (_WIN32_WINNT < 0x0600)
-
 #ifdef __cplusplus
 }
 #endif
@@ -111,6 +112,12 @@ int ZCE_API zce_symbol_read_linefeed(const char* buf, int size, std::string& val
 int ZCE_API zce_list_ip(std::vector<std::string>& ip_list);
 
 void ZCE_API zce_str2addrvec(std::vector<zce_addr_t>& tsock_vec, const std::string& addrs);
+
+std::set<std::string> ZCE_API zce_get_mac();
+
+std::set<std::string> ZCE_API zce_get_hardrive();
+
+std::string ZCE_API zce_get_cpuinfo();
 
 zce_bytevec ZCE_API zce_from_hex(const std::string& in);
 

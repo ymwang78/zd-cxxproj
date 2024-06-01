@@ -1,0 +1,46 @@
+#import sys, os, commands, platform, distutils.sysconfig, os.path, re, types
+#check ZDP
+
+inc_path = ['#', '#include', '../../include', './include/libvxml', './libdnet/include', './libdnet/include/dnet', './librsaref', './libvxml', './libsmtmon']
+env = Environment(CPPPATH=inc_path)
+print env["PLATFORM"]
+
+if env["PLATFORM"]=="win32":
+    cc_flags = """/O2 /Oi /GL 
+        /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_USRDLL" /D "_WIN32_WINNT=0x0501" 
+        /D "_CRT_SECURE_NO_WARNINGS" /D "UTINY_STATIC_LIB" /D "ZDP" /D "_MBCS" 
+        /FD /EHsc /MT /Gy /W3 /nologo /c /Zi /errorReport:prompt"""
+    ld_flags = '/LTCG'
+else:
+    cxx_flags = "-std=gnu++0x"
+    cc_flags = """-D_REENTRANT -D__LINUX__ -DNODEBUG -DNDEBUG -DHAVE_EXPAT_CONFIG_H -DHAVE_STDINT_H 
+	-DHAVE_MEMMOVE -DNWLICENSE_EXPORTS -D__PLATFORM__ -O2 -g"""
+    ld_flags = "-Wl,--hash-style=both"
+env.Append(LINKFLAGS = ld_flags)
+env.Append(CCFLAGS = cc_flags)
+env.Append(CXXFLAGS = cxx_flags)
+Export('env')
+
+objs = env.Object(
+	Glob('libdnet/src/addr.c') + 
+	Glob('libdnet/src/addr-util.c') + 
+	Glob('libdnet/src/blob.c') + 
+	Glob('libdnet/src/err.c') + 
+	Glob('libdnet/src/intf.c') + 
+	Glob('libdnet/src/rand.c') + 
+	Glob('libdnet/src/strlcat.c') + 
+	Glob('libdnet/src/strlcpy.c') + 
+	Glob('libdnet/src/strsep.c') + 
+	Glob('librsaref/*.c') + 
+	Glob('librsaref/linux/*.c') + 
+	Glob('libvxml/*.cpp') + 
+	Glob('libsmtmon/atacmdnames.cpp') + 
+	Glob('libsmtmon/atacmds.cpp') + 
+	Glob('libsmtmon/scsicmds.cpp') + 
+	Glob('libsmtmon/scsiata.cpp') + 
+	Glob('libsmtmon/utility.cpp') + 
+	Glob('libsmtmon/os_linux.cpp'))
+
+libvxml = env.StaticLibrary('libvxml', objs)
+env.Install('#../../bin/release', libvxml)
+env.Alias('install', '#../../bin/release')

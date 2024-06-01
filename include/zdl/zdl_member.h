@@ -32,13 +32,13 @@ class zdl_type;
 class zdl_member : public meta_base
 {
 public:
-    enum member_type_e
-    {
+    enum member_type_e {
         implement_e,
         array_e,
     };
 
-    zdl_member(zdl_struct* parent, int var_idx, const std::string& var, const std::string& minsize, const std::string& maxsize, zdl_type* type = 0)
+    zdl_member(zdl_struct* parent, int var_idx, const std::string& var,
+        const std::string& minsize, const std::string& maxsize, zdl_type* type = 0)
         :parent_(parent), var_idx_(var_idx), var_name_(var), type_(type), member_type_e_(array_e),
         min_size_(minsize), max_size_(maxsize)
     {
@@ -48,21 +48,19 @@ public:
             member_type_e_ = implement_e;
     };
 
-    bool is_array() const
-    {
-        return member_type_e_ == array_e;
+    bool is_array() const noexcept {
+        return (member_type_e_ == array_e);
     }
 
-    bool is_array_optional() const{
+    bool is_array_optional() const noexcept {
         return (calc_min_size() == 0 && is_array());
     }
 
-    bool is_fixsize() const
-    {
+    bool is_fixsize() const noexcept {
         return min_size_ == max_size_ && min_size_!="0" ;
     }
 
-    bool is_optional() const{
+    bool is_optional() const noexcept {
         if (is_array())
             return (calc_min_size() == 0);
         else
@@ -88,17 +86,17 @@ public:
     };
 
 
-    bool is_string() const;
+    bool is_string() const noexcept;
 
-    zdl_struct* parent() const{
+    zdl_struct* parent() const noexcept {
         return parent_;
     };
 
-    zdl_type* type() const{
+    zdl_type* type() const noexcept {
         return type_;
     };
 
-    void type(zdl_type* t){
+    void type(zdl_type* t) noexcept {
         type_ = t;
     };
 

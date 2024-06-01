@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <None Include="SConstruct" />
+    <None Include="license.ptl" />
+    <None Include="license_gen.bat" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="license_pack.cpp" />
+    <ClCompile Include="license_gen.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="license_pack.h" />
+    <ClInclude Include="license_proto.h" />
+    <ClInclude Include="license.h" />
+  </ItemGroup>
+</Project>

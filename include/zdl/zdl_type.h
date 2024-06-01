@@ -110,26 +110,31 @@ public:
 
     ~zdl_type();
 
-    const std::string& name() const{
+    const std::string& name() const noexcept {
         return type_name_;
     };
 
-    const std::string& full_name() const {
+    const std::string& full_name() const noexcept {
         return full_name_;
     }
 
-    const zce_smartptr<zdl_module>& module_ptr() const {
+    //type itself indicator is a vector
+    bool is_vector() const noexcept {
+        return (id() >= ZDL_ASTRVEC && id() <= ZDL_BYTEVEC);
+    }
+
+    const zce_smartptr<zdl_module>& module_ptr() const noexcept {
         return module_ptr_;
     }
 
     int id() const{
         return type_id_;
     };
-    zdl_type_e type_e() const{
+    zdl_type_e type_e() const noexcept {
         return get_type_e(type_id_);
     };
 
-    bool is_struct() const {
+    bool is_struct() const noexcept {
         return type_e() == type_struct_e;
     }
 

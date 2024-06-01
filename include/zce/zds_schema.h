@@ -105,7 +105,8 @@ namespace zdp
     int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, zce_double val, zds_context_t* ctx, bool has_prefix = true);
 
     template<typename T>
-    inline int zds_pack_builtin(zce_byte* buf, zce_int32 size, T val, zds_context_t* ctx, bool has_prefix = true) {
+    inline typename std::enable_if<std::is_integral<T>::value, int>::type
+    zds_pack_builtin(zce_byte* buf, zce_int32 size, T val, zds_context_t* ctx, bool has_prefix = true) {
         static_assert (std::is_integral<T>::value, "must be integral type");
         if (std::is_signed<T>::value) {
             zce_int64 tmp = (zce_int64)val;
