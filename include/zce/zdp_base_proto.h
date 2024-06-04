@@ -85,6 +85,14 @@ namespace zdp_base
     struct nspair_t
     {
         static nspair_t _empty;
+
+        bool operator==(const nspair_t& _t) const noexcept
+        {
+            if (name != _t.name) return false;
+            if (value != _t.value) return false;
+            return true;
+        }
+
         zce_astring name/*名*/;
         zce_astring value/*值*/;
     };
@@ -145,7 +153,14 @@ namespace zdp_base
         const static unsigned short MSG_TYPE = E_MSG_NONE_REQ;
         static const char* type_name() { return ("MSG_NONE_REQ");}
         static MSG_NONE_REQ _empty;
-        std::vector<nspair_t> ie_ns;
+
+        bool operator==(const MSG_NONE_REQ& _t) const noexcept
+        {
+            if (!(ie_ns == _t.ie_ns)) return false;
+            return true;
+        }
+
+        std::vector<zdp_base::nspair_t> ie_ns;
     };
     typedef zce_smartptr<MSG_NONE_REQ> MSG_NONE_REQ_PTR;
 
@@ -154,6 +169,12 @@ namespace zdp_base
         const static unsigned short MSG_TYPE = E_MSG_DISCONN_REQ;
         static const char* type_name() { return ("MSG_DISCONN_REQ");}
         static MSG_DISCONN_REQ _empty;
+
+        bool operator==(const MSG_DISCONN_REQ& _t) const noexcept
+        {
+            return true;
+        }
+
     };
     typedef zce_smartptr<MSG_DISCONN_REQ> MSG_DISCONN_REQ_PTR;
 
@@ -162,6 +183,13 @@ namespace zdp_base
         const static unsigned short MSG_TYPE = E_MSG_CONTAINER_REQ;
         static const char* type_name() { return ("MSG_CONTAINER_REQ");}
         static MSG_CONTAINER_REQ _empty;
+
+        bool operator==(const MSG_CONTAINER_REQ& _t) const noexcept
+        {
+            if (!(ie_req == _t.ie_req)) return false;
+            return true;
+        }
+
         zdp_container_t    ie_req;
     };
     typedef zce_smartptr<MSG_CONTAINER_REQ> MSG_CONTAINER_REQ_PTR;
@@ -180,7 +208,7 @@ namespace zdp_base
         }
 
         zce_int32    ie_result;
-        std::vector<zdp_container_t> ie_res;
+        std::vector<zdp_base::zdp_container_t> ie_res;
     };
     typedef zce_smartptr<MSG_CONTAINER_RES> MSG_CONTAINER_RES_PTR;
 
