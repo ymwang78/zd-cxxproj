@@ -32,7 +32,7 @@ typedef long long LONGLONG;
 #include <map>
 #include <deque>
 #include <set>
-#include <zce/zce_smartptr.h>
+#include <zce/zce_object.h>
 
 #ifndef _WIN32
 #   if (FD_SETSIZE < 8192)
