@@ -71,7 +71,7 @@ public:
 
     zdb_redis_connection();
 
-    zdb_redis_connection(const std::string& ip, unsigned short port, const char* passwd);
+    zdb_redis_connection(bool ssl, const std::string& ip, unsigned short port, const char* passwd);
 
     bool connetion_ok() const {
         return connection_ok_;
@@ -141,6 +141,7 @@ public:
 
 class ZCE_API zdb_redis_databse : public zce_object
 {
+    bool ssl_;
     std::string ip_;
     unsigned short port_;
     std::string passwd_;
@@ -148,7 +149,7 @@ class ZCE_API zdb_redis_databse : public zce_object
 
 public:
 
-    zdb_redis_databse(const std::string& ip, unsigned short port, const char* passwd);
+    zdb_redis_databse(bool ssl, const std::string& ip, unsigned short port, const char* passwd);
 
     zce_smartptr<zdb_redis_connection> get_connection();
 
