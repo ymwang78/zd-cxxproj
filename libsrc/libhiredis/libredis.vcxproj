@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectName>libredis</ProjectName>
+    <ProjectName>libhiredis</ProjectName>
     <ProjectGuid>{0B88ACEC-C920-488D-9925-107CFD2CC263}</ProjectGuid>
     <RootNamespace>hiredis</RootNamespace>
     <Keyword>Win32Proj</Keyword>
