@@ -129,6 +129,14 @@ public:
     int zrange(const std::string& k, kvpair_vec_t& vec, bool inc, int begin, int end);
 
     int expire(const std::string& k, zce_int64 expiresec);
+
+    int llen(const char* col, unsigned& len);
+
+    int lpush(const std::string& k, const zce_byte* v, unsigned l, zce_uint32 expiresec = 0);
+
+    int rpush(const std::string& k, const zce_byte* v, unsigned l, zce_uint32 expiresec = 0);
+
+    int lpop(const std::string& k, zce_dblock& v);
 };
 
 class ZCE_API zdb_redis_databse : public zce_object
