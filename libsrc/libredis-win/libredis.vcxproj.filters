@@ -39,6 +39,9 @@
     <ClCompile Include="sockcompat.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ssl.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="async.h">
@@ -70,6 +73,9 @@
     </ClInclude>
     <ClInclude Include="sockcompat.h">
       <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="hiredis_ssl.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

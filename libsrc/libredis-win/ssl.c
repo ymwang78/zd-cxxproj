@@ -38,6 +38,7 @@
 #include <errno.h>
 #include <string.h>
 #ifdef _WIN32
+#include <WinSock2.h>
 #include <windows.h>
 #include <wincrypt.h>
 #ifdef OPENSSL_IS_BORINGSSL

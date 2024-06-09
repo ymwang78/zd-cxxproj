@@ -117,6 +117,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <LanguageStandard_C>stdc11</LanguageStandard_C>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>.;..;../../include;../../include/win64;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <LinkDLL>true</LinkDLL>
@@ -156,6 +157,7 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>.;..;../../include;../../include/win64;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <LinkDLL>true</LinkDLL>
@@ -175,6 +177,7 @@
     <ClCompile Include="read.c" />
     <ClCompile Include="sds.c" />
     <ClCompile Include="sockcompat.c" />
+    <ClCompile Include="ssl.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="alloc.h" />
@@ -182,6 +185,7 @@
     <ClInclude Include="dict.h" />
     <ClInclude Include="fmacros.h" />
     <ClInclude Include="hiredis.h" />
+    <ClInclude Include="hiredis_ssl.h" />
     <ClInclude Include="net.h" />
     <ClInclude Include="read.h" />
     <ClInclude Include="resource.h" />
