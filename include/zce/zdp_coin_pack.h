@@ -29,4 +29,8 @@ namespace zdp
     int zds_unpack(zdp_coin::tradereq_t& _t, const zce_byte* buf, int size, zds_context_t* ctx, bool has_prefix);
     int zds_pack(zce_byte* buf, int size, const zdp_coin::queryhis_t& _t, zds_context_t* ctx, bool has_prefix);
     int zds_unpack(zdp_coin::queryhis_t& _t, const zce_byte* buf, int size, zds_context_t* ctx, bool has_prefix);
+    int zds_pack(zce_byte* buf, int size, const zdp_coin::coinlock_t& _t, zds_context_t* ctx, bool has_prefix);
+    int zds_unpack(zdp_coin::coinlock_t& _t, const zce_byte* buf, int size, zds_context_t* ctx, bool has_prefix);
+    int zds_pack(zce_byte* buf, int size, const zdp_coin::coinlockitem_t& _t, zds_context_t* ctx, bool has_prefix);
+    int zds_unpack(zdp_coin::coinlockitem_t& _t, const zce_byte* buf, int size, zds_context_t* ctx, bool has_prefix);
 } //namespace zdp_coin

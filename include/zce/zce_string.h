@@ -464,6 +464,8 @@ namespace zce
     unsigned ZCE_API time_from_string(const char* buf, const char* format);
 
     std::string ZCE_API utf8_strip(const char* input, size_t inputlen, size_t limitlen);
+
+    bool ZCE_API utf8_isvalid(const char* input, size_t inputlen);
 }
 
 #endif //__ZCE_STRING__

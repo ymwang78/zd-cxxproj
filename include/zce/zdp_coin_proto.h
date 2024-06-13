@@ -17,6 +17,17 @@
 namespace zdp_coin
 {
     struct zds_context_t;
+    enum ERV_COIN_FLAG: int
+    {
+        ERV_COIN_FLAG_ALLOWNEG = (int)0x00000001,
+        ERV_COIN_FLAG_UPTCOIN = (int)0x00000002,
+    };
+
+    enum ERV_COINLOCK_FLAG: int
+    {
+        ERV_COINLOCK_INCREATE = (int)0x00000001,
+    };
+
     struct tradelog_t
     {
         static tradelog_t _empty;
@@ -76,7 +87,7 @@ namespace zdp_coin
             if (tcoin != _t.tcoin) return false;
             if (selflocked != _t.selflocked) return false;
             if (otherlocked != _t.otherlocked) return false;
-            if (coinupdate != _t.coinupdate) return false;
+            if (lastupdate != _t.lastupdate) return false;
             if (lockexpire != _t.lockexpire) return false;
             return true;
         }
@@ -88,8 +99,8 @@ namespace zdp_coin
         zce_int64    tcoin;
         zce_int64    selflocked;
         zce_int64    otherlocked;
-        zce_int32    coinupdate;
-        zce_int32    lockexpire;
+        zce_int64    lastupdate;
+        zce_int64    lockexpire;
     };
     struct tradereq_t
     {
@@ -98,26 +109,34 @@ namespace zdp_coin
         bool operator==(const tradereq_t& _t) const noexcept
         {
             if (serverid != _t.serverid) return false;
+            if (tradetype != _t.tradetype) return false;
+            if (tradename != _t.tradename) return false;
+            if (tradeid != _t.tradeid) return false;
+            if (memo != _t.memo) return false;
+            if (critisteps != _t.critisteps) return false;
+            if (serialids != _t.serialids) return false;
             if (coinnames != _t.coinnames) return false;
             if (useridxs != _t.useridxs) return false;
             if (coinnums != _t.coinnums) return false;
-            if (!(tradelog == _t.tradelog)) return false;
+            if (tradeflags != _t.tradeflags) return false;
             if (coinlockid != _t.coinlockid) return false;
-            if (critisteps != _t.critisteps) return false;
             if (endlock != _t.endlock) return false;
-            if (allowneg != _t.allowneg) return false;
             return true;
         }
 
-        zce_tstring serverid;
-        zce_astrvec    coinnames;
-        std::vector<zce_int64> useridxs;
-        std::vector<zce_int64> coinnums;
-        tradelog_t    tradelog;
-        zce_tstring coinlockid;
-        zce_int32    critisteps;
-        zce_byte    endlock;
-        zce_byte    allowneg;
+        zce_tstring serverid/*发起交易的服务器ID*/;
+        zce_tstring tradetype/*交易类型ID*/;
+        zce_tstring tradename/*交易名*/;
+        zce_tstring tradeid/*交易关联ID*/;
+        zce_tstring memo/*交易备注*/;
+        zce_uint32    critisteps/*前面steps为关键，如果失败整个交易取消*/;
+        zce_astrvec    serialids/*交易流水号，如果小于需要数组大小，将以第一个serialid_{index}补齐*/;
+        zce_astrvec    coinnames/*交易币名称*/;
+        std::vector<zce_int64> useridxs/*交易用户ID*/;
+        std::vector<zce_int64> coinnums/*交易币数量*/;
+        std::vector<zce_byte> tradeflags/*交易标志, 参考 ERV_COIN_FLAG*/;
+        zce_tstring coinlockid/*对应的锁定ID*/;
+        zce_byte    endlock/*取消LOCK*/;
     };
     struct queryhis_t
     {
@@ -142,5 +161,43 @@ namespace zdp_coin
         zce_int64    endt;
         zce_int32    startidx;
         zce_int32    querynum;
+    };
+    struct coinlock_t
+    {
+        static coinlock_t _empty;
+
+        bool operator==(const coinlock_t& _t) const noexcept
+        {
+            if (lockid != _t.lockid) return false;
+            if (lockname != _t.lockname) return false;
+            if (expire != _t.expire) return false;
+            if (criticalstep != _t.criticalstep) return false;
+            if (flag != _t.flag) return false;
+            return true;
+        }
+
+        zce_tstring lockid;
+        zce_tstring lockname;
+        zce_int32    expire;
+        zce_int32    criticalstep;
+        zce_byte    flag;
+    };
+    struct coinlockitem_t
+    {
+        static coinlockitem_t _empty;
+
+        bool operator==(const coinlockitem_t& _t) const noexcept
+        {
+            if (coinname != _t.coinname) return false;
+            if (uid != _t.uid) return false;
+            if (locknum != _t.locknum) return false;
+            if (maxlock != _t.maxlock) return false;
+            return true;
+        }
+
+        zce_tstring coinname;
+        zce_int64    uid;
+        zce_int64    locknum;
+        zce_int64    maxlock;
     };
 } //namespace zdp_coin
