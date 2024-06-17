@@ -47,7 +47,7 @@ class zvm : public zce_object
     zce_smartptr<zvm_pimpl> pimpl_ptr_;
 
 public:
-    typedef std::function<void(int error_code, zce_dblock& retdata)> response_cb;
+    typedef std::function<void(int error_code, zce_dblock&& retdata)> response_cb;
 
     zvm();
 
@@ -70,7 +70,7 @@ public:
     int rpc_call_dblock(const zce_smartptr<zce_object>& vmptr,
         zce_int64 objectid,
         const std::string& method,
-        zce_dblock& dblock,
+        zce_dblock&& dblock,
         const response_cb& response);
 
     template<typename T>
@@ -90,7 +90,7 @@ public:
         if (ret < 0)
             return ret;
         dblock.wr_ptr(ret);
-        return rpc_call_dblock(vmptr, objectid, method, dblock, response);
+        return rpc_call_dblock(vmptr, objectid, method, std::move(dblock), response);
     }
 
     template<typename T>
@@ -110,18 +110,18 @@ public:
         if (ret < 0)
             return ret;
         dblock.wr_ptr(ret);
-        return rpc_call_dblock(vmptr, objectid, method, dblock, response);
+        return rpc_call_dblock(vmptr, objectid, method, std::move(dblock), response);
     }
 
     template<typename T>
     int rpc_call(const zce_smartptr<zce_object>& vmptr,
         zce_int64 objectid,
         const std::string& method,
-        const T& t,
+        T& t,
         const std::function<void(int error_code, const zce_dblock& retdata)>& response) {
 
         if constexpr (std::is_same<T, zce_dblock>::value) {
-            return rpc_call_dblock(vmptr, objectid, method, t, response);
+            return rpc_call_dblock(vmptr, objectid, method, std::move(t), response);
         }
         else if constexpr (zdp::is_builtin_type<T>()) {
             return rpc_call_builtin(vmptr, objectid, method, t, response);
