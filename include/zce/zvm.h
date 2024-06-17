@@ -47,6 +47,7 @@ class zvm : public zce_object
     zce_smartptr<zvm_pimpl> pimpl_ptr_;
 
 public:
+    typedef std::function<void(int error_code, zce_dblock& retdata)> response_cb;
 
     zvm();
 
@@ -69,15 +70,15 @@ public:
     int rpc_call_dblock(const zce_smartptr<zce_object>& vmptr,
         zce_int64 objectid,
         const std::string& method,
-        const zce_dblock& dblock,
-        const std::function<void(int error_code, const zce_dblock& retdata)>& response);
+        zce_dblock& dblock,
+        const response_cb& response);
 
     template<typename T>
     int rpc_call_builtin(const zce_smartptr<zce_object>& vmptr,
         zce_int64 objectid,
         const std::string& method,
         const T& t,
-        const std::function<void(int error_code, const zce_dblock& retdata)>& response) {
+        const response_cb& response) {
         zce_dblock dblock;
         int ret = zdp::zds_pack_builtin(0, 0, t, 0);
         if (ret < 0)
