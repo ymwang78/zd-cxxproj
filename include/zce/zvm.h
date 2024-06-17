@@ -12,12 +12,25 @@
 #include <functional>
 #include <zce/zce_dblock.h>
 #include <zce/zce_mbpool.h>
+#include <zce/zce_singleton.h>
+
 class zvm_pimpl;
+class zce_schedule;
+class zce_reactor;
 
 extern "C" {
     typedef struct lua_State lua_State;
-	typedef void (*lpfn_lual_openlibs)(lua_State* L);
+    typedef void (*lpfn_lual_openlibs)(lua_State* L);
 }
+
+class zua_register
+{
+public:
+
+    zua_register(lpfn_lual_openlibs openlibs);
+
+    ~zua_register();
+};
 
 namespace zdp {
     struct zds_context_t;
@@ -35,13 +48,12 @@ class zvm : public zce_object
 
 public:
 
-    zvm(const zce_smartptr<zce_schedule>&,
-        const zce_smartptr<zce_reactor>&);
+    zvm();
 
     ~zvm();
 
-
-    static void set_zua_hook(lpfn_lual_openlibs openlibs);
+    int init(const zce_smartptr<zce_schedule>&,
+        const zce_smartptr<zce_reactor>&);
 
     zce_smartptr<zce_object> boot(const std::string& svc_name,
         const std::string& path);
@@ -118,3 +130,5 @@ public:
         }
     }
 };
+
+typedef zce_singleton<zvm> zvm_sigt;

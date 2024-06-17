@@ -95,6 +95,16 @@
 #   endif
 #endif
 
+#if defined(_WIN32)
+# if defined(_WIN64)
+#  define FORCE_UNDEFINED_SYMBOL(x) __pragma(comment (linker, "/include:" #x))
+# else
+#  define FORCE_UNDEFINED_SYMBOL(x) __pragma(comment (linker, "/include:_" #x))
+# endif
+#else
+# define FORCE_UNDEFINED_SYMBOL(x) extern "C" void x(void); void (*__ ## x ## _fp)(void)=&x;
+#endif
+
 #ifdef __cpluscplus
 #   include <string>
 #   if defined(__APPLE__)
@@ -138,7 +148,7 @@ enum ERV_ZCE_ERROR
     ZCE_ERROR_BASE = 0x81000000,    //keep for stdc error
 
     ZCE_ERROR_COMMON = 0x81010000,  //ZCE ERROR
-    ZCE_ERROR_MALLOC,  //内存分配错误
+    ZCE_ERROR_MALLOC,   //内存分配错误
     ZCE_ERROR_UNSUPPORT,//遇到未支持的功能要求
     ZCE_ERROR_SHRTLEN,  //数据比要求的太短
     ZCE_ERROR_EXCDLEN,  //数据比要求的太长
@@ -146,12 +156,14 @@ enum ERV_ZCE_ERROR
     ZCE_ERROR_SYNTAX,   //数据语义错误
     ZCE_ERROR_ZIP,      //压缩出错
     ZCE_ERROR_TIMEOUT,  //接收响应超时
-    ZCE_ERROR_CONVERTOR,
+    ZCE_ERROR_CONVERTOR,//转换错误
     ZCE_ERROR_CLOSED,   //连接已经关闭
     ZCE_ERROR_TOCLOSE,  //连接将要关闭
     ZCE_ERROR_PREVNULL, //ISTEAM PREV NOT EXISTS
     ZCE_ERROR_OVERFLOW, //溢出，例如过大的数字
     ZCE_ERROR_INVALID,  //无效的参数
+    ZCE_ERROR_DUPLICATED, //重复的数据
+    ZCE_ERROR_UNINIT,     //未初始化
 
     ZCE_ERROR_UVBASE = 0x81020000,
 

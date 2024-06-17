@@ -86,9 +86,9 @@ namespace zdp
 #define CHECKCHAR_MOVEBUF_ADDDATA_DECSIZE(LTR) \
     do { \
         if (size == 0) return ZCE_ERROR_MALLOC; \
-        if (*buf != LTR) return ZCE_ERROR_SYNTAX; \
+        if (buf && *buf != LTR) return ZCE_ERROR_SYNTAX; \
         ret = 1; \
-        buf += ret; \
+        if (buf) buf += ret; \
         len += ret; \
         size -= ret; \
     }while(0)
@@ -137,24 +137,27 @@ namespace zdp
     template<typename T>
     static inline int pack_builtin(zce_byte* buf, int size, T val)
     {
-        if (size < (int)sizeof(T))
+        if (buf && size < (int)sizeof(T))
             return ZCE_ERROR_SHRTLEN;
 
-        if (sizeof(T) == 1) {
-            ZBYTE_HN_SCVAL(buf, 0, *(zce_char*)&val);
+        if (buf) {
+            if (sizeof(T) == 1) {
+                ZBYTE_HN_SCVAL(buf, 0, *(zce_char*)&val);
+            }
+            else if (sizeof(T) == 2) {
+                ZBYTE_HN_SSVAL(buf, 0, *(zce_int16*)&val);
+            }
+            else if (sizeof(T) == 4) {
+                ZBYTE_HN_SIVAL(buf, 0, *(zce_int32*)&val);
+            }
+            else if (sizeof(T) == 8) {
+                ZBYTE_HN_SLVAL(buf, 0, *(zce_int64*)&val);
+            }
+            else {
+                return ZCE_ERROR_SYNTAX;
+            }
         }
-        else if (sizeof(T) == 2) {
-            ZBYTE_HN_SSVAL(buf, 0, *(zce_int16*)&val);
-        }
-        else if (sizeof(T) == 4) {
-            ZBYTE_HN_SIVAL(buf, 0, *(zce_int32*)&val);
-        }
-        else if (sizeof(T) == 8) {
-            ZBYTE_HN_SLVAL(buf, 0, *(zce_int64*)&val);
-        }
-        else {
-            return ZCE_ERROR_SYNTAX;
-        }
+
         return sizeof(T);
     }
 

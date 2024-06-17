@@ -102,7 +102,7 @@ public:
         type_enum_e,
         type_struct_e,
     };
-    static zdl_type_e get_type_e (int tpid);
+    static zdl_type_e get_type_e (int tpid) noexcept;
     
 public:
     //tpid : ZDL_CHAR ,ZDL_UCHAR... @TODO CHECK CONV
@@ -110,31 +110,32 @@ public:
 
     ~zdl_type();
 
-    const std::string& name() const noexcept {
+    inline const std::string& name() const noexcept {
         return type_name_;
     };
 
-    const std::string& full_name() const noexcept {
+    inline const std::string& full_name() const noexcept {
         return full_name_;
     }
 
     //type itself indicator is a vector
-    bool is_vector() const noexcept {
+    inline bool is_vector() const noexcept {
         return (id() >= ZDL_ASTRVEC && id() <= ZDL_BYTEVEC);
     }
 
-    const zce_smartptr<zdl_module>& module_ptr() const noexcept {
+    inline const zce_smartptr<zdl_module>& module_ptr() const noexcept {
         return module_ptr_;
     }
 
-    int id() const{
+    inline int id() const{
         return type_id_;
     };
-    zdl_type_e type_e() const noexcept {
+
+    inline zdl_type_e type_e() const noexcept {
         return get_type_e(type_id_);
     };
 
-    bool is_struct() const noexcept {
+    inline bool is_struct() const noexcept {
         return type_e() == type_struct_e;
     }
 

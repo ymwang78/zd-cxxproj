@@ -1,3 +1,4 @@
+#pragma once
 /* ***************************************************************
  *  Copyright (C) 2006  Yongming Wang(wangym@gmail.com)
  *  All Rights Reserved
@@ -9,17 +10,9 @@
  *  along with this program, if not, get it from  
  *      http://www.ubeda.cn
  * ***************************************************************/
-/*****************************************************************
- * @file zdl_member.h
- * @brief
- *****************************************************************/
-
-#ifndef __zdl_member_h__
-#define __zdl_member_h__
 
 #include <string>
 #include <zce/zce_object.h>
-
 #include "zdl/zdl_visitor.h"
 #include "zdl/zdl_type.h"
 #include "zdl/zdl_template_arg.h"
@@ -84,7 +77,6 @@ public:
         }
         return false;
     };
-
 
     bool is_string() const noexcept;
 
@@ -180,5 +172,3 @@ private:
 };
 
 typedef zce_smartptr<zdl_member> zdl_member_ptr;
-
-#endif /*__zdl_member_h__*/
