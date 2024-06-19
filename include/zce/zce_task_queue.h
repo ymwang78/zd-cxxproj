@@ -56,25 +56,25 @@ public:
     virtual void call();
 
     template<typename F>
-    int enqueue(F f);
+    int enqueue(F f, const char* name = nullptr);
 };
 
 template<typename F>
-int zce_task_queue::enqueue(F f)
+int zce_task_queue::enqueue(F f, const char* name)
 {
     //enqueue can't use wait because work queue maybe the same with current working
     //so deadlock if it happened
     class Tq_task : public zce_task {
         F f_;
     public:
-        Tq_task(F f) : zce_task("Tq_task"), f_(f) {
+        Tq_task(F f, const char* name) : zce_task(name), f_(f) {
         }
         virtual void call() {
             f_();
         }
     };
 
-    zce_smartptr<zce_task> task_ptr(new Tq_task(f));
+    zce_smartptr<zce_task> task_ptr(new Tq_task(f, name ? name : "Tq_task"));
     return enqueue(task_ptr);
 };
 
