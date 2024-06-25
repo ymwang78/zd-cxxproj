@@ -117,13 +117,13 @@ public:
     int rpc_call(const zce_smartptr<zce_object>& vmptr,
         zce_int64 objectid,
         const std::string& method,
-        T& t,
+        T t,
         const std::function<void(int error_code, const zce_dblock& retdata)>& response) {
-
-        if constexpr (std::is_same<T, zce_dblock>::value) {
+        typedef typename std::remove_cv<typename std::remove_reference<T>::type>::type TT;
+        if constexpr (std::is_same<TT, zce_dblock>::value) {
             return rpc_call_dblock(vmptr, objectid, method, std::move(t), response);
         }
-        else if constexpr (zdp::is_builtin_type<T>()) {
+        else if constexpr (zdp::is_builtin_type<TT>()) {
             return rpc_call_builtin(vmptr, objectid, method, t, response);
         }
         else {

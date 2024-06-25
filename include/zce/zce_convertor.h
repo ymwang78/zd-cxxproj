@@ -1,3 +1,4 @@
+#pragma once
 // ***************************************************************
 //  zce_convertor   version:  1.0  date: 2007-12-21
 //  -------------------------------------------------------------
@@ -7,11 +8,8 @@
 // ***************************************************************
 // return Characters(not Bytes) of Target
 // ***************************************************************
-#ifndef __ZCE_CONVERTOR__H__
-#define __ZCE_CONVERTOR__H__
 
 #include <zce/zce_config.h>
-
 #include <memory>
 
 class ZCE_API zce_convertor
@@ -30,8 +28,11 @@ public:
     static int gb2312_to_utf8(const char* source, size_t source_size, unsigned char* target, size_t target_size, bool strict = true);
     static int utf8_to_gb2312(const unsigned char* source, size_t source_size, char* target, size_t target_size, bool strict = true);
     static int gb2312_to_wchart(const char* source, size_t source_size, wchar_t* target, size_t target_size);
-    static int utf16_to_utf8(const wchar_t* source, size_t source_size, char* target, size_t target_size);
-    static int utf8_to_utf16(const char* source, size_t source_size, wchar_t* target, size_t target_size);
+    static int utf16_to_utf8(const zce_char16* source, size_t source_size, char* target, size_t target_size);
+    static int utf8_to_utf16(const char* source, size_t source_size, zce_char16* target, size_t target_size);
+    static std::string utf16_to_utf8(const zce_ustring& ustr);
+    static int utf8_to_wchart(const char* source, size_t source_size, wchar_t* target, size_t target_size);
+    static int wchart_to_utf8(const wchar_t* source, size_t source_size, char* target, size_t target_size);
 };
 
 class ZCE_API zce_convertor_to_utf8
@@ -94,5 +95,3 @@ private:
     wchar_t           tmpstr_[2048];
     enum err_code    error_;
 };
-
-#endif //__XCHARACTERCONVERTOR__H__

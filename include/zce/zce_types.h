@@ -14,7 +14,6 @@
 #ifndef ZCE_TYPES_DEFINED
 #define ZCE_TYPES_DEFINED
 
-
 #   ifdef _WIN32
 
 #   if !defined(_SSIZE_T_) && !defined(_SSIZE_T_DEFINED)
@@ -85,6 +84,16 @@ typedef struct _zce_addr_t
 #   include <string>
 #   include <vector>
 
+#   ifdef _WIN32
+#       define ZCE_U16(x) L##x
+        typedef std::wstring zce_ustring;
+        typedef wchar_t zce_char16;
+#   else
+#       define ZCE_U16(x) u##x
+        typedef std::u16string zce_ustring;
+        typedef char16_t zce_char16;
+#   endif
+
 #   ifdef _UNICODE
         typedef std::wstring zce_tstring;
         typedef wchar_t      zce_tchar;
@@ -101,4 +110,6 @@ typedef struct _zce_addr_t
 	typedef std::vector<zce_astring> zce_astrvec;
     typedef std::vector<zce_tstring> zce_tstrvec;
     typedef std::vector<zce_wstring> zce_wstrvec;
+    typedef std::vector<zce_ustring> zce_ustrvec;
+
 #endif //__cplusplus

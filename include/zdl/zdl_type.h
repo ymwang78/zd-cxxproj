@@ -41,15 +41,17 @@ enum yytokentype
 	ZDL_WSTRVEC = 275,             /* ZDL_WSTRVEC  */
 	ZDL_BYTEVEC = 276,             /* ZDL_BYTEVEC  */
 	ZDL_ANY = 277,                 /* ZDL_ANY  */
-	ZDL_ENUM = 278,                /* ZDL_ENUM  */
-	ZDL_STRUCT = 279,              /* ZDL_STRUCT  */
-	ZDL_NAMESPACE = 280,           /* ZDL_NAMESPACE  */
-	ZDL_IDENTIFIER = 281,          /* ZDL_IDENTIFIER  */
-	ZDL_INTEGER_LITERAL = 282,     /* ZDL_INTEGER_LITERAL  */
-	ZDL_DOUBLE_LITERAL = 283,      /* ZDL_DOUBLE_LITERAL  */
-	ZDL_STRING_LITERAL = 284,      /* ZDL_STRING_LITERAL  */
-	ZDL_COMMENT = 285,             /* ZDL_COMMENT  */
-	ZDL_USER_START = 286           /* ZDL_USER_START  */
+    ZDL_DBLMAT = 278,              /* ZDL_DBLMAT  */
+    ZDL_FLTMAT = 279,              /* ZDL_FLTMAT  */
+    ZDL_ENUM = 280,                /* ZDL_ENUM  */
+    ZDL_STRUCT = 281,              /* ZDL_STRUCT  */
+    ZDL_NAMESPACE = 282,           /* ZDL_NAMESPACE  */
+    ZDL_IDENTIFIER = 283,          /* ZDL_IDENTIFIER  */
+    ZDL_INTEGER_LITERAL = 284,     /* ZDL_INTEGER_LITERAL  */
+    ZDL_DOUBLE_LITERAL = 285,      /* ZDL_DOUBLE_LITERAL  */
+    ZDL_STRING_LITERAL = 286,      /* ZDL_STRING_LITERAL  */
+    ZDL_COMMENT = 287,             /* ZDL_COMMENT  */
+    ZDL_USER_START = 288           /* ZDL_USER_START  */
 };
 typedef enum yytokentype yytoken_kind_t;
 #endif

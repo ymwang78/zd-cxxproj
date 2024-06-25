@@ -44,6 +44,8 @@ const char* ZCE_API zce_filename(const char* str);
 
 bool ZCE_API zce_filepath_exists(const char* path);
 
+int ZCE_API zce_temp_dir(char* buffer, size_t* size);
+
 zce_int64 ZCE_API zce_filesize(const char* path);
 
 handle_t ZCE_API zce_open(const char* filename, int mode, zce_uint16 perms, LPSECURITY_ATTRIBUTES sa);
@@ -90,4 +92,6 @@ public:
     int ftruncate(zce_int64 newsize);
 
     zce_int64 size();
+
+    void close();
 };

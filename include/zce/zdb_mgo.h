@@ -136,8 +136,8 @@ namespace zdp
 
     template <typename T>
     struct response_json_t {
-        int error_code;
-        std::string error_desc;
+        int errcode;
+        std::string errdesc;
         T data;
     };
 
@@ -146,8 +146,8 @@ namespace zdp
     {
         int ret = 0;
 
-        _obj_builder.append(bsoncxx::builder::basic::kvp("error_code", _t.error_code));
-        _obj_builder.append(bsoncxx::builder::basic::kvp("error_desc", _t.error_desc));
+        _obj_builder.append(bsoncxx::builder::basic::kvp("errcode", _t.errcode));
+        _obj_builder.append(bsoncxx::builder::basic::kvp("errdesc", _t.errdesc));
 
         if (_t.error_code >= 0) {
             _obj_builder.append(bsoncxx::builder::basic::kvp("data",
@@ -165,8 +165,8 @@ namespace zdp
     {
         int ret = 0;
 
-        _obj_builder.append(bsoncxx::builder::basic::kvp("error_code", _t.error_code));
-        _obj_builder.append(bsoncxx::builder::basic::kvp("error_desc", _t.error_desc));
+        _obj_builder.append(bsoncxx::builder::basic::kvp("errcode", _t.errcode));
+        _obj_builder.append(bsoncxx::builder::basic::kvp("errdesc", _t.errdesc));
 
         if (_t.error_code >= 0) {
             _obj_builder.append(bsoncxx::builder::basic::kvp("data",
