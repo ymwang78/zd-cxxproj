@@ -50,11 +50,11 @@ public:
 
     static SSL_CTX* init_ssl_ctx(bool isserver, const char* verifycrt, const char* cert, const char* key);
 
-    virtual void on_open(bool passive, const zce_sockaddr_t& remote);
+    void on_open(bool passive, const zce_sockaddr_t& remote) override;
 
-    virtual void on_read(zce_dblock& dblock, void*);
+    void on_read(zce_dblock& dblock, const zce_any&) override;
 
-    virtual void close();
+    void close() override;
 
-    virtual int  write(const zce_dblock& dblock, ERV_ISTREAM_WRITEOPT opt);
+    int  write(const zce_dblock& dblock, ERV_ISTREAM_WRITEOPT opt) override;
 };

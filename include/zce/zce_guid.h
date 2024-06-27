@@ -19,7 +19,7 @@ class ZCE_API zce_guid32
 {
     std::vector<unsigned char> uuid_;
 public:
-    zce_guid32();
+    zce_guid32(bool tmseq = true);
 	zce_guid32(const std::vector<unsigned char>&);
     const std::vector<unsigned char>& get_byte_array()const;
     std::string to_string() const;
