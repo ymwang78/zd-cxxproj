@@ -63,8 +63,6 @@ class ZCE_API zdb_redis_connection : public zce_object
 {
     redisContext* context_;
 
-    bool connection_ok_;
-
 public:
 
     typedef std::vector<std::pair<std::string, zce_int64> > kvpair_vec_t;
@@ -73,9 +71,7 @@ public:
 
     zdb_redis_connection(bool ssl, const std::string& ip, unsigned short port, const char* passwd);
 
-    bool connetion_ok() const {
-        return connection_ok_;
-    };
+    bool connetion_ok() const;
 
     void close();
 

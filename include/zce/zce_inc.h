@@ -164,6 +164,8 @@ enum ERV_ZCE_ERROR
     ZCE_ERROR_INVALID,  //无效的参数
     ZCE_ERROR_DUPLICATED, //重复的数据
     ZCE_ERROR_UNINIT,     //未初始化
+    ZCE_ERROR_BADPRC,     //处理错误
+    ZCE_ERROR_NORESOURCE, //资源不足
 
     ZCE_ERROR_UVBASE = 0x81020000,
 
