@@ -112,4 +112,29 @@ typedef struct _zce_addr_t
     typedef std::vector<zce_wstring> zce_wstrvec;
     typedef std::vector<zce_ustring> zce_ustrvec;
 
+
+    template <typename T>
+    class zce_matrix
+    {
+        int _x, _y;
+        std::vector<T> _vec;
+    public:
+        zce_matrix() : _x(0), _y(0) {}
+        zce_matrix(int x, int y) : _x(x), _y(y), _vec(x* y) {}
+        zce_matrix(const zce_matrix& m) : _x(m._x), _y(m._y), _vec(m._vec) {}
+        zce_matrix(zce_matrix&& m) : _x(m._x), _y(m._y), _vec(std::move(m._vec)) {}
+        ~zce_matrix() {}
+        zce_matrix& operator=(const zce_matrix& m) { _x = m._x; _y = m._y; _vec = m._vec; return *this; }
+        zce_matrix& operator=(zce_matrix&& m) { _x = m._x; _y = m._y; _vec = std::move(m._vec); return *this; }
+        T& operator()(int i, int j) { return _vec[i * _y + j]; }
+        T operator()(int i, int j) const { return _vec[i * _y + j]; }
+        void resize(int x, int y) { _vec.resize(x * y); this->_x = x; this->_y = y; }
+        int rows() const { return _x; }
+        int cols() const { return _y; }
+        const T* data() const { return _vec.data(); }
+        T* data() { return _vec.data(); }
+        const std::vector<T>& vec() const { return _vec; }
+        bool empty() const { return _vec.empty(); }
+    };
+
 #endif //__cplusplus
