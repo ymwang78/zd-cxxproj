@@ -55,13 +55,13 @@ class ZCE_API zce_any
             std::map<zce_any, zce_any>* dict_;
             std::vector<zce_any>* vec_;
         } u_;
-
-        zce_uint16 len_or_port_ = 0;
-        zce_uint16 padding_ : 6;
-        zce_uint16 type_ : 5;
-        zce_uint16 shiftbits_ : 3;
-        zce_uint16 signed_ : 1;
-        zce_uint16 outplace_ : 1;
+        zce_uint32 reserved;
+        zce_uint32 len_or_port_ : 16; // = 0
+        zce_uint32 padding_ : 6;
+        zce_uint32 type_ : 5;
+        zce_uint32 shiftbits_ : 3;
+        zce_uint32 signed_ : 1;
+        zce_uint32 outplace_ : 1;
     } data_;
 
     template<typename T>
@@ -176,7 +176,7 @@ public:
 
     static zce_any create_dblock();
 
-    inline bool get_type() const noexcept {
+    inline int get_type() const noexcept {
         return data_.type_;
     }
 
@@ -359,4 +359,6 @@ public:
     inline unsigned short port() const noexcept {
         return data_.len_or_port_;
     }
+
+    std::string to_string() const noexcept;
 };

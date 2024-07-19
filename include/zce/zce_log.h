@@ -95,12 +95,18 @@ void ZCE_API        zlog_rawprint(unsigned level, const char* fmt);
 }
 #endif
 
-
 #ifdef __cplusplus
 
 #include <zce/zce_object.h>
 #include <sstream>
 #include <vector>
+
+class zce_loglevel
+{
+public:
+    zce_loglevel(unsigned level, const char* filename);
+};
+#define ZCE_CURRENT_LOGLEVEL(x) static zce_loglevel __loglevel(x, __FILE__)
 
 template <typename T>
 std::ostream& operator<<(std::ostream& o, const ::std::vector<T>& t) {
