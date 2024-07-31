@@ -56,7 +56,7 @@ namespace zdp
 
     static inline unsigned zdp_msglen(const zce_byte* buf) //should ensure >= 10
     {
-        return (buf[5] << 16) | (buf[6] << 8) | (buf[7]);
+        return  ((buf[4] & 0xf) << 24) | (buf[5] << 16) | (buf[6] << 8) | (buf[7]);
     };
 
     static inline unsigned short zdp_msgtype(const zce_byte* buf) //should ensure >= 10

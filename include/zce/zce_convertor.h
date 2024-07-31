@@ -27,6 +27,7 @@ public:
     zce_convertor(bool swap = false) : swap_(swap) {};
     static int gb2312_to_utf8(const char* source, size_t source_size, unsigned char* target, size_t target_size, bool strict = true);
     static int utf8_to_gb2312(const unsigned char* source, size_t source_size, char* target, size_t target_size, bool strict = true);
+    static int wchart_to_gb2312(const wchar_t* source, size_t source_size, char* target, size_t target_size);
     static int gb2312_to_wchart(const char* source, size_t source_size, wchar_t* target, size_t target_size);
     static int utf16_to_utf8(const zce_char16* source, size_t source_size, char* target, size_t target_size);
     static int utf8_to_utf16(const char* source, size_t source_size, zce_char16* target, size_t target_size);

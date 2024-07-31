@@ -223,12 +223,14 @@ namespace zdp_base
             if (!(target == _t.target)) return false;
             if (method != _t.method) return false;
             if (payload != _t.payload) return false;
+            if (timeout != _t.timeout) return false;
             return true;
         }
 
         zobject_proxy_t    target;
         zce_astring method;
         zce_dblock    payload;
+        zce_int32    timeout;
     };
     typedef zce_smartptr<MSG_RPCCALL_REQ> MSG_RPCCALL_REQ_PTR;
 
