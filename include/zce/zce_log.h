@@ -54,6 +54,8 @@ void ZCE_API        zlog_setlevel(unsigned level);
 
 unsigned ZCE_API    zlog_getlevel();
 
+unsigned ZCE_API    zlog_getseq();
+
 int ZCE_API         zlog_snprintf(char* buffer, unsigned size, unsigned level, const char* funcname, const char* filename, int linenumber, const char* fmt, ...);
 
 int ZCE_API         zlog_vsnprintf(char* buffer, unsigned size, unsigned level, const char* funcname, const char* filename, int linenumber, const char* fmt, va_list argptr);
@@ -66,7 +68,9 @@ void ZCE_API        zlog_bizremote(const char* ip, unsigned short port);
 
 void ZCE_API        zlog_setremote(const char* ip, unsigned short port);
 
-void ZCE_API        zlog_rawprint(unsigned level, const char* fmt);
+void ZCE_API        zlog_rawprint(unsigned level, const char* fmt); 
+
+void ZCE_API        zlog_cleanup(int keep_days);
 
 #ifdef _WIN32
 #   define ZLOG(lv, fn, ...)            do { if(zlog_getlevel() <= (lv)) zlog_logv((lv), __FUNCTION__, __FILE__, __LINE__, (fn), __VA_ARGS__); } while (0)
