@@ -27,9 +27,9 @@ public:
 
     void error(const char* s);
     void warning(const char* s);
-    void read_cr();
-    void parse(const char* filename, const zdl_parser_context_ptr& parser_context);
     void info(const char* s);
+    void read_cr();
+    int parse(const char* filename, const zdl_parser_context_ptr& parser_context);
     zdl_parser_context_ptr context_ptr() const { return parser_context_; };
 
 private:
