@@ -47,6 +47,8 @@ extern "C"
 
     zce_timestamp ZCE_API zce_timestamp_from_asc(const char* timestr);
 
+    char* ZCE_API zce_strptime(const char* buf, const char* fmt, struct tm* tm, int* tz_offset);
+
     unsigned ZCE_API zce_thread_id();
 
     void ZCE_API zce_oom_adjust(int adjust);
@@ -261,9 +263,6 @@ std::string ZCE_API zce_to_utf8(const wchar_t* src, unsigned len);
 
 std::wstring ZCE_API zce_to_utf16(const char* src, unsigned len);
 
-extern "C" {
-    char* ZCE_API strptime(const char *buf, const char *fmt, struct tm *tm);
-}
 #endif
 
 template<typename T>

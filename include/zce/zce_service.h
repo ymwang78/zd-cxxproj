@@ -99,8 +99,6 @@ public:
     void control(int);
 #else
     int run_daemon(int, char*[]);
-    int start_workprocess_posix();
-    bool close_files_;
     std::string pid_file_;
     pid_t work_process_;
     const char* exepath_;
