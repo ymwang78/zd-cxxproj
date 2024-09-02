@@ -46,6 +46,20 @@ namespace zdp_base
         E_MSG_RPCCALL_RES = (int)0x00000009,
     };
 
+    struct err_t
+    {
+        static err_t _empty;
+
+        bool operator==(const err_t& _t) const noexcept
+        {
+            if (errcode != _t.errcode) return false;
+            if (errdesc != _t.errdesc) return false;
+            return true;
+        }
+
+        zce_int32    errcode;
+        zce_astring errdesc;
+    };
     struct zdp_addr_t
     {
         static zdp_addr_t _empty;

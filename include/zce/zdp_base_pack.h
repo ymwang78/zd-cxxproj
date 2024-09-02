@@ -19,6 +19,8 @@
 namespace zdp
 {
     struct zds_context_t;
+    int zds_pack(zce_byte* buf, int size, const zdp_base::err_t& _t, zds_context_t* ctx, bool has_prefix);
+    int zds_unpack(zdp_base::err_t& _t, const zce_byte* buf, int size, zds_context_t* ctx, bool has_prefix);
     int zds_pack(zce_byte* buf, int size, const zdp_base::zdp_addr_t& _t, zds_context_t* ctx, bool has_prefix);
     int zds_unpack(zdp_base::zdp_addr_t& _t, const zce_byte* buf, int size, zds_context_t* ctx, bool has_prefix);
     int zds_pack(zce_byte* buf, int size, const zdp_base::zdp_container_t& _t, zds_context_t* ctx, bool has_prefix);
