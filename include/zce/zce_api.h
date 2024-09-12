@@ -55,11 +55,16 @@ extern "C"
 
     void ZCE_API zce_to_hex(char* out, size_t out_size, const char* in, size_t in_size, bool upper = false);
 
-    int ZCE_API zce_from_hex(char* out, size_t out_size, const char* in, size_t in_size);
+    int ZCE_API zce_from_hex(unsigned char* out, size_t out_size, const char* in, size_t in_size);
 
     int ZCE_API zce_base64_decode(unsigned char* result, const unsigned char* input, size_t inputlen);
 
     int ZCE_API zce_base64_encode(unsigned char* buffer, const unsigned char* input, size_t input_len);
+
+    /*result == nul 可以预先计算所需大小*/
+    int ZCE_API zce_base58_decode(unsigned char* result, size_t result_size, const unsigned char* input, size_t inputlen);
+
+    int ZCE_API zce_base58_encode(unsigned char* buffer, size_t buffer_size, const unsigned char* input, size_t input_len);
 
     int ZCE_API zce_base32_encode(char* output, const zce_byte* data, size_t length);
 

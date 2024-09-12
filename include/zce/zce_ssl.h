@@ -31,7 +31,7 @@ class zce_ssl : public zce_istream
     //zce_dblock write_dblock_;
     BIO *write_bio_;
 
-    zce_ssl::sslstatus get_sslstatus(SSL* ssl, int n);
+    zce_ssl::sslstatus get_sslstatus(int n);
 
     zce_ssl::sslstatus do_ssl_handshake();
 
@@ -39,14 +39,11 @@ class zce_ssl : public zce_istream
 
     zce_ssl::sslstatus do_check_read_bio();
 
-    
 public:
 
     zce_ssl(bool isserver, const char* n, const char* verifycrt, const char* cert, const char* key);
 
     ~zce_ssl();
-
-    void set_tls_hostname(const char* n);
 
     static SSL_CTX* init_ssl_ctx(bool isserver, const char* verifycrt, const char* cert, const char* key);
 

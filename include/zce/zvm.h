@@ -131,6 +131,59 @@ public:
             return rpc_call_msg(vmptr, objectid, method, t, response);
         }
     }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#if 0
+    void zds_push(zce_dblock& dblock,
+        const char* v) {
+        zds_push_string(dblock, v);
+    }
+
+    void luas_push(zce_dblock& dblock,
+        const std::string& v) {
+        luas_push_lstring(dblock, v.c_str(), (zce_int32)v.length());
+    }
+
+    void luas_push(zce_dblock& dblock,
+        zce_int64 v) {
+        luas_push_integer(dblock, v);
+    }
+
+    void luas_push(zce_dblock& dblock,
+        zce_int32 v) {
+        luas_push_integer(dblock, v);
+    }
+
+    void luas_push(zce_dblock& dblock,
+        bool v) {
+        luas_push_bool(dblock, v);
+    }
+
+    void luas_push(zce_dblock& dblock,
+        void* ctx) {
+        luas_push_lightuserdata(dblock, ctx);
+    }
+
+    template <typename T, typename... Args>
+    void luas_push(zce_dblock& dblock,
+        const T& v,
+        Args... args) {
+        luas_push(dblock, v);
+        luas_push(dblock, args...);
+    }
+
+    template<typename... Args>
+    int rpc_call(const zce_smartptr<zce_object>& vmptr,
+        zce_int64 objectid,
+        const std::string& method,
+        const response_cb& response,
+        Args... args) {
+        zce_dblock dblock;
+        zds_pack()
+        luas_push(dblock, args...);
+        return lpc_call_dblock(svrname, method, dblock);
+    }
+#endif
 };
 
 typedef zce_singleton<zvm> zvm_sigt;

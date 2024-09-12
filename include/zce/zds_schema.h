@@ -159,6 +159,19 @@ namespace zdp
 
     int ZCE_API zds_pack_any_array_header(zce_byte* buf, int size, zce_uint64 array_size, zds_context_t* ctx, bool has_prefix = true);
 
+    template <typename T, typename... Args>
+    int zds_pack_builtin(zce_byte* buf, int size,
+        const T& v, 
+        zds_context_t* ctx,
+        Args... args) {
+        int ret = 0;
+        int len = zds_pack_builtin(buf, size, v, 0, true);
+        CHECKLEN_MOVEBUF_ADDRET_DECSIZE;
+        len = zds_pack_builtin(buf, size, args...);
+        CHECKLEN_MOVEBUF_ADDRET_DECSIZE;
+        return ret;
+    }
+
     ///////////////////////////////////////////////////////////////////////////
 
     int ZCE_API zds_unpack_builtin(void*& val, const zce_byte* buf, zce_int32 size, zds_context_t* ctx);
