@@ -136,6 +136,8 @@ std::string ZCE_API zce_md5sum(const char* fname);
 
 std::string ZCE_API zce_hash_md5(const char* input, size_t inputlen, unsigned char binout[16], bool upper = false);
 
+std::string ZCE_API zce_hash_sha256(const zce_byte* input, size_t inputlen, unsigned char binout[32], bool upper = false);
+
 std::string ZCE_API zce_string_format(unsigned length, const char* format, ...);
 
 std::string ZCE_API zce_trim(const std::string& str, const std::string& whitespace = " \t\r\n");

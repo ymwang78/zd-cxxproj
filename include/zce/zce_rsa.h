@@ -53,7 +53,7 @@ int ZCE_API zce_aes_encrypt(zce_dblock& dblock,
     const char* mode);
 
 int ZCE_API zce_aes_decrypt(zce_dblock& dblock,
-    zce_dblock& iv_dblock,
+    const zce_dblock& iv_dblock,
     const zce_byte* input,
     size_t inputlen,
     const zce_byte* key,

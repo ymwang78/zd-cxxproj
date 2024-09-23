@@ -35,6 +35,8 @@ class zce_ssl : public zce_istream
 
     zce_ssl::sslstatus do_ssl_handshake();
 
+    zce_ssl::sslstatus do_ssl_shutdown();
+
     zce_ssl::sslstatus do_check_write_bio();
 
     zce_ssl::sslstatus do_check_read_bio();
