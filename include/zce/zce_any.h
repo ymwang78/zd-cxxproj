@@ -154,6 +154,8 @@ public:
 
     zce_any(const char* str, size_t len) noexcept;
 
+    zce_any(const char* str) noexcept;
+
     zce_any(const zce_byte* buf, size_t len, zce_byte fixarr_u) noexcept;
 
     zce_any(const struct in_addr& ipv4, unsigned short port) noexcept 
