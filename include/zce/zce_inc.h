@@ -110,6 +110,7 @@
 #   if defined(__APPLE__)
 #       include <cstddef>
 #   endif //__APPLE__
+#   include <gsl/gsl>
 #endif //__cpluscplus
 
 #ifndef ZCE_API

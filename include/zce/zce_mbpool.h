@@ -39,9 +39,17 @@ public:
 
     void add_pool(size_t size, size_t count);
 
+    void add_pool_v2(size_t atomic_size, size_t count);
+
     zce_dtblock* acquire(size_t len, zce_object_counter& obj);
 
     zce_dblock acquire_dblock(size_t len, zce_object_counter& obj);
+
+    void* zmalloc(size_t len, size_t* nreal);
+
+    void zfree(void* ptr);
+
+    void* realloc(void* ptr, size_t len, size_t* nreal);
 
     void get_stat(std::vector<zce_alloc_stat>& stat) const;
 };
@@ -54,7 +62,7 @@ class zce_objpool
 public:
 
     zce_objpool()
-        :vt_allocator_(new zce_allocator_chunk(sizeof(T), 4096, true)) {
+        :vt_allocator_(zce_allocator::create_chunk(sizeof(T), 4096, true)) {
     }
 
     virtual ~zce_objpool() {

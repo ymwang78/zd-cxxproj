@@ -20,7 +20,7 @@
 
 struct ZCE_API zce_alloc_stat {
 
-    zce_alloc_stat(size_t chunk_s);
+    zce_alloc_stat(size_t chunk_s) noexcept;
 
     zce_alloc_stat() = default;
 
@@ -44,72 +44,25 @@ struct ZCE_API zce_alloc_stat {
 class ZCE_API zce_allocator : public zce_object
 {
 public:
+    enum ALLOCATOR_TYPE { CHUNK, V2 };
+
+    static zce_smartptr<zce_allocator> create_chunk(size_t chunk_size, size_t n_chunks, bool lock);
+
+    static zce_smartptr<zce_allocator> create_v2(size_t chunk_size, size_t n_chunks, bool lock);
+
+    virtual size_t total_size() const noexcept = 0;
+
+    virtual void get_stat(std::vector<zce_alloc_stat>& stat) const noexcept = 0;
+
+    virtual size_t get_capacity(void* item) const noexcept = 0 ;
+
     virtual void* alloc(size_t nbytes, size_t* nreal) = 0;
 
     virtual void zfree(void* item) noexcept = 0; //fuck off the macro
+
+    virtual void* realloc(void* ptr, size_t nbytes, size_t* nreal) noexcept = 0;
+
+    virtual ALLOCATOR_TYPE get_type() const noexcept = 0;
 };
 
-class ZCE_API zce_allocator_chunk : public zce_allocator
-{
-
-private:
-    bool lock_;                     //need cross thread usage
-    
-    zce_mutex pool_lock_;           //protected alloc and free if lock is enabled
-    
-    unsigned long work_threadid_;   //debug purpose only
-
-    unsigned chunk_count_;          //how many chunks in one pool
-
-    zce_alloc_stat alloc_stat_;
-
-    std::vector<char*> pool_vec_;       //pools
-
-    struct zce_list_node free_list_;    //available chunks
-
-    void add_new_pool();
-
-    void* do_malloc(size_t& nbytes);
-
-    void do_free(void* item);
-
-public:
-
-    inline unsigned chunk_size() const noexcept { return alloc_stat_.chunk_data_size_; }
-
-    inline zce_alloc_stat stat() const noexcept { return alloc_stat_; }
-
-public:
-
-    zce_allocator_chunk(size_t chunk_size, size_t n_chunks, bool lock);
-
-    ~zce_allocator_chunk() override;
-
-    void *alloc(size_t nbytes, size_t* nreal) override;
-
-    void zfree(void* item) noexcept override;
-};
-
-class ZCE_API zce_allocator_v2 : public zce_allocator
-{
-    struct pimpl;
-    
-    pimpl* pimpl_;
-
-    bool islock_;
-
-    zce_mutex lock_;
-
-public:
-    
-    zce_allocator_v2(size_t atmoic_size, bool islock = true);
-
-    ~zce_allocator_v2() override;
-
-    int init_pool(size_t malloc_size);
-
-    void* alloc(size_t nbytes, size_t* nreal) override;
-
-    void zfree(void* item) noexcept override;
-};
 #endif // __zce_allocator_h__

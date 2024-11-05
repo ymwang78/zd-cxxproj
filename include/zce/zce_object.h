@@ -38,7 +38,7 @@ protected:
     virtual ~zce_object() {
     };
 
-    void __free_me();
+    void __free_me() noexcept;
 
 public:
 
