@@ -62,6 +62,7 @@ public:
     zce_smartptr<zce_object> boot(const std::string& svc_name,
         const std::string& host, 
         unsigned short port,
+        bool ssl,
         int default_timeout);
 
     zce_smartptr<zce_object> get_vm(const std::string& svc_name) const;

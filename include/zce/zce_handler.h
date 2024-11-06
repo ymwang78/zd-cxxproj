@@ -290,7 +290,7 @@ public:
 
 	int start_resolve();
 
-	virtual void on_resolved(const zce_sockaddr_t& addr) = 0;
+	virtual void on_resolved(int errcode, const zce_sockaddr_t& addr) = 0;
 };
 
 class ZCE_API zce_connector : public zce_object
@@ -326,7 +326,7 @@ public:
 
     void handle_timeout(const zce_any&);
 
-	void on_resolved(const zce_sockaddr_t& addr);
+	void on_resolved(int errcode, const zce_sockaddr_t& addr);
 
     virtual void on_connect(int status);
 

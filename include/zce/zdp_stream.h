@@ -101,7 +101,9 @@ namespace zdp
 
         int write(const zce_dblock& dblock_ptr, zce_istream::ERV_ISTREAM_WRITEOPT opt = zce_istream::ERV_ISTREAM_DEFAULT) override;
 
-        void close() override;
+        //void close() override;
+
+        void on_close() override;
 
         //////////////////////////////////////////////////////////////////////////
 
