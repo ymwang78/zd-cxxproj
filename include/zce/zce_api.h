@@ -146,6 +146,8 @@ std::string ZCE_API zce_localtime_str(bool msec);
 
 std::string ZCE_API zce_timestamp_to_asc(zce_timestamp ts);
 
+std::string ZCE_API zce_get_hostname();
+
 template<typename T>
 inline T zce_min(T v1, T v2) 
 {
