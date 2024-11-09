@@ -122,7 +122,7 @@ namespace zdp
 
 #define DECLARE_PACK_BUILTIN_ARRAY(TT) \
     int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const std::vector<TT>& val, zds_context_t* ctx, bool has_prefix = true);\
-    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const TT* vec, unsigned vec_size, zds_context_t* ctx, bool has_prefix = true);
+    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const TT* vec, unsigned vec_size, zds_context_t* ctx, bool has_prefix = true, bool skip_content = false);
 
     int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const std::vector<bool>& val, zds_context_t* ctx, bool has_prefix = true);
 
@@ -137,15 +137,13 @@ namespace zdp
     DECLARE_PACK_BUILTIN_ARRAY(zce_float)
     DECLARE_PACK_BUILTIN_ARRAY(zce_double)
 
-    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const zce_dblock& val, zds_context_t* ctx, bool has_prefix = true);
+    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const zce_dblock& val, zds_context_t* ctx, bool has_prefix = true, bool skip_content = false);
 
-    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const char* val, zds_context_t* ctx, bool has_prefix = true);
+    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const char* val, zds_context_t* ctx, bool has_prefix = true, bool skip_content = false);
 
-	int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const zce_byte* val, zce_int32 len, zds_context_t* ctx, bool has_prefix = true);
+    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const std::string& val, zds_context_t* ctx, bool has_prefix = true, bool skip_content = false);
 
-    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const std::string& val, zds_context_t* ctx, bool has_prefix = true);
-
-    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const zce::string_view& val, zds_context_t* ctx, bool has_prefix = true);
+    int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const zce::string_view& val, zds_context_t* ctx, bool has_prefix = true, bool skip_content = false);
 
     int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const std::vector<std::string>& val, zds_context_t* ctx, bool has_prefix = true);
 

@@ -206,7 +206,7 @@ namespace zdp
     int zdp_stream::response(const MSG_T& msg, unsigned seq, zce_byte rev, ERV_ZCE_COMPRESS cps)
     {
         zce_dblock dblock_ptr;
-        ZTRACE("response", seq);
+        //ZTRACE("response", seq);
         int ret = zdp_serialize(dblock_ptr, seq, msg, rev, cps, 32);
         ZCE_ASSERT(ret >= 0);
         if (ret < 0)
