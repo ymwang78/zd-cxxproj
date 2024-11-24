@@ -41,6 +41,8 @@ extern "C"
 
     int ZCE_API zce_timespec_str(char* buf, int size, struct timespec*, bool msec);
 
+    zce_timestamp ZCE_API zce_timestamp_now();
+
     zce_timestamp ZCE_API zce_to_timestamp(time_t t);
 
     time_t ZCE_API zce_to_timet(zce_timestamp ts);

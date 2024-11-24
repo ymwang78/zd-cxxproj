@@ -127,6 +127,9 @@ protected:
     std::string remote_ip_;
     unsigned short remote_port_;
     zce_dblock dblock_;
+    bool chunked_ack_;
+    bool gzip_ack_;
+    zce_int64 body_length_ack_;
 
 public:
 
@@ -155,6 +158,8 @@ public:
 	virtual void on_prepare_nextreq();
 
 	int write_ack(unsigned code, const zce_byte* buf, size_t length, std::map<std::string, std::string>& paramdict);
+
+    int write_continue(const zce_byte* buf, size_t length);
 };
 
 ///////////////////////////////////////////////////////////////////////////////
