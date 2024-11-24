@@ -50,7 +50,7 @@ struct ZCE_API TEXT_HEADER : virtual public zce_object
 
     unsigned body_length() const { return body_length_; }
 
-    void body_length(int length);
+    void body_length(zce_int64 length);
 
     bool has_body_length() const { return has_body_length_; }
 
