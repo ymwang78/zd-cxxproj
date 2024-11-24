@@ -22,9 +22,9 @@ struct ZCE_API TEXT_HEADER : virtual public zce_object
 {
     static const std::string emptystr;
 
-    static const std::string content_length;
+    static const std::string CONTENT_LENGTH;
 
-    static const std::string transfer_encoding;
+    static const std::string TRANSFER_ENCODING;
 
     static const std::map<std::string, std::string> special_case;
 
