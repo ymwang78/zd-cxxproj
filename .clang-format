@@ -1,0 +1,12 @@
+Language: Cpp
+BasedOnStyle: Google
+IndentWidth: 4
+IndentPPDirectives: AfterHash
+TabWidth: 4
+UseTab: Never
+ColumnLimit: 100
+AccessModifierOffset: -2
+ContinuationIndentWidth: 4
+AlignAfterOpenBracket: Align
+BreakBeforeBraces: Attach  # "Attach" 对应 K&R 风格
+SortIncludes: false
