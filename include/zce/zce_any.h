@@ -60,8 +60,8 @@ class ZCE_API zce_any {
             std::map<zce_any, zce_any>* dict_;
             std::vector<zce_any>* vec_;
         } u_;
-        zce_uint16 reserved;
-        zce_uint16 len_or_port_;  // = 0
+        zce_uint16 len_or_port_;
+        zce_uint16 subtype_indicate_;  // defined by app
         zce_uint32 quality_ : 16;
         zce_uint32 padding_ : 6;
         zce_uint32 type_ : 5;
@@ -178,13 +178,39 @@ class ZCE_API zce_any {
         return data_.u_.i64_[0];
     }
 
+    inline void i64(zce_int64 v) noexcept {
+        ZCE_ASSERT_RETURN(data_.type_ == any_int64, );
+        data_.u_.i64_[0] = v;
+    }
+
     inline bool is_double() const noexcept { return data_.type_ == any_double; }
 
     inline zce_double dbl() const noexcept {
         ZCE_ASSERT_RETURN(data_.type_ == any_double || data_.type_ == any_int64, 0.0);
-        if (data_.type_ == any_int64) return (zce_double)data_.u_.i64_[0];
-        return data_.u_.dbl_[0];
+        if (data_.type_ == any_double) {
+            return data_.u_.dbl_[0];
+        }
+        if (data_.type_ == any_int64) {
+            constexpr zce_int64 max_precise = (1ll << 52) - 1;
+            if (data_.u_.i64_[0] > max_precise) return INFINITY;
+            if (data_.u_.i64_[0] < -max_precise) return -INFINITY;
+            return (zce_double)data_.u_.i64_[0];
+        }
+        return 0.0;
     }
+
+    inline void dbl(zce_double v) noexcept {
+        ZCE_ASSERT_RETURN(data_.type_ == any_double || data_.type_ == any_int64, );
+        if (data_.type_ == any_int64) {
+            data_.type_ = any_double;
+        }
+        data_.u_.dbl_[0] = v;
+    }
+
+    // detail type for int or double, byte, short, etc. specific type defined by apps
+    inline zce_uint16 subtype_indicate() const noexcept { return data_.subtype_indicate_; }
+
+    inline void subtype_indicate(zce_uint16 v) noexcept { data_.subtype_indicate_ = v; }
 
     inline bool is_object() const noexcept { return data_.type_ == any_object; }
 
@@ -320,7 +346,7 @@ class ZCE_API zce_any {
 
     inline bool is_datetime() const noexcept { return data_.type_ == any_datetime; }
 
-    inline zce_timestamp datetime() const noexcept { 
+    inline zce_timestamp datetime() const noexcept {
         ZCE_ASSERT_RETURN(data_.type_ == any_datetime, data_.u_.i64_[0]);
         return data_.u_.i64_[0];
     }
