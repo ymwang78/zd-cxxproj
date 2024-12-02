@@ -31,7 +31,7 @@ typedef enum _IDH_ERRCODE {
     IDH_ERRCODE_BADQUANLITY,
     IDH_ERRCODE_UNSUPPORTTYPE,
     IDH_ERRCODE_NOTALLREADABLE,
-    IDH_ERRCODE_HASUNSUBSRIBEDITEM,  // batch操作包含未订阅项
+    IDH_ERRCODE_HASUNSUBSRIBEDITEM,  // batch operation has unsubscribed item
 } IDH_ERRCODE;
 
 typedef enum _IDH_DATATYPE {
@@ -49,19 +49,14 @@ typedef enum _IDH_QUALITY {
     IDH_HIGH_UNCERTAIN = 0x0300,
     IDH_HIGH_MASK = 0xff00,
 
-    IDH_LOW_INVALID_NODATA = 0x01,       // 此位号无数据
-    IDH_LOW_INVALID_UNREAD = 0x02,       // 此位号尚未读取到数据
-    IDH_LOW_INVALID_UNSUBSCRIBE = 0x03,  // 调用Batch时此位号尚未被订阅
-    IDH_LOW_INVALID_TYPE = 0x04,         // 类型无法转换
-
-    IDH_LOW_LIMIT_MASK = 0x01,          // 是否超出上下限
-    IDH_LOW_CALIBRATING_MASK = 0x02,    // 是否处于设备校准
-    IDH_LOW_LOW_PRECISION_MASK = 0x04,  // 是否由于采样率低导致精度下降
-    IDH_LOW_NETWORK_DELAY_MASK = 0x08,  // 是否由于网络延迟导致
+    IDH_LOW_INVALID_NODATA = 0x01,       // tag value not exists
+    IDH_LOW_INVALID_UNREAD = 0x02,       // tag value has not been read
+    IDH_LOW_INVALID_UNSUBSCRIBE = 0x03,  // batch operation has unsubscribed item
+    IDH_LOW_INVALID_TYPE = 0x04,         // cannot convert data type
 
 } IDH_QUALITY;
 
-typedef enum _IDH_RTSOURCE { IDH_RTSOURCE_UA, IDH_RTSOURCE_COUNT } IDH_RTSOURCE;
+typedef enum _IDH_RTSOURCE { IDH_RTSOURCE_UA, IDH_RTSOURCE_DA, IDH_RTSOURCE_COUNT } IDH_RTSOURCE;
 
 typedef struct _idh_handle {
     int dummy;
@@ -70,6 +65,12 @@ typedef struct _idh_handle {
 typedef struct _idh_source {
     int dummy;
 }* idh_source_t;
+
+typedef struct _idh_source_desc {
+    IDH_RTSOURCE source_type;
+    char name[128];
+    char schema[512];
+} idh_source_desc_t;
 
 typedef struct _idh_batch {
     int dummy;
@@ -91,6 +92,8 @@ LIBIDH_API idh_handle_t idh_instance_create();
 
 LIBIDH_API void idh_instance_destroy(idh_handle_t handle);
 
+LIBIDH_API int idh_instance_discovery(idh_handle_t handle, idh_source_desc_t* source_vec,
+                                    unsigned source_size, const char* hostname, unsigned short port);
 /* data source */
 
 LIBIDH_API idh_source_t idh_source_create(idh_handle_t handle, IDH_RTSOURCE source_type,
