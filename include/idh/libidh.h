@@ -4,7 +4,8 @@
  *  This library is used to provide a common interface for accessing data from different data
  * sources The data sources can be OPC UA, OPC DA, SQL, etc.
  * Note:
- * 1. Don't support abs(int64/uint64) >= 2^52
+ * 1. Don't support abs(int64/uint64) >= 2^52, because of the precision of double.
+ * 2. Minimal support OPC DA 2.0. opcda://{hostname}/{ProgID} opcda://{hostname}/{CLSID}
  */
 
 #ifdef _WIN32
@@ -72,9 +73,9 @@ typedef struct _idh_source_desc {
     char schema[512];
 } idh_source_desc_t;
 
-typedef struct _idh_batch {
+typedef struct _idh_group {
     int dummy;
-}* idh_batch_t;
+}* idh_group_t;
 
 typedef struct _idh_tag {
     unsigned char data_type;
@@ -110,22 +111,22 @@ LIBIDH_API int idh_source_writevalues(idh_source_t source_id, int* results, cons
 
 /* batch operators. speed up for high frequency read/write */
 
-LIBIDH_API idh_batch_t idh_batch_create(idh_source_t handle);
+LIBIDH_API idh_group_t idh_group_create(idh_source_t handle);
 
-LIBIDH_API int idh_batch_subscribe(idh_batch_t batch_id, int* results, const idh_tag_t* tags_ptr,
+LIBIDH_API int idh_group_subscribe(idh_group_t batch_id, int* handles_or_errcode, const idh_tag_t* tags_ptr,
                                    unsigned tags_size);
 
-LIBIDH_API void idh_batch_unsubscribe(idh_batch_t batch_id, const idh_tag_t* tags_ptr,
+LIBIDH_API void idh_group_unsubscribe(idh_group_t batch_id, const int* tag_handles,
                                       unsigned tags_size);
 
 LIBIDH_API
-int idh_batch_readvalues(idh_batch_t batch_id, idh_real_t* values_ptr, const idh_tag_t* tags_ptr,
+int idh_group_readvalues(idh_group_t batch_id, idh_real_t* values_ptr, const int* tag_handles,
                          unsigned tags_size);
 
-LIBIDH_API int idh_batch_writevalues(idh_batch_t batch_id, int* results, const double* values_ptr,
-                                     const idh_tag_t* tags_ptr, unsigned tags_size);
+LIBIDH_API int idh_group_writevalues(idh_group_t batch_id, int* results, const double* values_ptr,
+                                     const int* tag_handles, unsigned tags_size);
 
-LIBIDH_API void idh_batch_destroy(idh_batch_t batch_id);
+LIBIDH_API void idh_group_destroy(idh_group_t batch_id);
 
 #ifdef __cplusplus
 }
