@@ -16,6 +16,7 @@
 
 #include <map>
 #include <vector>
+#include <limits>
 
 class zce_object;
 class zce_dblock;
@@ -169,6 +170,8 @@ class ZCE_API zce_any {
 
     static zce_any create_dblock();
 
+    static zce_any create_datetime_from_msec(zce_int64 msec);
+
     inline int get_type() const noexcept { return data_.type_; }
 
     inline bool is_i64() const noexcept { return data_.type_ == any_int64; }
@@ -192,8 +195,8 @@ class ZCE_API zce_any {
         }
         if (data_.type_ == any_int64) {
             constexpr zce_int64 max_precise = (1ll << 52) - 1;
-            if (data_.u_.i64_[0] > max_precise) return INFINITY;
-            if (data_.u_.i64_[0] < -max_precise) return -INFINITY;
+            if (data_.u_.i64_[0] > max_precise) return std::numeric_limits<double>::infinity();
+            if (data_.u_.i64_[0] < -max_precise) return -std::numeric_limits<double>::infinity();
             return (zce_double)data_.u_.i64_[0];
         }
         return 0.0;
