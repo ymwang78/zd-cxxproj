@@ -102,8 +102,8 @@ typedef struct _idh_source {
 
 typedef struct _idh_source_desc {
     IDH_RTSOURCE source_type;
-    char name[128];
-    char schema[512];
+    char name[256];
+    char schema[256];
 } idh_source_desc_t;
 
 typedef struct _idh_group {
@@ -134,6 +134,8 @@ LIBIDH_API int idh_instance_discovery(idh_handle_t handle, idh_source_desc_t* so
 LIBIDH_API idh_source_t idh_source_create(idh_handle_t handle, IDH_RTSOURCE source_type,
                                           const char* source_schema, int sample_timespan_msec,
                                           int support_subscribe);
+
+LIBIDH_API int idh_source_valid(idh_source_t source_id);
 
 LIBIDH_API void idh_source_destroy(idh_source_t source_id);
 

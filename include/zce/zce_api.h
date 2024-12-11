@@ -108,6 +108,8 @@ extern "C"
     int ZCE_API zce_inet_aton(zce_sockaddr_t*, const char* addr, int port);
     int ZCE_API zce_inet_ntoa(char* ip, unsigned len, const zce_sockaddr_t* addr, bool bport);
 
+    int ZCE_API zce_inet_parse_host_port(const char*& host, int& hostlen, int& port, const char* hostport);
+
 #ifdef __cplusplus
 }
 #endif
