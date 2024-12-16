@@ -4,7 +4,7 @@
 #include <vector>
 #include <new>  // for placement new
 
-template <typename T>
+template <typename T, bool is_auto_shrink = false>
 class zce_array {  // skew heap
     struct slot_t {
         union {
@@ -58,16 +58,7 @@ class zce_array {  // skew heap
     explicit zce_array(size_t capacity) : free_head_(-1), cur_top_(0) { slots_.resize(capacity); }
 
     ~zce_array() {
-        // 析构已使用的对象
-        for (int i = 0; i < cur_top_; ++i) {
-            if (slots_[i].in_use_) {
-                slots_[i].data_.magic = 0;
-                slots_[i].data_.item.~T();
-                slots_[i].in_use_ = false;
-            }
-        }
-        cur_top_ = 0;
-        free_head_ = -1;
+        clear();
     }
 
     template <typename U>
@@ -120,30 +111,32 @@ class zce_array {  // skew heap
             // 若释放的是最高索引的元素，可直接回退cur_top_
             --cur_top_;
 
-            // 检查是否有连续的空闲元素
-            while (cur_top_ > 0 && !slots_[cur_top_ - 1].in_use_) {
-                // 释放连续的空闲元素, 从skew heap中弹出
-                int cur_free = cur_top_ - 1;
-                int parent = slots_[cur_free].heap_node_.parent;
+            if (is_auto_shrink) {
+                // 检查是否有连续的空闲元素
+                while (cur_top_ > 0 && !slots_[cur_top_ - 1].in_use_) {
+                    // 释放连续的空闲元素, 从skew heap中弹出
+                    int cur_free = cur_top_ - 1;
+                    int parent = slots_[cur_free].heap_node_.parent;
 
-                int left = slots_[cur_free].heap_node_.left;
-                int right = slots_[cur_free].heap_node_.right;
-                int new_top = merge_skew_heap(left, right);
-                if (parent != -1) {
-                    if (slots_[parent].heap_node_.left == cur_free) {
-                        slots_[parent].heap_node_.left = new_top;
+                    int left = slots_[cur_free].heap_node_.left;
+                    int right = slots_[cur_free].heap_node_.right;
+                    int new_top = merge_skew_heap(left, right);
+                    if (parent != -1) {
+                        if (slots_[parent].heap_node_.left == cur_free) {
+                            slots_[parent].heap_node_.left = new_top;
+                        } else {
+                            ZCE_ASSERT(slots_[parent].heap_node_.right == cur_free);
+                            slots_[parent].heap_node_.right = new_top;
+                        }
+                        // slots_[cur_free].heap_node_.parent = -1;
+                        // free_head_ = merge_skew_heap(free_head_, cur_free);
                     } else {
-                        ZCE_ASSERT(slots_[parent].heap_node_.right == cur_free);
-                        slots_[parent].heap_node_.right = new_top;
+                        ZCE_ASSERT(free_head_ == cur_free);
+                        free_head_ = new_top;
                     }
-                    // slots_[cur_free].heap_node_.parent = -1;
-                    // free_head_ = merge_skew_heap(free_head_, cur_free);
-                } else {
-                    ZCE_ASSERT(free_head_ == cur_free);
-                    free_head_ = new_top;
-                }
 
-                --cur_top_;
+                    --cur_top_;
+                }
             }
             return;
         }
@@ -173,6 +166,18 @@ class zce_array {  // skew heap
                               magic == slots_[index].data_.magic,
                           _empty);
         return slots_[index].data_.item;
+    }
+
+    void clear() {
+        for (int i = 0; i < cur_top_; ++i) {
+            if (slots_[i].in_use_) {
+                slots_[i].data_.magic = 0;
+                slots_[i].data_.item.~T();
+                slots_[i].in_use_ = false;
+            }
+        }
+        cur_top_ = 0;
+        free_head_ = -1;
     }
 
   private:
