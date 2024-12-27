@@ -5,7 +5,7 @@
  * sources The data sources can be OPC UA, OPC DA, SQL, etc.
  * Note:
  * 1. Don't support abs(int64/uint64) >= 2^52, because of the precision of double.
- * 2. Minimal support OPC DA 2.0. opcda://{hostname}/{ProgID} opcda://{hostname}/{CLSID}
+ * 2. Minimal support OPC DA 2.0. opc.da://{hostname}/{ProgID} opc.da://{hostname}/{CLSID}
  */
 
 #ifdef _WIN32
@@ -65,6 +65,7 @@ typedef enum _IDH_ERRCODE {
     IDH_ERRCODE_HASUNSUBSRIBEDITEM,  // group operation has unsubscribed item
     IDH_ERRCODE_SUBSCRIBEFAILED,
     IDH_ERRCODE_INCONSISTENT,  // inconsistent request, e.g. write different values for the same tag
+    IDH_ERRCODE_BADSROUCE,
 
 } IDH_ERRCODE;
 
@@ -87,6 +88,10 @@ typedef enum _IDH_QUALITY {
     IDH_LOW_INVALID_UNREAD = 0x02,       // tag value has not been read
     IDH_LOW_INVALID_UNSUBSCRIBE = 0x03,  // batch operation has unsubscribed item
     IDH_LOW_INVALID_TYPE = 0x04,         // cannot convert data type
+    IDH_LOW_INVALID_HANDLE = 0x05,      // bad quality
+    IDH_LOW_INVALID_OVERFLOW = 0x06,     // overflow
+    IDH_LOW_INVALID_BADVALUE = 0x07,     // bad value
+    IDH_LOW_INVALID_BADQUALITY = 0x08,   // bad quality
 
 } IDH_QUALITY;
 
@@ -117,9 +122,9 @@ typedef struct _idh_tag {
 } idh_tag_t;
 
 typedef struct _idh_real {
-    unsigned short quality : 16;  // IDH_QUALITY
-    long long timestamp : 48;         // million second from 1970-01-01 00:00:00
-    double value;                     // value
+    unsigned short quality; // IDH_QUALITY
+    long long timestamp;    // million second from 1970-01-01 00:00:00
+    double value;           // value
 } idh_real_t;
 
 LIBIDH_API idh_handle_t idh_instance_create();
