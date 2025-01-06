@@ -36,7 +36,7 @@ public:
 
     int start(const zce_smartptr<zce_timer_doozer>& doozer_ptr);
 
-    int start(const std::function<void(void)>& cb);
+    int start(const std::function<void(void)>& cb, bool noaccumulate = false);
 
     void cancel();
 

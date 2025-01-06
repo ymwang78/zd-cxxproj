@@ -150,26 +150,26 @@ enum ERV_ZCE_ERROR {
 
     ZCE_ERROR_BASE = 0x81000000,  // keep for stdc error
 
-    ZCE_ERROR_COMMON = 0x81010000,  // ZCE ERROR
-    ZCE_ERROR_MALLOC,               // 内存分配错误
-    ZCE_ERROR_UNSUPPORT,            // 遇到未支持的功能要求
-    ZCE_ERROR_SHRTLEN,              // 数据比要求的太短
-    ZCE_ERROR_EXCDLEN,              // 数据比要求的太长
-    ZCE_ERROR_CORRUPT,              // 数据不一致
-    ZCE_ERROR_SYNTAX,               // 数据语义错误
-    ZCE_ERROR_ZIP,                  // 压缩出错
-    ZCE_ERROR_TIMEOUT,              // 接收响应超时
-    ZCE_ERROR_CONVERTOR,            // 转换错误
-    ZCE_ERROR_CLOSED,               // 连接已经关闭
-    ZCE_ERROR_TOCLOSE,              // 连接将要关闭
-    ZCE_ERROR_PREVNULL,             // ISTEAM PREV NOT EXISTS
-    ZCE_ERROR_OVERFLOW,             // 溢出，例如过大的数字
-    ZCE_ERROR_INVALID,              // 无效的参数
-    ZCE_ERROR_DUPLICATED,           // 重复的数据
-    ZCE_ERROR_UNINIT,               // 未初始化
-    ZCE_ERROR_BADPRC,               // 处理错误
-    ZCE_ERROR_NORESOURCE,           // 资源不足
-    ZCE_ERROR_VERSION,              // 版本不匹配
+    ZCE_ERROR_COMMON = 0x81010000,      // ZCE ERROR
+    ZCE_ERROR_MALLOC = 0x81010001,      // 内存分配错误
+    ZCE_ERROR_UNSUPPORT = 0x81010002,   // 遇到未支持的功能要求
+    ZCE_ERROR_SHRTLEN = 0x81010003,     // 数据比要求的太短
+    ZCE_ERROR_EXCDLEN = 0x81010004,     // 数据比要求的太长
+    ZCE_ERROR_CORRUPT = 0x81010005,     // 数据不一致
+    ZCE_ERROR_SYNTAX = 0x81010006,      // 数据语义错误
+    ZCE_ERROR_ZIP = 0x81010007,         // 压缩出错
+    ZCE_ERROR_TIMEOUT = 0x81010008,     // 接收响应超时
+    ZCE_ERROR_CONVERTOR = 0x81010009,   // 转换错误
+    ZCE_ERROR_CLOSED = 0x8101000a,      // 连接已经关闭
+    ZCE_ERROR_TOCLOSE = 0x8101000b,     // 连接将要关闭
+    ZCE_ERROR_PREVNULL = 0x8101000c,    // ISTEAM PREV NOT EXISTS
+    ZCE_ERROR_OVERFLOW = 0x8101000d,    // 溢出，例如过大的数字
+    ZCE_ERROR_INVALID = 0x8101000e,     // 无效的参数
+    ZCE_ERROR_DUPLICATED = 0x8101000f,  // 重复的数据
+    ZCE_ERROR_UNINIT = 0x81010010,      // 未初始化
+    ZCE_ERROR_BADPRC = 0x81010011,      // 处理错误
+    ZCE_ERROR_NORESOURCE = 0x81010012,  // 资源不足
+    ZCE_ERROR_VERSION = 0x81010013,     // 版本不匹配
 
     ZCE_ERROR_UVBASE = 0x81020000,
 

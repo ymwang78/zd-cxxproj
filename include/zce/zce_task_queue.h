@@ -18,6 +18,7 @@
 #    include <zce/zce_task.h>
 #    include <zce/zce_atomic.h>
 #    include <deque>
+#    include <algorithm>
 
 class zce_schedule;
 

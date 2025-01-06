@@ -293,4 +293,18 @@ static inline T zce_counter(zce_uint32 spanid, zce_uint32& lastspanid, T& count)
     }
 }
 
+class ZCE_API zce_profile {
+    const char* name_;
+    unsigned begin_tick_;
+    unsigned limit_;
+  public:
+    zce_profile(const char* name, unsigned limit)
+        : name_(name), limit_(limit), begin_tick_((unsigned)zce_tick()){
+    };
+
+    ~zce_profile();
+
+    inline void check_point(int line);
+};
+
 #endif // __zce_api_h__

@@ -9,8 +9,6 @@
 // ***************************************************************
 //
 // ***************************************************************
-#ifndef __zce_reactor_h__
-#define __zce_reactor_h__
 
 #include <zce/zce_object.h>
 #include <deque>
@@ -20,21 +18,19 @@ class zce_allocator;
 class zce_task;
 class zce_dnsresolve;
 
-class ZCE_API zce_reactor : virtual public zce_object
-{
+class ZCE_API zce_reactor : virtual public zce_object {
     struct pimpl;
     struct pimpl* pimpl_;
 
     friend class zce_reactor_thread;
 
-public:
-
+  public:
     zce_reactor();
 
     ~zce_reactor();
 
     unsigned long thread_id() const;
-    
+
     void* loop_t() const;
 
     int start();
@@ -53,11 +49,10 @@ public:
 
     virtual int on_start() { return 0; };
 
-	template<typename F>
-	int delegate(bool bwait, F f);
+    template <typename F>
+    int delegate(bool bwait, const char* name, F f);
 
-private:
-
+  private:
     int loop();
 
     void terminate();
@@ -65,28 +60,32 @@ private:
 
 #include <zce/zce_task.h>
 
-template<typename F>
-int zce_reactor::delegate(bool bwait, F f)
-{
-	class Fr_task : public zce_task
-	{
+template <typename F>
+int zce_reactor::delegate(bool bwait, const char* name, F f) {
+    class Fr_task : public zce_task {
         zce_smartptr<zce_reactor> reactor_ptr_;
-		zce_semaphore* sem_;
-		F f_;
-	public:
-		Fr_task(zce_reactor* reactor_ptr, zce_semaphore* sem, F f)
-            : zce_task("Fr_task"), reactor_ptr_(reactor_ptr), sem_(sem), f_(f) {
+        zce_semaphore* sem_;
+        F f_;
+
+      public:
+        Fr_task(const char* name, zce_reactor* reactor_ptr, zce_semaphore* sem, F f)
+            : zce_task(name ? name : "delegate_task"), reactor_ptr_(reactor_ptr), sem_(sem), f_(f) {
             if (sem_) {
                 bool wait = sem_->try_acquire();
                 ZCE_ASSERT_TEXT(wait, "deadlock detected!");
             }
-		}
-		virtual void call() {
-			f_();
-            if (sem_)
-                sem_->release();
-		}
-	};
+        }
+        virtual void call() {
+            try {
+                f_();
+            } catch (const std::exception& ex) {
+                ZCE_ASSERT_TEXT(false, ex.what());
+            } catch (...) {
+                ZCE_ASSERT_TEXT(false, "unknow exception");
+            }
+            if (sem_) sem_->release();
+        }
+    };
 
     if (bwait && zce_thread_id() == thread_id()) {
         ZCE_ASSERT(false);
@@ -95,13 +94,11 @@ int zce_reactor::delegate(bool bwait, F f)
     }
 
     zce_tss::global_t* tss = bwait ? zce_tss::get_global() : 0;
-    Fr_task* task = new Fr_task(this, bwait ? tss->sem_ : 0, f);
-	zce_smartptr<zce_task> task_ptr(task);
-	int ret = delegate_task(task_ptr);
+    Fr_task* task = new Fr_task(name, this, bwait ? tss->sem_ : 0, f);
+    zce_smartptr<zce_task> task_ptr(task);
+    int ret = delegate_task(task_ptr);
     if (ret >= 0 && bwait) {
         zce_guard<zce_semaphore> g(*tss->sem_);
     }
     return ret;
 };
-
-#endif //__zce_reactor_h__
