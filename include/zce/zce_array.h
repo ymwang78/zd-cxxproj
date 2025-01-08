@@ -4,26 +4,67 @@
 #include <vector>
 #include <new>  // for placement new
 
-template <typename T, bool is_auto_shrink = false>
+template <typename T, typename H = long long, bool is_auto_expand = false,
+          bool is_auto_shrink = false>
 class zce_array {  // skew heap
+
+    struct mix_64 {
+        static inline int magic(long m) { return m & 0x7fffffff; };
+
+        static inline long long mix(int magic, int index) {
+            return ((long long)magic << 32) | index;
+        }
+        static inline void seperate(long long handle, int& magic, int& index) {
+            magic = handle >> 32;
+            index = handle & 0xffffffff;
+        }
+        static const int LIMIT = 0x7fffffff;
+    };
+
+    struct mix_32 {
+        static inline int magic(long m) { return m & 0x7fff; };
+
+        static inline int mix(int magic, int index) {
+            return ((int)(magic & 0x7fff) << 16) | index;
+        }
+        static inline void seperate(int handle, int& magic, int& index) {
+            magic = handle >> 16;
+            index = handle & 0xffff;
+        }
+        static const int LIMIT = 0xffff;
+    };
+
+    template <typename H>
+    using mix_magic_t = typename std::conditional<sizeof(H) == 4, mix_32, mix_64>::type;
+
     struct slot_t {
-        union {
-            struct {
-                int magic;
-                T item;
-            } data_;
-            struct {
-                int parent;  // 为了方便删除，记录父节点
-                int left;
-                int right;
-            } heap_node_;
+        struct slot_t_data {
+            unsigned int inuse : 1;
+            unsigned int magic : 31;
+            T item;
         };
-        slot_t() : heap_node_{-1, -1, -1} {}
+
+        struct slot_t_node {
+            int inuse : 1;
+            int parent : 31;  // 为了方便删除，记录父节点
+            int left;
+            int right;
+        };
+
+        union {
+            struct slot_t_data data_;
+            struct slot_t_node heap_node_;
+        };
+
+        slot_t() : heap_node_{0, -1, -1, -1} {}
         ~slot_t() {}
+
+        inline bool in_use() const { return data_.inuse; }
 
         // 显式定义拷贝构造函数
         slot_t(const slot_t& other) {
-            if (other.in_use_) {
+            if (other.in_use()) {
+                data_.inuse = 1;
                 data_.magic = other.data_.magic;
                 new (&data_.item) T(other.data_.item);
             } else {
@@ -34,10 +75,13 @@ class zce_array {  // skew heap
         // 显式定义赋值运算符
         slot_t& operator=(const slot_t& other) {
             if (this != &other) {
-                if (in_use_) {
+                if (in_use()) {
+                    data_.inuse = 0;
+                    data_.magic = 0;
                     data_.item.~T();
                 }
-                if (other.in_use_) {
+                if (other.in_use()) {
+                    data_.inuse = 1;
                     data_.magic = other.data_.magic;
                     new (&data_.item) T(other.data_.item);
                 } else {
@@ -46,8 +90,6 @@ class zce_array {  // skew heap
             }
             return *this;
         }
-
-        bool in_use_ = false;
     };
 
     std::vector<slot_t> slots_;
@@ -57,12 +99,10 @@ class zce_array {  // skew heap
   public:
     explicit zce_array(size_t capacity) : free_head_(-1), cur_top_(0) { slots_.resize(capacity); }
 
-    ~zce_array() {
-        clear();
-    }
+    ~zce_array() { clear(); }
 
     template <typename U>
-    long long insert_item(U&& val) {
+    H insert_item(U&& val) {
         int index;
         if (free_head_ != -1) {
             // 从堆中弹出最小元素
@@ -72,40 +112,50 @@ class zce_array {  // skew heap
             free_head_ = merge_skew_heap(left, right);
             if (free_head_ != -1) slots_[free_head_].heap_node_.parent = -1;
         } else {
-            if (cur_top_ >= (int)slots_.size()) {
+            if (cur_top_ >= mix_magic_t<H>::LIMIT) {
                 return -1;  // 没有空间了
+            }
+            if (cur_top_ >= (int)slots_.size()) {
+                if (is_auto_expand) {
+                    slots_.resize(slots_.size() * 2);
+                } else {
+                    return -1;  // 没有空间了
+                }
             }
             index = cur_top_++;
         }
 
-        static zce_atomic_long _magic;
+        static zce_atomic_long _magic(rand());
         new (&slots_[index].data_.item) T(std::forward<U>(val));
-        slots_[index].data_.magic = (++_magic) & 0x7fffffff;
-        slots_[index].in_use_ = true;
-        return ((long long)slots_[index].data_.magic << 32) | index;
+        slots_[index].data_.inuse = 1;
+        slots_[index].data_.magic = mix_magic_t<H>::magic(++_magic);
+        while (slots_[index].data_.magic == 0) {
+            slots_[index].data_.magic = mix_magic_t<H>::magic(++_magic);
+        }
+        return mix_magic_t<H>::mix(slots_[index].data_.magic, index);
     }
 
-    long long alloc_item() { return insert_item(T()); }
+    H alloc_item() { return insert_item(T()); }
 
-    bool is_valid(long long handle) const noexcept {
-        int index = handle & 0xffffffff;
-        int magic = handle >> 32;
-        return index >= 0 && index < cur_top_ && slots_[index].in_use_ &&
+    bool is_valid(H handle) const noexcept {
+        int index, magic;
+        mix_magic_t<H>::seperate(handle, magic, index);
+        return index >= 0 && index < cur_top_ && slots_[index].in_use() &&
                magic == slots_[index].data_.magic;
     }
 
-    void release_item(long long handle) {
-        int index = handle & 0xffffffff;
-        int magic = handle >> 32;
+    void release_item(H handle) {
+        int index, magic;
+        mix_magic_t<H>::seperate(handle, magic, index);
 
-        ZCE_ASSERT_RETURN(index >= 0 && index < cur_top_ && slots_[index].in_use_ &&
+        ZCE_ASSERT_RETURN(index >= 0 && index < cur_top_ && slots_[index].in_use() &&
                               magic == slots_[index].data_.magic, );
 
         // 析构对象
 
         slots_[index].data_.item.~T();
+        slots_[index].data_.inuse = 0;
         slots_[index].data_.magic = 0;
-        slots_[index].in_use_ = false;
 
         if (index == cur_top_ - 1) {
             // 若释放的是最高索引的元素，可直接回退cur_top_
@@ -113,7 +163,7 @@ class zce_array {  // skew heap
 
             if (is_auto_shrink) {
                 // 检查是否有连续的空闲元素
-                while (cur_top_ > 0 && !slots_[cur_top_ - 1].in_use_) {
+                while (cur_top_ > 0 && !slots_[cur_top_ - 1].in_use()) {
                     // 释放连续的空闲元素, 从skew heap中弹出
                     int cur_free = cur_top_ - 1;
                     int parent = slots_[cur_free].heap_node_.parent;
@@ -142,27 +192,30 @@ class zce_array {  // skew heap
         }
 
         // 将该节点作为单独的小堆插入主堆
+        slots_[index].heap_node_.inuse = 0;
         slots_[index].heap_node_.parent = -1;
         slots_[index].heap_node_.left = -1;
         slots_[index].heap_node_.right = -1;
         free_head_ = merge_skew_heap(free_head_, index);
     }
 
-    T& operator[](long long handle) {
+    T& operator[](H handle) {
         static T _empty;
-        int index = handle & 0xffffffff;
-        int magic = handle >> 32;
-        ZCE_ASSERT_RETURN(index >= 0 && index < cur_top_ && slots_[index].in_use_ &&
+        int index, magic;
+        mix_magic_t<H>::seperate(handle, magic, index);
+
+        ZCE_ASSERT_RETURN(index >= 0 && index < cur_top_ && slots_[index].in_use() &&
                               magic == slots_[index].data_.magic,
                           _empty);
         return slots_[index].data_.item;
     }
 
-    const T& operator[](long long handle) const {
+    const T& operator[](H handle) const {
         static T _empty;
-        int index = handle & 0xffffffff;
-        int magic = handle >> 32;
-        ZCE_ASSERT_RETURN(index >= 0 && index < cur_top_ && slots_[index].in_use_ &&
+        int index, magic;
+        mix_magic_t<H>::seperate(handle, magic, index);
+
+        ZCE_ASSERT_RETURN(index >= 0 && index < cur_top_ && slots_[index].in_use() &&
                               magic == slots_[index].data_.magic,
                           _empty);
         return slots_[index].data_.item;
@@ -170,10 +223,10 @@ class zce_array {  // skew heap
 
     void clear() {
         for (int i = 0; i < cur_top_; ++i) {
-            if (slots_[i].in_use_) {
+            if (slots_[i].in_use()) {
+                slots_[i].data_.inuse = 0;
                 slots_[i].data_.magic = 0;
                 slots_[i].data_.item.~T();
-                slots_[i].in_use_ = false;
             }
         }
         cur_top_ = 0;

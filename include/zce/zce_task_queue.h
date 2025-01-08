@@ -57,23 +57,45 @@ class ZCE_API zce_task_queue : public zce_task {
     virtual void call();
 
     template <typename F>
-    int enqueue(F f, const char* name = nullptr);
+    int enqueue(bool wait, const char* name, F f);
 };
 
 template <typename F>
-int zce_task_queue::enqueue(F f, const char* name) {
+int zce_task_queue::enqueue(bool wait, const char* name, F f) {
     // enqueue can't use wait because work queue maybe the same with current working
     // so deadlock if it happened
     class Tq_task : public zce_task {
         F f_;
+        zce_semaphore* sem_;
 
       public:
-        Tq_task(F f, const char* name) : zce_task(name), f_(f) {}
-        virtual void call() { f_(); }
+        Tq_task(F f, const char* name, zce_semaphore* sem)
+            : zce_task(name ? name : "Tq_task"), f_(f), sem_(sem) {
+            if (sem_) {
+                bool wait = sem_->try_acquire();
+                ZCE_ASSERT_TEXT(wait, "deadlock detected!");
+            }
+        }
+
+        virtual void call() {
+            try {
+                f_();
+            } catch (const std::exception& ex) {
+                ZCE_ASSERT_TEXT(false, ex.what());
+            } catch (...) {
+                ZCE_ASSERT_TEXT(false, "unknow exception");
+            }
+            if (sem_) sem_->release();
+        }
     };
 
-    zce_smartptr<zce_task> task_ptr(new Tq_task(f, name ? name : "Tq_task"));
-    return enqueue(task_ptr);
+    zce_tss::global_t* tss = wait ? zce_tss::get_global() : 0;
+    zce_smartptr<zce_task> task_ptr(new Tq_task(f, name, wait ? tss->sem_ : 0));
+    int ret = enqueue(task_ptr);
+    if (ret >= 0 && wait) {
+        zce_guard<zce_semaphore> g(*tss->sem_);
+    }
+    return ret;
 };
 
 template <typename QueueSubType, typename Params, typename Results>
@@ -118,13 +140,13 @@ class zce_task_map_reduce : public zce_object {
         for (size_t i = 0; i < queue_size_; ++i) {
             if (!if_work_queue[i]) continue;
             queue_vec_[i]->enqueue(
+                false, __FUNCTION__, 
                 [=]() {
                     process_task((int)i, this_ptr->queue_idx_vec_ ,this_ptr->params_, this_ptr->result_);
                     if (--this_ptr->remain_tasks_ == 0) {
                         final_callback(this_ptr->params_, this_ptr->result_);
                     }
-                },
-                "Task");
+                });
         }
 
         return 0;

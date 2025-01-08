@@ -94,8 +94,7 @@ int zce_reactor::delegate(bool bwait, const char* name, F f) {
     }
 
     zce_tss::global_t* tss = bwait ? zce_tss::get_global() : 0;
-    Fr_task* task = new Fr_task(name, this, bwait ? tss->sem_ : 0, f);
-    zce_smartptr<zce_task> task_ptr(task);
+    zce_smartptr<zce_task> task_ptr(new Fr_task(name, this, bwait ? tss->sem_ : 0, f));
     int ret = delegate_task(task_ptr);
     if (ret >= 0 && bwait) {
         zce_guard<zce_semaphore> g(*tss->sem_);
