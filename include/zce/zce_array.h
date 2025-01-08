@@ -1,36 +1,53 @@
 ﻿#pragma once
 
-#include <zce/zce_list.h>
 #include <vector>
-#include <new>  // for placement new
+#include <new>
 
 template <typename T, typename H = long long, bool is_auto_expand = false,
           bool is_auto_shrink = false>
 class zce_array {  // skew heap
 
     struct mix_64 {
-        static inline int magic(long m) { return m & 0x7fffffff; };
+        static inline int next_magic() {
+            static zce_atomic_long _magic(rand());
+            int m = 0;
+            do {
+                m = (++_magic) & 0x7fffffff;
+            } while (m == 0);
+            return m;
+        }
 
         static inline long long mix(int magic, int index) {
             return ((long long)magic << 32) | index;
         }
+
         static inline void seperate(long long handle, int& magic, int& index) {
             magic = handle >> 32;
             index = handle & 0xffffffff;
         }
+
         static const int LIMIT = 0x7fffffff;
     };
 
     struct mix_32 {
-        static inline int magic(long m) { return m & 0x7fff; };
+        static inline int next_magic() { 
+            static zce_atomic_long _magic(rand());
+            int m = 0;
+            do {
+                m = (++_magic) & 0x7fff;
+            } while (m == 0);
+            return m;
+        }
 
         static inline int mix(int magic, int index) {
             return ((int)(magic & 0x7fff) << 16) | index;
         }
+
         static inline void seperate(int handle, int& magic, int& index) {
             magic = handle >> 16;
             index = handle & 0xffff;
         }
+
         static const int LIMIT = 0xffff;
     };
 
@@ -125,13 +142,9 @@ class zce_array {  // skew heap
             index = cur_top_++;
         }
 
-        static zce_atomic_long _magic(rand());
         new (&slots_[index].data_.item) T(std::forward<U>(val));
         slots_[index].data_.inuse = 1;
-        slots_[index].data_.magic = mix_magic_t<H>::magic(++_magic);
-        while (slots_[index].data_.magic == 0) {
-            slots_[index].data_.magic = mix_magic_t<H>::magic(++_magic);
-        }
+        slots_[index].data_.magic = mix_magic_t<H>::next_magic();
         return mix_magic_t<H>::mix(slots_[index].data_.magic, index);
     }
 
