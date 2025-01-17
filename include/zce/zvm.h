@@ -57,7 +57,7 @@ public:
         const zce_smartptr<zce_reactor>&);
 
     zce_smartptr<zce_object> boot(const std::string& svc_name,
-        const std::string& path);
+        const std::string& path, zce_dblock& args);
 
     zce_smartptr<zce_object> boot(const std::string& svc_name,
         const std::string& host, 
@@ -88,7 +88,7 @@ public:
         ZCE_MBACQUIRE(dblock, ret);
         if ((int)dblock.space() < ret)
             return ZCE_ERROR_MALLOC;
-        ret = zdp::zds_pack_builtin(dblock.rd_ptr(), (int)dblock.space(), t, 0);
+        ret = zdp::zds_pack_builtin(dblock.rd_ptr_cow(), (int)dblock.space(), t, 0);
         if (ret < 0)
             return ret;
         dblock.wr_ptr(ret);
@@ -108,7 +108,7 @@ public:
         ZCE_MBACQUIRE(dblock, ret);
         if ((int)dblock.space() < ret)
             return ZCE_ERROR_MALLOC;
-        ret = zdp::zds_pack(dblock.rd_ptr(), (int)dblock.space(), t, 0, true);
+        ret = zdp::zds_pack(dblock.rd_ptr_cow(), (int)dblock.space(), t, 0, true);
         if (ret < 0)
             return ret;
         dblock.wr_ptr(ret);

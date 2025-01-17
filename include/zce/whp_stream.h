@@ -48,7 +48,7 @@ public:
 
 	whp_stream(const zce_smartptr<zce_reactor>& reactor_ptr, unsigned preserv = 0);
 
-	int write(const zce_dblock& dblock_ptr, ERV_ISTREAM_WRITEOPT opt) override;
+	int write(zce_dblock& dblock_ptr, ERV_ISTREAM_WRITEOPT opt) override;
 
 	void on_read(zce_dblock& dblock, const zce_any&) override;
 };
@@ -65,7 +65,7 @@ public:
 
     idip_stream(const zce_smartptr<zce_reactor>& reactor_ptr, unsigned preserv = 0);
 
-    //virtual int write(const zce_dblock& dblock_ptr, ERV_ISTREAM_WRITEOPT opt);
+    //virtual int write(zce_dblock& dblock_ptr, ERV_ISTREAM_WRITEOPT opt);
 
     void on_read(zce_dblock& dblock, const zce_any&) override;
 };

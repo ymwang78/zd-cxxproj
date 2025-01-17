@@ -55,5 +55,5 @@ public:
 
     void close() override;
 
-    int  write(const zce_dblock& dblock, ERV_ISTREAM_WRITEOPT opt) override;
+    int  write(zce_dblock& dblock, ERV_ISTREAM_WRITEOPT opt) override;
 };

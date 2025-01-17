@@ -78,7 +78,7 @@ class ZCE_API zce_istream : virtual public zce_object {
 
     virtual void on_close();
 
-    virtual int write(const zce_dblock& dblock, ERV_ISTREAM_WRITEOPT opt = ERV_ISTREAM_DEFAULT);
+    virtual int write(zce_dblock& dblock, ERV_ISTREAM_WRITEOPT opt = ERV_ISTREAM_DEFAULT);
 
     virtual void close();
 
@@ -114,7 +114,7 @@ class ZCE_API zce_socket : public zce_istream {
 
     void do_close_delegate();
 
-    virtual int do_write(const zce_dblock& dblock_ptr, const zce_sockaddr_t* addr,
+    virtual int do_write(zce_dblock& dblock_ptr, const zce_sockaddr_t* addr,
                          ERV_ISTREAM_WRITEOPT opt) = 0;
 
   public:
@@ -122,7 +122,7 @@ class ZCE_API zce_socket : public zce_istream {
 
     virtual void close();
 
-    virtual int write(const zce_dblock& dblock_ptr, ERV_ISTREAM_WRITEOPT opt);
+    virtual int write(zce_dblock& dblock_ptr, ERV_ISTREAM_WRITEOPT opt);
 
     virtual void* handle() const = 0;
 
@@ -160,7 +160,7 @@ class ZCE_API zce_udp : public zce_socket {
 
     virtual void* handle() const;
 
-    virtual int do_write(const zce_dblock& dblock_ptr, const zce_sockaddr_t* addr,
+    virtual int do_write(zce_dblock& dblock_ptr, const zce_sockaddr_t* addr,
                          ERV_ISTREAM_WRITEOPT opt);
 
     virtual void on_read_data(zce_byte*, zce_uint32, const zce_sockaddr_t*);
@@ -169,9 +169,9 @@ class ZCE_API zce_udp : public zce_socket {
 
     virtual void on_close();
 
-    virtual int write(const zce_dblock& dblock_ptr, ERV_ISTREAM_WRITEOPT opt);
+    virtual int write(zce_dblock& dblock_ptr, ERV_ISTREAM_WRITEOPT opt);
 
-    int write(const zce_dblock& dblock_ptr, const zce_sockaddr_t* addr, ERV_ISTREAM_WRITEOPT opt);
+    int write(zce_dblock& dblock_ptr, const zce_sockaddr_t* addr, ERV_ISTREAM_WRITEOPT opt);
 
     int listen(const char* addr, unsigned short port);
 
@@ -226,7 +226,7 @@ class ZCE_API zce_tcp : public zce_socket {
 
     void do_priority();  // run inside dblock_lock_
 
-    virtual int do_write(const zce_dblock& dblock_ptr, const zce_sockaddr_t* addr,
+    virtual int do_write(zce_dblock& dblock_ptr, const zce_sockaddr_t* addr,
                          ERV_ISTREAM_WRITEOPT opt);
 
   public:
@@ -390,7 +390,7 @@ class ZCE_API zce_sync_istream : public zce_istream {
 
     virtual void on_close();
 
-    virtual int write(const zce_dblock& dblock, zce_istream::ERV_ISTREAM_WRITEOPT opt);
+    virtual int write(zce_dblock& dblock, zce_istream::ERV_ISTREAM_WRITEOPT opt);
 
     virtual void close();
 };

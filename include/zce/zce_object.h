@@ -131,6 +131,15 @@ public:
         }
         return (*this);
     }
+
+    zce_smartptr& operator=(zce_smartptr&& rhs) {
+        if (this->handler_ != rhs.handler_) {
+            IMPL_CLASS* r = rhs.handler_;
+            rhs.handler_ = 0;
+            __lock_sign(r);
+        }
+        return (*this);
+    }
     
     template<typename OTHER_LOCK>
     zce_smartptr& operator = (const zce_smartptr<IMPL_CLASS, OTHER_LOCK>& rhs)

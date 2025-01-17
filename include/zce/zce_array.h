@@ -51,7 +51,6 @@ class zce_array {  // skew heap
         static const int LIMIT = 0xffff;
     };
 
-    template <typename H>
     using mix_magic_t = typename std::conditional<sizeof(H) == 4, mix_32, mix_64>::type;
 
     struct slot_t {
@@ -129,7 +128,7 @@ class zce_array {  // skew heap
             free_head_ = merge_skew_heap(left, right);
             if (free_head_ != -1) slots_[free_head_].heap_node_.parent = -1;
         } else {
-            if (cur_top_ >= mix_magic_t<H>::LIMIT) {
+            if (cur_top_ >= mix_magic_t::LIMIT) {
                 return -1;  // 没有空间了
             }
             if (cur_top_ >= (int)slots_.size()) {
@@ -144,22 +143,22 @@ class zce_array {  // skew heap
 
         new (&slots_[index].data_.item) T(std::forward<U>(val));
         slots_[index].data_.inuse = 1;
-        slots_[index].data_.magic = mix_magic_t<H>::next_magic();
-        return mix_magic_t<H>::mix(slots_[index].data_.magic, index);
+        slots_[index].data_.magic = mix_magic_t::next_magic();
+        return mix_magic_t::mix(slots_[index].data_.magic, index);
     }
 
     H alloc_item() { return insert_item(T()); }
 
     bool is_valid(H handle) const noexcept {
         int index, magic;
-        mix_magic_t<H>::seperate(handle, magic, index);
+        mix_magic_t::seperate(handle, magic, index);
         return index >= 0 && index < cur_top_ && slots_[index].in_use() &&
                magic == slots_[index].data_.magic;
     }
 
     void release_item(H handle) {
         int index, magic;
-        mix_magic_t<H>::seperate(handle, magic, index);
+        mix_magic_t::seperate(handle, magic, index);
 
         ZCE_ASSERT_RETURN(index >= 0 && index < cur_top_ && slots_[index].in_use() &&
                               magic == slots_[index].data_.magic, );
@@ -215,7 +214,7 @@ class zce_array {  // skew heap
     T& operator[](H handle) {
         static T _empty;
         int index, magic;
-        mix_magic_t<H>::seperate(handle, magic, index);
+        mix_magic_t::seperate(handle, magic, index);
 
         ZCE_ASSERT_RETURN(index >= 0 && index < cur_top_ && slots_[index].in_use() &&
                               magic == slots_[index].data_.magic,
@@ -226,7 +225,7 @@ class zce_array {  // skew heap
     const T& operator[](H handle) const {
         static T _empty;
         int index, magic;
-        mix_magic_t<H>::seperate(handle, magic, index);
+        mix_magic_t::seperate(handle, magic, index);
 
         ZCE_ASSERT_RETURN(index >= 0 && index < cur_top_ && slots_[index].in_use() &&
                               magic == slots_[index].data_.magic,

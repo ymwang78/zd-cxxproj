@@ -77,7 +77,7 @@ namespace zdp
 
         int split_pkg(zce_byte* buf, unsigned size);
 
-        int _do_request(const zdp_head& head, const zce_dblock& dblock_ptr, int mstimeout, const zce_any& ctx);
+        int _do_request(const zdp_head& head, zce_dblock& dblock_ptr, int mstimeout, const zce_any& ctx);
     public:
 
         zdp_stream(const zce_smartptr<zce_reactor>& reactor_ptr, unsigned preserv = 0);
@@ -99,7 +99,7 @@ namespace zdp
 
         void on_read(zce_dblock& dblock_ptr, const zce_any&) override;
 
-        int write(const zce_dblock& dblock_ptr, zce_istream::ERV_ISTREAM_WRITEOPT opt = zce_istream::ERV_ISTREAM_DEFAULT) override;
+        int write(zce_dblock& dblock_ptr, zce_istream::ERV_ISTREAM_WRITEOPT opt = zce_istream::ERV_ISTREAM_DEFAULT) override;
 
         //void close() override;
 
@@ -116,7 +116,7 @@ namespace zdp
         int do_failed_process(zce_uint16 msgmid, unsigned msgseq, const zce_any& ctx);
 
         //timeout = 0, won't wait res
-        int do_request(const zce_dblock& plain_body, int mstimeout = 0, const zce_any& ctx = zce_any((zce_int64)0));
+        int do_request(zce_dblock& plain_body, int mstimeout = 0, const zce_any& ctx = zce_any((zce_int64)0));
 
         template<typename MSG_T>
         int request(const MSG_T& msg, int mstimeout = 0, const zce_any& ctx = zce_any((zce_int64)0), ERV_ZCE_COMPRESS cps = ZCE_COMPRESS_NONE);
@@ -168,7 +168,7 @@ namespace zdp
             dblock_ptr.preserv(preserv);
 
         if (bodylen) {
-            int ret = zds_pack(dblock_ptr.wr_ptr() + zdp_headlen(rev),
+            int ret = zds_pack(dblock_ptr.wr_ptr_cow() + zdp_headlen(rev),
                 (int)(dblock_ptr.space() - zdp_headlen(rev)), msg, 0, true);
             ZCE_ASSERT(bodylen == ret);
             if (ret < 0)

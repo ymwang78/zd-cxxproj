@@ -213,7 +213,7 @@ public:
 
 	void on_http_continue(zce_dblock& dblock) override;
 
-	int  write(const zce_dblock& dblock, ERV_ISTREAM_WRITEOPT opt) override;
+	int  write(zce_dblock& dblock, ERV_ISTREAM_WRITEOPT opt) override;
 
 	void on_prepare_nextreq() override {}; //websocket just continue process
 };
@@ -255,7 +255,7 @@ public:
 
     void on_http_continue(zce_dblock& dblock);
 
-    int  write(const zce_dblock& dblock, ERV_ISTREAM_WRITEOPT opt) override;
+    int  write(zce_dblock& dblock, ERV_ISTREAM_WRITEOPT opt) override;
 };
 
 ///////////////////////////////////////////////////////////////////////////////

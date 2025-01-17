@@ -80,6 +80,16 @@ public:
         return *this;
     };
 
+    zce_dblock& operator=(zce_dblock&& rhs) noexcept {
+        dt_ptr_ = std::move(rhs.dt_ptr_);
+        rd_pos_ = rhs.rd_pos_;
+        wr_pos_ = rhs.wr_pos_;
+        rhs.dt_ptr_ = 0;
+        rhs.rd_pos_ = 0;
+        rhs.wr_pos_ = 0;
+        return *this;
+    };
+
     inline bool operator==(const zce_dblock& rhs) const noexcept {
         return dt_ptr_ == rhs.dt_ptr_ && rd_pos_ == rhs.rd_pos_ && wr_pos_ == rhs.wr_pos_;
     }
@@ -87,6 +97,8 @@ public:
     inline bool operator!=(const zce_dblock& rhs) const noexcept {
         return ! operator==(rhs);
     }
+
+    inline zce_dtblock* _cow_dtblock() const noexcept;
 
     zce_dblock(zce_dtblock* dtblock);
 
@@ -96,11 +108,19 @@ public:
 
 public:
 
-    zce_byte* base_ptr() const;
+    const zce_smartptr<zce_dtblock>& dt_ptr() const { return dt_ptr_; };
 
-    zce_byte* rd_ptr() const;
+    const zce_byte* base_ptr() const;
 
-    zce_byte* wr_ptr() const;
+    const zce_byte* rd_ptr() const;
+
+    const zce_byte* wr_ptr() const;
+
+    zce_byte* base_ptr_cow();
+
+    zce_byte* rd_ptr_cow();
+
+    zce_byte* wr_ptr_cow();
 
     void swap(zce_dblock& rhs);
 

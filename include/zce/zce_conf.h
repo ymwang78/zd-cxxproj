@@ -34,7 +34,7 @@ public:
 
     int load(const char* filename);
 
-    virtual int process_content(unsigned char* data, unsigned len) = 0;
+    virtual int process_content(const unsigned char* data, unsigned len) = 0;
 };
 
 template<typename T>

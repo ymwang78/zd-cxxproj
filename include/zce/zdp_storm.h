@@ -148,7 +148,7 @@ class ZCE_API zdp_storm_stream_adapter : public zce_istream {
         peer_ = p;
     }
 
-    virtual int write(const zce_dblock& dblock, ERV_ISTREAM_WRITEOPT);
+    int write(zce_dblock& dblock, ERV_ISTREAM_WRITEOPT) override;
 };
 
 }  // namespace zdp

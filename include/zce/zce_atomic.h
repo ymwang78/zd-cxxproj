@@ -83,16 +83,16 @@ class ZCE_API zce_atomic_long_guard
     long value_;
 
 public:
-    zce_atomic_long_guard(zce_atomic_long& v)
+    inline zce_atomic_long_guard(zce_atomic_long& v)
     :atomic_(v){
         value_ = ++atomic_;
     }
 
-    ~zce_atomic_long_guard() {
+    inline  ~zce_atomic_long_guard() {
         --atomic_;
     }
 
-    long value() const {
+    inline long value() const {
         return value_;
     }
 };

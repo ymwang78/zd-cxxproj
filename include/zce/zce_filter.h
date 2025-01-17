@@ -69,7 +69,7 @@ public:
         return str_set_;
     }
 
-    virtual int process_content(unsigned char* data, unsigned len);
+    virtual int process_content(const unsigned char* data, unsigned len);
 
     static std::string simple_filter(const std::string& source, int* filtercnt = 0);
 };
