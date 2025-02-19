@@ -33,6 +33,8 @@ class ZCE_API zce_reactor : virtual public zce_object {
 
     void* loop_t() const;
 
+    int set_thread_priority(int priority);
+
     int start();
 
     void stop();

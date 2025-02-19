@@ -116,8 +116,8 @@ int zdp_storm_client::publish(TTOPIC topic, const T& msg, const zdp_storm_peer& 
     if (ret < 0) return ret;
     if (preserv) {
         dblock_ptr.rd_ptr(-16);
-        zdp::pack_builtin(dblock_ptr.rd_ptr(), 8, peer.to);
-        zdp::pack_builtin(dblock_ptr.rd_ptr() + 8, 8, peer.from);
+        zdp::pack_builtin(dblock_ptr.rd_ptr_cow(), 8, peer.to);
+        zdp::pack_builtin(dblock_ptr.rd_ptr_cow() + 8, 8, peer.from);
     }
     return publish(topic, dblock_ptr.rd_ptr(), dblock_ptr.length(), trace);
 }

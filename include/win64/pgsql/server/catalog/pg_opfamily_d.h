@@ -3,7 +3,7 @@
  * pg_opfamily_d.h
  *    Macro definitions for pg_opfamily
  *
- * Portions Copyright (c) 1996-2023, PostgreSQL Global Development Group
+ * Portions Copyright (c) 1996-2024, PostgreSQL Global Development Group
  * Portions Copyright (c) 1994, Regents of the University of California
  *
  * NOTES
@@ -40,6 +40,7 @@
 #define BYTEA_BTREE_FAM_OID 428
 #define NETWORK_BTREE_FAM_OID 1974
 #define INTEGER_BTREE_FAM_OID 1976
+#define INTERVAL_BTREE_FAM_OID 1982
 #define OID_BTREE_FAM_OID 1989
 #define TEXT_BTREE_FAM_OID 1994
 #define TEXT_PATTERN_BTREE_FAM_OID 2095

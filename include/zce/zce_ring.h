@@ -1,223 +1,188 @@
 #pragma once
-// ***************************************************************
-//  zce_ring   version:  1.0   -  date: 2005/06/01
-//  -------------------------------------------------------------
-//  Yongming Wang(wangym@gmail.com)
-//  -------------------------------------------------------------
-//  This is a part of ZCE lib, which inherited from ubeda/utiny.
-//  Copyright (C) 2005 - All Rights Reserved
-// ***************************************************************
-// 
-// ***************************************************************
-#ifndef __zce_ring_h__
-#define __zce_ring_h__
+#include <zce/zce_object.h>
+#include <zce/zce_sync.h>
+#include <type_traits>
 
-#include <cassert>
-#include <iostream>
-#ifdef _WIN32
-#define g_atomic_int_set(ptr, val) (*ptr = val)
-#define g_atomic_int_get(ptr) (*ptr)
-#elif defined (__MACH__) || defined (__ANDROID__)
-#define g_atomic_int_set(ptr, val) (*ptr = val)
-#define g_atomic_int_get(ptr) (*ptr)
-#else
-#include <glib.h>
-#endif
+template <typename T, typename Lock = zce_mutex_null>
+class zce_ring : public zce_object {
+  public:
+    zce_ring(const zce_ring&) = delete;
 
-/** A lock-free usys_ring.
- * Read/Write realtime safe.
- * Single-reader Single-writer thread safe.
- */
-template <typename T>
-class zce_ring {
-public:
+    zce_ring& operator=(const zce_ring&) = delete;
 
-    /** @param size Size in bytes.
-     */
-    zce_ring(size_t size)
-        : _size(size)
-        , _buf(new T[size])
-    {
-        reset();
-        assert(read_space() == 0);
-        assert(write_space() == size - 1);
-    }
-    
-    virtual ~zce_ring() {
-        delete[] _buf;
+    explicit zce_ring(size_t capacity) : _capacity(capacity), _size(0), _head(0), _tail(0) {
+        _buffer.resize(capacity);
     }
 
-    /** Reset(empty) the usys_ring.
-     * NOT thread safe.
-     */
+    zce_ring(zce_ring&& other) noexcept {
+        zce_guard<Lock> lock(_mutex);
+        _buffer = std::move(other._buffer);
+        _capacity = other._capacity;
+        _size = other._size;
+        _head = other._head;
+        _tail = other._tail;
+        other._capacity = 0;
+        other._size = 0;
+        other._head = 0;
+        other._tail = 0;
+    }
+
+    zce_ring& operator=(zce_ring&& other) noexcept {
+        if (this != &other) {
+            zce_guard<Lock> lock(_mutex);
+            zce_guard<Lock> lock_other(other._mutex);
+            _buffer = std::move(other._buffer);
+            _capacity = other._capacity;
+            _size = other._size;
+            _head = other._head;
+            _tail = other._tail;
+            other._capacity = 0;
+            other._size = 0;
+            other._head = 0;
+            other._tail = 0;
+        }
+        return *this;
+    }
+
+    /** 清空队列，重置所有指针 */
     void reset() {
-        g_atomic_int_set(&_write_ptr, 0);
-        g_atomic_int_set(&_read_ptr, 0);
+        zce_guard<Lock> lock(_mutex);
+        _head = 0;
+        _tail = 0;
+        _size = 0;
     }
 
-    size_t write_space() const {
-        
-        const size_t w = g_atomic_int_get(&_write_ptr);
-        const size_t r = g_atomic_int_get(&_read_ptr);
-        
-        if (w > r) {
-            return ((r - w + _size) % _size) - 1;
-        } else if (w < r) {
-            return (r - w) - 1;
+    /** 添加元素到队列（自动覆盖最老数据） */
+    void push(const T& item) {
+        zce_guard<Lock> lock(_mutex);
+
+        _buffer[_tail] = item;
+        _tail = (_tail + 1) % _capacity;
+
+        if (_size == _capacity) {
+            _head = (_head + 1) % _capacity;  // 队列已满，覆盖最老的数据
         } else {
-            return _size - 1;
-        }
-    }
-    
-    size_t read_space() const {
-        
-        const size_t w = g_atomic_int_get(&_write_ptr);
-        const size_t r = g_atomic_int_get(&_read_ptr);
-        
-        if (w > r) {
-            return w - r;
-        } else {
-            return (w - r + _size) % _size;
+            ++_size;
         }
     }
 
-    size_t capacity() const { return _size; }
+    /** 读取单个元素（如果队列为空，阻塞等待） */
+    bool pop(T& item) {
+        zce_guard<Lock> lock(_mutex);
+        if (_size == 0) return false;
 
-    size_t peek(size_t size, T* dst);
-    bool   full_peek(size_t size, T* dst);
+        item = _buffer[_head];
+        _head = (_head + 1) % _capacity;
+        --_size;
 
-    size_t read(size_t size, T* dst);
-    bool   full_read(size_t size, T* dst);
+        return true;
+    }
 
-    bool   skip(size_t size);
-    
-    void   write(size_t size, const T* src);
+    /** 批量写入（支持 `memcpy` 加速，自动覆盖最老数据） */
+    void write(size_t count, const T* src) {
+        zce_guard<Lock> lock(_mutex);
 
-protected:
-    mutable int _write_ptr;
-    mutable int _read_ptr;
-    
-    size_t _size; ///< Size (capacity) in bytes
-    T*     _buf;  ///< size, event, size, event...
+        if (count >= _capacity) {
+            // 如果写入数据超过队列容量，则只保留最新的 `_capacity` 个数据
+            src += (count - _capacity);
+            count = _capacity;
+            _head = 0;
+            _tail = 0;
+            _size = 0;
+        }
+
+        size_t first_part = std::min(count, _capacity - _tail);
+        size_t second_part = count - first_part;
+
+        if constexpr (std::is_trivially_copyable_v<T>) {
+            std::memcpy(&_buffer[_tail], src, first_part * sizeof(T));
+            if (second_part > 0) {
+                std::memcpy(&_buffer[0], src + first_part, second_part * sizeof(T));
+            }
+        } else {
+            std::copy(src, src + first_part, _buffer.begin() + _tail);
+            if (second_part > 0) {
+                std::copy(src + first_part, src + count, _buffer.begin());
+            }
+        }
+
+        _tail = (_tail + count) % _capacity;
+
+        if (_size + count > _capacity) {
+            _head = (_head + (_size + count - _capacity)) % _capacity;
+            _size = _capacity;
+        } else {
+            _size += count;
+        }
+    }
+
+    /** 读取多个元素（删除已读取数据，支持 `memcpy` 加速） */
+    size_t read(size_t count, T* dst) {
+        zce_guard<Lock> lock(_mutex);
+        size_t available = peek_no_lock(count, dst);
+
+        _head = (_head + available) % _capacity;
+        _size -= available;
+
+        return available;
+    }
+
+    /** 预览多个元素（不会修改 `_head`，支持 `memcpy` 加速） */
+    size_t peek(size_t count, T* dst) {
+        zce_guard<Lock> lock(_mutex);
+        return peek_no_lock(count, dst);
+    }
+
+    /** 队列是否为空 */
+    bool empty() const {
+        zce_guard<Lock> lock(_mutex);
+        return _size == 0;
+    }
+
+    /** 队列是否已满 */
+    bool full() const {
+        zce_guard<Lock> lock(_mutex);
+        return _size == _capacity;
+    }
+
+    /** 获取当前元素个数 */
+    size_t size() const {
+        zce_guard<Lock> lock(_mutex);
+        return _size;
+    }
+
+    /** 获取队列容量 */
+    size_t capacity() const { return _capacity; }
+
+  private:
+    size_t peek_no_lock(size_t count, T* dst) {
+        size_t available = std::min(count, _size);
+
+        if (available == 0) return 0;
+
+        size_t first_part = std::min(available, _capacity - _head);
+        size_t second_part = available - first_part;
+
+        // 优化：如果是基本类型，使用 `memcpy` 拷贝
+        if constexpr (std::is_trivially_copyable_v<T>) {
+            std::memcpy(dst, &_buffer[_head], first_part * sizeof(T));
+            if (second_part > 0) {
+                std::memcpy(dst + first_part, &_buffer[0], second_part * sizeof(T));
+            }
+        } else {
+            std::copy(_buffer.begin() + _head, _buffer.begin() + _head + first_part, dst);
+            if (second_part > 0) {
+                std::copy(_buffer.begin(), _buffer.begin() + second_part, dst + first_part);
+            }
+        }
+        return available;
+    }
+
+    std::vector<T> _buffer;  // 环形缓冲区
+    size_t _capacity;        // 最大容量
+    size_t _size;            // 当前元素个数
+    size_t _head;            // 头索引（读取位置）
+    size_t _tail;            // 尾索引（写入位置）
+
+    mutable Lock _mutex;
 };
-
-
-/** Peek at the usys_ring (read w/o advancing read pointer).
- *
- * Note that a full read may not be done if the data wraps around.
- * Caller must check return value and call again if necessary, or use the 
- * full_peek method which does this automatically.
- */
-template<typename T>
-size_t
-zce_ring<T>::peek(size_t size, T* dst)
-{
-    const size_t priv_read_ptr = g_atomic_int_get(&_read_ptr);
-
-    const size_t read_size = (priv_read_ptr + size < _size)
-            ? size
-            : _size - priv_read_ptr;
-    
-    memcpy(dst, &_buf[priv_read_ptr], read_size);
-
-    return read_size;
-}
-
-
-template<typename T>
-bool
-zce_ring<T>::full_peek(size_t size, T* dst)
-{
-    if (read_space() < size) {
-        return false;
-    }
-
-    const size_t read_size = peek(size, dst);
-    
-    if (read_size < size) {
-        peek(size - read_size, dst + read_size);
-    }
-
-    return true;
-}
-
-
-/** Read from the usys_ring.
- *
- * Note that a full read may not be done if the data wraps around.
- * Caller must check return value and call again if necessary, or use the 
- * full_read method which does this automatically.
- */
-template<typename T>
-size_t
-zce_ring<T>::read(size_t size, T* dst)
-{
-    const size_t priv_read_ptr = g_atomic_int_get(&_read_ptr);
-
-    const size_t read_size = (priv_read_ptr + size < _size)
-            ? size
-            : _size - priv_read_ptr;
-    
-    memcpy(dst, &_buf[priv_read_ptr], read_size);
-        
-    g_atomic_int_set(&_read_ptr, (priv_read_ptr + read_size) % _size);
-
-    return read_size;
-}
-
-
-template<typename T>
-bool
-zce_ring<T>::full_read(size_t size, T* dst)
-{
-    if (read_space() < size) {
-        return false;
-    }
-
-    const size_t read_size = read(size, dst);
-    
-    if (read_size < size) {
-        read(size - read_size, dst + read_size);
-    }
-
-    return true;
-}
-
-
-template<typename T>
-bool
-zce_ring<T>::skip(size_t size)
-{
-    if (read_space() < size) {
-        std::cerr << "WARNING: Attempt to skip past end of MIDI ring buffer" << std::endl;
-        return false;
-    }
-    
-    const size_t priv_read_ptr = g_atomic_int_get(&_read_ptr);
-    g_atomic_int_set(&_read_ptr, (priv_read_ptr + size) % _size);
-
-    return true;
-}
-
-
-template<typename T>
-inline void
-zce_ring<T>::write(size_t size, const T* src)
-{
-    const size_t priv_write_ptr = g_atomic_int_get(&_write_ptr);
-    
-    if (priv_write_ptr + size <= _size) {
-        memcpy(&_buf[priv_write_ptr], src, size);
-        g_atomic_int_set(&_write_ptr, (priv_write_ptr + size) % _size);
-    } else {
-        const size_t this_size = _size - priv_write_ptr;
-        assert(this_size < size);
-        assert(priv_write_ptr + this_size <= _size);
-        memcpy(&_buf[priv_write_ptr], src, this_size);
-        memcpy(&_buf[0], src+this_size, size - this_size);
-        g_atomic_int_set(&_write_ptr, size - this_size);
-    }
-}
-
-#endif // __zce_ring_h__
-

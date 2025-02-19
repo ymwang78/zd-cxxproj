@@ -41,7 +41,9 @@ public:
         JNIEnv* env_;
         void* spec_;
         zce_int64 oid_;
-        int last_err_;
+        int last_errcode_;
+        char* last_errdesc_;
+        static constexpr int last_errdesc_size_ = 4096;
 
         global_t();
 

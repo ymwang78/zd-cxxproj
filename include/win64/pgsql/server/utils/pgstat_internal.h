@@ -5,7 +5,7 @@
  * only be needed by files implementing statistics support (rather than ones
  * reporting / querying stats).
  *
- * Copyright (c) 2001-2023, PostgreSQL Global Development Group
+ * Copyright (c) 2001-2024, PostgreSQL Global Development Group
  *
  * src/include/utils/pgstat_internal.h
  * ----------
@@ -14,7 +14,7 @@
 #define PGSTAT_INTERNAL_H
 
 
-#include "common/hashfn.h"
+#include "common/hashfn_unstable.h"
 #include "lib/dshash.h"
 #include "lib/ilist.h"
 #include "pgstat.h"
@@ -94,6 +94,19 @@ typedef struct PgStatShared_HashEntry
 	pg_atomic_uint32 refcount;
 
 	/*
+	 * Counter tracking the number of times the entry has been reused.
+	 *
+	 * Set to 0 when the entry is created, and incremented by one each time
+	 * the shared entry is reinitialized with pgstat_reinit_entry().
+	 *
+	 * May only be incremented / decremented while holding at least a shared
+	 * lock on the dshash partition containing the entry. Like refcount, it
+	 * needs to be an atomic variable because multiple backends can increment
+	 * the generation with just a shared lock.
+	 */
+	pg_atomic_uint32 generation;
+
+	/*
 	 * Pointer to shared stats. The stats entry always starts with
 	 * PgStatShared_Common, embedded in a larger struct containing the
 	 * PgStat_Kind specific stats fields.
@@ -131,6 +144,12 @@ typedef struct PgStat_EntryRef
 	 * as a local pointer, to avoid repeated dsa_get_address() calls.
 	 */
 	PgStatShared_Common *shared_stats;
+
+	/*
+	 * Copy of PgStatShared_HashEntry->generation, keeping locally track of
+	 * the shared stats entry "generation" retrieved (number of times reused).
+	 */
+	uint32		generation;
 
 	/*
 	 * Pending statistics data that will need to be flushed to shared memory
@@ -269,13 +288,13 @@ typedef struct PgStat_KindInfo
  * definitions.
  */
 static const char *const slru_names[] = {
-	"CommitTs",
-	"MultiXactMember",
-	"MultiXactOffset",
-	"Notify",
-	"Serial",
-	"Subtrans",
-	"Xact",
+	"commit_timestamp",
+	"multixact_member",
+	"multixact_offset",
+	"notify",
+	"serializable",
+	"subtransaction",
+	"transaction",
 	"other"						/* has to be last */
 };
 
@@ -776,16 +795,10 @@ pgstat_cmp_hash_key(const void *a, const void *b, size_t size, void *arg)
 static inline uint32
 pgstat_hash_hash_key(const void *d, size_t size, void *arg)
 {
-	const PgStat_HashKey *key = (PgStat_HashKey *) d;
-	uint32		hash;
+	const char *key = (const char *) d;
 
 	Assert(size == sizeof(PgStat_HashKey) && arg == NULL);
-
-	hash = murmurhash32(key->kind);
-	hash = hash_combine(hash, murmurhash32(key->dboid));
-	hash = hash_combine(hash, murmurhash32(key->objoid));
-
-	return hash;
+	return fasthash32(key, size, 0);
 }
 
 /*
