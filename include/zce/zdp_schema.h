@@ -1,4 +1,4 @@
-// ***************************************************************
+﻿// ***************************************************************
 //  zdp_schema   version:  1.0   -  date: 2015/11/14
 //  -------------------------------------------------------------
 //  Yongming Wang(wangym@gmail.com)
@@ -418,9 +418,11 @@ namespace zdp
     int ZCE_API zdp_total_length(const std::string& val, zce_byte version);
 
 #ifdef _WIN32
-    int ZCE_API calc_pack_string_len(const std::wstring& val, zce_byte version);
-    int ZCE_API pack_builtin_string(zce_byte* buf, zce_int32 size, const std::wstring& val, zce_int32 fixed_len, zce_byte version);
-    int ZCE_API unpack_builtin_string(std::wstring& val, const zce_byte* buf, zce_int32 size, zce_int32 fixed_len, zce_byte version);
+    int ZCE_API calc_pack_string_len(const zce_ustr& val, zce_byte version);
+    int ZCE_API pack_builtin_string(zce_byte* buf, zce_int32 size, const zce_ustr& val,
+                                    zce_int32 fixed_len, zce_byte version);
+    int ZCE_API unpack_builtin_string(zce_ustr& val, const zce_byte* buf, zce_int32 size,
+                                      zce_int32 fixed_len, zce_byte version);
 #endif
 
     template<typename T>

@@ -82,33 +82,24 @@ typedef struct _zce_addr_t {
 #    include <string>
 #    include <vector>
 
-#    ifdef _WIN32
-#        define ZCE_U16(x) L##x
-typedef std::wstring zce_ustring;
-typedef wchar_t zce_char16;
-#    else
-#        define ZCE_U16(x) u##x
-typedef std::u16string zce_ustring;
-typedef char16_t zce_char16;
-#    endif
-
 #    ifdef _UNICODE
-typedef std::wstring zce_tstring;
-typedef wchar_t zce_tchar;
+typedef std::u16string zce_tstring;
+typedef char16_t zce_tchar;
 #    else   //_UNICODE
 typedef std::string zce_tstring;
 typedef char zce_tchar;
 #    endif  //_UNICODE
 
+typedef char16_t zce_char16;
+typedef std::u16string zce_ustr;
+typedef std::u16string_view zce_ustrview;
 typedef std::string zce_string;
 typedef std::string zce_astring;
-typedef std::wstring zce_wstring;
 typedef std::vector<zce_byte> zce_bytevec;
+typedef std::vector<zce_ustr> zce_ustrvec;
 typedef std::vector<zce_string> zce_strvec;
 typedef std::vector<zce_astring> zce_astrvec;
 typedef std::vector<zce_tstring> zce_tstrvec;
-typedef std::vector<zce_wstring> zce_wstrvec;
-typedef std::vector<zce_ustring> zce_ustrvec;
 
 template <typename T>
 class zce_matrix {

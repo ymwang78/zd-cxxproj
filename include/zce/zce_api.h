@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 // ***************************************************************
 //  zce_api   version:  1.0  date: 2002/04/29
 //  -------------------------------------------------------------
@@ -63,7 +63,7 @@ extern "C"
 
     int ZCE_API zce_base64_encode(unsigned char* buffer, const unsigned char* input, size_t input_len);
 
-    /*result == nul ¿ÉÒÔÔ¤ÏÈ¼ÆËãËùĞè´óĞ¡*/
+    /*result == nul å¯ä»¥é¢„å…ˆè®¡ç®—æ‰€éœ€å¤§å°*/
     int ZCE_API zce_base58_decode(unsigned char* result, size_t result_size, const unsigned char* input, size_t inputlen);
 
     int ZCE_API zce_base58_encode(unsigned char* buffer, size_t buffer_size, const unsigned char* input, size_t input_len);

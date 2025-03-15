@@ -171,6 +171,7 @@ enum ERV_ZCE_ERROR {
     ZCE_ERROR_BADPRC = 0x81010011,      // 处理错误
     ZCE_ERROR_NORESOURCE = 0x81010012,  // 资源不足
     ZCE_ERROR_VERSION = 0x81010013,     // 版本不匹配
+    ZCE_ERROR_READ = 0x81010014,        // 读取文件网络等失败
 
     ZCE_ERROR_UVBASE = 0x81020000,
 

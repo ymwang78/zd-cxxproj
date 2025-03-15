@@ -2,6 +2,9 @@
 
 #include <vector>
 #include <new>
+#include <algorithm>
+#include <zce/zce_atomic.h>
+#include <zce/zce_log.h>
 
 template <typename T, typename H = long long, bool is_auto_expand = false,
           bool is_auto_shrink = false>
@@ -30,7 +33,7 @@ class zce_array {  // skew heap
     };
 
     struct mix_32 {
-        static inline int next_magic() { 
+        static inline int next_magic() {
             static zce_atomic_long _magic(rand());
             int m = 0;
             do {
@@ -111,9 +114,13 @@ class zce_array {  // skew heap
     std::vector<slot_t> slots_;
     int free_head_;  // 堆的根节点索引，-1表示空
     int cur_top_;
+    size_t capacity_limit_;
 
   public:
-    explicit zce_array(size_t capacity) : free_head_(-1), cur_top_(0) { slots_.resize(capacity); }
+    explicit zce_array(size_t capacity, size_t capacity_limit = 0xffffffff)
+        : free_head_(-1), cur_top_(0), capacity_limit_(capacity_limit) {
+        slots_.resize(capacity);
+    }
 
     ~zce_array() { clear(); }
 
@@ -132,7 +139,7 @@ class zce_array {  // skew heap
                 return -1;  // 没有空间了
             }
             if (cur_top_ >= (int)slots_.size()) {
-                if (is_auto_expand) {
+                if (is_auto_expand && slots_.size() * 2 <= capacity_limit_) {
                     slots_.resize(slots_.size() * 2);
                 } else {
                     return -1;  // 没有空间了
@@ -178,25 +185,7 @@ class zce_array {  // skew heap
                 while (cur_top_ > 0 && !slots_[cur_top_ - 1].in_use()) {
                     // 释放连续的空闲元素, 从skew heap中弹出
                     int cur_free = cur_top_ - 1;
-                    int parent = slots_[cur_free].heap_node_.parent;
-
-                    int left = slots_[cur_free].heap_node_.left;
-                    int right = slots_[cur_free].heap_node_.right;
-                    int new_top = merge_skew_heap(left, right);
-                    if (parent != -1) {
-                        if (slots_[parent].heap_node_.left == cur_free) {
-                            slots_[parent].heap_node_.left = new_top;
-                        } else {
-                            ZCE_ASSERT(slots_[parent].heap_node_.right == cur_free);
-                            slots_[parent].heap_node_.right = new_top;
-                        }
-                        // slots_[cur_free].heap_node_.parent = -1;
-                        // free_head_ = merge_skew_heap(free_head_, cur_free);
-                    } else {
-                        ZCE_ASSERT(free_head_ == cur_free);
-                        free_head_ = new_top;
-                    }
-
+                    remove_free_node(cur_free);
                     --cur_top_;
                 }
             }
@@ -209,6 +198,40 @@ class zce_array {  // skew heap
         slots_[index].heap_node_.left = -1;
         slots_[index].heap_node_.right = -1;
         free_head_ = merge_skew_heap(free_head_, index);
+    }
+
+    // 强制设置一个空节点为当前值
+    template <typename U>
+    int set(H handle, U&& val) {
+        int index, magic;
+        mix_magic_t::seperate(handle, magic, index);
+        ZCE_ASSERT_RETURN(
+            (index >= cur_top_) || (index >= 0 && index < cur_top_ && !slots_[index].in_use()), -1);
+        if (index < cur_top_) {
+            remove_free_node(index);
+        } else if (index == cur_top_) {
+            cur_top_ = index + 1;
+        } else {
+            if (index > capacity_limit_) {
+                return -1; // 位置超限
+            }
+            if (index >= (int)slots_.size()) {
+                slots_.resize(std::min(capacity_limit_, std::max((size_t)index + 1, slots_.size() * 2)));
+            }
+            for (int i = cur_top_; i < index - 1; ++i) {
+                slots_[i].heap_node_.inuse = 0;
+                slots_[i].heap_node_.parent = -1;
+                slots_[i].heap_node_.left = -1;
+                slots_[i].heap_node_.right = -1;
+                free_head_ = merge_skew_heap(free_head_, i);
+            }
+            cur_top_ = index + 1;
+        }
+
+        new (&slots_[index].data_.item) T(std::forward<U>(val));
+        slots_[index].data_.inuse = 1;
+        slots_[index].data_.magic = magic;
+        return 0;
     }
 
     T& operator[](H handle) {
@@ -277,5 +300,25 @@ class zce_array {  // skew heap
         slots_[root1].heap_node_.right = l;
 
         return root1;
+    }
+
+    // 删除当前节点，返回新的子节点的根
+    int remove_free_node(int nodeid) {
+        int parent = slots_[nodeid].heap_node_.parent;
+        int left = slots_[nodeid].heap_node_.left;
+        int right = slots_[nodeid].heap_node_.right;
+        int new_top = merge_skew_heap(left, right);
+        if (parent != -1) {
+            if (slots_[parent].heap_node_.left == nodeid) {
+                slots_[parent].heap_node_.left = new_top;
+            } else {
+                ZCE_ASSERT(slots_[parent].heap_node_.right == nodeid);
+                slots_[parent].heap_node_.right = new_top;
+            }
+        } else {
+            ZCE_ASSERT(free_head_ == nodeid);
+            free_head_ = new_top;
+        }
+        return new_top;
     }
 };

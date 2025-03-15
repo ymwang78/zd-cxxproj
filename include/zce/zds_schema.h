@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 // ***************************************************************
 //  zds_schema   version:  1.0   -  date: 2023/07/07
 //  -------------------------------------------------------------
@@ -389,12 +389,12 @@ int zds_pack_builtin(zce_byte* buf, zce_int32 size, const std::map<TKEY, TVAL>& 
 }
 
 struct _dummy_t {};  // treat linux compiler
-inline int zds_pack(zce_byte* buf, int size, const _dummy_t& _t, zds_context_t* ctx,
-                    bool has_prefix) {
+inline int zds_pack(zce_byte* /*buf*/, int /*size*/, const _dummy_t& /*_t*/, zds_context_t* /*ctx*/,
+                    bool /*has_prefix*/) {
     return -1;
 };
-inline int zds_unpack(_dummy_t& _t, const zce_byte* buf, int size, zds_context_t* ctx,
-                      bool has_prefix) {
+inline int zds_unpack(_dummy_t& /*_t*/, const zce_byte* /*buf*/, int /*size*/, zds_context_t* /*ctx*/,
+                      bool /*has_prefix*/) {
     return -1;
 };
 }  // namespace zdp

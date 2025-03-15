@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 // ***************************************************************
 //  zce_task_queue   version:  1.0   -  date: 2002/11/15
 //  -------------------------------------------------------------
@@ -61,7 +61,7 @@ class ZCE_API zce_task_queue : public zce_task {
 };
 
 template <typename F>
-int zce_task_queue::enqueue(bool wait, const char* name, F f) {
+int zce_task_queue::enqueue(bool bwait, const char* name, F f) {
     // enqueue can't use wait because work queue maybe the same with current working
     // so deadlock if it happened
     class Tq_task : public zce_task {
@@ -71,10 +71,13 @@ int zce_task_queue::enqueue(bool wait, const char* name, F f) {
       public:
         Tq_task(F f, const char* name, zce_semaphore* sem)
             : zce_task(name ? name : "Tq_task"), f_(f), sem_(sem) {
-            if (sem_) {
-                bool wait = sem_->try_acquire();
-                ZCE_ASSERT_TEXT(wait, "deadlock detected!");
+#    ifdef _DEBUG
+            if (sem_) {  // ensure sem is 0
+                bool isget = sem_->try_acquire();
+                ZCE_ASSERT_TEXT(!isget, "deadlock detected!");
+                if (isget) sem_->release();
             }
+#    endif
         }
 
         virtual void call() {
@@ -89,13 +92,16 @@ int zce_task_queue::enqueue(bool wait, const char* name, F f) {
         }
     };
 
-    zce_tss::global_t* tss = wait ? zce_tss::get_global() : 0;
-    zce_smartptr<zce_task> task_ptr(new Tq_task(f, name, wait ? tss->sem_ : 0));
-    int ret = enqueue(task_ptr);
-    if (ret >= 0 && wait) {
-        zce_guard<zce_semaphore> g(*tss->sem_);
+    if (bwait) {
+        zce_tss::zce_global_semaphore global_semaphore;
+        zce_smartptr<zce_task> task_ptr(new Tq_task(f, name, global_semaphore.sem));
+        int ret = enqueue(task_ptr);
+        global_semaphore.sem->acquire();
+        return ret;
+    } else {
+        zce_smartptr<zce_task> task_ptr(new Tq_task(f, name, 0));
+        return enqueue(task_ptr);
     }
-    return ret;
 };
 
 template <typename QueueSubType, typename Params, typename Results>
@@ -139,14 +145,13 @@ class zce_task_map_reduce : public zce_object {
         zce_smartptr<zce_task_map_reduce> this_ptr(this);
         for (size_t i = 0; i < queue_size_; ++i) {
             if (!if_work_queue[i]) continue;
-            queue_vec_[i]->enqueue(
-                false, __FUNCTION__, 
-                [=]() {
-                    process_task((int)i, this_ptr->queue_idx_vec_ ,this_ptr->params_, this_ptr->result_);
-                    if (--this_ptr->remain_tasks_ == 0) {
-                        final_callback(this_ptr->params_, this_ptr->result_);
-                    }
-                });
+            queue_vec_[i]->enqueue(false, __FUNCTION__, [=]() {
+                process_task((int)i, this_ptr->queue_idx_vec_, this_ptr->params_,
+                             this_ptr->result_);
+                if (--this_ptr->remain_tasks_ == 0) {
+                    final_callback(this_ptr->params_, this_ptr->result_);
+                }
+            });
         }
 
         return 0;

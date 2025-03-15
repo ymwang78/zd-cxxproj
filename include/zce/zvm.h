@@ -1,4 +1,4 @@
-// *s**************************************************************
+﻿// *s**************************************************************
 //  zvm   version:  1.0   -  date: 2016/3/12
 //  -------------------------------------------------------------
 //  Yongming Wang(wangym@gmail.com)
@@ -82,13 +82,13 @@ public:
         const T& t,
         const response_cb& response) {
         zce_dblock dblock;
-        int ret = zdp::zds_pack_builtin(0, 0, t, 0);
+        int ret = zdp::zds_pack_builtin(0, 0, t, 0, true);
         if (ret < 0)
             return ret;
         ZCE_MBACQUIRE(dblock, ret);
         if ((int)dblock.space() < ret)
             return ZCE_ERROR_MALLOC;
-        ret = zdp::zds_pack_builtin(dblock.rd_ptr_cow(), (int)dblock.space(), t, 0);
+        ret = zdp::zds_pack_builtin(dblock.rd_ptr_cow(), (int)dblock.space(), t, 0, true);
         if (ret < 0)
             return ret;
         dblock.wr_ptr(ret);

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 /* ***************************************************************
  *  Copyright (C) 2006 -  Yongming Wang(wangym@gmail.com)
  *  All Rights Reserved
@@ -32,7 +32,7 @@ enum yytokentype {
     ZDL_DOUBLE = 267,          /* ZDL_DOUBLE  */
     ZDL_ASTRING = 268,         /* ZDL_ASTRING  */
     ZDL_TSTRING = 269,         /* ZDL_TSTRING  */
-    ZDL_WSTRING = 270,         /* ZDL_WSTRING  */
+    ZDL_USTRING = 270,         /* ZDL_USTRING  */
     ZDL_BYTEVEC = 271,         /* ZDL_BYTEVEC  */
     ZDL_DATETIME = 272,        /* ZDL_DATETIME  */
     ZDL_ANY = 273,             /* ZDL_ANY  */

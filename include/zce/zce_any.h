@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 // ***************************************************************
 //  zce_any   version:  1.0   -  date: 2023/08/01
 //  -------------------------------------------------------------
@@ -176,6 +176,14 @@ class ZCE_API zce_any {
 
     inline bool is_i64() const noexcept { return data_.type_ == any_int64; }
 
+    inline zce_int64 i64ordouble() const noexcept {
+        ZCE_ASSERT_RETURN(data_.type_ == any_int64 || data_.type_ == any_double, 0);
+        if (data_.type_ == any_double) {
+            return (zce_int64)data_.u_.dbl_[0];
+        }
+        return data_.u_.i64_[0];
+    }
+
     inline zce_int64 i64() const noexcept {
         ZCE_ASSERT_RETURN(data_.type_ == any_int64, 0);
         return data_.u_.i64_[0];
@@ -243,7 +251,7 @@ class ZCE_API zce_any {
 
     template <typename T>
     inline const T* array() const noexcept {
-        ZCE_ASSERT_RETURN(data_.type_ == _to_type<T>() && sizeof(T) == 1 << data_.shiftbits_, 0);
+        ZCE_ASSERT_RETURN(data_.type_ == _to_type<T>() && sizeof(T) == (1ull << data_.shiftbits_), 0);
         if (data_.outplace_) return (T*)data_.u_.bytearray_;
         return (T*)data_.u_.bytearray_inplace_;
     }

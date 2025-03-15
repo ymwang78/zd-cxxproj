@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 // ***************************************************************
 //  zce_reactor   version:  1.0     date: 2002/07/31
 //  -------------------------------------------------------------
@@ -72,10 +72,13 @@ int zce_reactor::delegate(bool bwait, const char* name, F f) {
       public:
         Fr_task(const char* name, zce_reactor* reactor_ptr, zce_semaphore* sem, F f)
             : zce_task(name ? name : "delegate_task"), reactor_ptr_(reactor_ptr), sem_(sem), f_(f) {
-            if (sem_) {
-                bool wait = sem_->try_acquire();
-                ZCE_ASSERT_TEXT(wait, "deadlock detected!");
+#ifdef _DEBUG
+            if (sem_) {  // ensure sem is 0
+                bool isget = sem_->try_acquire();
+                ZCE_ASSERT_TEXT(!isget, "deadlock detected!");
+                if (isget) sem_->release();
             }
+#endif
         }
         virtual void call() {
             try {
@@ -95,11 +98,14 @@ int zce_reactor::delegate(bool bwait, const char* name, F f) {
         return 0;
     }
 
-    zce_tss::global_t* tss = bwait ? zce_tss::get_global() : 0;
-    zce_smartptr<zce_task> task_ptr(new Fr_task(name, this, bwait ? tss->sem_ : 0, f));
-    int ret = delegate_task(task_ptr);
-    if (ret >= 0 && bwait) {
-        zce_guard<zce_semaphore> g(*tss->sem_);
+    if (bwait) {
+        zce_tss::zce_global_semaphore global_semaphore;
+        zce_smartptr<zce_task> task_ptr(new Fr_task(name, this, global_semaphore.sem, f));
+        int ret = delegate_task(task_ptr);
+        global_semaphore.sem->acquire();
+        return ret;
+    } else {
+        zce_smartptr<zce_task> task_ptr(new Fr_task(name, this, 0, f));
+        return delegate_task(task_ptr);
     }
-    return ret;
 };
