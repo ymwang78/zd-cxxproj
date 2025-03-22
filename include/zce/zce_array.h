@@ -114,15 +114,18 @@ class zce_array {  // skew heap
     std::vector<slot_t> slots_;
     int free_head_;  // 堆的根节点索引，-1表示空
     int cur_top_;
+    size_t used_count_;
     size_t capacity_limit_;
 
   public:
     explicit zce_array(size_t capacity, size_t capacity_limit = 0xffffffff)
-        : free_head_(-1), cur_top_(0), capacity_limit_(capacity_limit) {
+        : free_head_(-1), cur_top_(0), used_count_(0), capacity_limit_(capacity_limit) {
         slots_.resize(capacity);
     }
 
     ~zce_array() { clear(); }
+
+    size_t get_used_count() const { return used_count_; }
 
     template <typename U>
     H insert_item(U&& val) {
@@ -151,6 +154,7 @@ class zce_array {  // skew heap
         new (&slots_[index].data_.item) T(std::forward<U>(val));
         slots_[index].data_.inuse = 1;
         slots_[index].data_.magic = mix_magic_t::next_magic();
+        ++used_count_;
         return mix_magic_t::mix(slots_[index].data_.magic, index);
     }
 
@@ -175,6 +179,7 @@ class zce_array {  // skew heap
         slots_[index].data_.item.~T();
         slots_[index].data_.inuse = 0;
         slots_[index].data_.magic = 0;
+        --used_count_;
 
         if (index == cur_top_ - 1) {
             // 若释放的是最高索引的元素，可直接回退cur_top_
@@ -213,10 +218,11 @@ class zce_array {  // skew heap
             cur_top_ = index + 1;
         } else {
             if (index > capacity_limit_) {
-                return -1; // 位置超限
+                return -1;  // 位置超限
             }
             if (index >= (int)slots_.size()) {
-                slots_.resize(std::min(capacity_limit_, std::max((size_t)index + 1, slots_.size() * 2)));
+                slots_.resize(
+                    std::min(capacity_limit_, std::max((size_t)index + 1, slots_.size() * 2)));
             }
             for (int i = cur_top_; i < index - 1; ++i) {
                 slots_[i].heap_node_.inuse = 0;
@@ -231,6 +237,7 @@ class zce_array {  // skew heap
         new (&slots_[index].data_.item) T(std::forward<U>(val));
         slots_[index].data_.inuse = 1;
         slots_[index].data_.magic = magic;
+        ++used_count_;
         return 0;
     }
 
@@ -266,6 +273,7 @@ class zce_array {  // skew heap
         }
         cur_top_ = 0;
         free_head_ = -1;
+        used_count_ = 0;
     }
 
   private:
@@ -321,4 +329,103 @@ class zce_array {  // skew heap
         }
         return new_top;
     }
+
+  public:
+    // 非const迭代器
+    class iterator {
+      public:
+        using iterator_category = std::forward_iterator_tag;
+        using value_type = T;
+        using difference_type = std::ptrdiff_t;
+        using pointer = T*;
+        using reference = T&;
+
+      private:
+        zce_array* array_;
+        int index_;
+        // 跳过未使用的槽
+        void advance_to_valid() {
+            while (index_ < array_->cur_top_ && !array_->slots_[index_].in_use()) {
+                ++index_;
+            }
+        }
+
+      public:
+        iterator(zce_array* array, int index) : array_(array), index_(index) {
+            if (array_) {
+                advance_to_valid();
+            }
+        }
+        iterator& operator++() {
+            ++index_;
+            advance_to_valid();
+            return *this;
+        }
+        iterator operator++(int) {
+            iterator tmp(*this);
+            ++(*this);
+            return tmp;
+        }
+        reference operator*() { return array_->slots_[index_].data_.item; }
+        pointer operator->() { return &(operator*()); }
+        bool operator==(const iterator& other) const {
+            return array_ == other.array_ && index_ == other.index_;
+        }
+        bool operator!=(const iterator& other) const { return !(*this == other); }
+        // 允许 const_iterator 从非const迭代器构造
+        friend class const_iterator;
+    };
+
+    // const 迭代器
+    class const_iterator {
+      public:
+        using iterator_category = std::forward_iterator_tag;
+        using value_type = T;
+        using difference_type = std::ptrdiff_t;
+        using pointer = const T*;
+        using reference = const T&;
+
+      private:
+        const zce_array* array_;
+        int index_;
+        void advance_to_valid() {
+            while (index_ < array_->cur_top_ && !array_->slots_[index_].in_use()) {
+                ++index_;
+            }
+        }
+
+      public:
+        const_iterator(const zce_array* array, int index) : array_(array), index_(index) {
+            if (array_) {
+                advance_to_valid();
+            }
+        }
+        // 允许从非const迭代器转换
+        const_iterator(const iterator& it) : array_(it.array_), index_(it.index_) {}
+
+        const_iterator& operator++() {
+            ++index_;
+            advance_to_valid();
+            return *this;
+        }
+        const_iterator operator++(int) {
+            const_iterator tmp(*this);
+            ++(*this);
+            return tmp;
+        }
+        reference operator*() const { return array_->slots_[index_].data_.item; }
+        pointer operator->() const { return &(operator*()); }
+        bool operator==(const const_iterator& other) const {
+            return array_ == other.array_ && index_ == other.index_;
+        }
+        bool operator!=(const const_iterator& other) const { return !(*this == other); }
+    };
+
+    // 提供 begin/end 接口
+    iterator begin() { return iterator(this, 0); }
+    iterator end() { return iterator(this, cur_top_); }
+    const_iterator begin() const { return const_iterator(this, 0); }
+    const_iterator end() const { return const_iterator(this, cur_top_); }
+    const_iterator cbegin() const { return begin(); }
+    const_iterator cend() const { return end(); }
 };

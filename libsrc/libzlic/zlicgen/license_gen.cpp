@@ -1,4 +1,4 @@
-#include <zce/zce_config.h>
+ï»¿#include <zce/zce_config.h>
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
@@ -89,10 +89,10 @@ static const char _self_pubkey[] = "-----BEGIN RSA PUBLIC KEY-----\n"
 "Z4rkZ8jjX54NAgMBAAE=\n"
 "-----END RSA PUBLIC KEY-----";
 
-//license ĞÅÏ¢
+//license ä¿¡æ¯
 static zlicense::license_t g_lic;
 
-//»úÆ÷±¾ÉíµÄĞÅÏ¢
+//æœºå™¨æœ¬èº«çš„ä¿¡æ¯
 std::set<std::string> g_setmac;
 std::set<std::string> g_sethd;
 
@@ -123,7 +123,7 @@ static int _lic_from_base64(zlicense::license_t& lic, const zce_dblock& b64, con
 {
     zce_dblock dblock, mb;
     ZCE_MBACQUIRE(mb, b64.length() * 2);
-    int ret = zce_base64_decode(mb.rd_ptr(), b64.rd_ptr(), b64.length());
+    int ret = zce_base64_decode(mb.rd_ptr_cow(), b64.rd_ptr(), b64.length());
     ZCE_ASSERT_RETURN(ret >= 0, ZLIC_ERROR_CORRUPT);
     mb.wr_ptr(ret);
     ret = zce_rsa_private_decrypt(dblock, mb.rd_ptr(), mb.length(), priv, privlen);
@@ -197,7 +197,7 @@ const  std::string zlicgen_createlicense(const char* appname, const zce_dblock& 
     zlicense::license_t lic{};
     ret = _lic_from_base64(lic, mb, _self_privkey, sizeof(_self_privkey) - 1);
     ZCE_ASSERT_RETURN(ret >= 0, "");
-    lic.expire = ~0; //ÓÀ²»¹ıÆÚ
+    lic.expire = ~0; //æ°¸ä¸è¿‡æœŸ
     lic.nv.clear();
     lic.nv.push_back({ "version", std::vector<zce_byte>() });
     lic.nv.back().value.resize(sizeof(version) - 1);
@@ -215,7 +215,7 @@ const  std::string zlicgen_createlicense(const char* appname, const zce_dblock& 
     ret = zce_rsa_public_encrypt(dblock, buf.get(), ret, _lib_rsapub, sizeof(_lib_rsapub) - 1);
     ZCE_ASSERT_RETURN(ret >= 0, s_license_gen.c_str());
     ZCE_MBACQUIRE(output, dblock.length() * 2);
-    ret = zce_base64_encode(output.rd_ptr(), dblock.rd_ptr(), dblock.length());
+    ret = zce_base64_encode(output.rd_ptr_cow(), dblock.rd_ptr(), dblock.length());
     s_license_gen = std::string((const char*)output.rd_ptr(), ret);
     return s_license_gen;
 }

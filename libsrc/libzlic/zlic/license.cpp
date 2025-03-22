@@ -159,7 +159,7 @@ static int _lic_from_base64(zlicense::license_t& lic, const zce_dblock& b64, con
 {
     zce_dblock dblock, mb;
     ZCE_MBACQUIRE(mb, b64.length() * 2);
-    int ret = zce_base64_decode(mb.rd_ptr(), b64.rd_ptr(), b64.length());
+    int ret = zce_base64_decode(mb.rd_ptr_cow(), b64.rd_ptr(), b64.length());
     ZCE_ASSERT_RETURN(ret >= 0, ZLIC_ERROR_CORRUPT);
     mb.wr_ptr(ret);
     ret = zce_rsa_private_decrypt(dblock, mb.rd_ptr(), mb.length(), priv, privlen);
@@ -206,7 +206,7 @@ static std::string _create_trivallicense(const char* appname, int expire_trival)
     int ret = 0;
     zlicense::license_t lic{};
     lic.app = appname;
-    lic.expire = 24 * 3600 * (1 + time(nullptr) / (24*3600)) + expire_trival;
+    lic.expire = 24 * 3600 * (int)(1 + time(nullptr) / (24*3600)) + expire_trival;
     lic.nv.push_back({ "version", std::vector<zce_byte>()});
     lic.nv.back().value.resize(sizeof("trival") - 1);
     memcpy(lic.nv.back().value.data(), "trival", sizeof("trival") - 1);
@@ -224,7 +224,7 @@ static std::string _create_trivallicense(const char* appname, int expire_trival)
     ret = zce_rsa_public_encrypt(dblock, buf.get(), ret, _lib_rsapub, sizeof(_lib_rsapub) - 1);
     ZCE_ASSERT_RETURN(ret >= 0, s_license_gen);
     ZCE_MBACQUIRE(output, dblock.length() * 2);
-    ret = zce_base64_encode(output.rd_ptr(), dblock.rd_ptr(), dblock.length());
+    ret = zce_base64_encode(output.rd_ptr_cow(), dblock.rd_ptr(), dblock.length());
     s_license_gen = std::string((const char*)output.rd_ptr(), ret);
     return s_license_gen;
 }
@@ -286,7 +286,7 @@ const char* zlic_getreq(const char* appname)
     ret = zce_rsa_public_encrypt(dblock, buf.get(), ret, _self_pubkey, sizeof(_self_pubkey) - 1);
     ZCE_ASSERT_RETURN(ret >= 0, s_licreq.c_str());
     ZCE_MBACQUIRE(output, dblock.length() * 2);
-    ret = zce_base64_encode(output.rd_ptr(), dblock.rd_ptr(), dblock.length());
+    ret = zce_base64_encode(output.rd_ptr_cow(), dblock.rd_ptr(), dblock.length());
     s_licreq = std::string((const char*)output.rd_ptr(), ret);
     std::string subKey = std::string("SOFTWARE\\Microsoft\\UserData\\ZLIC\\") + appname;
     SetRegistryValue(HKEY_CURRENT_USER, subKey.c_str(), "Request", s_licreq.c_str());
