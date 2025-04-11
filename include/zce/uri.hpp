@@ -1,38 +1,61 @@
-// Copyright (c) Glyn Matthews 2012-2016.
-// Copyright 2012 Dean Michael Berris <dberris@google.com>
-// Copyright 2012 Google, Inc.
-// Distributed under the Boost Software License, Version 1.0.
-// (See accompanying file LICENSE_1_0.txt or copy at
-// http://www.boost.org/LICENSE_1_0.txt)
+﻿#pragma once
+// ***************************************************************
+//  uri   version:  1.0   -  date:  2016/04/11
+//  -------------------------------------------------------------
+//  Yongming Wang(wangym@gmail.com)
+//  -------------------------------------------------------------
+//  This file is a part of project ZCE.
+//  Copyright (C) 2016 - All Rights Reserved
+// ***************************************************************
+// 
+// ***************************************************************
 
-#ifndef NETWORK_URI_HPP
-#define NETWORK_URI_HPP
+#include <string>
+#include <string_view>
 
-/**
- * \defgroup uri URI
- *
- * This module contains a class encapsulating a URI, a URI builder and
- * percent encoding and decoding functions.
- *
- * \defgroup optional Optional
- *
- * This module contains a utility to represent optional values.
- *
- * \defgroup string String
- *
- * This module contains a class for a non-owning reference to a string.
- *
- * \namespace zce
- *
- * The \c network namespace contains all the classes and functions for
- * the URI in this library.
- *
- * \file
- * \brief Contains the uri, uri_builder classes and functions
- *        for percent encoding and decoding.
- */
+namespace zce {
 
-#include <zce/uri/uri.hpp>
-#include <zce/uri/uri_io.hpp>
+class uri {
+  public:
+    explicit uri(const std::string& uri_str);
 
-#endif // NETWORK_URI_HPP
+    ~uri();
+
+    bool has_scheme() const noexcept;
+
+    std::string_view scheme() const noexcept;
+
+    bool has_host() const noexcept;
+
+    std::string_view host() const noexcept;
+
+    bool has_port() const noexcept;
+
+    std::string_view port() const noexcept;
+
+    bool has_user_info() const noexcept;
+
+    std::string_view user_info() const noexcept;
+
+    bool has_path() const noexcept;
+
+    std::string_view path() const noexcept;
+
+    bool uri::has_query() const noexcept;
+
+    std::string_view uri::query() const noexcept;
+
+    bool uri::has_fragment() const noexcept;
+
+    std::string_view uri::fragment() const noexcept;
+
+    std::vector<std::pair<std::string_view, std::string_view>> query_items() const noexcept;
+  private:
+    struct Impl;
+
+    Impl* impl_;
+
+
+};
+
+}  // namespace zce
