@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 // ***************************************************************
 //  zce_object   version:  1.0     date: 2002/8/22
 //  -------------------------------------------------------------
@@ -40,7 +40,7 @@ protected:
 
     void __free_me() noexcept;
 
-public:
+  public:
 
 	inline zce_int64 __get_oid() const noexcept {
 		return obj_idx_;
@@ -71,7 +71,23 @@ public:
         return this->ref_count_.value();
     }
 
-private:
+    std::shared_ptr<zce_object> shared_ptr() noexcept {
+        __addref();
+        auto deleter = [](zce_object* p) {
+            if (p) {
+                p->__decref();
+            }
+        };
+        return std::shared_ptr<zce_object>(this, deleter);
+    }
+
+    template <typename T>   
+    std::shared_ptr<T> shared_from_this() noexcept {
+        static_assert(std::is_base_of_v<zce_object, T>, "T must derive from zce_object");
+        return std::dynamic_pointer_cast<T>(shared_ptr());
+    }
+
+  private:
     zce_allocator* zce_alloc_;
     zce_atomic_long ref_count_;
 	const zce_int64 obj_idx_;

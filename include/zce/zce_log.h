@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 // ***************************************************************
 //  zce_log   version:  1.0   -  date: 2002/11/01
 //  -------------------------------------------------------------
@@ -22,7 +22,8 @@
 extern "C" {
 #endif
 
-enum _zlog_level {
+#ifndef ZCE_DEFINED_LOGLEVEL
+typedef enum _zlog_level {
     ZLOG_TRACE = 0,
     ZLOG_DEBUG = 1,   /* debug */
     ZLOG_INFOR = 2,   /* info */
@@ -31,7 +32,9 @@ enum _zlog_level {
     ZLOG_FATAL = 5,   /* fatal */
     ZLOG_BIZDT = 100, /* bizdata */
     ZLOG_NONEL = 255, /* none */
-};
+} ZLOG_LEVEL;
+#    define ZCE_DEFINED_LOGLEVEL
+#endif
 
 typedef struct zlog_param {
     const char* name;
