@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include <zce/zce_object.h>
 #include <zce/zce_sync.h>
 #include <type_traits>
@@ -44,7 +44,7 @@ class zce_ring : public zce_object {
         return *this;
     }
 
-    /** Çå¿Õ¶ÓÁĞ£¬ÖØÖÃËùÓĞÖ¸Õë */
+    /** æ¸…ç©ºé˜Ÿåˆ—ï¼Œé‡ç½®æ‰€æœ‰æŒ‡é’ˆ */
     void reset() {
         zce_guard<Lock> lock(_mutex);
         _head = 0;
@@ -52,7 +52,7 @@ class zce_ring : public zce_object {
         _size = 0;
     }
 
-    /** Ìí¼ÓÔªËØµ½¶ÓÁĞ£¨×Ô¶¯¸²¸Ç×îÀÏÊı¾İ£© */
+    /** æ·»åŠ å…ƒç´ åˆ°é˜Ÿåˆ—ï¼ˆè‡ªåŠ¨è¦†ç›–æœ€è€æ•°æ®ï¼‰ */
     void push(const T& item) {
         zce_guard<Lock> lock(_mutex);
 
@@ -60,13 +60,13 @@ class zce_ring : public zce_object {
         _tail = (_tail + 1) % _capacity;
 
         if (_size == _capacity) {
-            _head = (_head + 1) % _capacity;  // ¶ÓÁĞÒÑÂú£¬¸²¸Ç×îÀÏµÄÊı¾İ
+            _head = (_head + 1) % _capacity;  // é˜Ÿåˆ—å·²æ»¡ï¼Œè¦†ç›–æœ€è€çš„æ•°æ®
         } else {
             ++_size;
         }
     }
 
-    /** ¶ÁÈ¡µ¥¸öÔªËØ£¨Èç¹û¶ÓÁĞÎª¿Õ£¬×èÈûµÈ´ı£© */
+    /** è¯»å–å•ä¸ªå…ƒç´ ï¼ˆå¦‚æœé˜Ÿåˆ—ä¸ºç©ºï¼Œé˜»å¡ç­‰å¾…ï¼‰ */
     bool pop(T& item) {
         zce_guard<Lock> lock(_mutex);
         if (_size == 0) return false;
@@ -78,12 +78,12 @@ class zce_ring : public zce_object {
         return true;
     }
 
-    /** ÅúÁ¿Ğ´Èë£¨Ö§³Ö `memcpy` ¼ÓËÙ£¬×Ô¶¯¸²¸Ç×îÀÏÊı¾İ£© */
+    /** æ‰¹é‡å†™å…¥ï¼ˆæ”¯æŒ `memcpy` åŠ é€Ÿï¼Œè‡ªåŠ¨è¦†ç›–æœ€è€æ•°æ®ï¼‰ */
     void write(size_t count, const T* src) {
         zce_guard<Lock> lock(_mutex);
 
         if (count >= _capacity) {
-            // Èç¹ûĞ´ÈëÊı¾İ³¬¹ı¶ÓÁĞÈİÁ¿£¬ÔòÖ»±£Áô×îĞÂµÄ `_capacity` ¸öÊı¾İ
+            // å¦‚æœå†™å…¥æ•°æ®è¶…è¿‡é˜Ÿåˆ—å®¹é‡ï¼Œåˆ™åªä¿ç•™æœ€æ–°çš„ `_capacity` ä¸ªæ•°æ®
             src += (count - _capacity);
             count = _capacity;
             _head = 0;
@@ -95,9 +95,9 @@ class zce_ring : public zce_object {
         size_t second_part = count - first_part;
 
         if constexpr (std::is_trivially_copyable_v<T>) {
-            std::memcpy(&_buffer[_tail], src, first_part * sizeof(T));
+            ::memcpy(&_buffer[_tail], src, first_part * sizeof(T));
             if (second_part > 0) {
-                std::memcpy(&_buffer[0], src + first_part, second_part * sizeof(T));
+                ::memcpy(&_buffer[0], src + first_part, second_part * sizeof(T));
             }
         } else {
             std::copy(src, src + first_part, _buffer.begin() + _tail);
@@ -116,7 +116,7 @@ class zce_ring : public zce_object {
         }
     }
 
-    /** ¶ÁÈ¡¶à¸öÔªËØ£¨É¾³ıÒÑ¶ÁÈ¡Êı¾İ£¬Ö§³Ö `memcpy` ¼ÓËÙ£© */
+    /** è¯»å–å¤šä¸ªå…ƒç´ ï¼ˆåˆ é™¤å·²è¯»å–æ•°æ®ï¼Œæ”¯æŒ `memcpy` åŠ é€Ÿï¼‰ */
     size_t read(size_t count, T* dst) {
         zce_guard<Lock> lock(_mutex);
         size_t available = peek_no_lock(count, dst);
@@ -127,31 +127,31 @@ class zce_ring : public zce_object {
         return available;
     }
 
-    /** Ô¤ÀÀ¶à¸öÔªËØ£¨²»»áĞŞ¸Ä `_head`£¬Ö§³Ö `memcpy` ¼ÓËÙ£© */
+    /** é¢„è§ˆå¤šä¸ªå…ƒç´ ï¼ˆä¸ä¼šä¿®æ”¹ `_head`ï¼Œæ”¯æŒ `memcpy` åŠ é€Ÿï¼‰ */
     size_t peek(size_t count, T* dst) {
         zce_guard<Lock> lock(_mutex);
         return peek_no_lock(count, dst);
     }
 
-    /** ¶ÓÁĞÊÇ·ñÎª¿Õ */
+    /** é˜Ÿåˆ—æ˜¯å¦ä¸ºç©º */
     bool empty() const {
         zce_guard<Lock> lock(_mutex);
         return _size == 0;
     }
 
-    /** ¶ÓÁĞÊÇ·ñÒÑÂú */
+    /** é˜Ÿåˆ—æ˜¯å¦å·²æ»¡ */
     bool full() const {
         zce_guard<Lock> lock(_mutex);
         return _size == _capacity;
     }
 
-    /** »ñÈ¡µ±Ç°ÔªËØ¸öÊı */
+    /** è·å–å½“å‰å…ƒç´ ä¸ªæ•° */
     size_t size() const {
         zce_guard<Lock> lock(_mutex);
         return _size;
     }
 
-    /** »ñÈ¡¶ÓÁĞÈİÁ¿ */
+    /** è·å–é˜Ÿåˆ—å®¹é‡ */
     size_t capacity() const { return _capacity; }
 
   private:
@@ -163,11 +163,11 @@ class zce_ring : public zce_object {
         size_t first_part = std::min(available, _capacity - _head);
         size_t second_part = available - first_part;
 
-        // ÓÅ»¯£ºÈç¹ûÊÇ»ù±¾ÀàĞÍ£¬Ê¹ÓÃ `memcpy` ¿½±´
+        // ä¼˜åŒ–ï¼šå¦‚æœæ˜¯åŸºæœ¬ç±»å‹ï¼Œä½¿ç”¨ `memcpy` æ‹·è´
         if constexpr (std::is_trivially_copyable_v<T>) {
-            std::memcpy(dst, &_buffer[_head], first_part * sizeof(T));
+            ::memcpy(dst, &_buffer[_head], first_part * sizeof(T));
             if (second_part > 0) {
-                std::memcpy(dst + first_part, &_buffer[0], second_part * sizeof(T));
+                ::memcpy(dst + first_part, &_buffer[0], second_part * sizeof(T));
             }
         } else {
             std::copy(_buffer.begin() + _head, _buffer.begin() + _head + first_part, dst);
@@ -178,11 +178,11 @@ class zce_ring : public zce_object {
         return available;
     }
 
-    std::vector<T> _buffer;  // »·ĞÎ»º³åÇø
-    size_t _capacity;        // ×î´óÈİÁ¿
-    size_t _size;            // µ±Ç°ÔªËØ¸öÊı
-    size_t _head;            // Í·Ë÷Òı£¨¶ÁÈ¡Î»ÖÃ£©
-    size_t _tail;            // Î²Ë÷Òı£¨Ğ´ÈëÎ»ÖÃ£©
+    std::vector<T> _buffer;  // ç¯å½¢ç¼“å†²åŒº
+    size_t _capacity;        // æœ€å¤§å®¹é‡
+    size_t _size;            // å½“å‰å…ƒç´ ä¸ªæ•°
+    size_t _head;            // å¤´ç´¢å¼•ï¼ˆè¯»å–ä½ç½®ï¼‰
+    size_t _tail;            // å°¾ç´¢å¼•ï¼ˆå†™å…¥ä½ç½®ï¼‰
 
     mutable Lock _mutex;
 };

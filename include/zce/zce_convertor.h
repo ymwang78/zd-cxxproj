@@ -32,11 +32,17 @@ class ZCE_API zce_convertor {
                                 size_t target_size);
     static int gb2312_to_wchart(const char* source, size_t source_size, wchar_t* target,
                                 size_t target_size);
+
     static int utf16_to_utf8(const zce_char16* source, size_t source_size, char* target,
                              size_t target_size);
+
+    static std::string utf16_to_utf8(const zce_ustr& ustr);
+
     static int utf8_to_utf16(const char* source, size_t source_size, zce_char16* target,
                              size_t target_size);
-    static std::string utf16_to_utf8(const zce_ustr& ustr);
+
+    static zce_ustr utf8_to_utf16(const std::string& str);
+
     static int utf8_to_wchart(const char* source, size_t source_size, wchar_t* target,
                               size_t target_size);
     static int wchart_to_utf8(const wchar_t* source, size_t source_size, char* target,

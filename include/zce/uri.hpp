@@ -41,13 +41,13 @@ class uri {
 
     std::string_view path() const noexcept;
 
-    bool uri::has_query() const noexcept;
+    bool has_query() const noexcept;
 
-    std::string_view uri::query() const noexcept;
+    std::string_view query() const noexcept;
 
-    bool uri::has_fragment() const noexcept;
+    bool has_fragment() const noexcept;
 
-    std::string_view uri::fragment() const noexcept;
+    std::string_view fragment() const noexcept;
 
     std::vector<std::pair<std::string_view, std::string_view>> query_items() const noexcept;
   private:
