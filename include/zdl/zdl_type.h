@@ -94,7 +94,7 @@ class zdl_type : public meta_base {
 
   public:
     // tpid : ZDL_CHAR ,ZDL_UCHAR... @TODO CHECK CONV
-    zdl_type(int tpid, const zce_smartptr<zdl_module>& module_ptr, const std::string& name);
+    zdl_type(int tpid, zdl_module* module_ptr, const std::string& name);
 
     ~zdl_type();
 
@@ -108,7 +108,7 @@ class zdl_type : public meta_base {
                 id() == ZDL_DBLMAT);
     }
 
-    inline const zce_smartptr<zdl_module>& module_ptr() const noexcept { return module_ptr_; }
+    inline zdl_module* module_ptr() const noexcept { return module_ptr_; }
 
     inline int id() const { return type_id_; };
 
@@ -122,7 +122,7 @@ class zdl_type : public meta_base {
 
   protected:
     int type_id_;
-    zce_smartptr<zdl_module> module_ptr_;
+    zdl_module* module_ptr_;
     std::string type_name_;
     std::string full_name_;
 };
