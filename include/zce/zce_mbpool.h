@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 // ***************************************************************
 //  zce_mbpool   version:  1.0   -  date: 2012/4/30
 //  -------------------------------------------------------------
@@ -7,7 +7,7 @@
 //  This is a part of ZCE lib, which inherited from ubeda/utiny.
 //  Copyright (C) 2012 - All Rights Reserved
 // ***************************************************************
-// add_pool ·ÇÏß³Ì°²È«£¬±ØĞëÔÚ³õÊ¼»¯Ê±È«²¿addÍê³É£¬ÆäËûº¯Êı°²È«
+// add_pool éçº¿ç¨‹å®‰å…¨ï¼Œå¿…é¡»åœ¨åˆå§‹åŒ–æ—¶å…¨éƒ¨addå®Œæˆï¼Œå…¶ä»–å‡½æ•°å®‰å…¨
 // ***************************************************************
 #ifndef __zce_mbpool_h__
 #define __zce_mbpool_h__
@@ -40,6 +40,8 @@ public:
     void add_pool(size_t size, size_t count);
 
     void add_pool_v2(size_t atomic_size, size_t count);
+
+    zce_smartptr<zce_allocator> get_v2() const;
 
     zce_dtblock* acquire(size_t len, zce_object_counter& obj);
 

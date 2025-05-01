@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 // ***************************************************************
 //  zdb_rdb   version:  1.0   -  date: 2015/01/01
 //  -------------------------------------------------------------
@@ -319,6 +319,7 @@ public:
     class zdb_database_impl : public zce_object {
     public:
         virtual zce_smartptr<zdb_connection> get_connection() = 0;
+        virtual void close() = 0;
     };
 
     typedef zdb_database::zdb_database_impl* (*pfn_zdb_database_impl_create)(const zce_astring& connection_str);
