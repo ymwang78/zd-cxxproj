@@ -17,9 +17,9 @@ typedef struct _JavaVM JavaVM;
 typedef struct _JNIEnv JNIEnv;
 typedef struct AAssetManager AAssetManager;
 class zce_semaphore;
+class zce_task_delegator;
 
-class ZCE_API zce_tss
-{
+class ZCE_API zce_tss {
     struct pimpl;
     struct pimpl* pimpl_;
 
@@ -42,6 +42,7 @@ public:
         zce_int64 oid_;
         int last_errcode_;
         char* last_errdesc_;
+        zce_task_delegator* current_delegator_;  // 当前线程的任务委托者环境
         std::vector<zce_semaphore*> sem_vec_;  // for wait delegate task
         static constexpr int last_errdesc_size_ = 4096;
 
@@ -66,5 +67,11 @@ public:
         zce_semaphore* sem;
         zce_global_semaphore();
         ~zce_global_semaphore();
+    };
+
+    struct zce_env_task_delegator {
+        zce_tss::global_t* tss;
+        zce_env_task_delegator(zce_task_delegator* v);
+        ~zce_env_task_delegator();
     };
 };

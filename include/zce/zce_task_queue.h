@@ -10,19 +10,17 @@
 //
 // ***************************************************************
 #pragma once
-#ifndef __zce_task_queue_h__
-#    define __zce_task_queue_h__
 
-#    include <zce/zce_config.h>
-#    include <zce/zce_object.h>
-#    include <zce/zce_task.h>
-#    include <zce/zce_atomic.h>
-#    include <deque>
-#    include <algorithm>
+#include <zce/zce_config.h>
+#include <zce/zce_object.h>
+#include <zce/zce_task.h>
+#include <zce/zce_atomic.h>
+#include <deque>
+#include <algorithm>
 
 class zce_schedule;
 
-class ZCE_API zce_task_queue : public zce_task {
+class ZCE_API zce_task_queue : public zce_task, public zce_task_delegator {
     ZCE_OBJECT_DECLARE;
 
   protected:
@@ -34,6 +32,8 @@ class ZCE_API zce_task_queue : public zce_task {
 
     std::deque<zce_smartptr<zce_task>> deque_;
 
+    std::vector<zce_smartptr<zce_object>> release_vec_;
+
     zce_mutex task_lock_;
 
     unsigned cont_proc_;
@@ -44,8 +44,6 @@ class ZCE_API zce_task_queue : public zce_task {
     zce_task_queue(const zce_smartptr<zce_schedule>& scheduler_ptr, unsigned contproc = 10,
                    const char* name = 0);
 
-    int enqueue(const zce_smartptr<zce_task>& req);
-
     int try_queue_length();  // if locked return -1
 
     void pause();
@@ -54,55 +52,15 @@ class ZCE_API zce_task_queue : public zce_task {
 
     void attach(const zce_smartptr<zce_task_queue>&);
 
+    int delegate_task(const zce_smartptr<zce_task>& task_ptr, int mstimeafter = 0) override;
+
+    // 有些对象的释放有同步要求，必须在相关队列或者线程释放
+    int delegate_release(zce_object* obj) override;
+
     virtual void call();
 
-    template <typename F>
-    int enqueue(bool wait, const char* name, F f);
 };
 
-template <typename F>
-int zce_task_queue::enqueue(bool bwait, const char* name, F f) {
-    // enqueue can't use wait because work queue maybe the same with current working
-    // so deadlock if it happened
-    class Tq_task : public zce_task {
-        F f_;
-        zce_semaphore* sem_;
-
-      public:
-        Tq_task(F f, const char* name, zce_semaphore* sem)
-            : zce_task(name ? name : "Tq_task"), f_(f), sem_(sem) {
-#    ifdef _DEBUG
-            if (sem_) {  // ensure sem is 0
-                bool isget = sem_->try_acquire();
-                ZCE_ASSERT_TEXT(!isget, "deadlock detected!");
-                if (isget) sem_->release();
-            }
-#    endif
-        }
-
-        virtual void call() {
-            try {
-                f_();
-            } catch (const std::exception& ex) {
-                ZCE_ASSERT_TEXT(false, ex.what());
-            } catch (...) {
-                ZCE_ASSERT_TEXT(false, "unknow exception");
-            }
-            if (sem_) sem_->release();
-        }
-    };
-
-    if (bwait) {
-        zce_tss::zce_global_semaphore global_semaphore;
-        zce_smartptr<zce_task> task_ptr(new Tq_task(f, name, global_semaphore.sem));
-        int ret = enqueue(task_ptr);
-        global_semaphore.sem->acquire();
-        return ret;
-    } else {
-        zce_smartptr<zce_task> task_ptr(new Tq_task(f, name, 0));
-        return enqueue(task_ptr);
-    }
-};
 
 template <typename QueueSubType, typename Params, typename Results>
 class zce_task_map_reduce : public zce_object {
@@ -145,7 +103,7 @@ class zce_task_map_reduce : public zce_object {
         zce_smartptr<zce_task_map_reduce> this_ptr(this);
         for (size_t i = 0; i < queue_size_; ++i) {
             if (!if_work_queue[i]) continue;
-            queue_vec_[i]->enqueue(false, __FUNCTION__, [=]() {
+            queue_vec_[i]->delegate(false, __FUNCTION__, [=]() {
                 process_task((int)i, this_ptr->queue_idx_vec_, this_ptr->params_,
                              this_ptr->result_);
                 if (--this_ptr->remain_tasks_ == 0) {
@@ -157,5 +115,3 @@ class zce_task_map_reduce : public zce_object {
         return 0;
     }
 };
-
-#endif  // __zce_task_queue_h__
