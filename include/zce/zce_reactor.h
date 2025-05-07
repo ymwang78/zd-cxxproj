@@ -42,7 +42,8 @@ class ZCE_API zce_reactor : public zce_task_delegator {
 
     int dns_resolve(const std::string& domain, const zce_smartptr<zce_dnsresolve>& resolve_ptr);
 
-    int delegate_task(const zce_smartptr<zce_task>& task_ptr, int mstimeafter = 0) override;
+    int delegate_task(const zce_smartptr<zce_task>& task_ptr, int mstimeafter = 0,
+                      bool wait = false) override;
 
     int delegate_release(zce_object* obj) override;
 

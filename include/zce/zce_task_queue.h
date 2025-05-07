@@ -52,7 +52,7 @@ class ZCE_API zce_task_queue : public zce_task, public zce_task_delegator {
 
     void attach(const zce_smartptr<zce_task_queue>&);
 
-    int delegate_task(const zce_smartptr<zce_task>& task_ptr, int mstimeafter = 0) override;
+    int delegate_task(const zce_smartptr<zce_task>& task_ptr, int mstimeafter = 0, bool bwait = false) override;
 
     // 有些对象的释放有同步要求，必须在相关队列或者线程释放
     int delegate_release(zce_object* obj) override;

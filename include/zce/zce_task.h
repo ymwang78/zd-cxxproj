@@ -33,7 +33,7 @@ typedef zce_smartptr<zce_task> zce_task_ptr;
 
 class ZCE_API zce_task_delegator : virtual public zce_object {
   public:
-    virtual int delegate_task(const zce_smartptr<zce_task>& task_ptr, int mstimeafter = 0) = 0;
+    virtual int delegate_task(const zce_smartptr<zce_task>& task_ptr, int mstimeafter = 0, bool wait = false) = 0;
 
     virtual int delegate_release(zce_object* obj) = 0;
 
@@ -74,12 +74,12 @@ int zce_task_delegator::delegate(bool bwait, const char* name, F f) {
     if (bwait) {
         zce_tss::zce_global_semaphore global_semaphore;
         zce_smartptr<zce_task> task_ptr(new Fr_task(name, this, global_semaphore.sem, f));
-        int ret = delegate_task(task_ptr);
+        int ret = delegate_task(task_ptr, 0, true);
         global_semaphore.sem->acquire();
         return ret;
     } else {
         zce_smartptr<zce_task> task_ptr(new Fr_task(name, this, 0, f));
-        return delegate_task(task_ptr);
+        return delegate_task(task_ptr, 0, false);
     }
 };
 
