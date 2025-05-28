@@ -29,6 +29,8 @@ extern "C"
 
     void ZCE_API zce_fini();
 
+    int ZCE_API zce_init_pyenv(const char* relative_path);
+
     struct tm * ZCE_API zce_localtime_r(const time_t *t, struct tm *res);
 
     zce_uint64 ZCE_API zce_tick();

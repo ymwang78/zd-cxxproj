@@ -429,3 +429,84 @@ class zce_array {  // skew heap
     const_iterator cbegin() const { return begin(); }
     const_iterator cend() const { return end(); }
 };
+
+#include <unordered_map>
+#include <functional>
+#include <optional>
+
+template <typename T, typename KeyType, typename GetKeyFunc>
+class zce_indexed_array {
+  public:
+    zce_indexed_array() : key_func_([](const T& item) -> KeyType { return item.name; }) {}
+
+    explicit zce_indexed_array(std::function<KeyType(const T&)> key_func)
+        : key_func_(std::move(key_func)) {}
+
+    template <typename T_S>
+    int add(T_S&& s_param, bool replace_if_exists = false) {
+        KeyType key = key_func_(s_param);
+        auto it = name_to_index_.find(key);
+
+        if (it != name_to_index_.end()) {
+            if (replace_if_exists) {
+                data_[it->second] = std::forward<T_S>(s_param);
+                return (int)it->second;
+            } else {
+                return -1;
+            }
+        } else {
+            data_.push_back(std::forward<T_S>(s_param));
+            name_to_index_[key] = data_.size() - 1;
+            return (int)(data_.size() - 1);
+        }
+    }
+
+    int get_index(const KeyType& key) const {
+        auto it = name_to_index_.find(key);
+        if (it != name_to_index_.end()) {
+            return (int)it->second;
+        }
+        return -1;
+    }
+
+    std::optional<const T*> find(const KeyType& key) const {
+        auto it = name_to_index_.find(key);
+        if (it != name_to_index_.end()) {
+            return &data_[it->second];
+        }
+        return std::nullopt;
+    }
+
+    const std::vector<T>& data() const { return data_; }
+
+    T& operator[](size_t index) {
+        if (index < data_.size()) {
+            return data_[index];
+        }
+        throw std::out_of_range("Index out of bounds");
+    }
+
+    const T& operator[](size_t index) const {
+        if (index < data_.size()) {
+            return data_[index];
+        }
+        throw std::out_of_range("Index out of bounds");
+    }
+
+    void clear() {
+        data_.clear();
+        name_to_index_.clear();
+    }
+
+    void reserve(size_t n) {
+        data_.reserve(n);
+        name_to_index_.reserve(n);
+    }
+
+    size_t size() const { return data_.size(); }
+
+  private:
+    std::vector<T> data_;
+    std::unordered_map<KeyType, size_t> name_to_index_;
+    std::function<KeyType(const T&)> key_func_;
+};
