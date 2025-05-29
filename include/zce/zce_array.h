@@ -452,6 +452,7 @@ class zce_indexed_array {
                 data_[it->second] = std::forward<T_S>(s_param);
                 return (int)it->second;
             } else {
+                ZCE_ASSERT(false);
                 return -1;
             }
         } else {

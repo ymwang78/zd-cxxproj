@@ -1,6 +1,7 @@
 *.o
 *.a
 *.so
+*.user
 include/boost
 vsvr
 vwin
@@ -13,16 +14,8 @@ HostVM
 RpcDemo
 TaiJiMPC
 
-# 忽略所有一级目录
 /*/
 
-# 允许 bin, include, lib 目录
-!bin/
-!include/
-!lib/
-!libsrc/
-
-# 忽略 bin, include, lib 目录下的空子目录
 bin/*
 include/*
 lib/*
@@ -34,9 +27,4 @@ libsrc/libubeda
 libsrc/libzce
 libsrc/libzdl
 
-# 允许 bin, include, lib 目录下的所有文件
-!bin/**
-!include/**
-!lib/**
-!libsrc/**
 
