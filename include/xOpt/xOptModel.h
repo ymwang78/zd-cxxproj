@@ -21,9 +21,21 @@ class xOptProblem;
 
 class XOPTIF_API xOptModel {
   public:
+
+      enum PROBLEM_TYPE {
+        PROBLEM_TYPE_SIMULATION,
+        PROBLEM_TYPE_OPTIMIZATION,
+        PROBLEM_TYPE_PARAMETER_ESTIMATION,
+        PROBLEM_TYPE_LIMIT
+      };
+
     virtual ~xOptModel() = 0;
 
-    virtual int validateModel() const = 0;
+    // 设置组分列表：
+    // 组分列表的名字约定为
+    //["C1P", "C2P", "C3P", "C4P", "C5P", "C6P", "C7P", "C8P", "C9P", "C10P", "C6N", "C7N", "C8N",
+    //"C9N", "C10N", "C6A", "C7A", "C8A", "C9A", "C10A", "H2"]
+    virtual int setComponents(const char* names[], int size) = 0;
 
     // parameter指不在模型方程组中作为变量出现的参数，可能会影响方程结构
     // 例如：板效率
@@ -31,11 +43,7 @@ class XOPTIF_API xOptModel {
 
     virtual int setParamter(const char* name, const char* value) = 0;
 
-    // 设置组分列表：
-    // 组分列表的名字约定为
-    //["C1P", "C2P", "C3P", "C4P", "C5P", "C6P", "C7P", "C8P", "C9P", "C10P", "C6N", "C7N", "C8N",
-    //"C9N", "C10N", "C6A", "C7A", "C8A", "C9A", "C10A", "H2"]
-    virtual int setComponents(const char* names[], int size) = 0;
+    virtual int setProblemType(PROBLEM_TYPE) = 0;
 
     // 获取可以被fix的变量，如：回流比、板效率
     // 根据用户界面配置是否被fix
@@ -60,6 +68,8 @@ class XOPTIF_API xOptModel {
     // 获取出料流股对应的变量映射表
     virtual int getOutPortVariableMap(int iPortIndex, const char* streamNames[],
                                       const char* variableNames[], int& size) = 0;
+
+    virtual int validateModel() const = 0;
 
     // 构造对应的xOptProblem
     virtual xOptProblem* buildProblem() = 0;
