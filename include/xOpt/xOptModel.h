@@ -22,13 +22,6 @@ class xOptProblem;
 class XOPTIF_API xOptModel {
   public:
 
-      enum PROBLEM_TYPE {
-        PROBLEM_TYPE_SIMULATION,
-        PROBLEM_TYPE_OPTIMIZATION,
-        PROBLEM_TYPE_PARAMETER_ESTIMATION,
-        PROBLEM_TYPE_LIMIT
-      };
-
     virtual ~xOptModel() = 0;
 
     // 设置组分列表：
@@ -39,11 +32,11 @@ class XOPTIF_API xOptModel {
 
     // parameter指不在模型方程组中作为变量出现的参数，可能会影响方程结构
     // 例如：板效率
-    virtual int getParamters(const char* names[], const char* values[], int& size) = 0;
+    virtual int getParameters(const char* names[], const char* values[], int& size) = 0;
 
-    virtual int setParamter(const char* name, const char* value) = 0;
+    virtual int setParameter(const char* name, const char* value) = 0;
 
-    virtual int setProblemType(PROBLEM_TYPE) = 0;
+    virtual int setProblemType(XOPTF_PROBLEM_TYPE) = 0;
 
     // 获取可以被fix的变量，如：回流比、板效率
     // 根据用户界面配置是否被fix

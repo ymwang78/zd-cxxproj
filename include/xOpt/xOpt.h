@@ -22,7 +22,6 @@
 #    define ZCE_API __attribute__((visibility("default")))
 #endif
 
-
 #ifndef ZCE_DEFINED_LOGLEVEL
 typedef enum _zlog_level {
     ZLOG_TRACE = 0,
@@ -40,6 +39,13 @@ typedef enum _zlog_level {
 
 class xOptSolver;
 class xOptProblem;
+class xOptModel;
+
+struct XOPT_API xOptModelArgs {
+    const char* model_type;
+    const char* model_path;
+    xOptProblem* problem;
+};
 
 class XOPT_API xOpt {
   public:
@@ -49,4 +55,5 @@ class XOPT_API xOpt {
     static void printX(xOptSolver*);
 
     static void printF(xOptSolver*);
+
 };
