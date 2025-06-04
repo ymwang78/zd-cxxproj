@@ -21,3 +21,13 @@
 #else
 #    define XOPTIF_API __attribute__((visibility("default")))
 #endif
+
+enum XOPTF_ERRCODE : int { 
+    XOPTF_OK = 0,
+
+    XOPTF_SUCCE_BASE = 5290000,
+
+    XOPTF_ERROR_BASE = 85290000,
+    XOPTF_ERROR_UNIMPLEMENT, // 未实现接口, 例如不支持固定变量
+    XOPTF_ERROR_INVALID,     // 数据无效, 例如固定的变量列表不合法
+};
