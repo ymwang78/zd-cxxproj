@@ -1,4 +1,19 @@
-﻿bin/*
+﻿# 忽略所有内容
+/*
+# 允许根目录下的所有文件（不包括文件夹）
+!/*.*
+.vscode/*
+!.vscode/settings.json
+!.vscode/launch.json
+!.vscode/tasks.json
+
+# 取消忽略特定文件夹
+!bin/
+!include/
+!lib/
+!libsrc/
+
+bin/*
 include/boost/*
 include/win32/*
 include/win64/*
@@ -11,9 +26,10 @@ libsrc/libubeda
 libsrc/libzce
 libsrc/libzdl
 
-ControlLink
-HostVM
-InstallXpress
-TaijiMPC
+.vscode/*
+!.vscode/settings.json
+!.vscode/launch.json
+!.vscode/tasks.json
+
 
 
