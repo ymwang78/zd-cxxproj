@@ -9,17 +9,16 @@
 // ***************************************************************
 //
 // ***************************************************************
-
-#ifdef _WIN32
-#    ifndef XOPT_API
+#ifndef XOPT_API
+#    ifdef _WIN32
 #        ifdef XOPT_EXPORTS
 #            define XOPT_API __declspec(dllexport)
 #        else
 #            define XOPT_API __declspec(dllimport)
 #        endif
+#    else
+#        define ZCE_API __attribute__((visibility("default")))
 #    endif
-#else
-#    define ZCE_API __attribute__((visibility("default")))
 #endif
 
 #ifndef ZCE_DEFINED_LOGLEVEL
@@ -36,15 +35,16 @@ typedef enum _zlog_level {
 #    define ZCE_DEFINED_LOGLEVEL
 #endif
 
-
 class xOptSolver;
 class xOptProblem;
-class xOptModel;
+class xOptModelBase;
 
 struct XOPT_API xOptModelArgs {
     const char* model_type;
     const char* model_path;
-    xOptProblem* problem;
+    const char* problem_type;
+    const char* problem_path;
+    const char* thermo_path;
 };
 
 class XOPT_API xOpt {
@@ -56,4 +56,8 @@ class XOPT_API xOpt {
 
     static void printF(xOptSolver*);
 
+    static xOptProblem* createProblem(const char* problem_name, const char* problem_type,
+                                      const char* problem_path, const void* arg);
+
+    static xOptModelBase* createModel(const char* model_name, const xOptModelArgs* context);
 };
