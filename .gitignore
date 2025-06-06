@@ -17,12 +17,13 @@ bin/*
 include/boost/*
 lib/*
 libsrc/*
-libsrc/libcoin
-libsrc/libidh
-libsrc/libslot
-libsrc/libubeda
-libsrc/libzce
-libsrc/libzdl
+!libsrc/lexilla
+!libsrc/libhiredis
+!libsrc/libjson
+!libsrc/liblua
+!libsrc/libpbc
+!libsrc/libzlib
+!libsrc/scintilla
 
 .vscode/*
 !.vscode/settings.json
