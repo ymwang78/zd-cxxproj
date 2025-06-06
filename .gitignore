@@ -15,7 +15,6 @@
 
 bin/*
 include/boost/*
-lib/*
 libsrc/*
 !libsrc/lexilla
 !libsrc/libhiredis
