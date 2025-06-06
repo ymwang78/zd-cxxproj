@@ -15,8 +15,6 @@
 
 bin/*
 include/boost/*
-include/win32/*
-include/win64/*
 lib/*
 libsrc/*
 libsrc/libcoin
