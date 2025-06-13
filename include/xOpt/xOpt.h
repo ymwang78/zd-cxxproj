@@ -9,6 +9,9 @@
 // ***************************************************************
 //
 // ***************************************************************
+#include <string>
+#include <vector>
+
 #ifndef XOPT_API
 #    ifdef _WIN32
 #        ifdef XOPT_EXPORTS
@@ -47,8 +50,23 @@ struct XOPT_API xOptModelArgs {
     const char* thermo_path;
 };
 
+struct SolverParameter {
+    std::string name;
+    std::string type;
+    std::string default_value;
+    std::string description;
+};
+
+struct SolverInfo {
+    std::string name;
+    std::string solver_path;
+    std::vector<SolverParameter> parameters;
+};
+
 class XOPT_API xOpt {
   public:
+    static int registerSolver(const SolverInfo& solver);
+
     static xOptSolver* createSolver(const char* name, xOptProblem* problem,
                                     const char* solver_name = "IPOPT");
 
