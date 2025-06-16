@@ -16,9 +16,11 @@
 #include <map>
 #include <unordered_map>
 
-typedef std::pair<std::string, std::string> xOptModelParameter;
+using  xOptModelParameter = std::pair<std::string, std::string> ;
 
-typedef std::unordered_map<std::string, std::string> xOptVarCompMap;
+using xOptModelParameters = std::unordered_map<std::string, std::string>;
+
+using xOptVarCompMap = std::unordered_map<std::string, std::string> ;
 
 struct xOptModelDescT {
     std::vector<xOptModelParameter> parameters;
@@ -117,6 +119,8 @@ class xOptModelBase {
     virtual std::vector<xOptModelParameter> getParameters() const = 0;
 
     virtual int setParameter(const xOptModelParameter& parameter) = 0;
+
+    virtual int setParameters(const xOptModelParameters& parameters);
 
     virtual int setComponents(const std::vector<std::string>& components) = 0;
 

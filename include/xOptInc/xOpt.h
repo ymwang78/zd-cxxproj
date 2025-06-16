@@ -67,7 +67,6 @@ struct SolverInfo {
     std::vector<SolverParameter> parameters;
 };
 
-
 using xOptIndexMap = std::map<std::string, std::pair<std::string, std::string>>;
 
 struct xOptParsedExternal {
