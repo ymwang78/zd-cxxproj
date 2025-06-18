@@ -27,7 +27,7 @@ class xOptModelSym : public xOptModelBase {
 
     int setProblemType(XOPTF_PROBLEM_TYPE) override;
 
-    std::vector<xOptModelParameter> getParameters() const override;
+    xOptModelParameters getParameters() const override;
 
     int setParameter(const xOptModelParameter& parameter) override;
 
@@ -38,8 +38,6 @@ class xOptModelSym : public xOptModelBase {
     std::vector<std::string> getFixableVariables() const override;
 
     int fixVariables(const std::vector<std::string>& varnames) override;
-
-    int unFixVariables(const std::vector<std::string>& varnames) override { return -1; };
 
     std::vector<int> getFixedVariableIndexes() override { return std::vector<int>(); }
 

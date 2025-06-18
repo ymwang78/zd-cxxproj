@@ -8,6 +8,10 @@ vcpkg install openssl:x64-windows-static-md
 vcpkg install uriparser:x64-windows-static-md 
 vcpkg install sol2:x64-windows-static-md 
 vcpkg install minizip-ng:x64-windows-static-md
+vcpkg install nlohmann-json:x64-windows-static-md
+vcpkg install libuv:x64-windows-static-md
+vcpkg install mongo-cxx-driver:x64-windows-static-md
+vcpkg install mysql:x64-windows-static-md
 
 rem TaijiMPC client requirements
 vcpkg install bzip2:x86-windows-static

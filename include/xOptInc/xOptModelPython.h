@@ -22,7 +22,7 @@ class xOptModelPython : public xOptModelBase {
 
     int setProblemType(XOPTF_PROBLEM_TYPE) override;
 
-    std::vector<xOptModelParameter> getParameters() const override;
+    xOptModelParameters getParameters() const override;
 
     int setParameter(const xOptModelParameter& parameter) override;
 
@@ -33,8 +33,6 @@ class xOptModelPython : public xOptModelBase {
     std::vector<std::string> getFixableVariables() const override;
 
     int fixVariables(const std::vector<std::string>& varnames) override;
-
-    int unFixVariables(const std::vector<std::string>& varnames) override;
 
     std::vector<int> getFixedVariableIndexes() override;
 

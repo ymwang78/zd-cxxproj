@@ -23,7 +23,7 @@ using xOptModelParameters = std::unordered_map<std::string, std::string>;
 using xOptVarCompMap = std::unordered_map<std::string, std::string> ;
 
 struct xOptModelDescT {
-    std::vector<xOptModelParameter> parameters;
+    xOptModelParameters parameters;
     std::vector<std::string> fixable_varnames;
     std::vector<xOptVarCompMap> inports_var_comp_map_vec;
     std::vector<xOptVarCompMap> outports_var_comp_map_vec;
@@ -116,7 +116,7 @@ class xOptModelBase {
 
     virtual int setProblemType(XOPTF_PROBLEM_TYPE) = 0;
 
-    virtual std::vector<xOptModelParameter> getParameters() const = 0;
+    virtual xOptModelParameters getParameters() const = 0;
 
     virtual int setParameter(const xOptModelParameter& parameter) = 0;
 
@@ -129,8 +129,6 @@ class xOptModelBase {
     virtual std::vector<std::string> getFixableVariables() const = 0;
 
     virtual int fixVariables(const std::vector<std::string>& varnames) = 0;
-
-    virtual int unFixVariables(const std::vector<std::string>& varnames) = 0;
 
     virtual std::vector<int> getFixedVariableIndexes() = 0;
 
