@@ -16,9 +16,11 @@
 #include <map>
 #include <unordered_map>
 
-using  xOptModelParameter = std::pair<std::string, std::string> ;
+using xOptModelParameter = std::pair<std::string, double> ;
 
-using xOptModelParameters = std::unordered_map<std::string, std::string>;
+using xOptModelParameters = std::unordered_map<std::string, double>;
+
+using xOptModelFixableVariables = std::unordered_map<std::string, double>;
 
 using xOptVarCompMap = std::unordered_map<std::string, std::string> ;
 
@@ -99,6 +101,7 @@ struct xOptPort {
 class xOptProblem;
 
 class xOptModelBase {
+  protected:
     std::string name_;
     std::vector<double> X_;
 
@@ -126,13 +129,11 @@ class xOptModelBase {
 
     virtual int validateModel() const = 0;
 
-    virtual std::vector<std::string> getFixableVariables() const = 0;
+    virtual xOptModelFixableVariables getFixableVariables() const = 0;
 
-    virtual int fixVariables(const std::vector<std::string>& varnames) = 0;
+    virtual int fixVariables(const xOptModelFixableVariables& varnames) = 0;
 
-    virtual std::vector<int> getFixedVariableIndexes() = 0;
-
-    virtual xOptParsedVariableArr getVariables() const = 0;
+    virtual xOptParsedVariableArr getVariables() const;
 
     virtual int setVariableValue(const std::string& varname, double value) { return 0; };
 

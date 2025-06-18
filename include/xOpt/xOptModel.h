@@ -32,18 +32,18 @@ class XOPTIF_API xOptModel {
 
     // parameter指不在模型方程组中作为变量出现的参数，可能会影响方程结构
     // 例如：板效率
-    virtual int getParameters(const char* names[], const char* values[], int& size) = 0;
+    virtual int getParameters(const char* names[], const double* values[], int& size) = 0;
 
-    virtual int setParameter(const char* name, const char* value) = 0;
+    virtual int setParameter(const char* name, double value) = 0;
 
     virtual int setProblemType(XOPTF_PROBLEM_TYPE) = 0;
 
-    // 获取可以被fix的变量，如：回流比、板效率
+    // 获取可以被fix的变量以及初值，如：回流比、板效率
     // 根据用户界面配置是否被fix
-    virtual int getFixableVariables(const char* names[], int& size) = 0;
+    virtual int getFixableVariables(const char* names[], double values[], int& size) = 0;
 
     // 固定变量, 返回值参考XOPTF_ERRCODE
-    virtual int fixVariables(const char* names[], int& size) = 0;
+    virtual int fixVariables(const char* names[], const double values[], int size) = 0;
 
     // 获取进料流股的个数，不考虑能量流股
     virtual int getInPortNum() = 0;

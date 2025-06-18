@@ -28,11 +28,9 @@ class xOptModelProblemWithDesc : public xOptModelBase {
 
     int setComponents(const std::vector<std::string>& components) override;
 
-    std::vector<std::string> getFixableVariables() const override;
+    xOptModelFixableVariables getFixableVariables() const override;
 
-    int fixVariables(const std::vector<std::string>& varnames) override;
-
-    std::vector<int> getFixedVariableIndexes() override;
+    int fixVariables(const xOptModelFixableVariables& varnames) override;
 
     xOptModelParameters getParameters() const override;
 

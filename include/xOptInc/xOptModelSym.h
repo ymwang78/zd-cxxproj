@@ -35,11 +35,9 @@ class xOptModelSym : public xOptModelBase {
 
     int validateModel() const override;
 
-    std::vector<std::string> getFixableVariables() const override;
+    xOptModelFixableVariables getFixableVariables() const override;
 
-    int fixVariables(const std::vector<std::string>& varnames) override;
-
-    std::vector<int> getFixedVariableIndexes() override { return std::vector<int>(); }
+    int fixVariables(const xOptModelFixableVariables& varnames) override;
 
     xOptParsedVariableArr getVariables() const override;
 

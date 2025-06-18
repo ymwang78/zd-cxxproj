@@ -26,9 +26,8 @@ class xOptModelBlackBox : public xOptModelBase {
     int setParameter(const xOptModelParameter& parameter) override;
     int setComponents(const std::vector<std::string>& components) override;
     int validateModel() const override;
-    std::vector<std::string> getFixableVariables() const override;
-    int fixVariables(const std::vector<std::string>& varnames) override;
-    std::vector<int> getFixedVariableIndexes() override { return std::vector<int>(); }
+    xOptModelFixableVariables getFixableVariables() const override;
+    int fixVariables(const xOptModelFixableVariables& varnames) override;
     xOptParsedVariableArr getVariables() const override;
     int getPortNum(bool is_input_port) const override;
     xOptVarCompMap getVarCompMap(bool isInPort, int iIndex) const override;
