@@ -46,6 +46,9 @@ class xOptSolver;
 class xOptProblem;
 class xOptModelBase;
 
+typedef xOptSolver* (*CreateSolverFunc)(const char*, xOptProblem*);
+typedef void (*RelaseSolverFunc)(xOptSolver*);
+
 struct XOPT_API xOptModelArgs {
     const char* model_type;
     const char* model_path;
@@ -64,6 +67,9 @@ struct SolverParameter {
 struct SolverInfo {
     std::string name;
     std::string solver_path;
+    std::string status;
+    CreateSolverFunc lpfn_create_solver;
+    RelaseSolverFunc lpfn_release_solver;
     std::vector<SolverParameter> parameters;
 };
 

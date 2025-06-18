@@ -55,3 +55,8 @@ class XOPTIF_API xOptSolver {
     virtual int Fmul(double* x, int x_size) const = 0;
 
 };
+
+typedef xOptSolver* (*CreateSolverFunc)(const char*, xOptProblem*);
+typedef void (*RelaseSolverFunc)(xOptSolver*);
+
+
