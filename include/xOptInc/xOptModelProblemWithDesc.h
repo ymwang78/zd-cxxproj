@@ -34,7 +34,7 @@ class xOptModelProblemWithDesc : public xOptModelBase {
 
     xOptModelParameters getParameters() const override;
 
-    int setParameter(const xOptModelParameter& parameter) override;
+    int setParameters(const xOptModelParameters& parameters) override;
 
     xOptParsedVariableArr getVariables() const override;
 

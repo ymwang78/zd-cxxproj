@@ -23,7 +23,7 @@ class xOptModelBlackBox : public xOptModelBase {
     // 实现xOptModelBase的所有接口
     int setProblemType(XOPTF_PROBLEM_TYPE) override;
     xOptModelParameters getParameters() const override;
-    int setParameter(const xOptModelParameter& parameter) override;
+    int setParameters(const xOptModelParameters& parameters) override;
     int setComponents(const std::vector<std::string>& components) override;
     int validateModel() const override;
     xOptModelFixableVariables getFixableVariables() const override;

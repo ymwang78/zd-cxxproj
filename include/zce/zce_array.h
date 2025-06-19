@@ -228,7 +228,7 @@ class zce_array {  // skew heap
                 slots_.resize(
                     std::min(capacity_limit_, std::max((size_t)index + 1, slots_.size() * 2)));
             }
-            for (int i = cur_top_; i < index - 1; ++i) {
+            for (int i = cur_top_; i < index; ++i) {
                 slots_[i].heap_node_.inuse = 0;
                 slots_[i].heap_node_.parent = -1;
                 slots_[i].heap_node_.left = -1;

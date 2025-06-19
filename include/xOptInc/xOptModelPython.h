@@ -25,8 +25,6 @@ class xOptModelPython : public xOptModelBase {
 
     xOptModelParameters getParameters() const override;
 
-    int setParameter(const xOptModelParameter& parameter) override;
-
     int setParameters(const xOptModelParameters& parameters) override;
 
     int setComponents(const std::vector<std::string>& components) override;
@@ -44,9 +42,6 @@ class xOptModelPython : public xOptModelBase {
     int getPortNum(bool is_input_port) const override;
 
     xOptVarCompMap getVarCompMap(bool is_input_port, int index) const override;
-
-    std::vector<int> getCompVariableIndexes(const xOptStreamType& stream, bool is_input_port,
-                                            int index) const override;
 
     xOptProblem* buildProblem() override;
 

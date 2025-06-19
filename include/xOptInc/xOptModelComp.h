@@ -39,7 +39,7 @@ class xOptModelComp : public xOptModelBase {
 
     xOptModelParameters getParameters() const override;
 
-    int setParameter(const xOptModelParameter& parameter) override;
+    int setParameters(const xOptModelParameters& parameters) override;
 
     int setComponents(const std::vector<std::string>& components) override;
 

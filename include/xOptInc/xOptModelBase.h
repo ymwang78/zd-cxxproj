@@ -55,6 +55,8 @@ class xOptStreamType {
 
     const std::vector<std::string>& getComponents() const;
 
+    const std::vector<std::string>& getVariableNames() const;
+
     bool hasComponent(const std::string& comp_name) const;
 
     int addVariableTemplate(const VariableTemplate& var_def);
@@ -121,13 +123,11 @@ class xOptModelBase {
 
     virtual xOptModelParameters getParameters() const = 0;
 
-    virtual int setParameter(const xOptModelParameter& parameter) = 0;
-
-    virtual int setParameters(const xOptModelParameters& parameters);
+    virtual int setParameters(const xOptModelParameters& parameters) = 0;
 
     virtual int setComponents(const std::vector<std::string>& components) = 0;
 
-    virtual int validateModel() const = 0;
+    virtual int validateModel() const= 0;
 
     virtual xOptModelFixableVariables getFixableVariables() const = 0;
 
@@ -141,7 +141,7 @@ class xOptModelBase {
 
     virtual xOptVarCompMap getVarCompMap(bool is_input_port, int index) const = 0;
 
-    virtual std::vector<int> getCompVariableIndexes(const xOptStreamType& stream,
+    virtual std::vector<int> getStreamVariableIndexes(const xOptStreamType& stream,
                                                          bool is_input_port, int index) const;
 
     virtual xOptProblem* buildProblem() = 0;

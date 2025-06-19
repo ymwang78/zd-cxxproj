@@ -34,7 +34,7 @@ class XOPTIF_API xOptModel {
     // 例如：板效率
     virtual int getParameters(const char* names[], const double* values[], int& size) = 0;
 
-    virtual int setParameter(const char* name, double value) = 0;
+    virtual int setParameters(const char* name[], double value[], int size) = 0;
 
     virtual int setProblemType(XOPTF_PROBLEM_TYPE) = 0;
 
@@ -62,7 +62,7 @@ class XOPTIF_API xOptModel {
     virtual int getOutPortVariableMap(int iPortIndex, const char* streamNames[],
                                       const char* variableNames[], int& size) = 0;
 
-    virtual int validateModel() const = 0;
+    virtual int validateModel() const= 0;
 
     // 构造对应的xOptProblem
     virtual xOptProblem* buildProblem() = 0;
