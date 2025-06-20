@@ -144,6 +144,8 @@ class xOptModelBase {
     virtual std::vector<int> getStreamVariableIndexes(const xOptStreamType& stream,
                                                          bool is_input_port, int index) const;
 
+    virtual std::vector<int> getFixableVariableIndexes(const xOptModelFixableVariables& vars) const;
+
     virtual xOptProblem* buildProblem() = 0;
 
     virtual xOptProblem* getProblem() const { return nullptr; }
