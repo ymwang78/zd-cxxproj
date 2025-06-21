@@ -68,11 +68,11 @@ protected:
 
     virtual bool on_stop() = 0;
 
+    virtual void print_object_stat();
+
     void enable_interrupt();
 
     void disable_interrupt();
-
-    void print_object_stat();
 
 private:
     unsigned    process_flag_;
