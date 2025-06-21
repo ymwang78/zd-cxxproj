@@ -211,7 +211,7 @@ class zce_array {  // skew heap
         int index, magic;
         mix_magic_t::seperate(handle, magic, index);
         ZCE_ASSERT_RETURN((index >= cur_top_) || (index >= 0 && index < cur_top_), -1);
-        if (slots_[index].in_use()) {
+        if (index < cur_top_ && slots_[index].in_use()) {
             if (slots_[index].data_.item == val) return 0;
             ZCE_ASSERT(false);
             return -1;
