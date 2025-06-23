@@ -143,6 +143,8 @@ struct xOptParsedModel {
 
 class XOPT_API xOpt {
   public:
+    static const std::map<std::string, SolverInfo>& getSolvers();
+
     static int registerSolver(const SolverInfo& solver);
 
     static xOptSolver* createSolver(const char* name, xOptProblem* problem,
