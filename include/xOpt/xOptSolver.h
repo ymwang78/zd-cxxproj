@@ -25,24 +25,27 @@ class XOPTIF_API xOptSolver {
         RESULT_ITER_LIMIT = 5,
     };
 
-    enum SOLVE_OPTIONS {
-        OPT_MAX_ITER = 0,
-        OPT_NONDERIVATIVE_LINESEARCH,
-        OPT_VERIFY_GRADIENT,
-        TOTAL_INTEGER_WORKSPACE,
-        TOTAL_REAL_WORKSPACE,
-        OPT_OPTIONS_LIMIT,
-    };
-
     virtual ~xOptSolver() = 0;
 
     virtual xOptProblem* getProblem() const = 0;
 
-    virtual int getParameters(double* parameters, int parameters_size) const = 0;
+    virtual int getStringOptions(const char* option_names[], const char* option_values[],
+                           int& options_size) const = 0;
 
-    virtual void setParameters(const double* parameters, int parameters_size) = 0;
+    virtual int setStringOptions(bool option_results[], const char* option_names[], const char* option_values[],
+                                 int options_size) = 0;
 
-    virtual int setParameter(SOLVE_OPTIONS option, double value) = 0;
+    virtual int getIntOptions(const char* option_names[], int option_values[],
+                              int& options_size) const = 0;
+
+    virtual int setIntOptions(bool option_results[], const char* option_names[], const int option_values[],
+                              int options_size) = 0;
+
+    virtual int getDoubleOptions(const char* option_names[], double option_values[],
+                                 int& options_size) const = 0;
+
+    virtual int setDoubleOptions(bool option_results[], const char* option_names[], const double option_values[],
+                                 int options_size) = 0;
 
     virtual int solve() = 0;
 
