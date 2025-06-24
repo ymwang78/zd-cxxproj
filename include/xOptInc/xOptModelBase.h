@@ -97,13 +97,13 @@ struct ReportMetaInfo {
     std::string preferred_display_type; // 首选显示类型: "line_chart", "table", "heatmap", "surface", etc.
     std::vector<std::string> dim_names; // 维度名称
     std::vector<std::string> units; // 每个维度的单位
-    std::vector<size_t> dim_sizes; // 维度大小   例如 [20, 5]
 };
 
 struct ReportData {
     std::vector<double> flat_data; // row-major 拍平
+    std::vector<size_t> shape; // 维度大小
 
-    double at(const std::vector<size_t>& shape, std::initializer_list<size_t> indices) const {
+    double at(std::initializer_list<size_t> indices) const {
         // 计算偏移量，按 row-major 展开规则
         size_t offset = 0;
         size_t stride = 1;
