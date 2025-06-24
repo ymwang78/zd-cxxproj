@@ -24,6 +24,7 @@ class XOPTIF_API xOptSolver {
         RESULT_UNBOUNDED = 4,
         RESULT_ITER_LIMIT = 5,
     };
+    using boolean = unsigned char;
 
     virtual ~xOptSolver() = 0;
 
@@ -32,19 +33,19 @@ class XOPTIF_API xOptSolver {
     virtual int getStringOptions(const char* option_names[], const char* option_values[],
                            int& options_size) const = 0;
 
-    virtual int setStringOptions(bool option_results[], const char* option_names[], const char* option_values[],
+    virtual int setStringOptions(boolean option_results[], const char* option_names[], const char* option_values[],
                                  int options_size) = 0;
 
     virtual int getIntOptions(const char* option_names[], int option_values[],
                               int& options_size) const = 0;
 
-    virtual int setIntOptions(bool option_results[], const char* option_names[], const int option_values[],
+    virtual int setIntOptions(boolean option_results[], const char* option_names[], const int option_values[],
                               int options_size) = 0;
 
     virtual int getDoubleOptions(const char* option_names[], double option_values[],
                                  int& options_size) const = 0;
 
-    virtual int setDoubleOptions(bool option_results[], const char* option_names[], const double option_values[],
+    virtual int setDoubleOptions(boolean option_results[], const char* option_names[], const double option_values[],
                                  int options_size) = 0;
 
     virtual int solve() = 0;
