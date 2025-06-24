@@ -19,17 +19,19 @@ class xOptModelPython : public xOptModelBase {
 
     ~xOptModelPython();
 
-    int initialize() override;
+    int initializeModel() override;
 
     int setProblemType(XOPTF_PROBLEM_TYPE) override;
+
+    int setComponents(const std::vector<std::string>& components) override;
 
     xOptModelParameters getParameters() const override;
 
     int setParameters(const xOptModelParameters& parameters) override;
 
-    int setComponents(const std::vector<std::string>& components) override;
-
     int validateModel() const override;
+
+    int prepareRuntime() override;
 
     xOptModelFixableVariables getFixableVariables() const override;
 
@@ -43,9 +45,11 @@ class xOptModelPython : public xOptModelBase {
 
     xOptVarCompMap getVarCompMap(bool is_input_port, int index) const override;
 
-    xOptProblem* buildProblem() override;
-
     xOptProblem* getProblem() const override;
+
+    std::vector<ReportMetaInfo> getReportMetas() const override;
+
+    ReportData getReportByMetaName(const std::string& name) const override;
 
   private:
     struct Impl;

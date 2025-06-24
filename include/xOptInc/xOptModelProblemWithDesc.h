@@ -22,19 +22,23 @@ class xOptModelProblemWithDesc : public xOptModelBase {
 
     ~xOptModelProblemWithDesc();
 
-    int validateModel() const override;
+    int initializeModel() override;
 
     int setProblemType(XOPTF_PROBLEM_TYPE) override;
 
     int setComponents(const std::vector<std::string>& components) override;
 
+    xOptModelParameters getParameters() const override;
+
+    int setParameters(const xOptModelParameters& parameters) override;
+
     xOptModelFixableVariables getFixableVariables() const override;
 
     int fixVariables(const xOptModelFixableVariables& varnames) override;
 
-    xOptModelParameters getParameters() const override;
+    int validateModel() const override;
 
-    int setParameters(const xOptModelParameters& parameters) override;
+    int prepareRuntime() override;
 
     xOptParsedVariableArr getVariables() const override;
 
@@ -42,9 +46,11 @@ class xOptModelProblemWithDesc : public xOptModelBase {
 
     xOptVarCompMap getVarCompMap(bool isInPort, int iIndex) const override;
 
-    xOptProblem* buildProblem() override;
+    xOptProblem* getProblem() const override;
 
-    virtual xOptProblem* getProblem() const override;
+    std::vector<ReportMetaInfo> getReportMetas() const override;
+
+    ReportData getReportByMetaName(const std::string& name) const override;
 
   private:
     struct Impl;

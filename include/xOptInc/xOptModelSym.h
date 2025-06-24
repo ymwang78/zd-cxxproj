@@ -25,19 +25,23 @@ class xOptModelSym : public xOptModelBase {
     // 以下函数为xOptModelBase的接口
     //////////////////////////////////////////////////////////////////////////////////
 
+    int initializeModel() override;
+
     int setProblemType(XOPTF_PROBLEM_TYPE) override;
+
+    int setComponents(const std::vector<std::string>& components) override;
 
     xOptModelParameters getParameters() const override;
 
     int setParameters(const xOptModelParameters& parameters) override;
 
-    int setComponents(const std::vector<std::string>& components) override;
-
-    int validateModel() const override;
-
     xOptModelFixableVariables getFixableVariables() const override;
 
     int fixVariables(const xOptModelFixableVariables& varnames) override;
+
+    int validateModel() const override;
+
+    int prepareRuntime() override;
 
     xOptParsedVariableArr getVariables() const override;
 
@@ -45,7 +49,11 @@ class xOptModelSym : public xOptModelBase {
 
     xOptVarCompMap getVarCompMap(bool isInPort, int iIndex) const override;
 
-    xOptProblem* buildProblem() override;
+    xOptProblem* getProblem() const override;
+
+    std::vector<ReportMetaInfo> getReportMetas() const override;
+
+    ReportData getReportByMetaName(const std::string& name) const override;
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
     int loadFromFile(const std::string& filepath);
@@ -71,5 +79,5 @@ class xOptModelSym : public xOptModelBase {
 
   private:
     struct Impl;
-    struct Impl* m_pimpl;
+    struct Impl* impl_;
 };

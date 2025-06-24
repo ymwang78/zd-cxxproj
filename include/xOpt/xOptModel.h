@@ -32,7 +32,7 @@ class XOPTIF_API xOptModel {
 
     // parameter指不在模型方程组中作为变量出现的参数，可能会影响方程结构
     // 例如：板效率
-    virtual int getParameters(const char* names[], const double* values[], int& size) = 0;
+    virtual int getParameters(const char* names[], double defualt_values[], int& size) = 0;
 
     virtual int setParameters(const char* name[], double value[], int size) = 0;
 
@@ -40,7 +40,7 @@ class XOPTIF_API xOptModel {
 
     // 获取可以被fix的变量以及初值，如：回流比、板效率
     // 根据用户界面配置是否被fix
-    virtual int getFixableVariables(const char* names[], double values[], int& size) = 0;
+    virtual int getFixableVariables(const char* names[], double initial_values[], int& size) = 0;
 
     // 固定变量, 返回值参考XOPTF_ERRCODE
     virtual int fixVariables(const char* names[], const double values[], int size) = 0;
@@ -66,4 +66,12 @@ class XOPTIF_API xOptModel {
 
     // 构造对应的xOptProblem
     virtual xOptProblem* buildProblem() = 0;
+
+    virtual void deleteProblem(xOptProblem* problem) = 0;
+
+    virtual int getReportMetaAbstracts(const char* names[], const char* titles[], const char* descriptions[], const char* preferred_display_types[], int dim_size[] , int& size) = 0;
+
+    virtual int getReportMetaDims(const char* dim_names[], const char* dim_units[], const int dim_sizes[], const char* name, int dim_size) = 0;
+
+    virtual int getReportData(double data[], const char* name, int& data_size) = 0;
 };

@@ -25,19 +25,27 @@ class xOptModelFixVars : public xOptModelBase {
 
     int clearUnfixedVariables();
 
+    //================= 模型初始化 ==================
+
+    int initializeModel() override;
+
+    int setComponents(const std::vector<std::string>& components) override;
+
     int setProblemType(XOPTF_PROBLEM_TYPE) override;
 
     xOptModelParameters getParameters() const override;
 
     int setParameters(const xOptModelParameters& parameters) override;
 
-    int setComponents(const std::vector<std::string>& components) override;
+    xOptModelFixableVariables getFixableVariables() const override;
+
+    int fixVariables(const xOptModelFixableVariables& varnames) override;
 
     int validateModel() const override;
 
-   xOptModelFixableVariables getFixableVariables() const override;
+    //================= 模型运行时 ==================
 
-    int fixVariables(const xOptModelFixableVariables& varnames) override;
+    int prepareRuntime() override;
 
     xOptParsedVariableArr getVariables() const override;
 
@@ -47,7 +55,11 @@ class xOptModelFixVars : public xOptModelBase {
 
     xOptVarCompMap getVarCompMap(bool is_input_port, int index) const override;
 
-    xOptProblem* buildProblem() override;
+    xOptProblem* getProblem() const override;
+
+    std::vector<ReportMetaInfo> getReportMetas() const override;
+    
+    ReportData getReportByMetaName(const std::string& name) const override;
 
   private:
     struct Impl;

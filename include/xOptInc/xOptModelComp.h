@@ -17,7 +17,7 @@ class xOptModelComp : public xOptModelBase {
     friend class xOptProblemComp;
 
     struct Impl;
-    struct Impl* m_pimpl;
+    struct Impl* pimpl_;
 
   public:
     xOptModelComp();
@@ -35,19 +35,26 @@ class xOptModelComp : public xOptModelBase {
     int addLink(const std::string& from_model_name, const std::vector<int>& from_indexes,
                 const std::string& to_model_name, const std::vector<int>& to_indexes);
 
+    //================= 模型初始化 ==================
+    int initializeModel() override;
+
+    //================= 模型配置 ==================
     int setProblemType(XOPTF_PROBLEM_TYPE) override;
+
+    int setComponents(const std::vector<std::string>& components) override;
 
     xOptModelParameters getParameters() const override;
 
     int setParameters(const xOptModelParameters& parameters) override;
 
-    int setComponents(const std::vector<std::string>& components) override;
-
-    int validateModel() const override;
-
     xOptModelFixableVariables getFixableVariables() const override;
 
     int fixVariables(const xOptModelFixableVariables& varnames) override;
+
+    int validateModel() const override;
+
+    //================= 模型运行时 ==================
+    int prepareRuntime() override;
 
     xOptParsedVariableArr getVariables() const override;
 
@@ -55,5 +62,11 @@ class xOptModelComp : public xOptModelBase {
 
     xOptVarCompMap getVarCompMap(bool isInPort, int iIndex) const override;
 
-    xOptProblem* buildProblem() override;
+    xOptProblem* getProblem() const override;
+
+    std::vector<ReportMetaInfo> getReportMetas() const override;
+
+    ReportData getReportByMetaName(const std::string& name) const override;
+
+
 };

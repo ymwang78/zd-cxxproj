@@ -90,6 +90,32 @@ struct xOptStream {
     struct xOptPort* m_input_port;
 };
 
+struct ReportMetaInfo {
+    std::string name; // 报告唯一标识
+    std::string title; // 报告标题
+    std::string description; // 报告描述
+    std::string preferred_display_type; // 首选显示类型: "line_chart", "table", "heatmap", "surface", etc.
+    std::vector<std::string> dim_names; // 维度名称
+    std::vector<std::string> units; // 每个维度的单位
+    std::vector<size_t> dim_sizes; // 维度大小   例如 [20, 5]
+};
+
+struct ReportData {
+    std::vector<double> flat_data; // row-major 拍平
+
+    double at(const std::vector<size_t>& shape, std::initializer_list<size_t> indices) const {
+        // 计算偏移量，按 row-major 展开规则
+        size_t offset = 0;
+        size_t stride = 1;
+        for (auto it = indices.end(); it != indices.begin();) {
+            --it;
+            offset += (*it) * stride;
+            stride *= shape[it - indices.begin()];
+        }
+        return flat_data[offset];
+    }
+};
+
 struct xOptPort {
     enum PortType : unsigned char { InputPort, OutputPort };
 
@@ -117,21 +143,25 @@ class xOptModelBase {
 
     virtual ~xOptModelBase() = default;
 
-    virtual int initialize() { return 0; };
+    // 初始化模型, 获取默认参数等，做好接受参数等准备
+    virtual int initializeModel() = 0;
 
     virtual int setProblemType(XOPTF_PROBLEM_TYPE) = 0;
+
+    virtual int setComponents(const std::vector<std::string>& components) = 0;
 
     virtual xOptModelParameters getParameters() const = 0;
 
     virtual int setParameters(const xOptModelParameters& parameters) = 0;
 
-    virtual int setComponents(const std::vector<std::string>& components) = 0;
-
-    virtual int validateModel() const= 0;
-
     virtual xOptModelFixableVariables getFixableVariables() const = 0;
 
     virtual int fixVariables(const xOptModelFixableVariables& varnames) = 0;
+
+    virtual int validateModel() const= 0;
+
+    // 以上是模型初始化准备，以下是运行时准备
+    virtual int prepareRuntime() = 0;
 
     virtual xOptParsedVariableArr getVariables() const;
 
@@ -146,7 +176,9 @@ class xOptModelBase {
 
     virtual std::vector<int> getFixableVariableIndexes(const xOptModelFixableVariables& vars) const;
 
-    virtual xOptProblem* buildProblem() = 0;
+    virtual xOptProblem* getProblem() const = 0;
 
-    virtual xOptProblem* getProblem() const { return nullptr; }
+    virtual std::vector<ReportMetaInfo> getReportMetas() const = 0;
+
+    virtual ReportData getReportByMetaName(const std::string& name) const = 0;
 };

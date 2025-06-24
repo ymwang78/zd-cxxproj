@@ -20,20 +20,39 @@ class xOptModelBlackBox : public xOptModelBase {
     // 析构函数
     ~xOptModelBlackBox();
 
-    // 实现xOptModelBase的所有接口
+    int initializeModel() override;
+
     int setProblemType(XOPTF_PROBLEM_TYPE) override;
-    xOptModelParameters getParameters() const override;
-    int setParameters(const xOptModelParameters& parameters) override;
+
     int setComponents(const std::vector<std::string>& components) override;
-    int validateModel() const override;
+
+    xOptModelParameters getParameters() const override;
+
+    int setParameters(const xOptModelParameters& parameters) override;
+
     xOptModelFixableVariables getFixableVariables() const override;
+
     int fixVariables(const xOptModelFixableVariables& varnames) override;
-    xOptParsedVariableArr getVariables() const override;
+
+    int validateModel() const override;
+
+    int prepareRuntime() override;  // 运行时准备
+
     int getPortNum(bool is_input_port) const override;
+
     xOptVarCompMap getVarCompMap(bool isInPort, int iIndex) const override;
-    xOptProblem* buildProblem() override;
+
+    xOptParsedVariableArr getVariables() const override;
+
+    int setVariableValue(const std::string& varname, double value) override;
+
+    xOptProblem* getProblem() const override;
+
+    std::vector<ReportMetaInfo> getReportMetas() const override;
+
+    ReportData getReportByMetaName(const std::string& name) const override;
 
   private:
     struct Impl;
-    struct Impl* m_pimpl;
+    struct Impl* pimpl_;
 };
