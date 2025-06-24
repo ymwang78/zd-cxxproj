@@ -35,6 +35,8 @@ class xOptModelComp : public xOptModelBase {
     int addLink(const std::string& from_model_name, const std::vector<int>& from_indexes,
                 const std::string& to_model_name, const std::vector<int>& to_indexes);
 
+    int fullfillInitialValue(const std::string& model_name, const std::vector<const char*>& variable_names, const std::vector<double>& initial_values);
+
     //================= 模型初始化 ==================
     int initializeModel() override;
 
