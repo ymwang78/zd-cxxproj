@@ -165,7 +165,9 @@ class xOptModelBase {
 
     virtual xOptParsedVariableArr getVariables() const;
 
-    virtual int setVariableValue(const std::string& varname, double value) { return 0; };
+    virtual int setVariableValues(const std::vector<double>& values) = 0;
+
+    virtual int setVariableValue(const std::string& varname, double value) = 0;
 
     virtual int getPortNum(bool is_input_port) const = 0;
 

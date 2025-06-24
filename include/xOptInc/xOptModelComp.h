@@ -60,6 +60,10 @@ class xOptModelComp : public xOptModelBase {
 
     xOptParsedVariableArr getVariables() const override;
 
+    int setVariableValues(const std::vector<double>& values) override;
+
+    int setVariableValue(const std::string& varname, double value) override;
+
     int getPortNum(bool is_input_port) const override;
 
     xOptVarCompMap getVarCompMap(bool isInPort, int iIndex) const override;

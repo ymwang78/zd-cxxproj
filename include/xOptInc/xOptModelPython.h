@@ -39,7 +39,9 @@ class xOptModelPython : public xOptModelBase {
 
     xOptParsedVariableArr getVariables() const override;
 
-    int setVariableValue(const std::string& varname, double value) override { return 0; };
+    int setVariableValues(const std::vector<double>& values) override;
+
+    int setVariableValue(const std::string& varname, double value) override;
 
     int getPortNum(bool is_input_port) const override;
 
