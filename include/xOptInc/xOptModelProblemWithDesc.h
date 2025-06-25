@@ -13,6 +13,7 @@
 #include "xOptInc/xOptModelBase.h"
 
 class xOptModelProblemWithDesc : public xOptModelBase {
+  friend class xOptProblemWithDesc;
   public:
     xOptModelProblemWithDesc(xOptProblem* external_problem, const xOptModelDescT& desc);
 
@@ -40,15 +41,19 @@ class xOptModelProblemWithDesc : public xOptModelBase {
 
     int prepareRuntime() override;
 
-    xOptParsedVariableArr getVariables() const override;
+    const xOptParsedVariableArr& getVariables() const override;
 
     int setVariableValues(const std::vector<double>& values) override;
 
-    int setVariableValue(const std::string& varname, double value) override;
+    xOptParsedVariable getVariable(const std::string& varname, int hint_index) override;
+
+    int setVariableValue(const std::string& varname, int hint_index, double value) override;
 
     int getPortNum(bool is_input_port) const override;
 
     xOptVarCompMap getVarCompMap(bool isInPort, int iIndex) const override;
+
+    std::vector<int> getFlowsheetFixedVariableIndexes() const override;
 
     xOptProblem* getProblem() const override;
 

@@ -26,8 +26,8 @@ class xOptModelComp : public xOptModelBase {
 
     int addModel(const std::string& name, xOptModelBase* sub_model);
 
-    int addLink(const std::string& from_model_name, int from_var_index,
-                const std::string& to_model_name, int to_var_index);
+    int addLink(const std::string& from_model_name, int from_var_index, const std::string& from_var_name,
+                const std::string& to_model_name, int to_var_index, const std::string& to_var_name);
 
     int addLink(const std::string& from_model_name, const std::vector<std::string>& from_names,
                 const std::string& to_model_name, const std::vector<int>& to_indexes);
@@ -36,6 +36,8 @@ class xOptModelComp : public xOptModelBase {
                 const std::string& to_model_name, const std::vector<int>& to_indexes);
 
     int fullfillInitialValue(const std::string& model_name, const std::vector<const char*>& variable_names, const std::vector<double>& initial_values);
+
+    int printX() const;
 
     //================= 模型初始化 ==================
     int initializeModel() override;
@@ -58,15 +60,19 @@ class xOptModelComp : public xOptModelBase {
     //================= 模型运行时 ==================
     int prepareRuntime() override;
 
-    xOptParsedVariableArr getVariables() const override;
+    const xOptParsedVariableArr& getVariables() const override;
 
     int setVariableValues(const std::vector<double>& values) override;
 
-    int setVariableValue(const std::string& varname, double value) override;
+    xOptParsedVariable getVariable(const std::string& varname, int hint_index) override;
+
+    int setVariableValue(const std::string& varname, int hint_index, double value) override;
 
     int getPortNum(bool is_input_port) const override;
 
     xOptVarCompMap getVarCompMap(bool isInPort, int iIndex) const override;
+
+    std::vector<int> getFlowsheetFixedVariableIndexes() const override;
 
     xOptProblem* getProblem() const override;
 

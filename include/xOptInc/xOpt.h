@@ -159,3 +159,7 @@ class XOPT_API xOpt {
 
     static xOptModelBase* createModel(const char* model_name, const xOptModelArgs* context);
 };
+
+extern "C" {
+void xOptLogPrintX(const double* x, int x_size);
+}

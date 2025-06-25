@@ -21,6 +21,10 @@ class xOptModelFixVars : public xOptModelBase {
     int fixVar(std::vector<std::string>& varname, const std::string& model_name,
                xOptProblem* problem, const std::vector<int>& var_index);
 
+    int fixVariables(std::vector<std::string>& varname, std::vector<int>& var_indexes,
+                     xOptModelBase* ref_model,
+                     const xOptModelFixableVariables& tofix);
+
     int addFixableVariables(const std::vector<std::pair<std::string, double>>& vars);
 
     int clearUnfixedVariables();
@@ -47,15 +51,19 @@ class xOptModelFixVars : public xOptModelBase {
 
     int prepareRuntime() override;
 
-    xOptParsedVariableArr getVariables() const override;
+    const xOptParsedVariableArr& getVariables() const override;
 
     int setVariableValues(const std::vector<double>& values) override;
 
-    int setVariableValue(const std::string& varname, double value) override;
+    xOptParsedVariable getVariable(const std::string& varname, int hint_index) override;
+
+    int setVariableValue(const std::string& varname, int hint_index, double value) override;
 
     int getPortNum(bool is_input_port) const override;
 
     xOptVarCompMap getVarCompMap(bool is_input_port, int index) const override;
+
+    std::vector<int> getFlowsheetFixedVariableIndexes() const override;
 
     xOptProblem* getProblem() const override;
 

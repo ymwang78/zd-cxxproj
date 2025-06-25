@@ -42,11 +42,15 @@ class xOptModelBlackBox : public xOptModelBase {
 
     xOptVarCompMap getVarCompMap(bool isInPort, int iIndex) const override;
 
-    xOptParsedVariableArr getVariables() const override;
+    std::vector<int> getFlowsheetFixedVariableIndexes() const override;
+
+    const xOptParsedVariableArr& getVariables() const override;
 
     int setVariableValues(const std::vector<double>& values) override;
 
-    int setVariableValue(const std::string& varname, double value) override;
+    xOptParsedVariable getVariable(const std::string& varname, int hint_index) override;
+
+    int setVariableValue(const std::string& varname, int hint_index, double value) override;
 
     xOptProblem* getProblem() const override;
 
