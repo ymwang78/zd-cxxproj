@@ -13,7 +13,8 @@
 #include "xOptInc/xOptModelBase.h"
 
 class xOptModelProblemWithDesc : public xOptModelBase {
-  friend class xOptProblemWithDesc;
+    friend class xOptProblemWithDesc;
+
   public:
     xOptModelProblemWithDesc(xOptProblem* external_problem, const xOptModelDescT& desc);
 
@@ -39,7 +40,7 @@ class xOptModelProblemWithDesc : public xOptModelBase {
 
     int validateModel() const override;
 
-    int prepareRuntime() override;
+    int prepareRuntime(const xOptParsedVariableArr& arr) override;
 
     const xOptParsedVariableArr& getVariables() const override;
 

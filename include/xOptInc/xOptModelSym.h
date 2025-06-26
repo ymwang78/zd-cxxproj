@@ -43,7 +43,7 @@ class xOptModelSym : public xOptModelBase {
 
     int validateModel() const override;
 
-    int prepareRuntime() override;
+    int prepareRuntime(const xOptParsedVariableArr& arr) override;
 
     const xOptParsedVariableArr& getVariables() const override;
 

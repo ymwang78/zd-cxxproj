@@ -58,7 +58,7 @@ class xOptModelComp : public xOptModelBase {
     int validateModel() const override;
 
     //================= 模型运行时 ==================
-    int prepareRuntime() override;
+    int prepareRuntime(const xOptParsedVariableArr& arr) override;
 
     const xOptParsedVariableArr& getVariables() const override;
 

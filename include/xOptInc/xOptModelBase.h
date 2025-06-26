@@ -161,7 +161,7 @@ class xOptModelBase {
     virtual int validateModel() const= 0;
 
     // 以上是模型初始化准备，以下是运行时准备
-    virtual int prepareRuntime() = 0;
+    virtual int prepareRuntime(const xOptParsedVariableArr& arr) = 0;
 
     virtual const xOptParsedVariableArr& getVariables() const = 0;
 

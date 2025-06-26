@@ -31,7 +31,7 @@ class xOptModelPython : public xOptModelBase {
 
     int validateModel() const override;
 
-    int prepareRuntime() override;
+    int prepareRuntime(const xOptParsedVariableArr& arr) override;
 
     xOptModelFixableVariables getFixableVariables() const override;
 

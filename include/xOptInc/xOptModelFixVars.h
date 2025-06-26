@@ -13,6 +13,7 @@
 
 class xOptModelFixVars : public xOptModelBase {
     friend class xOptProblemFixVars;
+
   public:
     xOptModelFixVars();
 
@@ -22,8 +23,7 @@ class xOptModelFixVars : public xOptModelBase {
                xOptProblem* problem, const std::vector<int>& var_index);
 
     int fixVariables(std::vector<std::string>& varname, std::vector<int>& var_indexes,
-                     xOptModelBase* ref_model,
-                     const xOptModelFixableVariables& tofix);
+                     xOptModelBase* ref_model, const xOptModelFixableVariables& tofix);
 
     int addFixableVariables(const std::vector<std::pair<std::string, double>>& vars);
 
@@ -49,7 +49,7 @@ class xOptModelFixVars : public xOptModelBase {
 
     //================= 模型运行时 ==================
 
-    int prepareRuntime() override;
+    int prepareRuntime(const xOptParsedVariableArr& arr) override;
 
     const xOptParsedVariableArr& getVariables() const override;
 

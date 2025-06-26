@@ -16,7 +16,7 @@ class xOptModelBlackBox : public xOptModelBase {
   public:
     // 构造函数接受动态库路径
     xOptModelBlackBox(const std::string& dll_path);
-    
+
     // 析构函数
     ~xOptModelBlackBox();
 
@@ -36,7 +36,7 @@ class xOptModelBlackBox : public xOptModelBase {
 
     int validateModel() const override;
 
-    int prepareRuntime() override;  // 运行时准备
+    int prepareRuntime(const xOptParsedVariableArr& arr) override;  // 运行时准备
 
     int getPortNum(bool is_input_port) const override;
 
