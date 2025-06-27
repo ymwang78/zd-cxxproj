@@ -97,3 +97,6 @@ class XOPTIF_API xOptProblem {
     // Evaluate constraint Jacobian values (x_size == numVariables(), values_size == iRow_jCol_size)
     virtual int evaluateConstraintsJacobianValues(double* values, int values_size) const = 0;
 };
+
+extern "C" typedef xOptProblem* (*createProblemFunc)();
+extern "C" typedef void (*destroyProblemFunc)(xOptProblem*);
