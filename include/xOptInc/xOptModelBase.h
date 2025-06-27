@@ -168,7 +168,7 @@ class xOptModelBase {
     virtual int setVariableValues(const std::vector<double>& values) = 0;
 
     // hint index是帮助提示索引，不是必须的，不清楚的情况下填-1
-    virtual xOptParsedVariable getVariable(const std::string& varname, int hint_index) = 0;
+    virtual const xOptParsedVariable& getVariable(const std::string& varname, int hint_index) = 0;
 
     virtual int setVariableValue(const std::string& varname, int hint_index, double value) = 0;
 

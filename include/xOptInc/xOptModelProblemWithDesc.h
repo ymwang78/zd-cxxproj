@@ -46,7 +46,7 @@ class xOptModelProblemWithDesc : public xOptModelBase {
 
     int setVariableValues(const std::vector<double>& values) override;
 
-    xOptParsedVariable getVariable(const std::string& varname, int hint_index) override;
+    const xOptParsedVariable& getVariable(const std::string& varname, int hint_index) override;
 
     int setVariableValue(const std::string& varname, int hint_index, double value) override;
 
