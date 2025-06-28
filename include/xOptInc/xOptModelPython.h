@@ -37,19 +37,9 @@ class xOptModelPython : public xOptModelBase {
 
     int fixVariables(const xOptModelFixableVariables& varnames) override;
 
-    const xOptParsedVariableArr& getVariables() const override;
-
-    int setVariableValues(const std::vector<double>& values) override;
-
-    const xOptParsedVariable& getVariable(const std::string& varname, int hint_index) override;
-
-    int setVariableValue(const std::string& varname, int hint_index, double value) override;
-
     int getPortNum(bool is_input_port) const override;
 
     xOptVarCompMap getVarCompMap(bool is_input_port, int index) const override;
-
-    std::vector<int> getFlowsheetFixedVariableIndexes() const override;
 
     xOptProblem* getProblem() const override;
 
@@ -57,7 +47,4 @@ class xOptModelPython : public xOptModelBase {
 
     ReportData getReportByMetaName(const std::string& name) const override;
 
-  private:
-    struct Impl;
-    struct Impl* m_pimpl;
 };

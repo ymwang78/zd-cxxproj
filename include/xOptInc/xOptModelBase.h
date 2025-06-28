@@ -127,9 +127,12 @@ struct xOptPort {
 };
 
 class xOptProblem;
+struct xOptModelImplBase;
 
 class xOptModelBase {
   protected:
+    struct xOptModelImplBase* pimpl_;
+
     std::string name_;
     std::vector<double> X_;
 
@@ -163,14 +166,17 @@ class xOptModelBase {
     // 以上是模型初始化准备，以下是运行时准备
     virtual int prepareRuntime(const xOptParsedVariableArr& arr) = 0;
 
-    virtual const xOptParsedVariableArr& getVariables() const = 0;
+    virtual const xOptParsedVariableArr& getVariables() const;
 
-    virtual int setVariableValues(const std::vector<double>& values) = 0;
+    virtual int setVariableValues(const std::vector<double>& values);
 
     // hint index是帮助提示索引，不是必须的，不清楚的情况下填-1
-    virtual const xOptParsedVariable& getVariable(const std::string& varname, int hint_index) = 0;
+    virtual const xOptParsedVariable& getVariable(const std::string& varname, int hint_index);
 
-    virtual int setVariableValue(const std::string& varname, int hint_index, double value) = 0;
+    virtual int setVariableValue(const std::string& varname, int hint_index, double value);
+
+    // 这里是返回需要流程固定的变量的索引, 单元模块自己能固定的索引不需要返回
+    virtual std::vector<int> getFlowsheetFixedVariableIndexes() const;
 
     virtual int getPortNum(bool is_input_port) const = 0;
 
@@ -179,8 +185,6 @@ class xOptModelBase {
     virtual std::vector<int> getStreamVariableIndexes(const xOptStreamType& stream,
                                                          bool is_input_port, int index) const;
 
-    // 这里是返回需要流程固定的变量的索引, 单元模块自己能固定的索引不需要返回
-    virtual std::vector<int> getFlowsheetFixedVariableIndexes() const = 0;
 
     virtual xOptProblem* getProblem() const = 0;
 

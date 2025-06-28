@@ -16,9 +16,6 @@ class xOptModelSym;
 class xOptModelComp : public xOptModelBase {
     friend class xOptProblemComp;
 
-    struct Impl;
-    struct Impl* pimpl_;
-
   public:
     xOptModelComp();
 
@@ -60,19 +57,11 @@ class xOptModelComp : public xOptModelBase {
     //================= 模型运行时 ==================
     int prepareRuntime(const xOptParsedVariableArr& arr) override;
 
-    const xOptParsedVariableArr& getVariables() const override;
-
     int setVariableValues(const std::vector<double>& values) override;
-
-    const xOptParsedVariable& getVariable(const std::string& varname, int hint_index) override;
-
-    int setVariableValue(const std::string& varname, int hint_index, double value) override;
 
     int getPortNum(bool is_input_port) const override;
 
     xOptVarCompMap getVarCompMap(bool isInPort, int iIndex) const override;
-
-    std::vector<int> getFlowsheetFixedVariableIndexes() const override;
 
     xOptProblem* getProblem() const override;
 

@@ -54,15 +54,9 @@ class xOptModelProblemWithDesc : public xOptModelBase {
 
     xOptVarCompMap getVarCompMap(bool isInPort, int iIndex) const override;
 
-    std::vector<int> getFlowsheetFixedVariableIndexes() const override;
-
     xOptProblem* getProblem() const override;
 
     std::vector<ReportMetaInfo> getReportMetas() const override;
 
     ReportData getReportByMetaName(const std::string& name) const override;
-
-  private:
-    struct Impl;
-    struct Impl* m_pimpl;
 };

@@ -45,19 +45,9 @@ class xOptModelSym : public xOptModelBase {
 
     int prepareRuntime(const xOptParsedVariableArr& arr) override;
 
-    const xOptParsedVariableArr& getVariables() const override;
-
-    int setVariableValues(const std::vector<double>& values) override;
-
-    const xOptParsedVariable& getVariable(const std::string& varname, int hint_index) override;
-
-    int setVariableValue(const std::string& varname, int hint_index, double value) override;
-
     int getPortNum(bool is_input_port) const override;
 
     xOptVarCompMap getVarCompMap(bool isInPort, int iIndex) const override;
-
-    std::vector<int> getFlowsheetFixedVariableIndexes() const override;
 
     xOptProblem* getProblem() const override;
 
@@ -86,8 +76,4 @@ class xOptModelSym : public xOptModelBase {
     int addConstraintExpr(const std::string& name, const std::string& expr,
                           const xOptIndexMap& index_map, double low_bound, double upper_bound,
                           bool modify_if_exists);
-
-  private:
-    struct Impl;
-    struct Impl* impl_;
 };
