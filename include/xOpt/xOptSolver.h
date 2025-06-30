@@ -50,6 +50,8 @@ class XOPTIF_API xOptSolver {
 
     virtual int solve() = 0;
 
+    virtual int pauseSolve() = 0;
+
     virtual int continueSolve() = 0;
 
     virtual int X(double* x, int x_size) const = 0;

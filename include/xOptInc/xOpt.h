@@ -107,7 +107,6 @@ struct xOptParsedVariable {
     double initx;
     std::vector<double> initial;
     std::string unit;
-    bool fixed = false;
     int expand_index;  // 展开后的数组下标
 };
 

@@ -330,6 +330,9 @@ class zce_array {  // skew heap
         } else {
             ZCE_ASSERT(free_head_ == nodeid);
             free_head_ = new_top;
+            if (new_top > 0) {
+                slots_[new_top].heap_node_.parent = -1;
+            }
         }
         return new_top;
     }

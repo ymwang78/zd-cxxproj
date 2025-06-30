@@ -69,6 +69,8 @@ class xOptModelSym : public xOptModelBase {
 
     int setObjectExpr(const std::string& expr);
 
+    int addVariable(const xOptParsedVariable& var, bool modify_if_exists);
+
     int addVariable(const std::string& name, const std::string& array_expr, double low_bound,
                     double upper_bound, const std::vector<double>& initial, const std::string& unit,
                     bool modify_if_exists);

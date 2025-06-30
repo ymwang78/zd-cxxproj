@@ -22,12 +22,8 @@ class xOptModelFixVars : public xOptModelBase {
     int fixVar(std::vector<std::string>& varname, const std::string& model_name,
                xOptProblem* problem, const std::vector<int>& var_index);
 
-    int fixVariables(std::vector<std::string>& varname, std::vector<int>& var_indexes,
+    int fixVar(std::vector<std::string>& varname, std::vector<int>& var_indexes,
                      xOptModelBase* ref_model, const xOptModelFixableVariables& tofix);
-
-    int addFixableVariables(const std::vector<std::pair<std::string, double>>& vars);
-
-    int clearUnfixedVariables();
 
     //================= 模型初始化 ==================
 
@@ -50,6 +46,8 @@ class xOptModelFixVars : public xOptModelBase {
     //================= 模型运行时 ==================
 
     int prepareRuntime(const xOptParsedVariableArr& arr) override;
+
+    std::vector<int> getFlowsheetFixedVariableIndexes() const override;
 
     int getPortNum(bool is_input_port) const override;
 
