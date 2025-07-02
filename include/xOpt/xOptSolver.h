@@ -16,13 +16,18 @@ class xOptProblem;
 
 class XOPTIF_API xOptSolver {
   public :
-    enum SOLVE_RESULT {
-        RESULT_UNKNOWN = 0,
-        RESULT_OPTIMAL = 1,
-        RESULT_FEASIBLE = 2,
-        RESULT_INFEASIBLE = 3,
-        RESULT_UNBOUNDED = 4,
-        RESULT_ITER_LIMIT = 5,
+    enum SOLVE_RESULT : int {
+        RESULT_OPTIMAL              = 0,
+        RESULT_FEASIBLE             = 1,
+
+        RESULT_UNKNOWN              = -1,
+        RESULT_INFEASIBLE           = -2,
+        RESULT_UNBOUNDED            = -3,
+        RESULT_ITER_LIMIT           = -4,
+        RESULT_INVALID_SETTINGS     = -5,
+        RESULT_NUMERICAL_ISSUES     = -6,
+        RESULT_INVALID_PROBLEM      = -7,
+        RESULT_USER_PAUSE           = -100,
     };
     using boolean = unsigned char;
 
@@ -64,7 +69,7 @@ class XOPTIF_API xOptSolver {
 
 };
 
-extern "C" typedef xOptSolver* (*createSolverFunc)(const char*, xOptProblem*);
-extern "C" typedef void (*destroySolverFunc)(xOptSolver*);
+typedef xOptSolver* (*CreateSolverFunc)(const char*, xOptProblem*);
+typedef void (*RelaseSolverFunc)(xOptSolver*);
 
 
