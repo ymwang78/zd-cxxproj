@@ -18,6 +18,14 @@ This directory contains all C++ projects with a shared structure for common depe
 - `libsrc/`: Common library source code
 - Individual project directories (each with their own git repository)
 
+## Coding Standards
+
+Based on Google C++ Style Guide with modifications:
+- **Class names**: PascalCase (大驼峰) - `MyClass`
+- **Function names**: camelCase (小驼峰) - `myFunction()`
+- **Variable names**: snake_case - `my_variable`
+- **Class member variables**: snake_case with trailing underscore - `member_variable_`
+
 ## Common Commands
 
 ### Build
