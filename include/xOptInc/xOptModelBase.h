@@ -144,6 +144,8 @@ class xOptModelBase {
 
     std::vector<double>& getX() { return X_; };
 
+    int getVariableIndex(const std::string& varname, int hint_index = -1) const;
+
     virtual ~xOptModelBase() = default;
 
     // 初始化模型, 获取默认参数等，做好接受参数等准备
