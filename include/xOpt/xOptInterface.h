@@ -22,6 +22,20 @@
 #    define XOPTIF_API __attribute__((visibility("default")))
 #endif
 
+#ifndef ZCE_DEFINED_LOGLEVEL
+typedef enum _zlog_level {
+    ZLOG_TRACE = 0,
+    ZLOG_DEBUG = 1,   /* debug */
+    ZLOG_INFOR = 2,   /* info */
+    ZLOG_WARNI = 3,   /* warn */
+    ZLOG_ERROR = 4,   /* error */
+    ZLOG_FATAL = 5,   /* fatal */
+    ZLOG_BIZDT = 100, /* bizdata */
+    ZLOG_NONEL = 255, /* none */
+} ZLOG_LEVEL;
+#    define ZCE_DEFINED_LOGLEVEL
+#endif
+
 enum XOPTF_PROBLEM_TYPE {
     XOPTF_PROBLEM_SIMULATION,
     XOPTF_PROBLEM_OPTIMIZATION,
@@ -38,3 +52,7 @@ enum XOPTF_ERRCODE : int {
     XOPTF_ERROR_UNIMPLEMENT,  // 未实现接口, 例如不支持固定变量
     XOPTF_ERROR_INVALID,      // 数据无效, 例如固定的变量列表不合法
 };
+
+extern "C" {
+    typedef void (*xOptLogFunc)(ZLOG_LEVEL level, const char *format, ...);
+}

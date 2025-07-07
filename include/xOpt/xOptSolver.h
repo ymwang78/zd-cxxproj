@@ -69,7 +69,7 @@ class XOPTIF_API xOptSolver {
 
 };
 
-typedef xOptSolver* (*CreateSolverFunc)(const char*, xOptProblem*);
+typedef xOptSolver* (*CreateSolverFunc)(const char*, xOptProblem*, xOptLogFunc loggerFunc);
 typedef void (*RelaseSolverFunc)(xOptSolver*);
 
 
