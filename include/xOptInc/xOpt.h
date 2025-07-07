@@ -15,7 +15,7 @@
 #include <unordered_map>
 #include <memory>
 #include <zce/zce_array.h>
-
+#include "xOpt/xOptSolver.h"
 #ifndef XOPT_API
 #    ifdef _WIN32
 #        ifdef XOPT_EXPORTS
@@ -46,9 +46,6 @@ class xOptSolver;
 class xOptProblem;
 class xOptModelBase;
 
-typedef xOptSolver* (*createSolverFunc)(const char*, xOptProblem*);
-typedef void (*destroySolverFunc)(xOptSolver*);
-
 struct XOPT_API xOptModelArgs {
     const char* model_type;
     const char* model_path;
@@ -68,8 +65,8 @@ struct SolverInfo {
     std::string name;
     std::string solver_path;
     std::string status;
-    createSolverFunc lpfn_create_solver;
-    destroySolverFunc lpfn_release_solver;
+    CreateSolverFunc lpfn_create_solver;
+    DestroySolverFunc lpfn_release_solver;
     std::vector<SolverParameter> parameters;
 };
 
@@ -147,7 +144,7 @@ class XOPT_API xOpt {
     static int registerSolver(const SolverInfo& solver);
 
     static xOptSolver* createSolver(const char* name, xOptProblem* problem,
-                                    const char* solver_name = "IPOPT");
+                                    const char* solver_name, xOptLogFunc loggerFunction);
 
     static void printX(xOptSolver*);
 
