@@ -132,14 +132,11 @@ class xOptModelBase {
   protected:
     struct xOptModelImplBase* pimpl_;
     std::string name_;
-    std::vector<double> X_;
 
   public:
     const std::string& getName() const { return name_; };
 
     void setName(const std::string& name) { name_ = name; };
-
-    std::vector<double>& getX() { return X_; };
 
     int getVariableIndex(const std::string& varname, int hint_index = -1) const;
 

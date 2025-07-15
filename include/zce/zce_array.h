@@ -516,6 +516,28 @@ class zce_indexed_array {
 
     size_t size() const { return data_.size(); }
 
+  // 迭代器支持
+    using iterator = typename std::vector<T>::iterator;
+    using const_iterator = typename std::vector<T>::const_iterator;
+    using reverse_iterator = typename std::vector<T>::reverse_iterator;
+    using const_reverse_iterator = typename std::vector<T>::const_reverse_iterator;
+
+    iterator begin() { return data_.begin(); }
+    const_iterator begin() const { return data_.begin(); }
+    const_iterator cbegin() const { return data_.cbegin(); }
+
+    iterator end() { return data_.end(); }
+    const_iterator end() const { return data_.end(); }
+    const_iterator cend() const { return data_.cend(); }
+
+    reverse_iterator rbegin() { return data_.rbegin(); }
+    const_reverse_iterator rbegin() const { return data_.rbegin(); }
+    const_reverse_iterator crbegin() const { return data_.crbegin(); }
+
+    reverse_iterator rend() { return data_.rend(); }
+    const_reverse_iterator rend() const { return data_.rend(); }
+    const_reverse_iterator crend() const { return data_.crend(); }
+    
   private:
     std::vector<T> data_;
     std::unordered_map<KeyType, size_t> name_to_index_;
