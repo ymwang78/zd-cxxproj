@@ -33,6 +33,8 @@ class xOptModelPython : public xOptModelBase {
 
     int prepareRuntime(const xOptParsedVariableArr& arr) override;
 
+    int setInPortVariableValues(const xOptModelFixableVariables& nvpairs) override;
+
     xOptModelFixableVariables getFixableVariables() const override;
 
     int fixVariables(const xOptModelFixableVariables& varnames) override;

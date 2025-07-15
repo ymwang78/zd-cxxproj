@@ -22,6 +22,8 @@ rem TaijiMPC client requirements
 vcpkg install bzip2:x86-windows-static
 vcpkg install open62541:x86-windows-static
 vcpkg install openssl:x86-windows-static
+vcpkg install boost-algorithm:x86-windows-static
+vcpkg install boost-tokenizer:x86-windows-static
 
 vcpkg install libuv:x64-windows-static-md
 vcpkg install mysql:x64-windows-static-md

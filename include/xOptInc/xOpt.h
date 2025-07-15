@@ -105,6 +105,7 @@ struct xOptParsedVariable {
     std::vector<double> initial;
     std::string unit;
     int expand_index;  // 展开后的数组下标
+    double current;  // 当前值
 };
 
 using xOptParsedVariableMap = std::unordered_map<std::string, xOptParsedVariable>;

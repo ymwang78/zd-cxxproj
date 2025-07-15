@@ -16,13 +16,13 @@
 #include <map>
 #include <unordered_map>
 
-using xOptModelParameter = std::pair<std::string, double> ;
+using xOptModelParameter = std::pair<std::string, double>;
 
 using xOptModelParameters = std::unordered_map<std::string, double>;
 
 using xOptModelFixableVariables = std::unordered_map<std::string, double>;
 
-using xOptVarCompMap = std::unordered_map<std::string, std::string> ;
+using xOptVarCompMap = std::unordered_map<std::string, std::string>;
 
 struct xOptModelDescT {
     xOptModelParameters parameters;
@@ -91,17 +91,18 @@ struct xOptStream {
 };
 
 struct ReportMetaInfo {
-    std::string name; // 报告唯一标识
-    std::string title; // 报告标题
-    std::string description; // 报告描述
-    std::string preferred_display_type; // 首选显示类型: "line_chart", "table", "heatmap", "surface", etc.
-    std::vector<std::string> dim_names; // 维度名称
-    std::vector<std::string> units; // 每个维度的单位
+    std::string name;         // 报告唯一标识
+    std::string title;        // 报告标题
+    std::string description;  // 报告描述
+    std::string
+        preferred_display_type;  // 首选显示类型: "line_chart", "table", "heatmap", "surface", etc.
+    std::vector<std::string> dim_names;  // 维度名称
+    std::vector<std::string> units;      // 每个维度的单位
 };
 
 struct ReportData {
-    std::vector<double> flat_data; // row-major 拍平
-    std::vector<size_t> shape; // 维度大小
+    std::vector<double> flat_data;  // row-major 拍平
+    std::vector<size_t> shape;      // 维度大小
 
     double at(std::initializer_list<size_t> indices) const {
         // 计算偏移量，按 row-major 展开规则
@@ -118,11 +119,9 @@ struct ReportData {
 
 struct xOptPort {
     enum PortType : unsigned char { InputPort, OutputPort };
-
     xOptModel* m_parent;
     std::string m_name;
     PortType m_port_type;
-
     xOptStream* m_stream;
 };
 
@@ -132,12 +131,10 @@ struct xOptModelImplBase;
 class xOptModelBase {
   protected:
     struct xOptModelImplBase* pimpl_;
-
     std::string name_;
     std::vector<double> X_;
 
   public:
-
     const std::string& getName() const { return name_; };
 
     void setName(const std::string& name) { name_ = name; };
@@ -159,11 +156,20 @@ class xOptModelBase {
 
     virtual int setParameters(const xOptModelParameters& parameters) = 0;
 
+    virtual int getPortNum(bool is_input_port) const = 0;
+
+    virtual xOptVarCompMap getVarCompMap(bool is_input_port, int index) const = 0;
+
+    // 这里不能用fixVariables的原因是因为setInPortVariableValues是必须的
+    virtual xOptModelFixableVariables getInPortVariableValues() const;
+
+    virtual int setInPortVariableValues(const xOptModelFixableVariables& nvpairs);
+
     virtual xOptModelFixableVariables getFixableVariables() const = 0;
 
     virtual int fixVariables(const xOptModelFixableVariables& varnames) = 0;
 
-    virtual int validateModel() const= 0;
+    virtual int validateModel() const = 0;
 
     // 以上是模型初始化准备，以下是运行时准备
     virtual int prepareRuntime(const xOptParsedVariableArr& arr) = 0;
@@ -180,17 +186,15 @@ class xOptModelBase {
     // 这里是返回需要流程固定的变量的索引, 单元模块自己能固定的索引不需要返回
     virtual std::vector<int> getFlowsheetFixedVariableIndexes() const;
 
-    virtual int getPortNum(bool is_input_port) const = 0;
-
-    virtual xOptVarCompMap getVarCompMap(bool is_input_port, int index) const = 0;
-
     virtual std::vector<int> getStreamVariableIndexes(const xOptStreamType& stream,
-                                                         bool is_input_port, int index) const;
-
+                                                      bool is_input_port, int index) const;
 
     virtual xOptProblem* getProblem() const = 0;
 
     virtual std::vector<ReportMetaInfo> getReportMetas() const = 0;
 
     virtual ReportData getReportByMetaName(const std::string& name) const = 0;
+
+    // 把当前值设置为更新值
+    virtual int updateInitialValue();
 };

@@ -10,7 +10,7 @@
 # 取消忽略特定文件夹
 !bin/
 !include/
-!lib/
+!lib/x64/
 !libsrc/
 
 bin/*
