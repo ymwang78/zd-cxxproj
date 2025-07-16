@@ -210,7 +210,7 @@ class zce_array {  // skew heap
     int set(H handle, U&& val) {
         int index, magic;
         mix_magic_t::seperate(handle, magic, index);
-        ZCE_ASSERT_RETURN((index >= cur_top_) || (index >= 0 && index < cur_top_), -1);
+        ZCE_ASSERT_RETURN(index >= 0, -1);
         if (index < cur_top_ && slots_[index].in_use()) {
             if (slots_[index].data_.item == val) return 0;
             ZCE_ASSERT(false);
@@ -221,7 +221,7 @@ class zce_array {  // skew heap
         } else if (index == cur_top_) {
             cur_top_ = index + 1;
         } else {
-            if (index > capacity_limit_) {
+            if (index > (int)capacity_limit_) {
                 return -1;  // 位置超限
             }
             if (index >= (int)slots_.size()) {
