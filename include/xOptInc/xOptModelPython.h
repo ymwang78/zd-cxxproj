@@ -37,7 +37,8 @@ class xOptModelPython : public xOptModelBase {
 
     xOptModelFixableVariables getFixableVariables() const override;
 
-    int fixVariables(const xOptModelFixableVariables& varnames) override;
+    int fixVariables(const xOptModelFixableVariables& varnames,
+                     bool try_fixed_in_model_first) override;
 
     int getPortNum(bool is_input_port) const override;
 

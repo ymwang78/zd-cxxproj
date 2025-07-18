@@ -23,8 +23,9 @@ class xOptModelComp : public xOptModelBase {
 
     int addModel(const std::string& name, xOptModelBase* sub_model);
 
-    int addLink(const std::string& from_model_name, int from_var_index, const std::string& from_var_name,
-                const std::string& to_model_name, int to_var_index, const std::string& to_var_name);
+    int addLink(const std::string& from_model_name, int from_var_index,
+                const std::string& from_var_name, const std::string& to_model_name,
+                int to_var_index, const std::string& to_var_name);
 
     int addLink(const std::string& from_model_name, const std::vector<std::string>& from_names,
                 const std::string& to_model_name, const std::vector<int>& to_indexes);
@@ -32,7 +33,9 @@ class xOptModelComp : public xOptModelBase {
     int addLink(const std::string& from_model_name, const std::vector<int>& from_indexes,
                 const std::string& to_model_name, const std::vector<int>& to_indexes);
 
-    int fullfillInitialValue(const std::string& model_name, const std::vector<const char*>& variable_names, const std::vector<double>& initial_values);
+    int fullfillInitialValue(const std::string& model_name,
+                             const std::vector<const char*>& variable_names,
+                             const std::vector<double>& initial_values);
 
     int printX() const;
 
@@ -50,7 +53,8 @@ class xOptModelComp : public xOptModelBase {
 
     xOptModelFixableVariables getFixableVariables() const override;
 
-    int fixVariables(const xOptModelFixableVariables& varnames) override;
+    int fixVariables(const xOptModelFixableVariables& varnames,
+                     bool try_fixed_in_model_first) override;
 
     int validateModel() const override;
 

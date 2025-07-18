@@ -516,6 +516,8 @@ class zce_indexed_array {
 
     size_t size() const { return data_.size(); }
 
+    const std::vector<T>& to_vec() const { return data_; }
+
   // 迭代器支持
     using iterator = typename std::vector<T>::iterator;
     using const_iterator = typename std::vector<T>::const_iterator;

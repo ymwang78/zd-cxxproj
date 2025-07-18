@@ -164,7 +164,7 @@ class xOptModelBase {
 
     virtual xOptModelFixableVariables getFixableVariables() const = 0;
 
-    virtual int fixVariables(const xOptModelFixableVariables& varnames) = 0;
+    virtual int fixVariables(const xOptModelFixableVariables& varnames, bool try_fixed_in_model_first) = 0;
 
     virtual int validateModel() const = 0;
 
@@ -183,6 +183,8 @@ class xOptModelBase {
     // 这里是返回需要流程固定的变量的索引, 单元模块自己能固定的索引不需要返回
     virtual std::vector<int> getFlowsheetFixedVariableIndexes() const;
 
+    virtual const xOptModelFixableVariables& getFlowsheetFixedVariables() const;
+
     virtual std::vector<int> getStreamVariableIndexes(const xOptStreamType& stream,
                                                       bool is_input_port, int index) const;
 
@@ -193,5 +195,5 @@ class xOptModelBase {
     virtual ReportData getReportByMetaName(const std::string& name) const = 0;
 
     // 把当前值设置为更新值
-    virtual int updateInitialValue();
+    virtual int updateCurrentToInitialValue();
 };
