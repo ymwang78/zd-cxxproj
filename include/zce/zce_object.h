@@ -89,7 +89,7 @@ class ZCE_API zce_object {
   private:
     zce::Allocator* zce_alloc_;
     zce::TaskDelegator* release_delegator_;
-    zce_atomic_long ref_count_;
+    zce::AtomicLong ref_count_;
     const zce_int64 obj_idx_;
 };
 

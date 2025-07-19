@@ -49,7 +49,7 @@ class ZCE_API zce_timer_doozer : public zce_object
     friend struct zce_timer::pimpl;
 
     bool noaccumulated_;
-    zce_atomic_long accum_count_;
+    zce::AtomicLong accum_count_;
 
     void do_timeout();
 

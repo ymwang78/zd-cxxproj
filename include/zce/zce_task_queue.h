@@ -28,7 +28,7 @@ class ZCE_API TaskQueue : public Task, public TaskDelegator {
   protected:
     zce_smartptr<Scheduler> scheduler_ptr_;
 
-    zce_atomic_long inque_;
+    zce::AtomicLong inque_;
 
     zce_smartptr<TaskQueue> proxy_ptr_;
 
@@ -66,7 +66,7 @@ template <typename QueueSubType, typename Params, typename Results>
 class TaskMapReduce : public zce_object {
     zce_smartptr<QueueSubType>* queue_vec_;
     size_t queue_size_;
-    zce_atomic_long remain_tasks_;
+    zce::AtomicLong remain_tasks_;
     std::vector<int> queue_idx_vec_;
     Params params_;
     Results result_;

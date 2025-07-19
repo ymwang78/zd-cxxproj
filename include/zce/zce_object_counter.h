@@ -1,4 +1,4 @@
-// ***************************************************************
+ï»¿// ***************************************************************
 //  zce_object_counter   version:  1.0     date: 07/31/2002
 //  -------------------------------------------------------------
 //  Yongming Wang(ymwang@iipc.zju.edu.cn)
@@ -6,7 +6,7 @@
 //  -------------------------------------------------------------
 //  Copyright (C) 2002 - All Rights Reserved
 // ***************************************************************
-// ÊµÏÖ¾«Ï¸Á£¶È¶ÔÏóÍ³¼Æ
+// å®žçŽ°ç²¾ç»†ç²’åº¦å¯¹è±¡ç»Ÿè®¡
 // ***************************************************************
 #ifndef __zce_object_counter_h__
 #define __zce_object_counter_h__
@@ -17,7 +17,9 @@
 #include <zce/zce_singleton.h>
 #include <zce/zce_atomic.h>
 
-class zce_atomic_long;
+namespace zce {
+    class ZCE_API AtomicLong;
+}
 
 class ZCE_API zce_monitor
 {
@@ -32,7 +34,7 @@ public:
     };
     zce_monitor();
     virtual ~zce_monitor();
-    void register_object(const char* name, zce_atomic_long*&, zce_atomic_long*&);
+    void register_object(const char* name, zce::AtomicLong*&, zce::AtomicLong*&);
     /*name: the name to query, NULL if query all; ret:0 if not found, >0 the number, <0 error*/
     int get_objects(const char* name, std::vector<object_stat>& vec);
 };
@@ -52,8 +54,8 @@ public:
     inline void inc_ref() { ++(*alloc_ref_ptr_); };
     inline void dec_ref() { ++(*free_ref_ptr_); };
 protected:
-    zce_atomic_long* alloc_ref_ptr_;
-    zce_atomic_long* free_ref_ptr_;
+    zce::AtomicLong* alloc_ref_ptr_;
+    zce::AtomicLong* free_ref_ptr_;
 };
 
 class ZCE_API zce_object_counter_proxy

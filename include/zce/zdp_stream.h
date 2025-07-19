@@ -69,7 +69,7 @@ namespace zdp
 
         unsigned last_recv_tick_;
 
-        zce_atomic_long seq_;
+        zce::AtomicLong seq_;
 
         std::map<unsigned short, zce_smartptr<zdp_resctx> > res_dict_;
 

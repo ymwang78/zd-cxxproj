@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <zce/zce_config.h>
 #include <zce/zce_object.h>
@@ -6,34 +6,31 @@
 #include <map>
 #include <set>
 
-class ZCE_API zce_filter : public zce_filemon
-{
-public:
-    enum ERV_FILTER
-    {
+namespace zce {
+
+class ZCE_API WordFilter : public zce::FileMonitor {
+  public:
+    enum ERV_FILTER {
         ERV_FILTER_MASK,
         ERV_FILTER_BLOCK,
     };
 
-private:
-
-    struct filter_string
-    {
-        unsigned pos;       //ÔÚstr_µÄÎ»ÖÃ
-        unsigned len;       //³¤¶È
-        ERV_FILTER level;   //¼¶±ğ
+  private:
+    struct filter_string {
+        unsigned pos;      // åœ¨str_çš„ä½ç½®
+        unsigned len;      // é•¿åº¦
+        ERV_FILTER level;  // çº§åˆ«
 
         filter_string(unsigned p, unsigned l, ERV_FILTER lev);
     };
 
-    struct match_context
-    {
-        struct filter_string* filter;   //Æ¥ÅäÖĞµÄ×Ö·û´®
+    struct match_context {
+        struct filter_string* filter;  // åŒ¹é…ä¸­çš„å­—ç¬¦ä¸²
 
-        unsigned start_pos;             //±»Æ¥Åä×Ö·û´®¿ªÊ¼·ûºÏÎ»ÖÃ
-        unsigned last_pos;              //×îºóÒ»´ÎÆ¥ÅäµÄÎ»ÖÃ
-        unsigned input_mask;            //´ÓÆğÊ¼Î»ÖÃ¿ªÊ¼Æ¥Åä£¬Ã¿¸öBIT±íÊ¾1£¬×î¶à¿ç¶ÈÒªÔÚ32ÒÔÄÚ
-        unsigned match_cnt;             //Æ¥ÅäµÄ¸öÊı
+        unsigned start_pos;  // è¢«åŒ¹é…å­—ç¬¦ä¸²å¼€å§‹ç¬¦åˆä½ç½®
+        unsigned last_pos;   // æœ€åä¸€æ¬¡åŒ¹é…çš„ä½ç½®
+        unsigned input_mask;  // ä»èµ·å§‹ä½ç½®å¼€å§‹åŒ¹é…ï¼Œæ¯ä¸ªBITè¡¨ç¤º1ï¼Œæœ€å¤šè·¨åº¦è¦åœ¨32ä»¥å†…
+        unsigned match_cnt;  // åŒ¹é…çš„ä¸ªæ•°
 
         match_context(struct filter_string* f, unsigned pos);
 
@@ -41,35 +38,35 @@ private:
     };
 
     typedef std::multimap<wchar_t, filter_string> key_string_map;
-    typedef std::multimap <wchar_t, match_context>::const_iterator key_pos_iter;
+    typedef std::multimap<wchar_t, match_context>::const_iterator key_pos_iter;
     typedef std::pair<key_pos_iter, key_pos_iter> key_pos_range;
 
-    wchar_t*    str_ptr_;
-    unsigned    str_len_;
-    unsigned    str_size_;
+    wchar_t* str_ptr_;
+    unsigned str_len_;
+    unsigned str_size_;
     key_string_map key_pos_map_;
 
     std::set<std::wstring> str_set_;
 
     int add_tofilter(const char* content, int size);
 
-public:
-    zce_filter();
+  public:
+    WordFilter();
 
-    ~zce_filter();
+    ~WordFilter();
 
     void clear();
 
     int add(const wchar_t* str, unsigned size, ERV_FILTER level);
 
-    //if have block, return 1; normal ,return 0; err < 0;
+    // if have block, return 1; normal ,return 0; err < 0;
     int replace(wchar_t* str, unsigned size, wchar_t c);
 
-    const std::set<std::wstring>& str_set() {
-        return str_set_;
-    }
+    const std::set<std::wstring>& str_set() { return str_set_; }
 
-    virtual int process_content(const unsigned char* data, unsigned len);
+    virtual int processContent(const unsigned char* data, unsigned len) override;
 
     static std::string simple_filter(const std::string& source, int* filtercnt = 0);
 };
+
+}  // namespace zce

@@ -1,6 +1,6 @@
-#pragma once
+﻿#pragma once
 // ***************************************************************
-//  zce_conf   version:  1.0   -  date: 2002/4/27/
+//  zce_conf.h   version:  1.0   -  date: 2002/4/27/
 //  -------------------------------------------------------------
 //  Yongming Wang(wangym@gmail.com)
 //  -------------------------------------------------------------
@@ -9,52 +9,42 @@
 // ***************************************************************
 // 
 // ***************************************************************
-#ifndef __zce_conf_h__
-#define __zce_conf_h__
-
 #include <zce/zce_object.h>
 
 class zce_dblock;
 
-class ZCE_API zce_filemon : public zce_object
+namespace zce
 {
+
+class ZCE_API FileMonitor : public zce_object {
     time_t st_mtime_;
 
-    std::string get_fullpath(const char* filename);
+    std::string getFullpath(const char* filename);
 
-    int load_file(zce_dblock& dblock, const char* filename);
+    int loadFile(zce_dblock& dblock, const char* filename);
 
-public:
+  public:
+    FileMonitor();
 
-    zce_filemon();
+    virtual ~FileMonitor();
 
-    virtual ~zce_filemon();
-
-    bool is_changed(const char* filename);
+    bool isChanged(const char* filename);
 
     int load(const char* filename);
 
-    virtual int process_content(const unsigned char* data, unsigned len) = 0;
+    virtual int processContent(const unsigned char* data, unsigned len) = 0;
 };
 
-template<typename T>
-class zce_conf : public zce_filemon
-{
-protected:
-
+template <typename T>
+class ConfigTemplate : public FileMonitor {
+  protected:
     T conf_;
 
-public:
+  public:
+    T& get() { return conf_; };
 
-    T& get()
-    { 
-        return conf_; 
-    };
-
-    const T& get_const() const
-    {
-        return conf_;
-    };
+    const T& get_const() const { return conf_; };
 };
 
-#endif // __zce_conf_h__
+}
+

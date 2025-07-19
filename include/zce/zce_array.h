@@ -17,7 +17,7 @@ class Array {  // skew heap
 
     struct mix_64 {
         static inline int nextMagic() {
-            static zce_atomic_long _magic(rand());
+            static zce::AtomicLong _magic(rand());
             int m = 0;
             do {
                 m = (++_magic) & 0x7fffffff;
@@ -39,7 +39,7 @@ class Array {  // skew heap
 
     struct mix_32 {
         static inline int nextMagic() {
-            static zce_atomic_long _magic(rand());
+            static zce::AtomicLong _magic(rand());
             int m = 0;
             do {
                 m = (++_magic) & 0x7fff;

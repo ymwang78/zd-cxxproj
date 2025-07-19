@@ -89,11 +89,11 @@ class ZCE_API zce_socket : public zce_istream {
     ZCE_OBJECT_DECLARE;
 
   protected:
-    zce_atomic_long onclose_refcnt_;
+    zce::AtomicLong onclose_refcnt_;
 
-    zce_atomic_long close_refcnt_;
+    zce::AtomicLong close_refcnt_;
 
-    zce_atomic_long read_refcnt_;
+    zce::AtomicLong read_refcnt_;
 
     zce_smartptr<zce_reactor> reactor_;
 
@@ -323,7 +323,7 @@ class ZCE_API zce_acceptor : public zce_object {
 
     bool isclose_;
 
-    zce_atomic_long block_count_;
+    zce::AtomicLong block_count_;
     zce_mutex_rw block_lock_;
     struct block_t {
         unsigned start_timet;
