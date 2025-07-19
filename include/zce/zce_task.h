@@ -49,7 +49,6 @@ struct TaskResult : public TaskResultBase {
 
 template <>
 struct TaskResult<void> : public TaskResultBase {
-
     static TaskResult<void> success() {
         TaskResult<void> res;
         res.status = Status::Success;
@@ -86,25 +85,51 @@ class ZCE_API TaskDelegator : virtual public zce_object {
 
     template <typename F, typename... Args>
     auto delegate(const char* name, F&& f, Args&&... args) -> std::future<decltype(f(args...))> {
-        using ResultType = decltype(f(args...));
-        auto task_binder = std::bind(std::forward<F>(f), std::forward<Args>(args)...);
-        auto packaged_task_ptr = std::make_shared<std::packaged_task<ResultType()>>(task_binder);
-        std::future<ResultType> result_future = packaged_task_ptr->get_future();
+        using ReturnType = decltype(f(args...));
+        using ResultType = TaskResult<ReturnType>;
 
-        class FutureTask : public zce::Task {
-            std::shared_ptr<std::packaged_task<ResultType()>> task_ptr_;
+        auto promise_ptr = std::make_shared<std::promise<ResultType>>();
+
+        std::future<ResultType> result_future = promise_ptr->get_future();
+
+        class FutureTask : public Task {
+            std::shared_ptr<std::promise<ResultType>> promise_;
+            std::function<ReturnType()> func_;
 
           public:
-            FutureTask(const char* name, std::shared_ptr<std::packaged_task<ResultType()>> ptr)
-                : zce::Task(name), task_ptr_(ptr) {}
+            FutureTask(std::shared_ptr<std::promise<ResultType>> p, F&& f, Args&&... args)
+                : Task("future_task_no_except"), promise_(p) {
+                func_ = std::bind(std::forward<F>(f), std::forward<Args>(args)...);
+            }
 
             virtual void call() override {
-                // 当调度器调用 call() 时，我们执行 packaged_task
-                // packaged_task 的执行结果会自动填充到 future 中
-                (*task_ptr_)();
+                try {
+                    if constexpr (std::is_same_v<ReturnType, void>) {
+                        func_();
+                        promise_->set_value(ResultType::success());
+                    } else {
+                        promise_->set_value(ResultType::success(func_()));
+                    }
+                } catch (const std::exception& e) {
+                    promise_->set_value(
+                        ResultType::error(ResultType::Status::TaskException, e.what()));
+                } catch (...) {
+                    promise_->set_value(ResultType::error(ResultType::Status::TaskException,
+                                                          "An unknown error occurred."));
+                }
             }
         };
-        delegateTask(zce_smartptr<zce::Task>(new FutureTask(packaged_task_ptr)));
+
+        auto task = zce_smartptr<Task>(
+            new FutureTask(promise_ptr, std::forward<F>(f), std::forward<Args>(args)...));
+
+        int ret = delegateTask(task);
+
+        if (ret != 0) {
+            promise_ptr->set_value(
+                ResultType::error(ResultType::Status::SubmitFailed, "Failed to schedule task."));
+        }
+
         return result_future;
     }
 
@@ -187,15 +212,11 @@ class ZCE_API Scheduler : public zce_object {
         using ReturnType = decltype(f(args...));
         using ResultType = TaskResult<ReturnType>;
 
-        // 1. 在外部作用域创建 promise_ptr
         auto promise_ptr = std::make_shared<std::promise<ResultType>>();
 
-        // 2. 从 promise_ptr 获取 future
         std::future<ResultType> result_future = promise_ptr->get_future();
 
-        // 3. 定义 FutureTask 内部类
         class FutureTask : public Task {
-            // 内部成员变量，持有 promise 的共享所有权
             std::shared_ptr<std::promise<ResultType>> promise_;
             std::function<ReturnType()> func_;
 
@@ -223,21 +244,16 @@ class ZCE_API Scheduler : public zce_object {
             }
         };
 
-        // 将 promise_ptr 传递给 FutureTask 的构造函数
         auto task = zce_smartptr<Task>(
             new FutureTask(promise_ptr, std::forward<F>(f), std::forward<Args>(args)...));
 
-        // 4. 提交任务到底层调度器
         int ret = perform(task);
 
-        // 5. 【修正部分】如果提交失败
         if (ret != 0) {
-            // 使用在【当前外部作用域】中定义的 promise_ptr，而不是内部类的成员 promise_
             promise_ptr->set_value(
                 ResultType::error(ResultType::Status::SubmitFailed, "Failed to schedule task."));
         }
 
-        // 6. 返回 future
         return result_future;
     }
 };
