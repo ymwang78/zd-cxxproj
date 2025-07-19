@@ -112,11 +112,12 @@ extern "C"
 
     int ZCE_API zce_inet_parse_host_port(const char*& host, int& hostlen, int& port, const char* hostport);
 
+    int ZCE_API zce_create_pipe(SOCKET fds[2]);
+
+
 #ifdef __cplusplus
 }
 #endif
-
-int ZCE_API zce_create_pipe(SOCKET fds[2]);
 
 int ZCE_API zce_symbol_read(const char* buf, int size, std::string& val, char split = ' ');
 

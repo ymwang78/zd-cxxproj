@@ -110,7 +110,7 @@ struct xOptParsedVariable {
 
 using xOptParsedVariableMap = std::unordered_map<std::string, xOptParsedVariable>;
 using xOptParsedVariableArr =
-    zce_indexed_array<xOptParsedVariable, std::string,
+    zce::ArrayWithIndex<xOptParsedVariable, std::string,
                       std::function<std::string(const xOptParsedVariable&)>>;
 
 struct xOptParsedConstraint {
@@ -124,7 +124,7 @@ struct xOptParsedConstraint {
 
 using xOptParsedConstraintMap = std::unordered_map<std::string, xOptParsedConstraint>;
 using xOptParsedConstraintArr =
-    zce_indexed_array<xOptParsedConstraint, std::string,
+    zce::ArrayWithIndex<xOptParsedConstraint, std::string,
                       std::function<std::string(const xOptParsedConstraint&)>>;
 
 struct xOptParsedModel {

@@ -5,10 +5,15 @@
 #include <algorithm>
 #include <zce/zce_atomic.h>
 #include <zce/zce_log.h>
+#include <unordered_map>
+#include <functional>
+#include <optional>
+
+namespace zce {
 
 template <typename T, typename H = long long, bool is_auto_expand = false,
           bool is_auto_shrink = false>
-class zce_array {  // skew heap
+class Array {  // skew heap
 
     struct mix_64 {
         static inline int next_magic() {
@@ -118,12 +123,12 @@ class zce_array {  // skew heap
     size_t capacity_limit_;
 
   public:
-    explicit zce_array(size_t capacity, size_t capacity_limit = 0xffffffff)
+    explicit Array(size_t capacity, size_t capacity_limit = 0xffffffff)
         : free_head_(-1), cur_top_(0), used_count_(0), capacity_limit_(capacity_limit) {
         slots_.resize(capacity);
     }
 
-    ~zce_array() { clear(); }
+    ~Array() { clear(); }
 
     size_t get_used_count() const { return used_count_; }
 
@@ -351,7 +356,7 @@ class zce_array {  // skew heap
         using reference = T&;
 
       private:
-        zce_array* array_;
+        Array* array_;
         int index_;
         // 跳过未使用的槽
         void advance_to_valid() {
@@ -361,7 +366,7 @@ class zce_array {  // skew heap
         }
 
       public:
-        iterator(zce_array* array, int index) : array_(array), index_(index) {
+        iterator(Array* array, int index) : array_(array), index_(index) {
             if (array_) {
                 advance_to_valid();
             }
@@ -396,7 +401,7 @@ class zce_array {  // skew heap
         using reference = const T&;
 
       private:
-        const zce_array* array_;
+        const Array* array_;
         int index_;
         void advance_to_valid() {
             while (index_ < array_->cur_top_ && !array_->slots_[index_].in_use()) {
@@ -405,7 +410,7 @@ class zce_array {  // skew heap
         }
 
       public:
-        const_iterator(const zce_array* array, int index) : array_(array), index_(index) {
+        const_iterator(const Array* array, int index) : array_(array), index_(index) {
             if (array_) {
                 advance_to_valid();
             }
@@ -440,16 +445,14 @@ class zce_array {  // skew heap
     const_iterator cend() const { return end(); }
 };
 
-#include <unordered_map>
-#include <functional>
-#include <optional>
+
 
 template <typename T, typename KeyType, typename GetKeyFunc>
-class zce_indexed_array {
+class ArrayWithIndex {
   public:
-    zce_indexed_array() : key_func_([](const T& item) -> KeyType { return item.name; }) {}
+    ArrayWithIndex() : key_func_([](const T& item) -> KeyType { return item.name; }) {}
 
-    explicit zce_indexed_array(std::function<KeyType(const T&)> key_func)
+    explicit ArrayWithIndex(std::function<KeyType(const T&)> key_func)
         : key_func_(std::move(key_func)) {}
 
     template <typename T_S>
@@ -545,3 +548,5 @@ class zce_indexed_array {
     std::unordered_map<KeyType, size_t> name_to_index_;
     std::function<KeyType(const T&)> key_func_;
 };
+
+}  // namespace zce
