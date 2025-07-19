@@ -16,7 +16,7 @@ template <typename T, typename H = long long, bool is_auto_expand = false,
 class Array {  // skew heap
 
     struct mix_64 {
-        static inline int next_magic() {
+        static inline int nextMagic() {
             static zce_atomic_long _magic(rand());
             int m = 0;
             do {
@@ -38,7 +38,7 @@ class Array {  // skew heap
     };
 
     struct mix_32 {
-        static inline int next_magic() {
+        static inline int nextMagic() {
             static zce_atomic_long _magic(rand());
             int m = 0;
             do {
@@ -83,11 +83,11 @@ class Array {  // skew heap
         slot_t() : heap_node_{0, -1, -1, -1} {}
         ~slot_t() {}
 
-        inline bool in_use() const { return data_.inuse; }
+        inline bool isInUse() const { return data_.inuse; }
 
         // 显式定义拷贝构造函数
         slot_t(const slot_t& other) {
-            if (other.in_use()) {
+            if (other.isInUse()) {
                 data_.inuse = 1;
                 data_.magic = other.data_.magic;
                 new (&data_.item) T(other.data_.item);
@@ -99,12 +99,12 @@ class Array {  // skew heap
         // 显式定义赋值运算符
         slot_t& operator=(const slot_t& other) {
             if (this != &other) {
-                if (in_use()) {
+                if (isInUse()) {
                     data_.inuse = 0;
                     data_.magic = 0;
                     data_.item.~T();
                 }
-                if (other.in_use()) {
+                if (other.isInUse()) {
                     data_.inuse = 1;
                     data_.magic = other.data_.magic;
                     new (&data_.item) T(other.data_.item);
@@ -130,17 +130,17 @@ class Array {  // skew heap
 
     ~Array() { clear(); }
 
-    size_t get_used_count() const { return used_count_; }
+    size_t getUsedCount() const { return used_count_; }
 
     template <typename U>
-    H insert_item(U&& val) {
+    H insertItem(U&& val) {
         int index;
         if (free_head_ != -1) {
             // 从堆中弹出最小元素
             index = free_head_;
             int left = slots_[index].heap_node_.left;
             int right = slots_[index].heap_node_.right;
-            free_head_ = merge_skew_heap(left, right);
+            free_head_ = mergeSkewHeap(left, right);
             if (free_head_ != -1) slots_[free_head_].heap_node_.parent = -1;
         } else {
             if (cur_top_ >= mix_magic_t::LIMIT) {
@@ -158,25 +158,25 @@ class Array {  // skew heap
 
         new (&slots_[index].data_.item) T(std::forward<U>(val));
         slots_[index].data_.inuse = 1;
-        slots_[index].data_.magic = mix_magic_t::next_magic();
+        slots_[index].data_.magic = mix_magic_t::nextMagic();
         ++used_count_;
         return mix_magic_t::mix(slots_[index].data_.magic, index);
     }
 
-    H alloc_item() { return insert_item(T()); }
+    H allocItem() { return insertItem(T()); }
 
-    bool is_valid(H handle) const noexcept {
+    bool isValid(H handle) const noexcept {
         int index, magic;
         mix_magic_t::seperate(handle, magic, index);
-        return index >= 0 && index < cur_top_ && slots_[index].in_use() &&
+        return index >= 0 && index < cur_top_ && slots_[index].isInUse() &&
                magic == slots_[index].data_.magic;
     }
 
-    void release_item(H handle) {
+    void releaseItem(H handle) {
         int index, magic;
         mix_magic_t::seperate(handle, magic, index);
 
-        ZCE_ASSERT_RETURN(index >= 0 && index < cur_top_ && slots_[index].in_use() &&
+        ZCE_ASSERT_RETURN(index >= 0 && index < cur_top_ && slots_[index].isInUse() &&
                               magic == slots_[index].data_.magic, );
 
         // 析构对象
@@ -192,10 +192,10 @@ class Array {  // skew heap
 
             if (is_auto_shrink) {
                 // 检查是否有连续的空闲元素
-                while (cur_top_ > 0 && !slots_[cur_top_ - 1].in_use()) {
+                while (cur_top_ > 0 && !slots_[cur_top_ - 1].isInUse()) {
                     // 释放连续的空闲元素, 从skew heap中弹出
                     int cur_free = cur_top_ - 1;
-                    remove_free_node(cur_free);
+                    removeFreeNode(cur_free);
                     --cur_top_;
                 }
             }
@@ -207,7 +207,7 @@ class Array {  // skew heap
         slots_[index].heap_node_.parent = -1;
         slots_[index].heap_node_.left = -1;
         slots_[index].heap_node_.right = -1;
-        free_head_ = merge_skew_heap(free_head_, index);
+        free_head_ = mergeSkewHeap(free_head_, index);
     }
 
     // 强制设置一个空节点为当前值
@@ -216,13 +216,13 @@ class Array {  // skew heap
         int index, magic;
         mix_magic_t::seperate(handle, magic, index);
         ZCE_ASSERT_RETURN(index >= 0, -1);
-        if (index < cur_top_ && slots_[index].in_use()) {
+        if (index < cur_top_ && slots_[index].isInUse()) {
             if (slots_[index].data_.item == val) return 0;
             ZCE_ASSERT(false);
             return -1;
         }
         if (index < cur_top_) {
-            remove_free_node(index);
+            removeFreeNode(index);
         } else if (index == cur_top_) {
             cur_top_ = index + 1;
         } else {
@@ -238,7 +238,7 @@ class Array {  // skew heap
                 slots_[i].heap_node_.parent = -1;
                 slots_[i].heap_node_.left = -1;
                 slots_[i].heap_node_.right = -1;
-                free_head_ = merge_skew_heap(free_head_, i);
+                free_head_ = mergeSkewHeap(free_head_, i);
             }
             cur_top_ = index + 1;
         }
@@ -255,7 +255,7 @@ class Array {  // skew heap
         int index, magic;
         mix_magic_t::seperate(handle, magic, index);
 
-        ZCE_ASSERT_RETURN(index >= 0 && index < cur_top_ && slots_[index].in_use() &&
+        ZCE_ASSERT_RETURN(index >= 0 && index < cur_top_ && slots_[index].isInUse() &&
                               magic == slots_[index].data_.magic,
                           _empty);
         return slots_[index].data_.item;
@@ -266,7 +266,7 @@ class Array {  // skew heap
         int index, magic;
         mix_magic_t::seperate(handle, magic, index);
 
-        ZCE_ASSERT_RETURN(index >= 0 && index < cur_top_ && slots_[index].in_use() &&
+        ZCE_ASSERT_RETURN(index >= 0 && index < cur_top_ && slots_[index].isInUse() &&
                               magic == slots_[index].data_.magic,
                           _empty);
         return slots_[index].data_.item;
@@ -274,7 +274,7 @@ class Array {  // skew heap
 
     void clear() {
         for (int i = 0; i < cur_top_; ++i) {
-            if (slots_[i].in_use()) {
+            if (slots_[i].isInUse()) {
                 slots_[i].data_.inuse = 0;
                 slots_[i].data_.magic = 0;
                 slots_[i].data_.item.~T();
@@ -288,7 +288,7 @@ class Array {  // skew heap
   private:
     // Skew Heap合并函数
     // 将堆root1和root2合并成一个并返回新根节点
-    int merge_skew_heap(int root1, int root2) {
+    int mergeSkewHeap(int root1, int root2) {
         if (root1 == -1) return root2;
         if (root2 == -1) return root1;
 
@@ -304,7 +304,7 @@ class Array {  // skew heap
         // Skew Heap的merge:
         // 合并root1的右子树和root2
         int r = slots_[root1].heap_node_.right;
-        slots_[root1].heap_node_.right = merge_skew_heap(r, root2);
+        slots_[root1].heap_node_.right = mergeSkewHeap(r, root2);
 
         // Skew Heap特性：交换左右子树
         int l = slots_[root1].heap_node_.left;
@@ -320,11 +320,11 @@ class Array {  // skew heap
     }
 
     // 删除当前节点，返回新的子节点的根
-    int remove_free_node(int nodeid) {
+    int removeFreeNode(int nodeid) {
         int parent = slots_[nodeid].heap_node_.parent;
         int left = slots_[nodeid].heap_node_.left;
         int right = slots_[nodeid].heap_node_.right;
-        int new_top = merge_skew_heap(left, right);
+        int new_top = mergeSkewHeap(left, right);
         if (parent != -1) {
             if (slots_[parent].heap_node_.left == nodeid) {
                 slots_[parent].heap_node_.left = new_top;
@@ -360,7 +360,7 @@ class Array {  // skew heap
         int index_;
         // 跳过未使用的槽
         void advance_to_valid() {
-            while (index_ < array_->cur_top_ && !array_->slots_[index_].in_use()) {
+            while (index_ < array_->cur_top_ && !array_->slots_[index_].isInUse()) {
                 ++index_;
             }
         }
@@ -404,7 +404,7 @@ class Array {  // skew heap
         const Array* array_;
         int index_;
         void advance_to_valid() {
-            while (index_ < array_->cur_top_ && !array_->slots_[index_].in_use()) {
+            while (index_ < array_->cur_top_ && !array_->slots_[index_].isInUse()) {
                 ++index_;
             }
         }
@@ -475,7 +475,7 @@ class ArrayWithIndex {
         }
     }
 
-    int get_index(const KeyType& key) const {
+    int getIndex(const KeyType& key) const {
         auto it = name_to_index_.find(key);
         if (it != name_to_index_.end()) {
             return (int)it->second;
@@ -519,7 +519,7 @@ class ArrayWithIndex {
 
     size_t size() const { return data_.size(); }
 
-    const std::vector<T>& to_vec() const { return data_; }
+    const std::vector<T>& toVector() const { return data_; }
 
   // 迭代器支持
     using iterator = typename std::vector<T>::iterator;
