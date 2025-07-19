@@ -1,6 +1,6 @@
 ﻿#pragma once
 // ***************************************************************
-//  zce_any   version:  1.0   -  date: 2023/08/01
+//  zce::Any   version:  1.0   -  date: 2023/08/01
 //  -------------------------------------------------------------
 //  Yongming Wang(wangym@gmail.com)
 //  -------------------------------------------------------------
@@ -21,7 +21,9 @@
 class zce_object;
 class zce_dblock;
 
-class ZCE_API zce_any {
+namespace zce {
+
+class ZCE_API Any {
     enum _any_types {
         any_int64 = 0,
         any_double,
@@ -58,8 +60,8 @@ class ZCE_API zce_any {
             zce_byte* bytearray_;
             char* str_;
             std::vector<bool>* boolvec_;
-            std::map<zce_any, zce_any>* dict_;
-            std::vector<zce_any>* vec_;
+            std::map<Any, Any>* dict_;
+            std::vector<Any>* vec_;
         } u_;
         zce_uint16 len_or_port_;
         zce_uint16 subtype_indicate_;  // defined by app
@@ -88,89 +90,89 @@ class ZCE_API zce_any {
     }
 
     // called by template constructor
-    zce_any(const zce_byte* buf, size_t len, _any_types any_types, bool issigned,
+    Any(const zce_byte* buf, size_t len, _any_types any_types, bool issigned,
             int shiftbits) noexcept;
 
   public:
-    zce_any(const zce_any& rhs);
+    Any(const Any& rhs);
 
-    zce_any(zce_any&& rhs) noexcept;
+    Any(Any&& rhs) noexcept;
 
-    ~zce_any();
+    ~Any();
 
-    zce_any& operator=(const zce_any& rhs) {
+    Any& operator=(const Any& rhs) {
         if (this != &rhs) {
-            this->~zce_any();
-            new (this) zce_any(rhs);
+            this->~Any();
+            new (this) Any(rhs);
         }
         return *this;
     }
 
-    bool operator==(const zce_any& rhs) const noexcept;
+    bool operator==(const Any& rhs) const noexcept;
 
-    bool operator!=(const zce_any& rhs) const noexcept { return !(operator==(rhs)); }
+    bool operator!=(const Any& rhs) const noexcept { return !(operator==(rhs)); }
 
-    bool operator<(const zce_any& rhs) const noexcept;
+    bool operator<(const Any& rhs) const noexcept;
 
-    zce_any(int i32 = 0) noexcept : data_{} {
+    Any(int i32 = 0) noexcept : data_{} {
         data_.type_ = any_int64;
         data_.u_.i64_[0] = i32;
     }
 
-    zce_any(zce_int64 i64, bool is_datetime = false) noexcept : data_{} {
+    Any(zce_int64 i64, bool is_datetime = false) noexcept : data_{} {
         data_.type_ = is_datetime ? any_datetime : any_int64;
         data_.u_.i64_[0] = i64;
     }
 
-    zce_any(zce_double dbl) noexcept : data_{} {
+    Any(zce_double dbl) noexcept : data_{} {
         data_.type_ = any_double;
         data_.u_.dbl_[0] = dbl;
     }
 
-    zce_any(const void* raw) noexcept : data_{} {
+    Any(const void* raw) noexcept : data_{} {
         data_.type_ = any_rawptr;
         data_.u_.rawptr_[0] = (void*)raw;
     }
 
-    zce_any(zce_object* obj) noexcept : data_{} {
+    Any(zce_object* obj) noexcept : data_{} {
         data_.type_ = any_object;
         data_.u_.obj_ = obj;
         if (data_.u_.obj_) data_.u_.obj_->__addref();
     }
 
     template <typename T>
-    zce_any(const T* barray, size_t len) noexcept {
-        new (this) zce_any((const zce_byte*)barray, (size_t)len * sizeof(T), _to_type<T>(),
+    Any(const T* barray, size_t len) noexcept {
+        new (this) zce::Any((const zce_byte*)barray, (size_t)len * sizeof(T), _to_type<T>(),
                            std::is_signed<T>::value, zce_bits_msb_index(sizeof(T)));
     }
 
-    zce_any(const std::vector<bool>& vec) noexcept;
+    Any(const std::vector<bool>& vec) noexcept;
 
-    zce_any(const char* str, size_t len) noexcept;
+    Any(const char* str, size_t len) noexcept;
 
-    zce_any(const char* str) noexcept;
+    Any(const char* str) noexcept;
 
-    zce_any(const zce_byte* buf, size_t len, zce_byte fixarr_u) noexcept;
+    Any(const zce_byte* buf, size_t len, zce_byte fixarr_u) noexcept;
 
-    zce_any(const struct in_addr& ipv4, unsigned short port) noexcept : data_{} {
+    Any(const struct in_addr& ipv4, unsigned short port) noexcept : data_{} {
         data_.type_ = any_ipv4;
         data_.u_.ipv4_ = ipv4;
         data_.len_or_port_ = port;
     }
 
-    zce_any(const struct in6_addr& ipv6, unsigned short port) noexcept : data_{} {
+    Any(const struct in6_addr& ipv6, unsigned short port) noexcept : data_{} {
         data_.type_ = any_ipv6;
         data_.u_.ipv6_ = ipv6;
         data_.len_or_port_ = port;
     }
 
-    static zce_any create_dict();
+    static Any create_dict();
 
-    static zce_any create_vector();
+    static Any create_vector();
 
-    static zce_any create_dblock();
+    static Any create_dblock();
 
-    static zce_any create_datetime_from_msec(zce_int64 msec);
+    static Any create_datetime_from_msec(zce_int64 msec);
 
     inline int get_type() const noexcept { return data_.type_; }
 
@@ -251,7 +253,8 @@ class ZCE_API zce_any {
 
     template <typename T>
     inline const T* array() const noexcept {
-        ZCE_ASSERT_RETURN(data_.type_ == _to_type<T>() && sizeof(T) == (1ull << data_.shiftbits_), 0);
+        ZCE_ASSERT_RETURN(data_.type_ == _to_type<T>() && sizeof(T) == (1ull << data_.shiftbits_),
+                          0);
         if (data_.outplace_) return (T*)data_.u_.bytearray_;
         return (T*)data_.u_.bytearray_inplace_;
     }
@@ -279,14 +282,14 @@ class ZCE_API zce_any {
 
     inline bool is_dict() const noexcept { return data_.type_ == any_dict; }
 
-    inline std::map<zce_any, zce_any>& dict() {
-        static std::map<zce_any, zce_any> empty;
+    inline std::map<Any, Any>& dict() {
+        static std::map<Any, Any> empty;
         ZCE_ASSERT_RETURN(data_.type_ == any_dict, empty);
         return *data_.u_.dict_;
     }
 
-    inline const std::map<zce_any, zce_any>& dict() const noexcept {
-        static std::map<zce_any, zce_any> empty;
+    inline const std::map<Any, Any>& dict() const noexcept {
+        static std::map<Any, Any> empty;
         ZCE_ASSERT_RETURN(data_.type_ == any_dict, empty);
         return *data_.u_.dict_;
     }
@@ -301,14 +304,14 @@ class ZCE_API zce_any {
 
     inline bool is_vector() const noexcept { return data_.type_ == any_vector; }
 
-    inline std::vector<zce_any>& vector() {
-        static std::vector<zce_any> empty;
+    inline std::vector<Any>& vector() {
+        static std::vector<Any> empty;
         ZCE_ASSERT_RETURN(data_.type_ == any_vector, empty);
         return *data_.u_.vec_;
     }
 
-    inline const std::vector<zce_any>& vector() const noexcept {
-        static std::vector<zce_any> empty;
+    inline const std::vector<Any>& vector() const noexcept {
+        static std::vector<Any> empty;
         ZCE_ASSERT_RETURN(data_.type_ == any_vector, empty);
         return *data_.u_.vec_;
     }
@@ -342,13 +345,13 @@ class ZCE_API zce_any {
     inline bool is_ipv6() const noexcept { return data_.type_ == any_ipv6; }
 
     inline const struct in_addr& ipv4() const noexcept {
-        static const struct in_addr _empty {};
+        static const struct in_addr _empty{};
         ZCE_ASSERT_RETURN(data_.type_ == any_ipv4, _empty);
         return data_.u_.ipv4_;
     }
 
     inline const struct in6_addr& ipv6() const noexcept {
-        static const struct in6_addr _empty {};
+        static const struct in6_addr _empty{};
         ZCE_ASSERT_RETURN(data_.type_ == any_ipv6, _empty);
         return data_.u_.ipv6_;
     }
@@ -368,3 +371,5 @@ class ZCE_API zce_any {
 
     std::string to_string() const noexcept;
 };
+
+}  // namespace zce

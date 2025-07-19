@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 // ***************************************************************
 //  whp_stream   version:  1.0   -  date: 2003/01/01
 //  -------------------------------------------------------------
@@ -42,7 +42,7 @@ class ZCE_API whp_stream : public zce_istream
 
 	unsigned char MapRecvByte(unsigned char cbData);
 
-	int proc_next(zce_dblock& dblock_ptr, const zce_any& ctx);
+	int proc_next(zce_dblock& dblock_ptr, const zce::Any& ctx);
 
 public:
 
@@ -50,7 +50,7 @@ public:
 
 	int write(zce_dblock& dblock_ptr, ERV_ISTREAM_WRITEOPT opt) override;
 
-	void on_read(zce_dblock& dblock, const zce_any&) override;
+	void on_read(zce_dblock& dblock, const zce::Any&) override;
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -67,5 +67,5 @@ public:
 
     //virtual int write(zce_dblock& dblock_ptr, ERV_ISTREAM_WRITEOPT opt);
 
-    void on_read(zce_dblock& dblock, const zce_any&) override;
+    void on_read(zce_dblock& dblock, const zce::Any&) override;
 };

@@ -55,7 +55,7 @@ template <typename T>
 struct is_builtin_basic
     : std::integral_constant<
           bool, std::is_arithmetic<T>::value || std::is_same<T, std::string>::value ||
-                    std::is_same<T, zce_dblock>::value || std::is_same<T, zce_any>::value> {};
+                    std::is_same<T, zce_dblock>::value || std::is_same<T, zce::Any>::value> {};
 
 template <typename T>
 struct is_builtin_vector : std::false_type {};
@@ -126,7 +126,7 @@ inline typename std::enable_if<std::is_integral<T>::value, int>::type zds_pack_b
     }
 }
 
-int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const zce_any& val, zds_context_t* ctx,
+int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const zce::Any& val, zds_context_t* ctx,
                              bool has_prefix = true);
 
 #define DECLARE_PACK_BUILTIN_ARRAY(TT)                                                            \
@@ -165,13 +165,13 @@ int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const zce::string_vi
 int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const std::vector<std::string>& val,
                              zds_context_t* ctx, bool has_prefix = true);
 
-int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const std::vector<zce_any>& val,
+int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const std::vector<zce::Any>& val,
                              zds_context_t* ctx, bool has_prefix = true);
 
 int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const zce_dblmat& val,
                              zds_context_t* ctx, bool has_prefix = true);
 
-// int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const std::map<zce_any, zce_any>&
+// int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const std::map<zce_any, zce::Any>&
 // val, zds_context_t* ctx, bool has_prefix = true);
 
 int ZCE_API zds_pack_struct_header(zce_byte* buf, int size, zce_uint64 struct_prefix,
@@ -253,7 +253,7 @@ int ZCE_API zds_unpack_builtin(zce_dblock& val, const zce_byte* buf, zce_int32 s
 int ZCE_API zds_unpack_builtin(std::string& val, const zce_byte* buf, zce_int32 size,
                                zds_context_t* ctx);
 
-int ZCE_API zds_unpack_builtin(zce_any& val, const zce_byte* buf, zce_int32 size,
+int ZCE_API zds_unpack_builtin(zce::Any& val, const zce_byte* buf, zce_int32 size,
                                zds_context_t* ctx);
 
 int ZCE_API zds_unpack_builtin(std::vector<std::string>& val, const zce_byte* buf, zce_int32 size,
@@ -349,7 +349,7 @@ constexpr zce_byte _get_payload() {
         return ZDS_PAYLOAD_UTF8STR;
     } else if constexpr (std::is_same<T, zce_dblock>::value) {
         return ZDS_PAYLOAD_FIXARR;
-    } else if constexpr (std::is_same<T, zce_any>::value) {
+    } else if constexpr (std::is_same<T, zce::Any>::value) {
         return ZDS_PAYLOAD_ANY;
     } else if constexpr (zdp::is_builtin_vector<T>::value) {
         return ZDS_PAYLOAD_FIXARR;
@@ -367,7 +367,7 @@ constexpr zce_byte _get_payload() {
 template <typename TKEY, typename TVAL>
 int zds_pack_builtin(zce_byte* buf, zce_int32 size, const std::map<TKEY, TVAL>& val,
                      zds_context_t* ctx, bool has_prefix = true) {
-    static_assert(std::is_same<TKEY, zce_any>::value || is_builtin_type<TKEY>(),
+    static_assert(std::is_same<TKEY, zce::Any>::value || is_builtin_type<TKEY>(),
                   "key must be builtin type");
 
     int len = 0, ret = 0;
@@ -376,12 +376,12 @@ int zds_pack_builtin(zce_byte* buf, zce_int32 size, const std::map<TKEY, TVAL>& 
     CHECKLEN_MOVEBUF_ADDRET_DECSIZE;
 
     for (auto it = val.begin(); it != val.end(); ++it) {
-        len = zds_pack_builtin(buf, size, it->first, ctx, std::is_same<TKEY, zce_any>::value);
+        len = zds_pack_builtin(buf, size, it->first, ctx, std::is_same<TKEY, zce::Any>::value);
         CHECKLEN_MOVEBUF_ADDRET_DECSIZE;
         if constexpr (is_builtin_type<TVAL>()) {
-            len = zds_pack_builtin(buf, size, it->second, ctx, std::is_same<TKEY, zce_any>::value);
+            len = zds_pack_builtin(buf, size, it->second, ctx, std::is_same<TKEY, zce::Any>::value);
         } else {
-            len = zds_pack(buf, size, it->second, ctx, std::is_same<TKEY, zce_any>::value);
+            len = zds_pack(buf, size, it->second, ctx, std::is_same<TKEY, zce::Any>::value);
         }
         CHECKLEN_MOVEBUF_ADDRET_DECSIZE;
     }

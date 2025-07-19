@@ -29,10 +29,10 @@ struct ZCE_API zdp_storm_peer {
 };
 
 extern "C" {
-typedef int (*publish_callback)(const zce_any& ctx, int cnt, zce_int64* topics, zce_int64 from,
+typedef int (*publish_callback)(const zce::Any& ctx, int cnt, zce_int64* topics, zce_int64 from,
                                 zce_byte* data, zce_uint32 len);
 
-typedef int (*set_callback)(const zce_any& ctx, zce_int64 topic, const zce_string& name,
+typedef int (*set_callback)(const zce::Any& ctx, zce_int64 topic, const zce_string& name,
                             zce_int64 seq, zce_int64 tick, zce_int64 uid, zce_int64 flag,
                             const std::vector<zce_byte>& data);
 
@@ -56,7 +56,7 @@ class ZCE_API zdp_storm : public zce_object {
 
   public:
     zdp_storm(const zce_smartptr<zce_reactor>&, const zce_smartptr<zce::Scheduler>&,
-              zce_uint16 uniqueid, const zce_string& token, const zce_any& ctx,
+              zce_uint16 uniqueid, const zce_string& token, const zce::Any& ctx,
               publish_callback child_cb, set_callback set_cb);
 
     ~zdp_storm();
@@ -75,7 +75,7 @@ class ZCE_API zdp_storm_client : public zce_object {
 
   public:
     zdp_storm_client(const zce_smartptr<zce_reactor>&, zce_int64 uniqueid, const zce_string& token,
-                     const zce_any& ctx, publish_callback father_cb, set_callback set_cb);
+                     const zce::Any& ctx, publish_callback father_cb, set_callback set_cb);
 
     ~zdp_storm_client();
 

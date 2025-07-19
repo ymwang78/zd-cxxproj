@@ -1,4 +1,4 @@
-// ***************************************************************
+﻿// ***************************************************************
 //  http_stream   version:  1.0   -  date: 2003/03/01
 //  -------------------------------------------------------------
 //  Yongming Wang(wangym@gmail.com)
@@ -143,13 +143,13 @@ public:
     
     const std::string& get_x_forward_for() const;
 
-    void proc_dblock(zce_dblock& dblock, const zce_any&);
+    void proc_dblock(zce_dblock& dblock, const zce::Any&);
 
 public:
 
     void on_open(bool passive, const zce_sockaddr_t& remote) override;
 
-    void on_read(zce_dblock& dblock, const zce_any&) override;
+    void on_read(zce_dblock& dblock, const zce::Any&) override;
 
 	virtual void on_http_request(const zce_smartptr<ZCE_HTTP_REQUEST>&, const zce_dblock& dblock);
 
@@ -173,7 +173,7 @@ class ZCE_API zce_http_client : public zce_istream
 	zce_dblock cont_dblock_;
 public:
 
-	virtual void on_read(zce_dblock& dblock, const zce_any&);
+	virtual void on_read(zce_dblock& dblock, const zce::Any&);
 
 	virtual void on_http_response(const ZCE_HTTP_RESPONSE& header, const zce_dblock& dblock) = 0;
 
@@ -249,7 +249,7 @@ public:
 
     void on_open(bool passive, const zce_sockaddr_t& remote) override;
 
-    void on_read(zce_dblock& dblock, const zce_any& ctx) override;
+    void on_read(zce_dblock& dblock, const zce::Any& ctx) override;
 
     void on_http_response(const ZCE_HTTP_RESPONSE& header, const zce_dblock& dblock);
 

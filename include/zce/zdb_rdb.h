@@ -726,7 +726,7 @@ struct zdb_object
 		return -1;
 	}
 
-	static int execute(const zce_smartptr<zdb_connection>& connptr, T& m, const char* sql, bool isprc = false, const zce_any& ctx = zce_any((zce_int64)0))
+	static int execute(const zce_smartptr<zdb_connection>& connptr, T& m, const char* sql, bool isprc = false, const zce::Any& ctx = zce::Any((zce_int64)0))
 	{
 		try
 		{
@@ -757,7 +757,7 @@ struct zdb_object
 	}
 
 	template<typename TARG>
-	static int execute(const zce_smartptr<zdb_connection>& connptr, std::vector<T>& mvec, TARG prop, const char* sql, bool isprc = false, const zce_any& ctx = zce_any((zce_int64)0))
+	static int execute(const zce_smartptr<zdb_connection>& connptr, std::vector<T>& mvec, TARG prop, const char* sql, bool isprc = false, const zce::Any& ctx = zce::Any((zce_int64)0))
 	{
 		try
 		{

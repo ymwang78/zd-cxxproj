@@ -74,7 +74,7 @@ class ZCE_API zce_istream : virtual public zce_object {
 
     virtual void on_open(bool passive, const zce_sockaddr_t& remote);
 
-    virtual void on_read(zce_dblock& dblock, const zce_any&);
+    virtual void on_read(zce_dblock& dblock, const zce::Any&);
 
     virtual void on_close();
 
@@ -234,7 +234,7 @@ class ZCE_API zce_tcp : public zce_socket {
 
     ~zce_tcp();
 
-    void handle_timeout(const zce_any&);
+    void handle_timeout(const zce::Any&);
 
     virtual void* handle() const;
 
@@ -301,7 +301,7 @@ class ZCE_API zce_connector : public zce_object {
 
     int start_connect();
 
-    void handle_timeout(const zce_any&);
+    void handle_timeout(const zce::Any&);
 
     void on_resolved(int errcode, const zce_sockaddr_t& addr);
 
@@ -382,13 +382,13 @@ class ZCE_API zce_sync_istream : public zce_istream {
     const zce_smartptr<zce::TaskQueue>& queue_ptr() const { return taskdeque_ptr_; }
 
     virtual int do_match_queue(zce_smartptr<zce::TaskQueue>&, const zce_dblock& dblock,
-                               const zce_any& ctx) {
+                               const zce::Any& ctx) {
         return 0;
     };
 
     virtual void on_open(bool passive, const zce_sockaddr_t& remote);
 
-    virtual void on_read(zce_dblock& dblock, const zce_any&);
+    virtual void on_read(zce_dblock& dblock, const zce::Any&);
 
     virtual void on_close();
 
@@ -410,9 +410,9 @@ class zce_proxy_socks : public zce_istream {
 
     enum { STATE_BEGIN, STATE_AUTH, STATE_CONNECT } state_ = STATE_BEGIN;
 
-    void proc_begin_ack(zce_dblock& dblock, const zce_any& ctx);
+    void proc_begin_ack(zce_dblock& dblock, const zce::Any& ctx);
 
-    void proc_auth_ack(zce_dblock& dblock, const zce_any& ctx);
+    void proc_auth_ack(zce_dblock& dblock, const zce::Any& ctx);
 
     void send_cmd_connect();
 
@@ -422,7 +422,7 @@ class zce_proxy_socks : public zce_istream {
 
     virtual void on_open(bool passive, const zce_sockaddr_t& remote);
 
-    virtual void on_read(zce_dblock& dblock, const zce_any&);
+    virtual void on_read(zce_dblock& dblock, const zce::Any&);
 };
 
 #endif  //__zce_handler_h__

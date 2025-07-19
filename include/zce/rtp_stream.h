@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 // ***************************************************************
 //  rtp_stream   version:  1.0   -  date: 2004/01/01
 //  -------------------------------------------------------------
@@ -23,7 +23,7 @@ public:
 
     ~rtp_stream();
 
-    void on_read(zce_dblock& dblock_ptr, const zce_any&) override;
+    void on_read(zce_dblock& dblock_ptr, const zce::Any&) override;
 
     int write(zce_dblock& dblock_ptr, zce_istream::ERV_ISTREAM_WRITEOPT opt) override;
 };

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <zce/zce_handler.h>
 
@@ -51,7 +51,7 @@ public:
 
     void on_open(bool passive, const zce_sockaddr_t& remote) override;
 
-    void on_read(zce_dblock& dblock, const zce_any&) override;
+    void on_read(zce_dblock& dblock, const zce::Any&) override;
 
     void close() override;
 
