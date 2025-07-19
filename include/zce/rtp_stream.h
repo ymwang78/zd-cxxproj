@@ -15,7 +15,7 @@ static const int RTP_STREAM_HEADLEN = 4;
 
 class ZCE_API rtp_stream : public zce_istream
 {
-    zce_dblock dblock_;
+    zce::RefBlock dblock_;
 
 public:
 
@@ -23,7 +23,7 @@ public:
 
     ~rtp_stream();
 
-    void on_read(zce_dblock& dblock_ptr, const zce::Any&) override;
+    void on_read(zce::RefBlock& dblock_ptr, const zce::Any&) override;
 
-    int write(zce_dblock& dblock_ptr, zce_istream::ERV_ISTREAM_WRITEOPT opt) override;
+    int write(zce::RefBlock& dblock_ptr, zce_istream::ERV_ISTREAM_WRITEOPT opt) override;
 };

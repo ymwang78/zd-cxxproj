@@ -94,7 +94,7 @@ namespace zdp_base
         zce_int16    subcmd;
         zce_int16    payload/*ERV_ZDP_PAYLOAD*/;
         zce_int64    i64arg;
-        zce_dblock    content;
+        zce::RefBlock    content;
     };
     struct nspair_t
     {
@@ -243,7 +243,7 @@ namespace zdp_base
 
         zobject_proxy_t    target;
         zce_astring    method;
-        zce_dblock    payload;
+        zce::RefBlock    payload;
         zce_int32    mstimeout;
     };
     typedef zce_smartptr<MSG_RPCCALL_REQ> MSG_RPCCALL_REQ_PTR;
@@ -262,7 +262,7 @@ namespace zdp_base
         }
 
         zce_int32    ie_result;
-        zce_dblock    payload;
+        zce::RefBlock    payload;
     };
     typedef zce_smartptr<MSG_RPCCALL_RES> MSG_RPCCALL_RES_PTR;
 

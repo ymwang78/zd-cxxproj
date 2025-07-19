@@ -20,7 +20,7 @@
 typedef intptr_t ssize_t;
 #            define _SSIZE_T_
 #            define _SSIZE_T_DEFINED
-#        endif //!defined(_SSIZE_T_) && !defined(_SSIZE_T_DEFINED)
+#        endif  //! defined(_SSIZE_T_) && !defined(_SSIZE_T_DEFINED)
 
 typedef DWORD threadid_t;
 typedef HANDLE handle_t;
@@ -29,7 +29,7 @@ struct iovec {
     u_long iov_len;
     char* iov_base;
 };
-#    else //_WIN32
+#    else   //_WIN32
 typedef pthread_t threadid_t;
 typedef int handle_t;
 #    endif  //_WIN32
@@ -79,6 +79,7 @@ typedef struct _zce_addr_t {
 } zce_addr_t;
 
 #ifdef __cplusplus
+
 #    include <string>
 #    include <vector>
 #    include <string_view>
@@ -152,5 +153,10 @@ class zce_matrix {
 };
 
 typedef zce_matrix<double> zce_dblmat;
+
+namespace zce {
+class Allocator;
+class RefBlock;
+}  // namespace zce
 
 #endif  //__cplusplus

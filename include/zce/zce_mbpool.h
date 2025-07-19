@@ -14,10 +14,11 @@
 #include <zce/zce_allocator.h>
 #include <map>
 
-class zce_dtblock;
-class zce_dblock;
+
 namespace zce {
 class Allocator;
+class DataBlock;
+class RefBlock;
 }
 
 class ZCE_API zce_mbpool
@@ -42,9 +43,9 @@ public:
 
     zce_smartptr<zce::Allocator> get_v2() const;
 
-    zce_dtblock* acquire(size_t len, zce_object_counter& obj);
+    zce::DataBlock* acquire(size_t len, zce_object_counter& obj);
 
-    zce_dblock acquire_dblock(size_t len, zce_object_counter& obj);
+    zce::RefBlock acquire_dblock(size_t len, zce_object_counter& obj);
 
     void* zmalloc(size_t len, size_t* nreal);
 

@@ -21,7 +21,7 @@ class zce_ssl : public zce_istream
 
     bool is_server_;
 
-    zce_dblock dblock_;
+    zce::RefBlock dblock_;
 
     /* SSL reads from, we write to. */
     //zce_dblock read_dblock_;
@@ -51,9 +51,9 @@ public:
 
     void on_open(bool passive, const zce_sockaddr_t& remote) override;
 
-    void on_read(zce_dblock& dblock, const zce::Any&) override;
+    void on_read(zce::RefBlock& dblock, const zce::Any&) override;
 
     void close() override;
 
-    int  write(zce_dblock& dblock, ERV_ISTREAM_WRITEOPT opt) override;
+    int write(zce::RefBlock& dblock, ERV_ISTREAM_WRITEOPT opt) override;
 };

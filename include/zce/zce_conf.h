@@ -11,7 +11,7 @@
 // ***************************************************************
 #include <zce/zce_object.h>
 
-class zce_dblock;
+class zce::RefBlock;
 
 namespace zce
 {
@@ -21,7 +21,7 @@ class ZCE_API FileMonitor : public zce_object {
 
     std::string getFullpath(const char* filename);
 
-    int loadFile(zce_dblock& dblock, const char* filename);
+    int loadFile(zce::RefBlock& dblock, const char* filename);
 
   public:
     FileMonitor();

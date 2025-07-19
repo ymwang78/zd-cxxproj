@@ -19,7 +19,7 @@
 #include <limits>
 
 class zce_object;
-class zce_dblock;
+class zce::RefBlock;
 
 namespace zce {
 
@@ -56,7 +56,7 @@ class ZCE_API Any {
             struct in6_addr ipv6_;
 
             zce_object* obj_;
-            zce_dblock* dblock_;  // string or bytearray limit to 4M, use dblock if larger
+            zce::RefBlock* dblock_;  // string or bytearray limit to 4M, use dblock if larger
             zce_byte* bytearray_;
             char* str_;
             std::vector<bool>* boolvec_;
@@ -234,12 +234,12 @@ class ZCE_API Any {
 
     inline bool is_dblock() const noexcept { return data_.type_ == any_dblock; }
 
-    inline zce_dblock* dblock() noexcept {
+    inline zce::RefBlock* dblock() noexcept {
         ZCE_ASSERT_RETURN(data_.type_ == any_dblock, 0);
         return data_.u_.dblock_;
     }
 
-    inline const zce_dblock* dblock() const noexcept {
+    inline const zce::RefBlock* dblock() const noexcept {
         ZCE_ASSERT_RETURN(data_.type_ == any_dblock, 0);
         return data_.u_.dblock_;
     }

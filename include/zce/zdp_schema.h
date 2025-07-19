@@ -517,7 +517,7 @@ namespace zdp
         ZDP_ZIP_BZIP2,
         ZDP_ZIP_NOPE,
     };
-    int ZCE_API zdp_unzip(zce_dblock& out_ptr, const zce_dblock& in_ptr, const zdp_head& head);
+    int ZCE_API zdp_unzip(zce::RefBlock& out_ptr, const zce::RefBlock& in_ptr, const zdp_head& head);
 };
 
 #define ZDP_PROC_MSG(Y, X, C) case Y::X::MSG_TYPE : {\

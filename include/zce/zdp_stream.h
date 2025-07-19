@@ -18,7 +18,7 @@
 #include <zce/zce_timer.h>
 #include <zce/zce_any.h>
 
-class zce_dblock;
+class zce::RefBlock;
 class zce_reactor;
 
 namespace zdp
@@ -63,7 +63,7 @@ namespace zdp
 
     class ZCE_API zdp_stream : public zce_istream
     {
-        zce_dblock dblock_;
+        zce::RefBlock dblock_;
 
         zce_smartptr<zce_reactor> reactor_ptr_;
 
@@ -73,11 +73,11 @@ namespace zdp
 
         std::map<unsigned short, zce_smartptr<zdp_resctx> > res_dict_;
 
-        int proc_next(const zdp_head& head, zce_dblock& dblock_ptr);
+        int proc_next(const zdp_head& head, zce::RefBlock& dblock_ptr);
 
         int split_pkg(zce_byte* buf, unsigned size);
 
-        int _do_request(const zdp_head& head, zce_dblock& dblock_ptr, int mstimeout, const zce::Any& ctx);
+        int _do_request(const zdp_head& head, zce::RefBlock& dblock_ptr, int mstimeout, const zce::Any& ctx);
     public:
 
         zdp_stream(const zce_smartptr<zce_reactor>& reactor_ptr, unsigned preserv = 0);
@@ -97,9 +97,9 @@ namespace zdp
 
         //////////////////////////////////////////////////////////////////////////
 
-        void on_read(zce_dblock& dblock_ptr, const zce::Any&) override;
+        void on_read(zce::RefBlock& dblock_ptr, const zce::Any&) override;
 
-        int write(zce_dblock& dblock_ptr, zce_istream::ERV_ISTREAM_WRITEOPT opt = zce_istream::ERV_ISTREAM_DEFAULT) override;
+        int write(zce::RefBlock& dblock_ptr, zce_istream::ERV_ISTREAM_WRITEOPT opt = zce_istream::ERV_ISTREAM_DEFAULT) override;
 
         //void close() override;
 
@@ -107,16 +107,16 @@ namespace zdp
 
         //////////////////////////////////////////////////////////////////////////
 
-        virtual void on_packet(const zdp_head&, const zce_dblock& plain_body, const zce_dblock& org_full, const zce::Any& ctx);
+        virtual void on_packet(const zdp_head&, const zce::RefBlock& plain_body, const zce::RefBlock& org_full, const zce::Any& ctx);
 
         virtual void on_timeout(zdp_resctx* resctx);
 
-        zce_dblock create_failed_response_dblock(zce_uint16 msgmid, unsigned msgseq);
+        zce::RefBlock create_failed_response_dblock(zce_uint16 msgmid, unsigned msgseq);
 
         int do_failed_process(zce_uint16 msgmid, unsigned msgseq, const zce::Any& ctx);
 
         //timeout = 0, won't wait res
-        int do_request(zce_dblock& plain_body, int mstimeout = 0, const zce::Any& ctx = zce::Any((zce_int64)0));
+        int do_request(zce::RefBlock& plain_body, int mstimeout = 0, const zce::Any& ctx = zce::Any((zce_int64)0));
 
         template<typename MSG_T>
         int request(const MSG_T& msg, int mstimeout = 0, const zce::Any& ctx = zce::Any((zce_int64)0), ERV_ZCE_COMPRESS cps = ZCE_COMPRESS_NONE);
@@ -125,12 +125,12 @@ namespace zdp
         int response(const MSG_T& msg, unsigned seq, zce_byte rev = 0, ERV_ZCE_COMPRESS cps = ZCE_COMPRESS_NONE);
     };
 
-    int ZCE_API zdp_serialize_dblock(zce_dblock& dblock_ptr, zce_uint16 msgmid,
+    int ZCE_API zdp_serialize_dblock(zce::RefBlock& dblock_ptr, zce_uint16 msgmid,
         zce_uint32 seq, ERV_ZCE_COMPRESS cps, zce_uint32 bodylen, int preserv, int rev = 0
     );
 
     template<typename T>
-    int zdp_serialize_struct(zce_dblock& dblock_ptr, const T& msg, zce_byte rev, int preserv = 0)
+    int zdp_serialize_struct(zce::RefBlock& dblock_ptr, const T& msg, zce_byte rev, int preserv = 0)
     {
         int ret = 0;
         int bodylen = zdp_body_length(msg, rev);
@@ -156,7 +156,7 @@ namespace zdp
     }
 
     template<typename T>
-    int zdp_serialize(zce_dblock& dblock_ptr, zce_uint32 seq, const T& msg, zce_byte rev,
+    int zdp_serialize(zce::RefBlock& dblock_ptr, zce_uint32 seq, const T& msg, zce_byte rev,
         ERV_ZCE_COMPRESS cps = ZCE_COMPRESS_NONE, int preserv = 0) 
     {
         int bodylen = zdp::zds_pack(0, 0, msg, 0, true);
@@ -194,7 +194,7 @@ namespace zdp
     template<typename MSG_T>
     int zdp_stream::request(const MSG_T& msg, int mstimeout, const zce::Any& ctx, ERV_ZCE_COMPRESS cps)
     {
-        zce_dblock dblock_ptr;
+        zce::RefBlock dblock_ptr;
         int ret = zdp_serialize(dblock_ptr, 0, msg, 0, cps, 32);
         ZCE_ASSERT(ret >= 0);
         if (ret < 0)
@@ -205,7 +205,7 @@ namespace zdp
     template<typename MSG_T>
     int zdp_stream::response(const MSG_T& msg, unsigned seq, zce_byte rev, ERV_ZCE_COMPRESS cps)
     {
-        zce_dblock dblock_ptr;
+        zce::RefBlock dblock_ptr;
         //ZTRACE("response", seq);
         int ret = zdp_serialize(dblock_ptr, seq, msg, rev, cps, 32);
         ZCE_ASSERT(ret >= 0);

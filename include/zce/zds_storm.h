@@ -24,7 +24,7 @@ class zds_storm_requester : virtual public zce_object {
 
     virtual const zdp::zdp_storm_peer& peer() const = 0;
 
-    virtual void on_response(const zce_dblock& dblockptr, void* ctx) = 0;
+    virtual void on_response(const zce::RefBlock& dblockptr, void* ctx) = 0;
 };
 
 class zds_storm : public zce_reactor {
@@ -33,22 +33,22 @@ class zds_storm : public zce_reactor {
         zce_smartptr<zds_storm> stormptr_;
         zce_smartptr<zds_storm_requester> requester_;
         zce_int64 topic_;
-        zce_dblock dblockptr_;
+        zce::RefBlock dblockptr_;
         int timeoutms_;
         void* ctx_;
 
-        zce_dblock response_dblockptr_;
+        zce::RefBlock response_dblockptr_;
 
       public:
         zds_storm_task(const zce_smartptr<zds_storm>& stormptr,
                        const zce_smartptr<zds_storm_requester>& requester, zce_int64 topic,
-                       const zce_dblock& dblockptr, int timeoutms, void* ctx);
+                       const zce::RefBlock& dblockptr, int timeoutms, void* ctx);
 
         ~zds_storm_task();
 
         virtual void call();
 
-        void response(const zce_dblock& dblockptr);
+        void response(const zce::RefBlock& dblockptr);
     };
 
     zce_smartptr<zdp::zdp_stream> stream_ptr_;
@@ -77,7 +77,7 @@ class zds_storm : public zce_reactor {
     virtual zce_int64 streamtopic_from_msgmid(zce_uint16 msgmid) { return 0; };
 
     virtual int on_topic_readzdp(zce_int64 topic, zce_int64 from, const zdp::zdp_storm_peer& peer,
-                                 zce_dblock& plaindblock) = 0;
+                                 zce::RefBlock& plaindblock) = 0;
 
     virtual int on_topic_read(zce_int64 topic, zce_int64 from, zce_byte* data, zce_uint32 len);
 
@@ -142,7 +142,7 @@ int zds_storm::zdp_publish(const std::vector<zce_int64>& topics, const T& msg,
 template <typename T>
 int zds_storm::request_async(const zce_smartptr<zds_storm_requester>& requestptr, zce_int64 topic,
                              const T& msg, int timeoutms, void* ctx) {
-    zce_dblock dblock_ptr;
+    zce::RefBlock dblock_ptr;
     int ret = zdp::zdp_serialize(dblock_ptr, 0, msg, 0, ZCE_COMPRESS_NONE, 32);
     ZCE_ASSERT(ret >= 0);
     if (ret < 0) return ret;
@@ -169,7 +169,7 @@ class zds_storm_requester_impl : public zds_storm_requester {
 
     const zce_smartptr<zce::TaskQueue>& taskdeque_ptr(void) { return session_->taskdeque_ptr(); }
 
-    virtual void on_response(const zce_dblock& dblockptr, void* ctx) {
+    virtual void on_response(const zce::RefBlock& dblockptr, void* ctx) {
         int ret = -1;
         zdp::zdp_head head;
         zce_smartptr<RES> msgres;

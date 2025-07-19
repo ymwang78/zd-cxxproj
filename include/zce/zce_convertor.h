@@ -1,6 +1,6 @@
 ﻿#pragma once
 // ***************************************************************
-//  zce_convertor   version:  1.0  date: 2007-12-21
+//  zce::CharacterConvertor   version:  1.0  date: 2007-12-21
 //  -------------------------------------------------------------
 //  Yongming Wang(wangym@gmail.com)
 //  -------------------------------------------------------------
@@ -12,7 +12,9 @@
 #include <zce/zce_config.h>
 #include <memory>
 
-class ZCE_API zce_convertor {
+namespace zce {
+
+class ZCE_API CharacterConvertor {
     bool swap_;
 
   public:
@@ -23,7 +25,7 @@ class ZCE_API zce_convertor {
         SOURCE_ILLEGAL
     };
 
-    zce_convertor(bool swap = false) : swap_(swap) {};
+    CharacterConvertor(bool swap = false) : swap_(swap) {};
     static int gb2312_to_utf8(const char* source, size_t source_size, unsigned char* target,
                               size_t target_size, bool strict = true);
     static int utf8_to_gb2312(const unsigned char* source, size_t source_size, char* target,
@@ -49,11 +51,11 @@ class ZCE_API zce_convertor {
                               size_t target_size);
 };
 
-class ZCE_API zce_convertor_to_utf8 {
+class ZCE_API ToUtf8 {
   public:
     enum err_code { E_OK, E_ERR = ~0 };
-    zce_convertor_to_utf8(const char* gb2312_str, int len = 0);  // gb2312
-    ~zce_convertor_to_utf8();
+    ToUtf8(const char* gb2312_str, int len = 0);  // gb2312
+    ~ToUtf8();
 
     int utf8_len() const { return utf8_len_; }
     operator const char*() const { return utf8_str_; }
@@ -66,11 +68,11 @@ class ZCE_API zce_convertor_to_utf8 {
     enum err_code error_;
 };
 
-class ZCE_API zce_convertor_from_utf8 {
+class ZCE_API FromUtf8 {
   public:
     enum err_code { E_OK, E_ERR = ~0 };
-    zce_convertor_from_utf8(const char* utf8_str, int len = 0);
-    ~zce_convertor_from_utf8();
+    FromUtf8(const char* utf8_str, int len = 0);
+    ~FromUtf8();
     operator const char*() const { return str_; }
     int str_len() const { return str_len_; }
     bool result() const { return E_OK == error_; }
@@ -82,11 +84,11 @@ class ZCE_API zce_convertor_from_utf8 {
     enum err_code error_;
 };
 
-class ZCE_API zce_convertor_to_wchart {
+class ZCE_API ToWChart {
   public:
     enum err_code { E_OK, E_ERR = ~0 };
-    zce_convertor_to_wchart(const char* gbk_str, int len = 0);
-    ~zce_convertor_to_wchart();
+    ToWChart(const char* gbk_str, int len = 0);
+    ~ToWChart();
     operator const wchar_t*() const { return str_; }
     int str_len() const { return str_len_; }
     bool result() const { return E_OK == error_; }
@@ -97,3 +99,5 @@ class ZCE_API zce_convertor_to_wchart {
     wchar_t tmpstr_[2048];
     enum err_code error_;
 };
+
+}  // namespace zce

@@ -22,7 +22,7 @@
 #    include <map>
 
 class zce_reactor;
-class zce_dblock;
+class zce::RefBlock;
 class zce_timer;
 
 //////////////////////////////////////////////////////////////////////////
@@ -74,11 +74,11 @@ class ZCE_API zce_istream : virtual public zce_object {
 
     virtual void on_open(bool passive, const zce_sockaddr_t& remote);
 
-    virtual void on_read(zce_dblock& dblock, const zce::Any&);
+    virtual void on_read(zce::RefBlock& dblock, const zce::Any&);
 
     virtual void on_close();
 
-    virtual int write(zce_dblock& dblock, ERV_ISTREAM_WRITEOPT opt = ERV_ISTREAM_DEFAULT);
+    virtual int write(zce::RefBlock& dblock, ERV_ISTREAM_WRITEOPT opt = ERV_ISTREAM_DEFAULT);
 
     virtual void close();
 
@@ -97,7 +97,7 @@ class ZCE_API zce_socket : public zce_istream {
 
     zce_smartptr<zce_reactor> reactor_;
 
-    zce_dblock read_dblock_;
+    zce::RefBlock read_dblock_;
 
     zce_sockaddr_t local_addr_;
 
@@ -114,7 +114,7 @@ class ZCE_API zce_socket : public zce_istream {
 
     void do_close_delegate();
 
-    virtual int do_write(zce_dblock& dblock_ptr, const zce_sockaddr_t* addr,
+    virtual int do_write(zce::RefBlock& dblock_ptr, const zce_sockaddr_t* addr,
                          ERV_ISTREAM_WRITEOPT opt) = 0;
 
   public:
@@ -122,7 +122,7 @@ class ZCE_API zce_socket : public zce_istream {
 
     virtual void close();
 
-    virtual int write(zce_dblock& dblock_ptr, ERV_ISTREAM_WRITEOPT opt);
+    virtual int write(zce::RefBlock& dblock_ptr, ERV_ISTREAM_WRITEOPT opt);
 
     virtual void* handle() const = 0;
 
@@ -160,7 +160,7 @@ class ZCE_API zce_udp : public zce_socket {
 
     virtual void* handle() const;
 
-    virtual int do_write(zce_dblock& dblock_ptr, const zce_sockaddr_t* addr,
+    virtual int do_write(zce::RefBlock& dblock_ptr, const zce_sockaddr_t* addr,
                          ERV_ISTREAM_WRITEOPT opt);
 
     virtual void on_read_data(zce_byte*, zce_uint32, const zce_sockaddr_t*);
@@ -169,9 +169,9 @@ class ZCE_API zce_udp : public zce_socket {
 
     virtual void on_close();
 
-    virtual int write(zce_dblock& dblock_ptr, ERV_ISTREAM_WRITEOPT opt);
+    virtual int write(zce::RefBlock& dblock_ptr, ERV_ISTREAM_WRITEOPT opt);
 
-    int write(zce_dblock& dblock_ptr, const zce_sockaddr_t* addr, ERV_ISTREAM_WRITEOPT opt);
+    int write(zce::RefBlock& dblock_ptr, const zce_sockaddr_t* addr, ERV_ISTREAM_WRITEOPT opt);
 
     int listen(const char* addr, unsigned short port);
 
@@ -190,12 +190,12 @@ class ZCE_API zce_tcp : public zce_socket {
 
   protected:
     struct data_item {
-        zce_dblock dblock_ptr_;
+        zce::RefBlock dblock_ptr_;
         ERV_ISTREAM_WRITEOPT option_;
 
         data_item();
 
-        data_item(const zce_dblock& dblock, ERV_ISTREAM_WRITEOPT opt);
+        data_item(const zce::RefBlock& dblock, ERV_ISTREAM_WRITEOPT opt);
     };
 
     struct data_item_isless {
@@ -226,7 +226,7 @@ class ZCE_API zce_tcp : public zce_socket {
 
     void do_priority();  // run inside dblock_lock_
 
-    virtual int do_write(zce_dblock& dblock_ptr, const zce_sockaddr_t* addr,
+    virtual int do_write(zce::RefBlock& dblock_ptr, const zce_sockaddr_t* addr,
                          ERV_ISTREAM_WRITEOPT opt);
 
   public:
@@ -381,18 +381,18 @@ class ZCE_API zce_sync_istream : public zce_istream {
 
     const zce_smartptr<zce::TaskQueue>& queue_ptr() const { return taskdeque_ptr_; }
 
-    virtual int do_match_queue(zce_smartptr<zce::TaskQueue>&, const zce_dblock& dblock,
+    virtual int do_match_queue(zce_smartptr<zce::TaskQueue>&, const zce::RefBlock& dblock,
                                const zce::Any& ctx) {
         return 0;
     };
 
     virtual void on_open(bool passive, const zce_sockaddr_t& remote);
 
-    virtual void on_read(zce_dblock& dblock, const zce::Any&);
+    virtual void on_read(zce::RefBlock& dblock, const zce::Any&);
 
     virtual void on_close();
 
-    virtual int write(zce_dblock& dblock, zce_istream::ERV_ISTREAM_WRITEOPT opt);
+    virtual int write(zce::RefBlock& dblock, zce_istream::ERV_ISTREAM_WRITEOPT opt);
 
     virtual void close();
 };
@@ -404,15 +404,15 @@ class zce_proxy_socks : public zce_istream {
 
     std::string remote_ip_;
 
-    zce_dblock dblock_;
+    zce::RefBlock dblock_;
 
     zce_uint16 remote_port_ = 0;
 
     enum { STATE_BEGIN, STATE_AUTH, STATE_CONNECT } state_ = STATE_BEGIN;
 
-    void proc_begin_ack(zce_dblock& dblock, const zce::Any& ctx);
+    void proc_begin_ack(zce::RefBlock& dblock, const zce::Any& ctx);
 
-    void proc_auth_ack(zce_dblock& dblock, const zce::Any& ctx);
+    void proc_auth_ack(zce::RefBlock& dblock, const zce::Any& ctx);
 
     void send_cmd_connect();
 
@@ -422,7 +422,7 @@ class zce_proxy_socks : public zce_istream {
 
     virtual void on_open(bool passive, const zce_sockaddr_t& remote);
 
-    virtual void on_read(zce_dblock& dblock, const zce::Any&);
+    virtual void on_read(zce::RefBlock& dblock, const zce::Any&);
 };
 
 #endif  //__zce_handler_h__

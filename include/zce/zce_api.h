@@ -271,11 +271,9 @@ std::string ZCE_API zce_getharddrv();
 
 std::string ZCE_API zce_getimei();
 
-class zce_dblock;
+int ZCE_API zce_getmblock(zce::RefBlock& dblock);
 
-int ZCE_API zce_getmblock(zce_dblock& dblock);
-
-void ZCE_API zce_setmblock(zce_dblock& dblock);
+void ZCE_API zce_setmblock(zce::RefBlock& dblock);
 
 std::string ZCE_API zce_to_utf8(const wchar_t* src, unsigned len);
 

@@ -15,7 +15,7 @@
 #include <zce/zce_api.h>
 #include <zce/zce_handler.h>
 
-class zce_dblock;
+class zce::RefBlock;
 class zce_reactor;
 namespace zce {
 class Scheduler;
@@ -111,7 +111,7 @@ class ZCE_API zdp_storm_client : public zce_object {
 template <typename T, typename TTOPIC>
 int zdp_storm_client::publish(TTOPIC topic, const T& msg, const zdp_storm_peer& peer, int seq,
                               zce_int64 trace) {
-    zce_dblock dblock_ptr;
+    zce::RefBlock dblock_ptr;
     bool preserv = !(peer.to == 0 && peer.from == 0);
     int ret = zdp_serialize(dblock_ptr, seq, msg, 0, default_cps(), preserv ? 16 : 0);
     ZCE_ASSERT(ret >= 0);
@@ -127,7 +127,7 @@ int zdp_storm_client::publish(TTOPIC topic, const T& msg, const zdp_storm_peer& 
 template <typename T>
 int zdp_storm_client::set(zce_int64 topic, const zce_string& name, zce_int64 oldseq, zce_int64 uid,
                           zce_int64 flag, const T& msg) {
-    zce_dblock data_ptr, cond_ptr;
+    zce::RefBlock data_ptr, cond_ptr;
     zdp_serialize(data_ptr, 0, msg, 0, default_cps());
     return set(topic, name, oldseq, uid, flag, data_ptr.rd_ptr(), data_ptr.length());
 }
@@ -150,7 +150,7 @@ class ZCE_API zdp_storm_stream_adapter : public zce_istream {
         peer_ = p;
     }
 
-    int write(zce_dblock& dblock, ERV_ISTREAM_WRITEOPT) override;
+    int write(zce::RefBlock& dblock, ERV_ISTREAM_WRITEOPT) override;
 };
 
 }  // namespace zdp

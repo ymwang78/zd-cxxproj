@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 /* ***************************************************************
 //  zce_rsa   version:  1.0  date: 2015/02/08 
 //  -------------------------------------------------------------
@@ -14,46 +14,46 @@
 
 #include <zce/zce_config.h>
 
-class zce_dblock;
+class zce::RefBlock;
 
-int zce_rsa_genkey(zce_dblock& pubkey, zce_dblock& prikey);
+int zce_rsa_genkey(zce::RefBlock& pubkey, zce::RefBlock& prikey);
 
-int zce_randbytes(zce_dblock& pubkey, int len);
+int zce_randbytes(zce::RefBlock& pubkey, int len);
 
-int ZCE_API zce_rsa_public_encrypt(zce_dblock& dblock,
+int ZCE_API zce_rsa_public_encrypt(zce::RefBlock& dblock,
     const zce_byte* input,
     size_t inputlen,
     const char* key,
     size_t keylen);
 
-int ZCE_API zce_rsa_public_verify(zce_dblock& dblock,
+int ZCE_API zce_rsa_public_verify(zce::RefBlock& dblock,
     const zce_byte* input,
     size_t inputlen,
     const char* key,
     size_t keylen);
 
-int ZCE_API zce_rsa_private_sign(zce_dblock& dblock,
+int ZCE_API zce_rsa_private_sign(zce::RefBlock& dblock,
     const zce_byte* input,
     size_t inputlen,
     const char* key,
     size_t keylen);
 
-int ZCE_API zce_rsa_private_decrypt(zce_dblock& dblock,
+int ZCE_API zce_rsa_private_decrypt(zce::RefBlock& dblock,
     const zce_byte* input,
     size_t inputlen,
     const char* key,
     size_t keylen);
 
-int ZCE_API zce_aes_encrypt(zce_dblock& dblock,
-    zce_dblock& iv_dblock,
+int ZCE_API zce_aes_encrypt(zce::RefBlock& dblock,
+    zce::RefBlock& iv_dblock,
     const zce_byte* input,
     size_t inputlen,
     const zce_byte* key,
     size_t keylen,
     const char* mode);
 
-int ZCE_API zce_aes_decrypt(zce_dblock& dblock,
-    const zce_dblock& iv_dblock,
+int ZCE_API zce_aes_decrypt(zce::RefBlock& dblock,
+    const zce::RefBlock& iv_dblock,
     const zce_byte* input,
     size_t inputlen,
     const zce_byte* key,

@@ -49,7 +49,7 @@ class zvm : public zce_object
     zce_smartptr<zvm_pimpl> pimpl_ptr_;
 
 public:
-    typedef std::function<void(int error_code, zce_dblock&& retdata)> response_cb;
+    typedef std::function<void(int error_code, zce::RefBlock&& retdata)> response_cb;
 
     zvm();
 
@@ -59,7 +59,7 @@ public:
         const zce_smartptr<zce_reactor>&);
 
     zce_smartptr<zce_object> boot(const std::string& svc_name,
-        const std::string& path, zce_dblock& args);
+        const std::string& path, zce::RefBlock& args);
 
     zce_smartptr<zce_object> boot(const std::string& svc_name,
         const std::string& host, 
@@ -74,7 +74,7 @@ public:
     int rpc_call_dblock(const zce_smartptr<zce_object>& vmptr,
         zce_int64 objectid,
         const std::string& method,
-        zce_dblock&& dblock,
+        zce::RefBlock&& dblock,
         const response_cb& response);
 
     template<typename T>
@@ -83,7 +83,7 @@ public:
         const std::string& method,
         const T& t,
         const response_cb& response) {
-        zce_dblock dblock;
+        zce::RefBlock dblock;
         int ret = zdp::zds_pack_builtin(0, 0, t, 0, true);
         if (ret < 0)
             return ret;
@@ -102,8 +102,8 @@ public:
         zce_int64 objectid,
         const std::string& method,
         const T& t,
-        const std::function<void(int error_code, const zce_dblock& retdata)>& response) {
-        zce_dblock dblock;
+        const std::function<void(int error_code, const zce::RefBlock& retdata)>& response) {
+        zce::RefBlock dblock;
         int ret = zdp::zds_pack(0, 0, t, 0, true);
         if (ret < 0)
             return ret;
@@ -122,9 +122,9 @@ public:
         zce_int64 objectid,
         const std::string& method,
         T t,
-        const std::function<void(int error_code, const zce_dblock& retdata)>& response) {
+        const std::function<void(int error_code, const zce::RefBlock& retdata)>& response) {
         typedef typename std::remove_cv<typename std::remove_reference<T>::type>::type TT;
-        if constexpr (std::is_same<TT, zce_dblock>::value) {
+        if constexpr (std::is_same<TT, zce::RefBlock>::value) {
             return rpc_call_dblock(vmptr, objectid, method, std::move(t), response);
         }
         else if constexpr (zdp::is_builtin_type<TT>()) {
@@ -137,38 +137,38 @@ public:
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #if 0
-    void zds_push(zce_dblock& dblock,
+    void zds_push(zce::RefBlock& dblock,
         const char* v) {
         zds_push_string(dblock, v);
     }
 
-    void luas_push(zce_dblock& dblock,
+    void luas_push(zce::RefBlock& dblock,
         const std::string& v) {
         luas_push_lstring(dblock, v.c_str(), (zce_int32)v.length());
     }
 
-    void luas_push(zce_dblock& dblock,
+    void luas_push(zce::RefBlock& dblock,
         zce_int64 v) {
         luas_push_integer(dblock, v);
     }
 
-    void luas_push(zce_dblock& dblock,
+    void luas_push(zce::RefBlock& dblock,
         zce_int32 v) {
         luas_push_integer(dblock, v);
     }
 
-    void luas_push(zce_dblock& dblock,
+    void luas_push(zce::RefBlock& dblock,
         bool v) {
         luas_push_bool(dblock, v);
     }
 
-    void luas_push(zce_dblock& dblock,
+    void luas_push(zce::RefBlock& dblock,
         void* ctx) {
         luas_push_lightuserdata(dblock, ctx);
     }
 
     template <typename T, typename... Args>
-    void luas_push(zce_dblock& dblock,
+    void luas_push(zce::RefBlock& dblock,
         const T& v,
         Args... args) {
         luas_push(dblock, v);
@@ -181,7 +181,7 @@ public:
         const std::string& method,
         const response_cb& response,
         Args... args) {
-        zce_dblock dblock;
+        zce::RefBlock dblock;
         zds_pack()
         luas_push(dblock, args...);
         return lpc_call_dblock(svrname, method, dblock);

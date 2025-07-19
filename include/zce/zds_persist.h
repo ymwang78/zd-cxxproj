@@ -22,13 +22,13 @@ class zds_persist : public zce_object {
         zce_smartptr<zds_persist> persist_ptr_;
         std::string dbname_;
         std::string coll_;
-        zce_dblock key_;
-        zce_dblock obj_;
+        zce::RefBlock key_;
+        zce::RefBlock obj_;
         bool upsert_;
 
       public:
         async_write_task(const zce_smartptr<zds_persist>& ptr, const std::string& dbname,
-                         const std::string& coll, const zce_dblock& key, const zce_dblock& obj,
+                         const std::string& coll, const zce::RefBlock& key, const zce::RefBlock& obj,
                          bool upsert);
 
         virtual void call();
@@ -43,9 +43,9 @@ class zds_persist : public zce_object {
   public:
     int init();
 
-    static zce_dblock to_dblock(const bsoncxx::document::view& v);
+    static zce::RefBlock to_dblock(const bsoncxx::document::view& v);
 
-    static zce_dblock to_setdblock(const zce_dblock& dblock);
+    static zce::RefBlock to_setdblock(const zce::RefBlock& dblock);
 
     static bsoncxx::document::value to_query(const std::string& v);
 
@@ -58,7 +58,7 @@ class zds_persist : public zce_object {
     template <typename T>
     int redist_read_data(const std::string& coll, const std::string& key, T& obj);
 
-    int redist_write_data(const std::string& coll, const std::string& key, const zce_dblock& obj,
+    int redist_write_data(const std::string& coll, const std::string& key, const zce::RefBlock& obj,
                           int expire = 3600 * 24 * 3);
 
     int redis_inc(const std::string& coll, const std::string& key, zce_int64 v, int expire,
@@ -70,7 +70,7 @@ class zds_persist : public zce_object {
     ///////////////////////////////////////////////////////////////////////////
 
     int mongo_write_async(const std::string& dbname, const std::string& coll,
-                          const bsoncxx::document::value& key, const zce_dblock& obj, bool upsert);
+                          const bsoncxx::document::value& key, const zce::RefBlock& obj, bool upsert);
 
     ///////////////////////////////////////////////////////////////////////////
 
@@ -85,7 +85,7 @@ class zds_persist : public zce_object {
 
     template <typename KEYT>
     int write_bson(const std::string& platname, const std::string& coll, const KEYT& key,
-                   const zce_dblock& bsonobj, const zce_dblock* bsonextra = 0, bool upsert = true);
+                   const zce::RefBlock& bsonobj, const zce::RefBlock* bsonextra = 0, bool upsert = true);
 };
 
 template <typename T>
@@ -192,7 +192,7 @@ int zds_persist::inc_rank(const std::string& dbname, const std::string& coll, co
 
 template <typename KEYT>
 int zds_persist::write_bson(const std::string& platname, const std::string& coll, const KEYT& key,
-                            const zce_dblock& bsonobj, const zce_dblock* bsonextra, bool upsert) {
+                            const zce::RefBlock& bsonobj, const zce::RefBlock* bsonextra, bool upsert) {
     int ret = redist_write_data(coll, zce::to_string(key), bsonobj);
 
     bsoncxx::document::view obj(bsonobj.rd_ptr(), bsonobj.length());

@@ -55,7 +55,7 @@ template <typename T>
 struct is_builtin_basic
     : std::integral_constant<
           bool, std::is_arithmetic<T>::value || std::is_same<T, std::string>::value ||
-                    std::is_same<T, zce_dblock>::value || std::is_same<T, zce::Any>::value> {};
+                    std::is_same<T, zce::RefBlock>::value || std::is_same<T, zce::Any>::value> {};
 
 template <typename T>
 struct is_builtin_vector : std::false_type {};
@@ -150,7 +150,7 @@ DECLARE_PACK_BUILTIN_ARRAY(zce_int64)
 DECLARE_PACK_BUILTIN_ARRAY(zce_float)
 DECLARE_PACK_BUILTIN_ARRAY(zce_double)
 
-int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const zce_dblock& val,
+int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const zce::RefBlock& val,
                              zds_context_t* ctx, bool has_prefix = true, bool skip_content = false);
 
 int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const char* val, zds_context_t* ctx,
@@ -247,7 +247,7 @@ int ZCE_API zds_unpack_builtin(std::vector<zce_float>& val, const zce_byte* buf,
 int ZCE_API zds_unpack_builtin(std::vector<zce_double>& val, const zce_byte* buf, zce_int32 size,
                                zds_context_t* ctx);
 
-int ZCE_API zds_unpack_builtin(zce_dblock& val, const zce_byte* buf, zce_int32 size,
+int ZCE_API zds_unpack_builtin(zce::RefBlock& val, const zce_byte* buf, zce_int32 size,
                                zds_context_t* ctx);
 
 int ZCE_API zds_unpack_builtin(std::string& val, const zce_byte* buf, zce_int32 size,
@@ -347,7 +347,7 @@ constexpr zce_byte _get_payload() {
             return ZDS_PAYLOAD_VARUINT;
     } else if constexpr (std::is_same<T, std::string>::value) {
         return ZDS_PAYLOAD_UTF8STR;
-    } else if constexpr (std::is_same<T, zce_dblock>::value) {
+    } else if constexpr (std::is_same<T, zce::RefBlock>::value) {
         return ZDS_PAYLOAD_FIXARR;
     } else if constexpr (std::is_same<T, zce::Any>::value) {
         return ZDS_PAYLOAD_ANY;

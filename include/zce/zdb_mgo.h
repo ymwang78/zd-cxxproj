@@ -9,7 +9,7 @@
 #include <bsoncxx/builder/basic/kvp.hpp>
 #include <bsoncxx/builder/basic/document.hpp>
 #include <bsoncxx/builder/basic/array.hpp>
-class zce_dblock;
+class zce::RefBlock;
 
 #if ZCE_ZDB_MONGODB
 #include <mongocxx/client.hpp>
@@ -73,7 +73,7 @@ std::string ZCE_API zdb_mgo_getfield(const bsoncxx::document::view& p, const std
 
 bool ZCE_API zdb_mgo_getfield(const bsoncxx::document::view& p, const std::string& field, bool def = false);
 
-int ZCE_API zdb_mgo_getfield(const bsoncxx::document::view& p, const std::string& field, zce_dblock& dblock);
+int ZCE_API zdb_mgo_getfield(const bsoncxx::document::view& p, const std::string& field, zce::RefBlock& dblock);
 
 int ZCE_API zdb_mgo_getfield(const bsoncxx::document::view& p, const std::string& field, bsoncxx::document::view& subv);
 
@@ -113,7 +113,7 @@ public:
 
     std::string get(const std::string& f, const std::string& def = "");
 
-    int get_dblock(const std::string& f, zce_dblock& dblock);
+    int get_dblock(const std::string& f, zce::RefBlock& dblock);
 
     bool get_bool(const std::string& f, bool def = false);
 };
