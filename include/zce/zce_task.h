@@ -84,7 +84,8 @@ class ZCE_API TaskDelegator : virtual public zce_object {
     virtual int delegateRelease(zce_object* obj) = 0;
 
     template <typename F, typename... Args>
-    auto delegate(const char* name, F&& f, Args&&... args) -> std::future<decltype(f(args...))> {
+    auto delegateFuture(const char* name, F&& f, Args&&... args)
+        -> std::future<TaskResult<decltype(f(args...))>> {
         using ReturnType = decltype(f(args...));
         using ResultType = TaskResult<ReturnType>;
 
@@ -179,7 +180,7 @@ class ZCE_API Scheduler : public zce_object {
     struct pimpl;
     struct pimpl* pimpl_;
 
-    void do_work(zce_worker_contex& ctx);
+    void doWork(zce_worker_contex& ctx);
 
   public:
     Scheduler();
@@ -192,7 +193,7 @@ class ZCE_API Scheduler : public zce_object {
 
     int perform(const TaskPtr& req);
 
-    int print_curtask();
+    int printCurrentTask();
 
     template <typename F>
     int perform(F f) {
@@ -208,7 +209,7 @@ class ZCE_API Scheduler : public zce_object {
     };
 
     template <typename F, typename... Args>
-    auto perform(F&& f, Args&&... args) -> std::future<TaskResult<decltype(f(args...))>> {
+    auto performFuture(F&& f, Args&&... args) -> std::future<TaskResult<decltype(f(args...))>> {
         using ReturnType = decltype(f(args...));
         using ResultType = TaskResult<ReturnType>;
 

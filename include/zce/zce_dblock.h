@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 /* ***************************************************************
 //  zce_data_block   version:  1.0  date: 2009/5/6
 //  -------------------------------------------------------------
@@ -19,13 +19,13 @@
 #include <zce/zce_dblock.h>
 
 class zce_object_counter;
-class zce_allocator;
+class zce::Allocator;
 
 class ZCE_API zce_dtblock : public zce_object
 {
     zce_byte* buffer_;
     zce_object_counter* obj_;       //for alloc position statistics
-    zce_allocator* alloc_;
+    zce::Allocator* alloc_;
     struct _size_t {
 		zce_uint64 refbuf : 1;
         zce_uint64 len : 63;
@@ -36,7 +36,7 @@ class ZCE_API zce_dtblock : public zce_object
     friend class zce_mbpool;
 
 public:
-    zce_dtblock(size_t len, zce_object_counter* obj = NULL, zce_allocator* alloc = NULL);
+    zce_dtblock(size_t len, zce_object_counter* obj = NULL, zce::Allocator* alloc = NULL);
 
     zce_dtblock(size_t len, zce_byte* buf);
     

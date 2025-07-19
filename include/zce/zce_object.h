@@ -16,8 +16,10 @@
 #include <zce/zce_tss.h>
 #include <zce/zce_sync.h>
 
-class zce_allocator;
-class zce::TaskDelegator;
+namespace zce {
+class Allocator;
+class TaskDelegator;
+}  // namespace zce
 
 class ZCE_API zce_object {
   protected:
@@ -49,7 +51,7 @@ class ZCE_API zce_object {
 
     inline bool __isvalid() noexcept { return true; }
 
-    inline void __set_allocator(zce_allocator* alloc) noexcept { zce_alloc_ = alloc; }
+    inline void __set_allocator( zce::Allocator* alloc) noexcept { zce_alloc_ = alloc; }
 
     inline void __set_release_delegator(zce::TaskDelegator* v) { release_delegator_ = v; }
 
@@ -85,7 +87,7 @@ class ZCE_API zce_object {
     }
 
   private:
-    zce_allocator* zce_alloc_;
+    zce::Allocator* zce_alloc_;
     zce::TaskDelegator* release_delegator_;
     zce_atomic_long ref_count_;
     const zce_int64 obj_idx_;

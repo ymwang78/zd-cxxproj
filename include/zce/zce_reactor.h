@@ -15,7 +15,7 @@
 #include <deque>
 
 class zce_thread;
-class zce_allocator;
+class zce::Allocator;
 class zce::Task;
 class zce_dnsresolve;
 
