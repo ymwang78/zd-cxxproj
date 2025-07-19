@@ -1,6 +1,6 @@
 ﻿#pragma once
 // ***************************************************************
-//  zce_task   version:  1.0   -  date: 2003/03/27
+//  zce::Task   version:  1.0   -  date: 2003/03/27
 //  -------------------------------------------------------------
 //  Yongming Wang(wangym@gmail.com)
 //  -------------------------------------------------------------
@@ -16,74 +16,137 @@
 #include <zce/zce_object_counter.h>
 #include <zce/zce_thread.h>
 #include <deque>
+#include <future>
+#include <optional>
 
-class ZCE_API zce_task : virtual public zce_object {
+namespace zce {
+
+struct TaskResultBase {
+    enum class Status { Success, TaskException, SubmitFailed };
+    Status status;
+    std::string error_message;
+    bool is_ok() const { return status == Status::Success; }
+};
+
+template <typename T>
+struct TaskResult : public TaskResultBase {
+    std::optional<T> value;
+
+    static TaskResult<T> success(T val) {
+        TaskResult<T> res;
+        res.status = Status::Success;
+        res.value = std::move(val);
+        return res;
+    }
+
+    static TaskResult<T> error(Status s, std::string msg) {
+        TaskResult<T> res;
+        res.status = s;
+        res.error_message = std::move(msg);
+        return res;
+    }
+};
+
+template <>
+struct TaskResult<void> : public TaskResultBase {
+
+    static TaskResult<void> success() {
+        TaskResult<void> res;
+        res.status = Status::Success;
+        return res;
+    }
+
+    static TaskResult<void> error(Status s, std::string msg) {
+        TaskResult<void> res;
+        res.status = s;
+        res.error_message = std::move(msg);
+        return res;
+    }
+};
+
+class ZCE_API Task : virtual public zce_object {
   protected:
     const char* task_name_;
 
   public:
-    zce_task(const char* const name);
+    Task(const char* const name);
 
     inline const char* const name() const { return task_name_; }
 
     virtual void call() = 0;
 };
 
-typedef zce_smartptr<zce_task> zce_task_ptr;
+typedef zce_smartptr<Task> TaskPtr;
 
-class ZCE_API zce_task_delegator : virtual public zce_object {
+class ZCE_API TaskDelegator : virtual public zce_object {
   public:
-    virtual int delegate_task(const zce_smartptr<zce_task>& task_ptr, bool wait = false) = 0;
+    virtual int delegateTask(const TaskPtr& task_ptr) = 0;
 
-    virtual int delegate_release(zce_object* obj) = 0;
+    virtual int delegateRelease(zce_object* obj) = 0;
+
+    template <typename F, typename... Args>
+    auto delegate(const char* name, F&& f, Args&&... args) -> std::future<decltype(f(args...))> {
+        using ResultType = decltype(f(args...));
+        auto task_binder = std::bind(std::forward<F>(f), std::forward<Args>(args)...);
+        auto packaged_task_ptr = std::make_shared<std::packaged_task<ResultType()>>(task_binder);
+        std::future<ResultType> result_future = packaged_task_ptr->get_future();
+
+        class FutureTask : public zce::Task {
+            std::shared_ptr<std::packaged_task<ResultType()>> task_ptr_;
+
+          public:
+            FutureTask(const char* name, std::shared_ptr<std::packaged_task<ResultType()>> ptr)
+                : zce::Task(name), task_ptr_(ptr) {}
+
+            virtual void call() override {
+                // 当调度器调用 call() 时，我们执行 packaged_task
+                // packaged_task 的执行结果会自动填充到 future 中
+                (*task_ptr_)();
+            }
+        };
+        delegateTask(zce_smartptr<zce::Task>(new FutureTask(packaged_task_ptr)));
+        return result_future;
+    }
 
     template <typename F>
-    int delegate(bool bwait, const char* name, F f);
-};
+    int delegate(bool bwait, const char* name, F f) {
+        class Fr_task : public zce::Task {
+            zce_smartptr<zce::TaskDelegator> delegator_;
+            zce_semaphore* sem_;
+            F f_;
 
-template <typename F>
-int zce_task_delegator::delegate(bool bwait, const char* name, F f) {
-    class Fr_task : public zce_task {
-        zce_smartptr<zce_task_delegator> delegator_;
-        zce_semaphore* sem_;
-        F f_;
-
-      public:
-        Fr_task(const char* name, zce_task_delegator* delegate_ptr, zce_semaphore* sem, F f)
-            : zce_task(name ? name : "delegate_task"), delegator_(delegate_ptr), sem_(sem), f_(f) {
+          public:
+            Fr_task(const char* name, zce::TaskDelegator* delegate_ptr, zce_semaphore* sem, F f)
+                : zce::Task(name ? name : "delegateTask"),
+                  delegator_(delegate_ptr),
+                  sem_(sem),
+                  f_(f) {
 #ifdef _DEBUG
-            if (sem_) {  // ensure sem is 0
-                bool isget = sem_->try_acquire();
-                ZCE_ASSERT_TEXT(!isget, "deadlock detected!");
-                if (isget) sem_->release();
-            }
+                if (sem_) {  // ensure sem is 0
+                    bool isget = sem_->try_acquire();
+                    ZCE_ASSERT_TEXT(!isget, "deadlock detected!");
+                    if (isget) sem_->release();
+                }
 #endif
-        }
-        virtual void call() {
-            try {
-                f_();
-            } catch (const std::exception& ex) {
-                ZCE_ASSERT_TEXT(false, ex.what());
-            } catch (...) {
-                ZCE_ASSERT_TEXT(false, "unknow exception");
             }
-            if (sem_) sem_->release();
-        }
-    };
+            virtual void call() {
+                try {
+                    f_();
+                } catch (const std::exception& ex) {
+                    ZCE_ASSERT_TEXT(false, ex.what());
+                } catch (...) {
+                    ZCE_ASSERT_TEXT(false, "unknow exception");
+                }
+                if (sem_) sem_->release();
+            }
+        };
 
-    if (bwait) {
-        zce_tss::zce_global_semaphore global_semaphore;
-        zce_smartptr<zce_task> task_ptr(new Fr_task(name, this, global_semaphore.sem, f));
-        int ret = delegate_task(task_ptr, true);
-        global_semaphore.sem->acquire();
-        return ret;
-    } else {
-        zce_smartptr<zce_task> task_ptr(new Fr_task(name, this, 0, f));
-        return delegate_task(task_ptr, false);
-    }
+        zce_smartptr<zce::Task> task_ptr(new Fr_task(name, this, 0, f));
+        return delegateTask(task_ptr);
+    };
 };
 
-class ZCE_API zce_schedule : public zce_object {
+class ZCE_API Scheduler : public zce_object {
     struct zce_worker_contex;
 
     class zce_worker;
@@ -94,48 +157,107 @@ class ZCE_API zce_schedule : public zce_object {
     void do_work(zce_worker_contex& ctx);
 
   public:
-    zce_schedule();
+    Scheduler();
 
-    ~zce_schedule();
+    ~Scheduler();
 
     int active(int work_thread_cnt);
 
     void stop();
 
-    int perform(const zce_smartptr<zce_task>& req);
+    int perform(const TaskPtr& req);
 
     int print_curtask();
 
     template <typename F>
     int perform(F f) {
-        class F_task : public zce_task {
+        class FuncTask : public Task {
             F f_;
 
           public:
-            F_task(F f) : zce_task("F_task"), f_(f) {}
+            FuncTask(F f) : zce::Task("FuncTask"), f_(f) {}
             virtual void call() { f_(); }
         };
-        zce_smartptr<zce_task> task_ptr(new F_task(f));
+        zce_smartptr<zce::Task> task_ptr(new FuncTask(f));
         return perform(task_ptr);
     };
+
+    template <typename F, typename... Args>
+    auto perform(F&& f, Args&&... args) -> std::future<TaskResult<decltype(f(args...))>> {
+        using ReturnType = decltype(f(args...));
+        using ResultType = TaskResult<ReturnType>;
+
+        // 1. 在外部作用域创建 promise_ptr
+        auto promise_ptr = std::make_shared<std::promise<ResultType>>();
+
+        // 2. 从 promise_ptr 获取 future
+        std::future<ResultType> result_future = promise_ptr->get_future();
+
+        // 3. 定义 FutureTask 内部类
+        class FutureTask : public Task {
+            // 内部成员变量，持有 promise 的共享所有权
+            std::shared_ptr<std::promise<ResultType>> promise_;
+            std::function<ReturnType()> func_;
+
+          public:
+            FutureTask(std::shared_ptr<std::promise<ResultType>> p, F&& f, Args&&... args)
+                : Task("future_task_no_except"), promise_(p) {
+                func_ = std::bind(std::forward<F>(f), std::forward<Args>(args)...);
+            }
+
+            virtual void call() override {
+                try {
+                    if constexpr (std::is_same_v<ReturnType, void>) {
+                        func_();
+                        promise_->set_value(ResultType::success());
+                    } else {
+                        promise_->set_value(ResultType::success(func_()));
+                    }
+                } catch (const std::exception& e) {
+                    promise_->set_value(
+                        ResultType::error(ResultType::Status::TaskException, e.what()));
+                } catch (...) {
+                    promise_->set_value(ResultType::error(ResultType::Status::TaskException,
+                                                          "An unknown error occurred."));
+                }
+            }
+        };
+
+        // 将 promise_ptr 传递给 FutureTask 的构造函数
+        auto task = zce_smartptr<Task>(
+            new FutureTask(promise_ptr, std::forward<F>(f), std::forward<Args>(args)...));
+
+        // 4. 提交任务到底层调度器
+        int ret = perform(task);
+
+        // 5. 【修正部分】如果提交失败
+        if (ret != 0) {
+            // 使用在【当前外部作用域】中定义的 promise_ptr，而不是内部类的成员 promise_
+            promise_ptr->set_value(
+                ResultType::error(ResultType::Status::SubmitFailed, "Failed to schedule task."));
+        }
+
+        // 6. 返回 future
+        return result_future;
+    }
 };
 
 #include <zce/zce_singleton.h>
 
-typedef zce_singleton<zce_schedule> zce_schedule_sigt;
+typedef zce_singleton<Scheduler> SchedulerSigt;
 
 //////////////////////////////////////////////////////////////////////////
 
 template <typename H, typename T0, typename T1, typename T2>
-class zce_delegate_task : public zce_task {
+class DelegateTask : public Task {
     zce_smartptr<H> host_ptr_;
     T0 t0_;
     T1 t1_;
     T2 t2_;
 
   public:
-    zce_delegate_task(H* h, const T0& t0, const T1& t1, const T2& t2)
-        : zce_task("zce_delegate_task"), host_ptr_(h), t0_(t0), t1_(t1), t2_(t2) {}
+    DelegateTask(H* h, const T0& t0, const T1& t1, const T2& t2)
+        : Task("DelegateTask"), host_ptr_(h), t0_(t0), t1_(t1), t2_(t2) {}
 
     virtual void call() {
         if (host_ptr_) {
@@ -143,3 +265,5 @@ class zce_delegate_task : public zce_task {
         }
     }
 };
+
+}  // namespace zce

@@ -17,7 +17,7 @@
 #include <zce/zce_sync.h>
 
 class zce_allocator;
-class zce_task_delegator;
+class zce::TaskDelegator;
 
 class ZCE_API zce_object {
   protected:
@@ -25,13 +25,13 @@ class ZCE_API zce_object {
         : zce_alloc_(nullptr),
           release_delegator_(nullptr),
           ref_count_(0),
-          obj_idx_(zce_tss::get_global()->next_oid()) {};
+          obj_idx_(zce::Tss::get_global()->next_oid()) {};
 
     zce_object(const zce_object& rhs)
         : zce_alloc_(nullptr),
           release_delegator_(rhs.release_delegator_),
           ref_count_(1),
-          obj_idx_(zce_tss::get_global()->next_oid()) {};
+          obj_idx_(zce::Tss::get_global()->next_oid()) {};
 
     zce_object& operator=(const zce_object& rhs) {
         release_delegator_ = rhs.release_delegator_;
@@ -51,7 +51,7 @@ class ZCE_API zce_object {
 
     inline void __set_allocator(zce_allocator* alloc) noexcept { zce_alloc_ = alloc; }
 
-    inline void __set_release_delegator(zce_task_delegator* v) { release_delegator_ = v; }
+    inline void __set_release_delegator(zce::TaskDelegator* v) { release_delegator_ = v; }
 
     inline void __addref() noexcept { ++this->ref_count_; }
 
@@ -86,7 +86,7 @@ class ZCE_API zce_object {
 
   private:
     zce_allocator* zce_alloc_;
-    zce_task_delegator* release_delegator_;
+    zce::TaskDelegator* release_delegator_;
     zce_atomic_long ref_count_;
     const zce_int64 obj_idx_;
 };
@@ -206,6 +206,8 @@ class zce_smartptr {
     static zce_smartptr __dynamic_cast(Y* p) {
         return zce_smartptr(dynamic_cast<IMPL_CLASS*>(p));
     }
+
+    IMPL_CLASS* get() const { return this->handler_; }
 
   private:
     IMPL_CLASS* handler_;

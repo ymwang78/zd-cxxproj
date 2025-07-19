@@ -1,6 +1,6 @@
 ﻿#pragma once
 // ***************************************************************
-//  zce_task_queue   version:  1.0   -  date: 2002/11/15
+//  TaskQueue   version:  1.0   -  date: 2002/11/15
 //  -------------------------------------------------------------
 //  Yongming Wang(wangym@gmail.com)
 //  -------------------------------------------------------------
@@ -18,19 +18,21 @@
 #include <deque>
 #include <algorithm>
 
-class zce_schedule;
+namespace zce {
 
-class ZCE_API zce_task_queue : public zce_task, public zce_task_delegator {
+    class Scheduler;
+
+class ZCE_API TaskQueue : public Task, public TaskDelegator {
     ZCE_OBJECT_DECLARE;
 
   protected:
-    zce_smartptr<zce_schedule> scheduler_ptr_;
+    zce_smartptr<Scheduler> scheduler_ptr_;
 
     zce_atomic_long inque_;
 
-    zce_smartptr<zce_task_queue> proxy_ptr_;
+    zce_smartptr<TaskQueue> proxy_ptr_;
 
-    std::deque<zce_smartptr<zce_task>> deque_;
+    std::deque<zce_smartptr<Task>> deque_;
 
     std::vector<zce_smartptr<zce_object>> release_vec_;
 
@@ -41,8 +43,8 @@ class ZCE_API zce_task_queue : public zce_task, public zce_task_delegator {
     bool paused_;
 
   public:
-    zce_task_queue(const zce_smartptr<zce_schedule>& scheduler_ptr, unsigned contproc = 10,
-                   const char* name = 0);
+    TaskQueue(const zce_smartptr<Scheduler>& scheduler_ptr, unsigned contproc = 10,
+              const char* name = 0);
 
     int try_queue_length();  // if locked return -1
 
@@ -50,20 +52,18 @@ class ZCE_API zce_task_queue : public zce_task, public zce_task_delegator {
 
     int resume();
 
-    void attach(const zce_smartptr<zce_task_queue>&);
+    void attach(const zce_smartptr<TaskQueue>&);
 
-    int delegate_task(const zce_smartptr<zce_task>& task_ptr, bool bwait = false) override;
+    int delegateTask(const zce_smartptr<Task>& task_ptr) override;
 
     // 有些对象的释放有同步要求，必须在相关队列或者线程释放
-    int delegate_release(zce_object* obj) override;
+    int delegateRelease(zce_object* obj) override;
 
     virtual void call();
-
 };
 
-
 template <typename QueueSubType, typename Params, typename Results>
-class zce_task_map_reduce : public zce_object {
+class TaskMapReduce : public zce_object {
     zce_smartptr<QueueSubType>* queue_vec_;
     size_t queue_size_;
     zce_atomic_long remain_tasks_;
@@ -73,8 +73,8 @@ class zce_task_map_reduce : public zce_object {
 
   public:
     template <typename QueueIdxVecType, typename ParamsType, typename ResultsType>
-    zce_task_map_reduce(zce_smartptr<QueueSubType>* queue_vec, size_t queue_size,
-                        QueueIdxVecType&& queue_idx_vec, ParamsType&& params, ResultsType&& result)
+    TaskMapReduce(zce_smartptr<QueueSubType>* queue_vec, size_t queue_size,
+                  QueueIdxVecType&& queue_idx_vec, ParamsType&& params, ResultsType&& result)
         : queue_vec_(queue_vec),
           queue_size_(queue_size),
           queue_idx_vec_(std::forward<QueueIdxVecType>(queue_idx_vec)),
@@ -100,7 +100,7 @@ class zce_task_map_reduce : public zce_object {
 
         remain_tasks_ = (long)work_queue_count;
 
-        zce_smartptr<zce_task_map_reduce> this_ptr(this);
+        zce_smartptr<TaskMapReduce> this_ptr(this);
         for (size_t i = 0; i < queue_size_; ++i) {
             if (!if_work_queue[i]) continue;
             queue_vec_[i]->delegate(false, __FUNCTION__, [=]() {
@@ -115,3 +115,5 @@ class zce_task_map_reduce : public zce_object {
         return 0;
     }
 };
+
+}  // namespace zce

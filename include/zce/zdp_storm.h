@@ -1,4 +1,4 @@
-// ***************************************************************
+﻿// ***************************************************************
 //  zdp_storm   version:  1.0   -  date: 2015/01/01
 //  -------------------------------------------------------------
 //  Yongming Wang(wangym@gmail.com)
@@ -17,7 +17,9 @@
 
 class zce_dblock;
 class zce_reactor;
-class zce_schedule;
+namespace zce {
+class Scheduler;
+};
 
 namespace zdp {
 struct ZCE_API zdp_storm_peer {
@@ -53,7 +55,7 @@ class ZCE_API zdp_storm : public zce_object {
     zce_smartptr<Pimpl> pimpl_ptr_;
 
   public:
-    zdp_storm(const zce_smartptr<zce_reactor>&, const zce_smartptr<zce_schedule>&,
+    zdp_storm(const zce_smartptr<zce_reactor>&, const zce_smartptr<zce::Scheduler>&,
               zce_uint16 uniqueid, const zce_string& token, const zce_any& ctx,
               publish_callback child_cb, set_callback set_cb);
 

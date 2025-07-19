@@ -15,8 +15,10 @@
 #include <zce/zce_singleton.h>
 
 class zvm_pimpl;
-class zce_schedule;
 class zce_reactor;
+namespace zce {
+class Scheduler;
+}
 
 extern "C" {
     typedef struct lua_State lua_State;
@@ -53,7 +55,7 @@ public:
 
     ~zvm();
 
-    int init(const zce_smartptr<zce_schedule>&,
+    int init(const zce_smartptr<zce::Scheduler>&,
         const zce_smartptr<zce_reactor>&);
 
     zce_smartptr<zce_object> boot(const std::string& svc_name,

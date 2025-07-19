@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <zce/zce_config.h>
 #include <zce/zce_object.h>
@@ -15,10 +15,10 @@ class zdb_redis_connection;
 
 class zds_persist : public zce_object {
   protected:
-    zce_smartptr<zce_schedule> write_schedule_;
-    zce_smartptr<zce_task_queue> queue_ptr_;
+    zce_smartptr<zce::Scheduler> write_schedule_;
+    zce_smartptr<zce::TaskQueue> queue_ptr_;
 
-    class async_write_task : public zce_task {
+    class async_write_task : public zce::Task {
         zce_smartptr<zds_persist> persist_ptr_;
         std::string dbname_;
         std::string coll_;

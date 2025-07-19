@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <zce/zce_task.h>
 #include <zce/zce_bytes.h>
@@ -41,7 +41,7 @@ class ZCE_API zdb_mgo_database
 
     std::string dbname_;
 
-    zce_tss tss_conn_;
+    zce::Tss tss_conn_;
 
 public:
 

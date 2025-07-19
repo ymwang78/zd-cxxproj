@@ -1,4 +1,4 @@
-// ***************************************************************
+﻿// ***************************************************************
 //  zdb_ecpg   version:  1.0   -  date: 2015/01/01
 //  -------------------------------------------------------------
 //  Yongming Wang(wangym@gmail.com)
@@ -82,7 +82,7 @@ class ZCE_API zdb_ecpg_database : public zce_object
     std::string dbname_;
     std::string dbuser_;
     std::string dbpasswd_;
-    zce_tss tss_conn_;
+    zce::Tss tss_conn_;
 
 public:
 

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 // ***************************************************************
 //  zce_timer   version:  1.0   -  date: 2003/02/15
 //  -------------------------------------------------------------
@@ -13,10 +13,12 @@
 #include <zce/zce_config.h>
 #include <zce/zce_object.h>
 #include <zce/zce_object_counter.h>
-#include <zce/zce_task_queue.h>
 #include <functional>
+
+namespace zce {
+    class TaskQueue;
+}  // namespace zce
 class zce_reactor;
-class zce_task_queue;
 class zce_timer_doozer;
 
 class ZCE_API zce_timer : public zce_object
@@ -28,7 +30,7 @@ class ZCE_API zce_timer : public zce_object
 
 public:
     zce_timer(const zce_smartptr<zce_reactor>& reactor, 
-        const zce_smartptr<zce_task_queue>& syncque,
+        const zce_smartptr<zce::TaskQueue>& syncque,
         unsigned msecond, 
         bool repeat = true);
 

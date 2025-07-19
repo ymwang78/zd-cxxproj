@@ -142,7 +142,7 @@ class ZCE_API zdb_redis_databse : public zce_object
     std::string ip_;
     unsigned short port_;
     std::string passwd_;
-    zce_tss tss_conn_;
+    zce::Tss tss_conn_;
 
 public:
 

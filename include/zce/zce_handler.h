@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 // ***************************************************************
 //  zce_handler   version:  1.0     date: 2002/06/22
 //  -------------------------------------------------------------
@@ -44,15 +44,15 @@ class ZCE_API zce_istream : virtual public zce_object {
 
         ERV_ISTREAM_DEFAULT,
 
-        ERV_ISTREAM_PRIORITY_LOWP = 1,  // ×îµÍ¿É¶ªÆúµÈ¼¶£¬±ÈÈçPÖ¡
-        ERV_ISTREAM_PRIORITY_LOWI,      // ½Ï¸ß¿É¶ªÆúµÈ¼¶£¬±ÈÈçIÖ¡
-        ERV_ISTREAM_PRIORITY_LOWA,      // ×î¸ß¿É¶ªÆúµÈ¼¶£¬ÒôÆµ
-        ERV_ISTREAM_PRIORITY_STD,       // Õı³£µÈ¼¶£¬²»¿É¶ªÆú
-        ERV_ISTREAM_PRIORITY_HIGH,      // ÓÅÏÈ¿É²å¶Ó·¢ËÍ
+        ERV_ISTREAM_PRIORITY_LOWP = 1,  // æœ€ä½å¯ä¸¢å¼ƒç­‰çº§ï¼Œæ¯”å¦‚På¸§
+        ERV_ISTREAM_PRIORITY_LOWI,      // è¾ƒé«˜å¯ä¸¢å¼ƒç­‰çº§ï¼Œæ¯”å¦‚Iå¸§
+        ERV_ISTREAM_PRIORITY_LOWA,      // æœ€é«˜å¯ä¸¢å¼ƒç­‰çº§ï¼ŒéŸ³é¢‘
+        ERV_ISTREAM_PRIORITY_STD,       // æ­£å¸¸ç­‰çº§ï¼Œä¸å¯ä¸¢å¼ƒ
+        ERV_ISTREAM_PRIORITY_HIGH,      // ä¼˜å…ˆå¯æ’é˜Ÿå‘é€
 
         ERV_ISTREAM_PRIORITY_MASK = 0x7,
 
-        ERV_ISTREAM_WITHSOCKADDR = 0x10,  // °üÇ°Ãæ´øÁËÄ¿±êµØÖ·
+        ERV_ISTREAM_WITHSOCKADDR = 0x10,  // åŒ…å‰é¢å¸¦äº†ç›®æ ‡åœ°å€
 
         ERV_ISTREAM_REQUESTCLOSE = 0x20,
     };
@@ -360,26 +360,28 @@ class ZCE_API zce_acceptor : public zce_object {
     virtual zce_tcp* make_handler() = 0;
 };
 
-class zce_task_queue;
+namespace zce {
+class TaskQueue;
+}  // namespace zce
 class zce_reactor;
 
 class ZCE_API zce_sync_istream : public zce_istream {
     ZCE_OBJECT_DECLARE;
 
   protected:
-    zce_smartptr<zce_task_queue> taskdeque_ptr_;
+    zce_smartptr<zce::TaskQueue> taskdeque_ptr_;
 
     zce_smartptr<zce_reactor> reactor_ptr_;
 
   public:
-    zce_sync_istream(const zce_smartptr<zce_task_queue>& taskdeque,
+    zce_sync_istream(const zce_smartptr<zce::TaskQueue>& taskdeque,
                      const zce_smartptr<zce_reactor>& reactor);
 
     ~zce_sync_istream();
 
-    const zce_smartptr<zce_task_queue>& queue_ptr() const { return taskdeque_ptr_; }
+    const zce_smartptr<zce::TaskQueue>& queue_ptr() const { return taskdeque_ptr_; }
 
-    virtual int do_match_queue(zce_smartptr<zce_task_queue>&, const zce_dblock& dblock,
+    virtual int do_match_queue(zce_smartptr<zce::TaskQueue>&, const zce_dblock& dblock,
                                const zce_any& ctx) {
         return 0;
     };

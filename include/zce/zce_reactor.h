@@ -16,10 +16,10 @@
 
 class zce_thread;
 class zce_allocator;
-class zce_task;
+class zce::Task;
 class zce_dnsresolve;
 
-class ZCE_API zce_reactor : public zce_task_delegator {
+class ZCE_API zce_reactor : public zce::TaskDelegator {
     struct pimpl;
     struct pimpl* pimpl_;
 
@@ -42,11 +42,11 @@ class ZCE_API zce_reactor : public zce_task_delegator {
 
     int dns_resolve(const std::string& domain, const zce_smartptr<zce_dnsresolve>& resolve_ptr);
 
-    int delegate_task(const zce_smartptr<zce_task>& task_ptr, bool wait = false) override;
+    int delegateTask(const zce_smartptr<zce::Task>& task_ptr) override;
 
-    int delegate_delay(const zce_smartptr<zce_task>& task_ptr, int ms_second);
+    int delegate_delay(const zce_smartptr<zce::Task>& task_ptr, int ms_second);
 
-    int delegate_release(zce_object* obj) override;
+    int delegateRelease(zce_object* obj) override;
 
     void delegate_work();
 
