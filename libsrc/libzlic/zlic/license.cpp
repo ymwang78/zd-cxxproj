@@ -1,4 +1,4 @@
-#include <zce/zce_config.h>
+ï»¿#include <zce/zce_config.h>
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
@@ -93,12 +93,12 @@ static const char _self_pubkey[] = "-----BEGIN RSA PUBLIC KEY-----\n"
 
 bool SetRegistryValue(HKEY hKey, LPCSTR subKey, LPCSTR valueName, LPCSTR data) {
     HKEY hSubKey;
-    // ´ò¿ª£¨»ò´´½¨£©Ò»¸ö×¢²á±í¼ü
+    // æ‰“å¼€ï¼ˆæˆ–åˆ›å»ºï¼‰ä¸€ä¸ªæ³¨å†Œè¡¨é”®
     if (RegCreateKeyExA(hKey, subKey, 0, NULL, REG_OPTION_NON_VOLATILE, KEY_WRITE, NULL, &hSubKey, NULL) != ERROR_SUCCESS) {
         return false;
     }
 
-    // ÉèÖÃ×¢²á±í¼üÖµ
+    // è®¾ç½®æ³¨å†Œè¡¨é”®å€¼
     if (RegSetValueExA(hSubKey, valueName, 0, REG_SZ, (const BYTE*)data, strlen(data) + 1) != ERROR_SUCCESS) {
         RegCloseKey(hSubKey);
         return false;
@@ -125,10 +125,10 @@ std::string GetRegistryValue(HKEY hKey, LPCSTR subKey, LPCSTR valueName) {
     RegCloseKey(hSubKey);
     return std::string(data, dataSize - 1);
 }
-//license ĞÅÏ¢
+//license ä¿¡æ¯
 static zlicense::license_t g_lic;
 
-//»úÆ÷±¾ÉíµÄĞÅÏ¢
+//æœºå™¨æœ¬èº«çš„ä¿¡æ¯
 std::set<std::string> g_setmac;
 std::set<std::string> g_sethd;
 
@@ -155,9 +155,9 @@ static bool machine_check(const zlicense::license_t& lic)
     return false;
 }
 
-static int _lic_from_base64(zlicense::license_t& lic, const zce_dblock& b64, const char* priv, int privlen)
+static int _lic_from_base64(zlicense::license_t& lic, const zce::RefBlock& b64, const char* priv, int privlen)
 {
-    zce_dblock dblock, mb;
+    zce::RefBlock dblock, mb;
     ZCE_MBACQUIRE(mb, b64.length() * 2);
     int ret = zce_base64_decode(mb.rd_ptr_cow(), b64.rd_ptr(), b64.length());
     ZCE_ASSERT_RETURN(ret >= 0, ZLIC_ERROR_CORRUPT);
@@ -220,7 +220,7 @@ static std::string _create_trivallicense(const char* appname, int expire_trival)
     ZCE_ASSERT_RETURN(ret >= 0, s_license_gen);
 
     //rsa encrypt
-    zce_dblock dblock, output;
+    zce::RefBlock dblock, output;
     ret = zce_rsa_public_encrypt(dblock, buf.get(), ret, _lib_rsapub, sizeof(_lib_rsapub) - 1);
     ZCE_ASSERT_RETURN(ret >= 0, s_license_gen);
     ZCE_MBACQUIRE(output, dblock.length() * 2);
@@ -282,7 +282,7 @@ const char* zlic_getreq(const char* appname)
     ZCE_ASSERT_RETURN(ret >= 0, s_licreq.c_str());
 
     //rsa encrypt
-    zce_dblock dblock, output;
+    zce::RefBlock dblock, output;
     ret = zce_rsa_public_encrypt(dblock, buf.get(), ret, _self_pubkey, sizeof(_self_pubkey) - 1);
     ZCE_ASSERT_RETURN(ret >= 0, s_licreq.c_str());
     ZCE_MBACQUIRE(output, dblock.length() * 2);
@@ -304,15 +304,15 @@ int zlic_setkey(const char* appname, const char* keystr)
     _machine_init();
     int ret = 0;
     size_t keylen = strlen(keystr);
-    zce_dblock mb(keylen, (zce_byte*)keystr, (int)keylen);
+    zce::RefBlock mb(keylen, (zce_byte*)keystr, (int)keylen);
 
     std::string subKey = std::string("SOFTWARE\\Microsoft\\UserData\\ZLIC\\") + appname;
     SetRegistryValue(HKEY_CURRENT_USER, subKey.c_str(), "Response", keystr);
 
-    //¿¼ÂÇµ½ÓĞµÄ»úÆ÷¸´ÖÆÎÄ¼ş·Ç³£Âé·³£¬ËùÒÔÊ¹ÓÃÊÖ¶¯ÊäÈëlicense£¬ÄÇ¾Í±ØĞë·Ç³£µÄ¶Ì
+    //è€ƒè™‘åˆ°æœ‰çš„æœºå™¨å¤åˆ¶æ–‡ä»¶éå¸¸éº»çƒ¦ï¼Œæ‰€ä»¥ä½¿ç”¨æ‰‹åŠ¨è¾“å…¥licenseï¼Œé‚£å°±å¿…é¡»éå¸¸çš„çŸ­
     if (mb.length() < 64) {
         //std::string val = GetRegistryValue(HKEY_CURRENT_USER, subKey.c_str(), "Request");
-        //zce_dblock mb(val.length(), (zce_byte*)val.c_str(), (int)val.length());
+        //zce::RefBlock mb(val.length(), (zce_byte*)val.c_str(), (int)val.length());
         //zlicense::license_t lic{};
         //ret = _lic_from_base64(lic, mb, _lib_privkey, sizeof(_lib_privkey) - 1);
         //ZCE_ASSERT_RETURN(ret >= 0, ret);
@@ -339,8 +339,8 @@ ZLIC_API int  zlic_valid(const char* appname, int trival_expire)
 {
     _machine_init();
     if (g_lic.app.empty()) {
-        zce_dblock mb;
-        int ret = zce_dblock_from_file(mb, (std::string(appname) + ".zlic").c_str(), 0);
+        zce::RefBlock mb;
+        int ret = zce::fromFile(mb, (std::string(appname) + ".zlic").c_str(), 0);
         ZCE_ASSERT_RETURN(ret >= 0, ZLIC_ERROR_NOLICENSE);
         zlicense::license_t lic{};
         ret = _lic_from_base64(lic, mb, _lib_privkey, sizeof(_lib_privkey) - 1);
@@ -352,14 +352,14 @@ ZLIC_API int  zlic_valid(const char* appname, int trival_expire)
         int nlen = 0;
         zce_byte* data = _lic_fetch(g_lic, "version", &nlen);
         if (nlen > 0 && data && 0 == memcmp(data, "trival", zce_min(nlen, (int)sizeof("trival") - 1))) {
-            //ÏÈ¶ÁÈ¡ÊÔÓÃ°ælicense£¬Èç¹ûÃ»ÓĞÔòÉú³ÉÒ»¸ö£¬µ«ÊÇÈçºÎ·ÀÖ¹É¾³ıÊÔÓÃ°ælicense£¬Ôì³ÉÎŞÏŞÊÔÓÃÄØ£¿
+            //å…ˆè¯»å–è¯•ç”¨ç‰ˆlicenseï¼Œå¦‚æœæ²¡æœ‰åˆ™ç”Ÿæˆä¸€ä¸ªï¼Œä½†æ˜¯å¦‚ä½•é˜²æ­¢åˆ é™¤è¯•ç”¨ç‰ˆlicenseï¼Œé€ æˆæ— é™è¯•ç”¨å‘¢ï¼Ÿ
             std::string subKey = std::string("SOFTWARE\\Microsoft\\UserData\\ZLIC\\") + appname;
             std::string val = GetRegistryValue(HKEY_CURRENT_USER, subKey.c_str(), "Data");
             if (val.empty()) {
                 val = _create_trivallicense(appname, trival_expire);
                 SetRegistryValue(HKEY_CURRENT_USER, subKey.c_str(), "Data", val.c_str());
             }
-            zce_dblock mb(val.length(), (zce_byte*)val.c_str(), (int)val.length());
+            zce::RefBlock mb(val.length(), (zce_byte*)val.c_str(), (int)val.length());
             zlicense::license_t lic{};
             ret = _lic_from_base64(lic, mb, _lib_privkey, sizeof(_lib_privkey) - 1);
             ZCE_ASSERT_RETURN(ret >= 0, ret);
