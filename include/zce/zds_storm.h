@@ -27,7 +27,7 @@ class zds_storm_requester : virtual public zce_object {
     virtual void on_response(const zce::RefBlock& dblockptr, void* ctx) = 0;
 };
 
-class zds_storm : public zce_reactor {
+class zds_storm : public zce::Reactor {
     class zds_storm_task : public zce::Task {
         enum { TO_STORM, FROM_STORM } step_;
         zce_smartptr<zds_storm> stormptr_;

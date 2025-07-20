@@ -1,6 +1,6 @@
 ﻿#pragma once
 // ***************************************************************
-//  zce_reactor   version:  1.0     date: 2002/07/31
+//  zce::Reactor   version:  1.0     date: 2002/07/31
 //  -------------------------------------------------------------
 //  Yongming Wang(wangym@gmail.com)
 //  -------------------------------------------------------------
@@ -14,21 +14,23 @@
 #include <zce/zce_task.h>
 #include <deque>
 
-class zce_thread;
-class zce::Allocator;
-class zce::Task;
-class zce_dnsresolve;
+namespace zce {
 
-class ZCE_API zce_reactor : public zce::TaskDelegator {
+class Allocator;
+class DnsResolve;
+class Task;
+class Thread;
+
+class ZCE_API Reactor : public zce::TaskDelegator {
     struct pimpl;
     struct pimpl* pimpl_;
 
-    friend class zce_reactor_thread;
+    friend class ReactorThread;
 
   public:
-    zce_reactor();
+    Reactor();
 
-    ~zce_reactor();
+    ~Reactor();
 
     unsigned long thread_id() const;
 
@@ -40,7 +42,7 @@ class ZCE_API zce_reactor : public zce::TaskDelegator {
 
     void stop();
 
-    int dns_resolve(const std::string& domain, const zce_smartptr<zce_dnsresolve>& resolve_ptr);
+    int dns_resolve(const std::string& domain, const zce_smartptr<zce::DnsResolve>& resolve_ptr);
 
     int delegateTask(const zce_smartptr<zce::Task>& task_ptr) override;
 
@@ -61,3 +63,5 @@ class ZCE_API zce_reactor : public zce::TaskDelegator {
 
     void terminate();
 };
+
+}  // namespace zce

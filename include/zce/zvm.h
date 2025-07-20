@@ -15,8 +15,9 @@
 #include <zce/zce_singleton.h>
 
 class zvm_pimpl;
-class zce_reactor;
+
 namespace zce {
+class Reactor;
 class Scheduler;
 }
 
@@ -56,7 +57,7 @@ public:
     ~zvm();
 
     int init(const zce_smartptr<zce::Scheduler>&,
-        const zce_smartptr<zce_reactor>&);
+        const zce_smartptr<zce::Reactor>&);
 
     zce_smartptr<zce_object> boot(const std::string& svc_name,
         const std::string& path, zce::RefBlock& args);

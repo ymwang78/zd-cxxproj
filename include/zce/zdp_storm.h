@@ -55,7 +55,7 @@ class ZCE_API zdp_storm : public zce_object {
     zce_smartptr<Pimpl> pimpl_ptr_;
 
   public:
-    zdp_storm(const zce_smartptr<zce_reactor>&, const zce_smartptr<zce::Scheduler>&,
+    zdp_storm(const zce_smartptr<zce::Reactor>&, const zce_smartptr<zce::Scheduler>&,
               zce_uint16 uniqueid, const zce_string& token, const zce::Any& ctx,
               publish_callback child_cb, set_callback set_cb);
 
@@ -74,7 +74,7 @@ class ZCE_API zdp_storm_client : public zce_object {
     zce_smartptr<Pimpl> pimpl_ptr_;
 
   public:
-    zdp_storm_client(const zce_smartptr<zce_reactor>&, zce_int64 uniqueid, const zce_string& token,
+    zdp_storm_client(const zce_smartptr<zce::Reactor>&, zce_int64 uniqueid, const zce_string& token,
                      const zce::Any& ctx, publish_callback father_cb, set_callback set_cb);
 
     ~zdp_storm_client();
@@ -134,7 +134,7 @@ int zdp_storm_client::set(zce_int64 topic, const zce_string& name, zce_int64 old
 
 //////////////////////////////////////////////////////////////////////////
 
-class ZCE_API zdp_storm_stream_adapter : public zce_istream {
+class ZCE_API zdp_storm_stream_adapter : public zce::IStream {
     zce_int64 topic_;
 
     zdp::zdp_storm_peer peer_;

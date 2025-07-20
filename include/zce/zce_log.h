@@ -160,7 +160,9 @@ std::ostream& operator<<(std::ostream& ost, const hex_t<T>& t) {
     return ost;
 }
 
-class ZCE_API zce_logstr : public zce_object {
+namespace zce {
+
+class ZCE_API Logger : public zce_object {
   private:
     _zlog_level level_;
     int line_;
@@ -170,7 +172,7 @@ class ZCE_API zce_logstr : public zce_object {
     std::ostringstream oss_;
 
   public:
-    zce_logstr(_zlog_level level, const char* func, const char* fname, int line,
+    Logger(_zlog_level level, const char* func, const char* fname, int line,
                const char* splitter = "|");
 
     void flush();
@@ -217,39 +219,41 @@ class ZCE_API zce_logstr : public zce_object {
     }
 };
 
+}  // namespace zce
+
 #    define ZTRACE(...)                                                                      \
         do {                                                                                 \
             if (zlog_getlevel() <= ZLOG_TRACE)                                               \
-                zce_logstr(ZLOG_TRACE, __FUNCTION__, __FILE__, __LINE__).write(__VA_ARGS__); \
+                zce::Logger(ZLOG_TRACE, __FUNCTION__, __FILE__, __LINE__).write(__VA_ARGS__); \
         } while (0)
 #    define ZDEBUG(...)                                                                      \
         do {                                                                                 \
             if (zlog_getlevel() <= ZLOG_DEBUG)                                               \
-                zce_logstr(ZLOG_DEBUG, __FUNCTION__, __FILE__, __LINE__).write(__VA_ARGS__); \
+                zce::Logger(ZLOG_DEBUG, __FUNCTION__, __FILE__, __LINE__).write(__VA_ARGS__); \
         } while (0)
 #    define ZINFOR(...)                                                                      \
         do {                                                                                 \
             if (zlog_getlevel() <= ZLOG_INFOR)                                               \
-                zce_logstr(ZLOG_INFOR, __FUNCTION__, __FILE__, __LINE__).write(__VA_ARGS__); \
+                zce::Logger(ZLOG_INFOR, __FUNCTION__, __FILE__, __LINE__).write(__VA_ARGS__); \
         } while (0)
 #    define ZWARNI(...)                                                                      \
         do {                                                                                 \
             if (zlog_getlevel() <= ZLOG_WARNI)                                               \
-                zce_logstr(ZLOG_WARNI, __FUNCTION__, __FILE__, __LINE__).write(__VA_ARGS__); \
+                zce::Logger(ZLOG_WARNI, __FUNCTION__, __FILE__, __LINE__).write(__VA_ARGS__); \
         } while (0)
 #    define ZERROR(...)                                                                      \
         do {                                                                                 \
             if (zlog_getlevel() <= ZLOG_ERROR)                                               \
-                zce_logstr(ZLOG_ERROR, __FUNCTION__, __FILE__, __LINE__).write(__VA_ARGS__); \
+                zce::Logger(ZLOG_ERROR, __FUNCTION__, __FILE__, __LINE__).write(__VA_ARGS__); \
         } while (0)
 #    define ZFATAL(...)                                                                      \
         do {                                                                                 \
             if (zlog_getlevel() <= ZLOG_FATAL)                                               \
-                zce_logstr(ZLOG_FATAL, __FUNCTION__, __FILE__, __LINE__).write(__VA_ARGS__); \
+                zce::Logger(ZLOG_FATAL, __FUNCTION__, __FILE__, __LINE__).write(__VA_ARGS__); \
         } while (0)
 
 #    define ZBIZDT(...)
-// #define ZBIZDT(...) do { if(zlog_getlevel() <= ZLOG_BIZDT) zce_logstr(ZLOG_BIZDT, __FUNCTION__,
+// #define ZBIZDT(...) do { if(zlog_getlevel() <= ZLOG_BIZDT) zce::Logger(ZLOG_BIZDT, __FUNCTION__,
 // __FILE__, __LINE__).write(__VA_ARGS__); } while(0)
 
 #endif

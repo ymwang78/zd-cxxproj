@@ -6,7 +6,7 @@ typedef struct bio_st BIO;
 typedef struct ssl_st SSL;
 typedef struct ssl_ctx_st SSL_CTX;
 
-class zce_ssl : public zce_istream
+class zce_ssl : public zce::IStream
 {
     enum _tls_state {
         STATE_INIT = 0x0,

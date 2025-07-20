@@ -1,6 +1,6 @@
 ﻿#pragma once
 // ***************************************************************
-//  zce_mbpool   version:  1.0   -  date: 2012/4/30
+//  zce::BlockPool   version:  1.0   -  date: 2012/4/30
 //  -------------------------------------------------------------
 //  Yongming Wang(wangym@gmail.com)
 //  -------------------------------------------------------------
@@ -14,14 +14,13 @@
 #include <zce/zce_allocator.h>
 #include <map>
 
-
 namespace zce {
+
 class Allocator;
 class DataBlock;
 class RefBlock;
-}
 
-class ZCE_API zce_mbpool
+class ZCE_API BlockPool
 {
     std::map<unsigned, zce_smartptr<zce::Allocator> >* allocators_;
 
@@ -33,9 +32,9 @@ class ZCE_API zce_mbpool
 
 public:
 
-    zce_mbpool();
+    BlockPool();
 
-    virtual ~zce_mbpool();
+    virtual ~BlockPool();
 
     void add_pool(size_t size, size_t count);
 
@@ -79,8 +78,10 @@ public:
     }
 };
 
+}  // namespace zce
+
 #include <zce/zce_singleton.h>
-typedef zce_singleton<zce_mbpool> zce_mbpool_sigt;
+typedef zce_singleton<zce::BlockPool> zce_mbpool_sigt;
 
 #define ZCE_MBACQUIRE(RET, x) do{ \
     static zce_object_counter obj(__FUNCTION__); \

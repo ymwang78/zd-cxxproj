@@ -16,9 +16,10 @@
 #include <functional>
 
 namespace zce {
-    class TaskQueue;
+class Reactor;
+class TaskQueue;
 }  // namespace zce
-class zce_reactor;
+
 class zce_timer_doozer;
 
 class ZCE_API zce_timer : public zce_object
@@ -29,7 +30,7 @@ class ZCE_API zce_timer : public zce_object
     zce_smartptr<pimpl> pimpl_;
 
 public:
-    zce_timer(const zce_smartptr<zce_reactor>& reactor, 
+    zce_timer(const zce_smartptr<zce::Reactor>& reactor, 
         const zce_smartptr<zce::TaskQueue>& syncque,
         unsigned msecond, 
         bool repeat = true);

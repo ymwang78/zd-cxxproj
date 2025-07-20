@@ -9,20 +9,15 @@
 // ***************************************************************
 //
 // ***************************************************************
-#ifndef __zce_handler_h__
-#    define __zce_handler_h__
+#include <zce/zce_object.h>
+#include <zce/zce_task.h>
+#include <zce/zce_types.h>
+#include <zce/zce_dblock.h>
+#include <zce/zce_any.h>
+#include <string>
+#include <deque>
+#include <map>
 
-#    include <zce/zce_object.h>
-#    include <zce/zce_task.h>
-#    include <zce/zce_types.h>
-#    include <zce/zce_dblock.h>
-#    include <zce/zce_any.h>
-#    include <string>
-#    include <deque>
-#    include <map>
-
-class zce_reactor;
-class zce::RefBlock;
 class zce_timer;
 
 //////////////////////////////////////////////////////////////////////////
@@ -33,11 +28,16 @@ bool ZCE_API operator<(const zce_addr_t& s1, const zce_addr_t& s2);
 
 //////////////////////////////////////////////////////////////////////////
 
-class ZCE_API zce_istream : virtual public zce_object {
-  protected:
-    zce_smartptr<zce_istream> prev_;
+namespace zce {
 
-    zce_smartptr<zce_istream> next_;
+class Reactor;
+class RefBlock;
+
+class ZCE_API IStream : virtual public zce_object {
+  protected:
+    zce_smartptr<IStream> prev_;
+
+    zce_smartptr<IStream> next_;
 
   public:
     enum ERV_ISTREAM_WRITEOPT {
@@ -57,18 +57,18 @@ class ZCE_API zce_istream : virtual public zce_object {
         ERV_ISTREAM_REQUESTCLOSE = 0x20,
     };
 
-    const zce_smartptr<zce_istream>& prev() { return prev_; }
+    const zce_smartptr<IStream>& prev() { return prev_; }
 
-    void prev(const zce_smartptr<zce_istream>& v) { prev_ = v; }
+    void prev(const zce_smartptr<IStream>& v) { prev_ = v; }
 
-    const zce_smartptr<zce_istream>& next() { return next_; }
+    const zce_smartptr<IStream>& next() { return next_; }
 
-    void next(const zce_smartptr<zce_istream>& v) { next_ = v; }
+    void next(const zce_smartptr<IStream>& v) { next_ = v; }
 
-    void link(const zce_smartptr<zce_istream>& v) {
+    void link(const zce_smartptr<IStream>& v) {
         next_ = v;
         if (v) {
-            v->prev(zce_smartptr<zce_istream>(this));
+            v->prev(zce_smartptr<IStream>(this));
         }
     }
 
@@ -85,7 +85,7 @@ class ZCE_API zce_istream : virtual public zce_object {
     const zce_sockaddr_t& get_remote_addr() const;
 };
 
-class ZCE_API zce_socket : public zce_istream {
+class ZCE_API Socket : public IStream {
     ZCE_OBJECT_DECLARE;
 
   protected:
@@ -95,7 +95,7 @@ class ZCE_API zce_socket : public zce_istream {
 
     zce::AtomicLong read_refcnt_;
 
-    zce_smartptr<zce_reactor> reactor_;
+    zce_smartptr<zce::Reactor> reactor_;
 
     zce::RefBlock read_dblock_;
 
@@ -108,7 +108,7 @@ class ZCE_API zce_socket : public zce_istream {
     unsigned preserved_size_;
 
   protected:
-    zce_socket(const zce_smartptr<zce_reactor>& reactor_ptr, int preserved_size);
+    Socket(const zce_smartptr<zce::Reactor>& reactor_ptr, int preserved_size);
 
     void do_close();
 
@@ -126,7 +126,7 @@ class ZCE_API zce_socket : public zce_istream {
 
     virtual void* handle() const = 0;
 
-    const zce_smartptr<zce_reactor>& reactor() const { return reactor_; }
+    const zce_smartptr<zce::Reactor>& reactor() const { return reactor_; }
 
     void alloc_writebuf(unsigned suggest_size, zce_byte*& buf, zce_uint32& len);
 
@@ -137,7 +137,7 @@ class ZCE_API zce_socket : public zce_istream {
     void suggest_size(unsigned v) { suggest_size_ = v; };
 };
 
-class ZCE_API zce_udp : public zce_socket {
+class ZCE_API Udp : public Socket {
     struct pimpl;
     struct pimpl* pimpl_;
 
@@ -151,12 +151,12 @@ class ZCE_API zce_udp : public zce_socket {
   public:
     static const int SOCKADDR_MAGIC = 0x19781217;
 
-    zce_udp(const zce_smartptr<zce_reactor>& reactor,
-            int preserved_size =
-                6 + sizeof(zce_sockaddr_t));  // default rtp, tcp head 4 + serveroverhead 2 +
-                                              // sizeof(zce_sockaddr_t)
+    Udp(const zce_smartptr<zce::Reactor>& reactor,
+        int preserved_size = 6 +
+                             sizeof(zce_sockaddr_t));  // default rtp, tcp head 4 + serveroverhead 2
+                                                       // + sizeof(zce_sockaddr_t)
 
-    ~zce_udp();
+    ~Udp();
 
     virtual void* handle() const;
 
@@ -184,7 +184,7 @@ class ZCE_API zce_udp : public zce_socket {
 
 //////////////////////////////////////////////////////////////////////////
 
-class ZCE_API zce_tcp : public zce_socket {
+class ZCE_API Tcp : public Socket {
     struct pimpl;
     struct pimpl* pimpl_;
 
@@ -200,7 +200,7 @@ class ZCE_API zce_tcp : public zce_socket {
 
     struct data_item_isless {
         ERV_ISTREAM_WRITEOPT opt_;
-        data_item_isless(ERV_ISTREAM_WRITEOPT opt) : opt_(opt){};
+        data_item_isless(ERV_ISTREAM_WRITEOPT opt) : opt_(opt) {};
 
         bool operator()(const data_item& rhs) const { return rhs.option_ < opt_; }
     };
@@ -230,9 +230,9 @@ class ZCE_API zce_tcp : public zce_socket {
                          ERV_ISTREAM_WRITEOPT opt);
 
   public:
-    zce_tcp(const zce_smartptr<zce_reactor>& reactor, int preserved_size = 16);
+    Tcp(const zce_smartptr<zce::Reactor>& reactor, int preserved_size = 16);
 
-    ~zce_tcp();
+    ~Tcp();
 
     void handle_timeout(const zce::Any&);
 
@@ -256,28 +256,28 @@ class ZCE_API zce_tcp : public zce_socket {
     virtual int get_local_addr(zce_sockaddr_t& addr) const;
 };
 
-class ZCE_API zce_dnsresolve : virtual public zce_object {
+class ZCE_API DnsResolve : virtual public zce_object {
     ZCE_OBJECT_DECLARE;
-    zce_smartptr<zce_reactor> reactor_ptr_;
+    zce_smartptr<zce::Reactor> reactor_ptr_;
     std::string domain_;
 
   public:
-    zce_dnsresolve(const zce_smartptr<zce_reactor>& reactor, const char* domain);
+    DnsResolve(const zce_smartptr<zce::Reactor>& reactor, const char* domain);
 
-    const zce_smartptr<zce_reactor>& reactor() { return reactor_ptr_; }
+    const zce_smartptr<zce::Reactor>& reactor() { return reactor_ptr_; }
 
     int start_resolve();
 
     virtual void on_resolved(int errcode, const zce_sockaddr_t& addr) = 0;
 };
 
-class ZCE_API zce_connector : public zce_object {
+class ZCE_API Connector : public zce_object {
     ZCE_OBJECT_DECLARE;
 
     struct pimpl;
     struct pimpl* pimpl_;
 
-    zce_smartptr<zce_tcp> tcp_ptr_;
+    zce_smartptr<zce::Tcp> tcp_ptr_;
 
     std::string remote_ip_;
 
@@ -292,10 +292,10 @@ class ZCE_API zce_connector : public zce_object {
     int _do_connect(zce_sockaddr_t& addr_in);
 
   public:
-    zce_connector(const zce_smartptr<zce_tcp>& tcp_ptr, const std::string& ip, unsigned short port,
-                  unsigned short timeoutsec = 0);
+    Connector(const zce_smartptr<zce::Tcp>& tcp_ptr, const std::string& ip, unsigned short port,
+              unsigned short timeoutsec = 0);
 
-    ~zce_connector();
+    ~Connector();
 
     void* handle() const;
 
@@ -307,15 +307,15 @@ class ZCE_API zce_connector : public zce_object {
 
     virtual void on_connect(int status);
 
-    const zce_smartptr<zce_reactor>& reactor() { return tcp_ptr_->reactor(); }
+    const zce_smartptr<zce::Reactor>& reactor() { return tcp_ptr_->reactor(); }
 };
 
-class ZCE_API zce_acceptor : public zce_object {
+class ZCE_API Acceptor : public zce_object {
     struct pimpl;
     struct pimpl* pimpl_;
 
   protected:
-    zce_smartptr<zce_reactor> reactor_ptr_;
+    zce_smartptr<zce::Reactor> reactor_ptr_;
 
     std::string local_ip_;
 
@@ -337,11 +337,11 @@ class ZCE_API zce_acceptor : public zce_object {
     void do_close();
 
   public:
-    zce_acceptor(const zce_smartptr<zce_reactor>& reactor);
+    Acceptor(const zce_smartptr<zce::Reactor>& reactor);
 
-    ~zce_acceptor();
+    ~Acceptor();
 
-    const zce_smartptr<zce_reactor>& reactor() { return reactor_ptr_; }
+    const zce_smartptr<zce::Reactor>& reactor() { return reactor_ptr_; }
 
     int listen(const char* localip, unsigned short port);
 
@@ -357,27 +357,24 @@ class ZCE_API zce_acceptor : public zce_object {
 
     void unblock_remote(const zce_sockaddr_t& remote);
 
-    virtual zce_tcp* make_handler() = 0;
+    virtual zce::Tcp* make_handler() = 0;
 };
 
-namespace zce {
 class TaskQueue;
-}  // namespace zce
-class zce_reactor;
 
-class ZCE_API zce_sync_istream : public zce_istream {
+class ZCE_API SyncStream : public IStream {
     ZCE_OBJECT_DECLARE;
 
   protected:
     zce_smartptr<zce::TaskQueue> taskdeque_ptr_;
 
-    zce_smartptr<zce_reactor> reactor_ptr_;
+    zce_smartptr<zce::Reactor> reactor_ptr_;
 
   public:
-    zce_sync_istream(const zce_smartptr<zce::TaskQueue>& taskdeque,
-                     const zce_smartptr<zce_reactor>& reactor);
+    SyncStream(const zce_smartptr<zce::TaskQueue>& taskdeque,
+               const zce_smartptr<zce::Reactor>& reactor);
 
-    ~zce_sync_istream();
+    ~SyncStream();
 
     const zce_smartptr<zce::TaskQueue>& queue_ptr() const { return taskdeque_ptr_; }
 
@@ -392,12 +389,12 @@ class ZCE_API zce_sync_istream : public zce_istream {
 
     virtual void on_close();
 
-    virtual int write(zce::RefBlock& dblock, zce_istream::ERV_ISTREAM_WRITEOPT opt);
+    virtual int write(zce::RefBlock& dblock, IStream::ERV_ISTREAM_WRITEOPT opt);
 
     virtual void close();
 };
 
-class zce_proxy_socks : public zce_istream {
+class SocksStream : public IStream {
     std::string user_;
 
     std::string pass_;
@@ -417,12 +414,12 @@ class zce_proxy_socks : public zce_istream {
     void send_cmd_connect();
 
   public:
-    zce_proxy_socks(const std::string& realip, zce_uint16 realport, const std::string& user,
-                    const std::string& pass);
+    SocksStream(const std::string& realip, zce_uint16 realport, const std::string& user,
+                const std::string& pass);
 
     virtual void on_open(bool passive, const zce_sockaddr_t& remote);
 
     virtual void on_read(zce::RefBlock& dblock, const zce::Any&);
 };
 
-#endif  //__zce_handler_h__
+}  // namespace zce

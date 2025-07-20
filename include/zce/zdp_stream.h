@@ -19,7 +19,7 @@
 #include <zce/zce_any.h>
 
 class zce::RefBlock;
-class zce_reactor;
+class zce::Reactor;
 
 namespace zdp
 {
@@ -61,11 +61,11 @@ namespace zdp
         void handle_timeout(const zce::Any& arg);
     };
 
-    class ZCE_API zdp_stream : public zce_istream
+    class ZCE_API zdp_stream : public zce::IStream
     {
         zce::RefBlock dblock_;
 
-        zce_smartptr<zce_reactor> reactor_ptr_;
+        zce_smartptr<zce::Reactor> reactor_ptr_;
 
         unsigned last_recv_tick_;
 
@@ -80,7 +80,7 @@ namespace zdp
         int _do_request(const zdp_head& head, zce::RefBlock& dblock_ptr, int mstimeout, const zce::Any& ctx);
     public:
 
-        zdp_stream(const zce_smartptr<zce_reactor>& reactor_ptr, unsigned preserv = 0);
+        zdp_stream(const zce_smartptr<zce::Reactor>& reactor_ptr, unsigned preserv = 0);
 
         ~zdp_stream();
 
@@ -88,7 +88,7 @@ namespace zdp
 
         zce_uint32 next_seq();
 
-        const zce_smartptr<zce_reactor>& reactor_ptr() const {
+        const zce_smartptr<zce::Reactor>& reactor_ptr() const {
             return reactor_ptr_;
         }
 
@@ -99,7 +99,7 @@ namespace zdp
 
         void on_read(zce::RefBlock& dblock_ptr, const zce::Any&) override;
 
-        int write(zce::RefBlock& dblock_ptr, zce_istream::ERV_ISTREAM_WRITEOPT opt = zce_istream::ERV_ISTREAM_DEFAULT) override;
+        int write(zce::RefBlock& dblock_ptr, zce::IStream::ERV_ISTREAM_WRITEOPT opt = zce::IStream::ERV_ISTREAM_DEFAULT) override;
 
         //void close() override;
 
@@ -211,7 +211,7 @@ namespace zdp
         ZCE_ASSERT(ret >= 0);
         if (ret < 0)
             return ret;
-        return write(dblock_ptr, zce_istream::ERV_ISTREAM_DEFAULT);
+        return write(dblock_ptr, zce::IStream::ERV_ISTREAM_DEFAULT);
     }
 };
 

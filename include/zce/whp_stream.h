@@ -15,8 +15,8 @@
 
 class zce_reactor;
 
-class ZCE_API whp_stream : public zce_istream {
-    zce_smartptr<zce_reactor> reactor_ptr_;
+class ZCE_API whp_stream : public zce::IStream {
+    zce_smartptr<zce::Reactor> reactor_ptr_;
 
     zce::RefBlock dblock_;
 
@@ -43,7 +43,7 @@ class ZCE_API whp_stream : public zce_istream {
     int proc_next(zce::RefBlock& dblock_ptr, const zce::Any& ctx);
 
   public:
-    whp_stream(const zce_smartptr<zce_reactor>& reactor_ptr, unsigned preserv = 0);
+    whp_stream(const zce_smartptr<zce::Reactor>& reactor_ptr, unsigned preserv = 0);
 
     int write(zce::RefBlock& dblock_ptr, ERV_ISTREAM_WRITEOPT opt) override;
 
@@ -52,13 +52,13 @@ class ZCE_API whp_stream : public zce_istream {
 
 //////////////////////////////////////////////////////////////////////////
 
-class ZCE_API idip_stream : public zce_istream {
-    zce_smartptr<zce_reactor> reactor_ptr_;
+class ZCE_API idip_stream : public zce::IStream {
+    zce_smartptr<zce::Reactor> reactor_ptr_;
 
     zce::RefBlock dblock_;
 
   public:
-    idip_stream(const zce_smartptr<zce_reactor>& reactor_ptr, unsigned preserv = 0);
+    idip_stream(const zce_smartptr<zce::Reactor>& reactor_ptr, unsigned preserv = 0);
 
     // virtual int write(zce::RefBlock& dblock_ptr, ERV_ISTREAM_WRITEOPT opt);
 

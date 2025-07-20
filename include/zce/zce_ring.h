@@ -3,18 +3,20 @@
 #include <zce/zce_sync.h>
 #include <type_traits>
 
+namespace zce {
+
 template <typename T, typename Lock = zce_mutex_null>
-class zce_ring : public zce_object {
+class Ring : public zce_object {
   public:
-    zce_ring(const zce_ring&) = delete;
+    Ring(const Ring&) = delete;
 
-    zce_ring& operator=(const zce_ring&) = delete;
+    Ring& operator=(const Ring&) = delete;
 
-    explicit zce_ring(size_t capacity) : _capacity(capacity), _size(0), _head(0), _tail(0) {
+    explicit Ring(size_t capacity) : _capacity(capacity), _size(0), _head(0), _tail(0) {
         _buffer.resize(capacity);
     }
 
-    zce_ring(zce_ring&& other) noexcept {
+    Ring(Ring&& other) noexcept {
         zce_guard<Lock> lock(_mutex);
         _buffer = std::move(other._buffer);
         _capacity = other._capacity;
@@ -27,7 +29,7 @@ class zce_ring : public zce_object {
         other._tail = 0;
     }
 
-    zce_ring& operator=(zce_ring&& other) noexcept {
+    Ring& operator=(Ring&& other) noexcept {
         if (this != &other) {
             zce_guard<Lock> lock(_mutex);
             zce_guard<Lock> lock_other(other._mutex);
@@ -186,3 +188,5 @@ class zce_ring : public zce_object {
 
     mutable Lock _mutex;
 };
+
+}  // namespace zce
