@@ -1,6 +1,6 @@
 ﻿#pragma once
 // ***************************************************************
-//  zce_timer   version:  1.0   -  date: 2003/02/15
+//  Timer   version:  1.0   -  date: 2003/02/15
 //  -------------------------------------------------------------
 //  Yongming Wang(wangym@gmail.com)
 //  -------------------------------------------------------------
@@ -16,28 +16,27 @@
 #include <functional>
 
 namespace zce {
+
 class Reactor;
 class TaskQueue;
-}  // namespace zce
+class TimerDoozer;
 
-class zce_timer_doozer;
-
-class ZCE_API zce_timer : public zce_object
+class ZCE_API Timer : public zce_object
 {
-    friend class zce_timer_doozer;
+    friend class TimerDoozer;
     ZCE_OBJECT_DECLARE;
     struct pimpl;
     zce_smartptr<pimpl> pimpl_;
 
 public:
-    zce_timer(const zce_smartptr<zce::Reactor>& reactor, 
-        const zce_smartptr<zce::TaskQueue>& syncque,
+    Timer(const zce_smartptr<Reactor>& reactor, 
+        const zce_smartptr<TaskQueue>& syncque,
         unsigned msecond, 
         bool repeat = true);
 
-    ~zce_timer();
+    ~Timer();
 
-    int start(const zce_smartptr<zce_timer_doozer>& doozer_ptr);
+    int start(const zce_smartptr<TimerDoozer>& doozer_ptr);
 
     int start(const std::function<void(void)>& cb, bool noaccumulate = false);
 
@@ -45,17 +44,19 @@ public:
 
 };
 
-class ZCE_API zce_timer_doozer : public zce_object
+class ZCE_API TimerDoozer : public zce_object
 {
-    friend struct zce_timer::pimpl;
+    friend struct Timer::pimpl;
 
     bool noaccumulated_;
-    zce::AtomicLong accum_count_;
+    AtomicLong accum_count_;
 
     void do_timeout();
 
 public:
-    zce_timer_doozer(bool noaccum = false);
+    TimerDoozer(bool noaccum = false);
     virtual bool will_trigger();
     virtual void handle_timeout() = 0;
 };
+
+}  // namespace zce

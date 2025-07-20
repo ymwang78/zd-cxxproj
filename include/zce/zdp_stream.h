@@ -36,7 +36,7 @@ namespace zdp
 
         zce_smartptr<zdp_stream> stream_ptr_;
 
-        zce_smartptr<zce_timer> timeout_ptr_;
+        zce_smartptr<zce::Timer> timeout_ptr_;
 
     public:
 

@@ -18,8 +18,6 @@
 #include <deque>
 #include <map>
 
-class zce_timer;
-
 //////////////////////////////////////////////////////////////////////////
 
 bool ZCE_API operator<(const zce_sockaddr_t& s1, const zce_sockaddr_t& s2);
@@ -32,6 +30,7 @@ namespace zce {
 
 class Reactor;
 class RefBlock;
+class Timer;
 
 class ZCE_API IStream : virtual public zce_object {
   protected:
@@ -209,7 +208,7 @@ class ZCE_API Tcp : public Socket {
 
     std::deque<data_item> dblock_deque_;
 
-    zce_smartptr<zce_timer> timer_ptr_;
+    zce_smartptr<Timer> timer_ptr_;
 
     unsigned last_recv_tick_;
 
@@ -285,7 +284,7 @@ class ZCE_API Connector : public zce_object {
 
     unsigned short timeout_sec_;
 
-    zce_smartptr<zce_timer> timer_ptr_;
+    zce_smartptr<zce::Timer> timer_ptr_;
 
     int _prepare_connect();
 
