@@ -1,6 +1,6 @@
 ﻿#pragma once
 // ***************************************************************
-//  zce_object   version:  1.0     date: 2002/8/22
+//  Object   version:  1.0     date: 2002/8/22
 //  -------------------------------------------------------------
 //  Yongming Wang(wangym@gmail.com)
 //  -------------------------------------------------------------
@@ -17,30 +17,30 @@
 #include <zce/zce_sync.h>
 
 namespace zce {
+
 class Allocator;
 class TaskDelegator;
-}  // namespace zce
 
-class ZCE_API zce_object {
+class ZCE_API Object {
   protected:
-    zce_object()
+    Object()
         : zce_alloc_(nullptr),
           release_delegator_(nullptr),
           ref_count_(0),
-          obj_idx_(zce::Tss::get_global()->next_oid()) {};
+          obj_idx_(Tss::get_global()->next_oid()) {};
 
-    zce_object(const zce_object& rhs)
+    Object(const Object& rhs)
         : zce_alloc_(nullptr),
           release_delegator_(rhs.release_delegator_),
           ref_count_(1),
-          obj_idx_(zce::Tss::get_global()->next_oid()) {};
+          obj_idx_(Tss::get_global()->next_oid()) {};
 
-    zce_object& operator=(const zce_object& rhs) {
+    Object& operator=(const Object& rhs) {
         release_delegator_ = rhs.release_delegator_;
         return *this;
     };
 
-    virtual ~zce_object() {};
+    virtual ~Object() {};
 
     void __free_me() noexcept;
 
@@ -51,9 +51,9 @@ class ZCE_API zce_object {
 
     inline bool __isvalid() noexcept { return true; }
 
-    inline void __set_allocator( zce::Allocator* alloc) noexcept { zce_alloc_ = alloc; }
+    inline void __set_allocator( Allocator* alloc) noexcept { zce_alloc_ = alloc; }
 
-    inline void __set_release_delegator(zce::TaskDelegator* v) { release_delegator_ = v; }
+    inline void __set_release_delegator(TaskDelegator* v) { release_delegator_ = v; }
 
     inline void __addref() noexcept { ++this->ref_count_; }
 
@@ -70,68 +70,68 @@ class ZCE_API zce_object {
 
     inline long __get_ref_count() const noexcept { return this->ref_count_.value(); }
 
-    std::shared_ptr<zce_object> shared_ptr() noexcept {
+    std::shared_ptr<Object> shared_ptr() noexcept {
         __addref();
-        auto deleter = [](zce_object* p) {
+        auto deleter = [](Object* p) {
             if (p) {
                 p->__decref();
             }
         };
-        return std::shared_ptr<zce_object>(this, deleter);
+        return std::shared_ptr<Object>(this, deleter);
     }
 
     template <typename T>
     std::shared_ptr<T> shared_from_this() noexcept {
-        static_assert(std::is_base_of_v<zce_object, T>, "T must derive from zce_object");
+        static_assert(std::is_base_of_v<Object, T>, "T must derive from Object");
         return std::dynamic_pointer_cast<T>(shared_ptr());
     }
 
   private:
-    zce::Allocator* zce_alloc_;
-    zce::TaskDelegator* release_delegator_;
-    zce::AtomicLong ref_count_;
+    Allocator* zce_alloc_;
+    TaskDelegator* release_delegator_;
+    AtomicLong ref_count_;
     const zce_int64 obj_idx_;
 };
 
 template <typename ZCE_LOCK>
-class zce_smartptr_lock {
+class SmartPtrLock {
     static ZCE_LOCK mutex_;
 
   public:
     ZCE_LOCK& get() { return mutex_; }
 };
 template <typename ZCE_LOCK>
-ZCE_LOCK zce_smartptr_lock<ZCE_LOCK>::mutex_;
+ZCE_LOCK SmartPtrLock<ZCE_LOCK>::mutex_;
 
-template <typename IMPL_CLASS, typename ZCE_LOCK = zce::MutexNull>
-class zce_smartptr {
+template <typename IMPL_CLASS, typename ZCE_LOCK = MutexNull>
+class SmartPtr {
     template <typename IMPL_OTHER, typename ZCE_LOCK_OTHER>
-    friend class zce_smartptr;
+    friend class SmartPtr;
 
   public:
     typedef IMPL_CLASS THE_CLASS;
 
   public:
-    explicit zce_smartptr(IMPL_CLASS* handler = 0) {
+    explicit SmartPtr(IMPL_CLASS* handler = 0) {
         if (handler) {
             handler->__addref();
         }
         this->handler_ = handler;
     };
 
-    zce_smartptr(const zce_smartptr& rhs) { this->handler_ = rhs.__lock_addref(); };
+    SmartPtr(const SmartPtr& rhs) { this->handler_ = rhs.__lock_addref(); };
 
-    zce_smartptr(zce_smartptr&& rhs) {
+    SmartPtr(SmartPtr&& rhs) {
         this->handler_ = rhs.handler_;
         rhs.handler_ = 0;
     };
 
     template <typename OTHER_LOCK>
-    zce_smartptr(const zce_smartptr<IMPL_CLASS, OTHER_LOCK>& rhs) {
+    SmartPtr(const SmartPtr<IMPL_CLASS, OTHER_LOCK>& rhs) {
         this->handler_ = rhs.__lock_addref();
     };
 
-    zce_smartptr& operator=(const zce_smartptr& rhs) {
+    SmartPtr& operator=(const SmartPtr& rhs) {
         if (this->handler_ != rhs.handler_) {
             IMPL_CLASS* r = rhs.__lock_addref();
             __lock_sign(r);
@@ -139,7 +139,7 @@ class zce_smartptr {
         return (*this);
     }
 
-    zce_smartptr& operator=(zce_smartptr&& rhs) {
+    SmartPtr& operator=(SmartPtr&& rhs) {
         if (this->handler_ != rhs.handler_) {
             IMPL_CLASS* r = rhs.handler_;
             rhs.handler_ = 0;
@@ -149,7 +149,7 @@ class zce_smartptr {
     }
 
     template <typename OTHER_LOCK>
-    zce_smartptr& operator=(const zce_smartptr<IMPL_CLASS, OTHER_LOCK>& rhs) {
+    SmartPtr& operator=(const SmartPtr<IMPL_CLASS, OTHER_LOCK>& rhs) {
         if (this->handler_ != rhs.handler_) {
             IMPL_CLASS* r = rhs.__lock_addref();
             __lock_sign(r);
@@ -157,7 +157,7 @@ class zce_smartptr {
         return (*this);
     }
 
-    zce_smartptr& operator=(IMPL_CLASS* rhs) {
+    SmartPtr& operator=(IMPL_CLASS* rhs) {
         if (this->handler_ != rhs) {
             if (rhs) {
                 rhs->__addref();
@@ -168,18 +168,18 @@ class zce_smartptr {
         return (*this);
     }
 
-    ~zce_smartptr() {
+    ~SmartPtr() {
         if (this->handler_) this->handler_->__decref();
     }
 
     inline void __assign(IMPL_CLASS* right) { this->handler_ = right; }
 
     template <class Y, class P>
-    inline bool operator==(const zce_smartptr<Y, P>& right) const {
+    inline bool operator==(const SmartPtr<Y, P>& right) const {
         return (this->handler_ == right.handler_);
     }
     template <class Y, class P>
-    inline bool operator!=(const zce_smartptr<Y, P>& right) const {
+    inline bool operator!=(const SmartPtr<Y, P>& right) const {
         return (this->handler_ != right.handler_);
     }
     inline bool operator==(IMPL_CLASS* right) const { return (this->handler_ == right); }
@@ -188,25 +188,25 @@ class zce_smartptr {
     inline IMPL_CLASS* operator->() const { return this->handler_; }
     inline operator IMPL_CLASS*() const { return this->handler_; }
     template <class Y, class P>
-    inline bool operator<(const zce_smartptr<Y, P>& right) const {
+    inline bool operator<(const SmartPtr<Y, P>& right) const {
         return (this->handler_ < right.handler_);
     }
 
     template <class Y, class P>
-    static zce_smartptr __dynamic_cast(const zce_smartptr<Y, P>& rhs) {
+    static SmartPtr __dynamic_cast(const SmartPtr<Y, P>& rhs) {
         Y* handler = rhs.__lock_addref();
         IMPL_CLASS* p = dynamic_cast<IMPL_CLASS* const>(handler);
         if (p == 0 && handler != 0) {
             handler->__decref();
         }
-        zce_smartptr<IMPL_CLASS, ZCE_LOCK> lhs;
+        SmartPtr<IMPL_CLASS, ZCE_LOCK> lhs;
         lhs.__assign(p);
         return lhs;
     }
 
     template <class Y>
-    static zce_smartptr __dynamic_cast(Y* p) {
-        return zce_smartptr(dynamic_cast<IMPL_CLASS*>(p));
+    static SmartPtr __dynamic_cast(Y* p) {
+        return SmartPtr(dynamic_cast<IMPL_CLASS*>(p));
     }
 
     IMPL_CLASS* get() const { return this->handler_; }
@@ -215,7 +215,7 @@ class zce_smartptr {
     IMPL_CLASS* handler_;
 
     IMPL_CLASS* __lock_addref() const {
-        zce::Guard<ZCE_LOCK> g(zce_smartptr_lock<ZCE_LOCK>().get());
+        Guard<ZCE_LOCK> g(SmartPtrLock<ZCE_LOCK>().get());
         if (this->handler_) this->handler_->__addref();
         return this->handler_;
     }
@@ -223,7 +223,7 @@ class zce_smartptr {
     void __lock_sign(IMPL_CLASS* rhs) {
         IMPL_CLASS* ptr = NULL;
         {
-            zce::Guard<ZCE_LOCK> g(zce_smartptr_lock<ZCE_LOCK>().get());
+            Guard<ZCE_LOCK> g(SmartPtrLock<ZCE_LOCK>().get());
             ptr = this->handler_;
             this->handler_ = rhs;
         }
@@ -233,19 +233,19 @@ class zce_smartptr {
     }
 };
 
-typedef zce_smartptr<zce_object> zce_object_ptr;
+typedef SmartPtr<Object> ObjectPtr;
 
 template <typename T>
-class zce_object_wrapper : public zce_object {
+class ObjectWrapper : public Object {
   public:
-    typedef zce_object_wrapper<T> wrapper_t;
-    typedef zce_smartptr<wrapper_t> smart_ptr;
+    typedef ObjectWrapper<T> wrapper_t;
+    typedef SmartPtr<wrapper_t> smart_ptr;
 
-    zce_object_wrapper() {};
+    ObjectWrapper() {};
 
-    zce_object_wrapper(const T& val) : val_(val) {};
+    ObjectWrapper(const T& val) : val_(val) {};
 
-    zce_object_wrapper(T&& val) : val_(val) {};
+    ObjectWrapper(T&& val) : val_(val) {};
 
     const T& get() const { return val_; }
 
@@ -260,12 +260,14 @@ class zce_object_wrapper : public zce_object {
     T val_;
 };
 
-class zce_smartptr_decref {
-    zce_object* const p_;
+class SmartPtrDecRef {
+    Object* const p_;
 
   public:
-    zce_smartptr_decref(zce_object* p) : p_(p) {}
-    ~zce_smartptr_decref() {
+    SmartPtrDecRef(Object* p) : p_(p) {}
+    ~SmartPtrDecRef() {
         if (p_) p_->__decref();
     }
 };
+
+}  // namespace zce

@@ -162,7 +162,7 @@ std::ostream& operator<<(std::ostream& ost, const hex_t<T>& t) {
 
 namespace zce {
 
-class ZCE_API Logger : public zce_object {
+class ZCE_API Logger : public zce::Object {
   private:
     _zlog_level level_;
     int line_;

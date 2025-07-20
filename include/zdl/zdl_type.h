@@ -51,7 +51,7 @@ enum yytokentype {
 typedef enum yytokentype yytoken_kind_t;
 #endif
 
-class meta_base : public zce_object {
+class meta_base : public zce::Object {
   public:
     virtual ~meta_base() {}
 
@@ -81,7 +81,7 @@ class meta_base : public zce_object {
 
 class zdl_type : public meta_base {
   protected:
-    typedef zce_smartptr<zdl_visitor> zdl_visitor_ptr;
+    typedef zce::SmartPtr<zdl_visitor> zdl_visitor_ptr;
 
   public:
     enum zdl_type_e {
@@ -127,4 +127,4 @@ class zdl_type : public meta_base {
     std::string full_name_;
 };
 
-typedef zce_smartptr<zdl_type> zdl_type_ptr;
+typedef zce::SmartPtr<zdl_type> zdl_type_ptr;

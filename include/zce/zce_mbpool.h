@@ -23,11 +23,11 @@ class RefBlock;
 
 class ZCE_API BlockPool
 {
-    std::map<unsigned, zce_smartptr<zce::Allocator> >* allocators_;
+    std::map<unsigned, zce::SmartPtr<zce::Allocator> >* allocators_;
 
-    zce_smartptr<zce::Allocator> dtblock_allocator_;
+    zce::SmartPtr<zce::Allocator> dtblock_allocator_;
 
-    zce_smartptr<zce::Allocator> dbblock_allocator_;
+    zce::SmartPtr<zce::Allocator> dbblock_allocator_;
 
     zce::AllocStat outpool_alloc_;
 
@@ -41,7 +41,7 @@ public:
 
     void add_pool_v2(size_t atomic_size, size_t count);
 
-    zce_smartptr<zce::Allocator> get_v2() const;
+    zce::SmartPtr<zce::Allocator> get_v2() const;
 
     zce::DataBlock* acquire(size_t len, zce_object_counter& obj);
 
@@ -59,7 +59,7 @@ public:
 template <typename T>
 class ObjectPool
 {
-    zce_smartptr<zce::Allocator> vt_allocator_;
+    zce::SmartPtr<zce::Allocator> vt_allocator_;
 
 public:
 

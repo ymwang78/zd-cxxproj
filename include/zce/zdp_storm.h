@@ -47,15 +47,15 @@ zce_int64 ZCE_API zdp_service_ident(zce_uint32 seq, const char siteid[4]);
 zce_int64 ZCE_API zdp_user_ident(unsigned uid, const char siteid[4]);
 };
 
-class ZCE_API zdp_storm : public zce_object {
+class ZCE_API zdp_storm : public zce::Object {
   public:
     struct Pimpl;
 
   private:
-    zce_smartptr<Pimpl> pimpl_ptr_;
+    zce::SmartPtr<Pimpl> pimpl_ptr_;
 
   public:
-    zdp_storm(const zce_smartptr<zce::Reactor>&, const zce_smartptr<zce::Scheduler>&,
+    zdp_storm(const zce::SmartPtr<zce::Reactor>&, const zce::SmartPtr<zce::Scheduler>&,
               zce_uint16 uniqueid, const zce_string& token, const zce::Any& ctx,
               publish_callback child_cb, set_callback set_cb);
 
@@ -66,15 +66,15 @@ class ZCE_API zdp_storm : public zce_object {
     int stop();
 };
 
-class ZCE_API zdp_storm_client : public zce_object {
+class ZCE_API zdp_storm_client : public zce::Object {
   public:
     struct Pimpl;
 
   private:
-    zce_smartptr<Pimpl> pimpl_ptr_;
+    zce::SmartPtr<Pimpl> pimpl_ptr_;
 
   public:
-    zdp_storm_client(const zce_smartptr<zce::Reactor>&, zce_int64 uniqueid, const zce_string& token,
+    zdp_storm_client(const zce::SmartPtr<zce::Reactor>&, zce_int64 uniqueid, const zce_string& token,
                      const zce::Any& ctx, publish_callback father_cb, set_callback set_cb);
 
     ~zdp_storm_client();
@@ -139,11 +139,11 @@ class ZCE_API zdp_storm_stream_adapter : public zce::IStream {
 
     zdp::zdp_storm_peer peer_;
 
-    zce_smartptr<zdp::zdp_storm_client> stormclient_ptr_;
+    zce::SmartPtr<zdp::zdp_storm_client> stormclient_ptr_;
 
   public:
     zdp_storm_stream_adapter(zce_int64 topic, const zdp_storm_peer& peer,
-                             const zce_smartptr<zdp::zdp_storm_client>& stormclient);
+                             const zce::SmartPtr<zdp::zdp_storm_client>& stormclient);
 
     void set_peer(zce_int64 topic, const zdp::zdp_storm_peer& p) {
         topic_ = topic;

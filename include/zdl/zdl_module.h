@@ -11,20 +11,20 @@
 class zdl_type;
 class zdl_visitor;
 
-class zdl_module : public zce_object
+class zdl_module : public zce::Object
 {
     std::string namespace_name_;
-    std::map<std::string, zce_smartptr<zdl_type>> type_dict_;
-    std::vector<zce_smartptr<zdl_type>> type_vec_;
+    std::map<std::string, zce::SmartPtr<zdl_type>> type_dict_;
+    std::vector<zce::SmartPtr<zdl_type>> type_vec_;
 
 public:
     zdl_module(const std::string& ns);
 
-    const std::map<std::string, zce_smartptr<zdl_type>>& type_dict() const noexcept {
+    const std::map<std::string, zce::SmartPtr<zdl_type>>& type_dict() const noexcept {
         return type_dict_;
     }
 
-    const std::vector<zce_smartptr<zdl_type>>& types() const noexcept {
+    const std::vector<zce::SmartPtr<zdl_type>>& types() const noexcept {
         return type_vec_;
     }
 
@@ -32,19 +32,19 @@ public:
         return namespace_name_;
     }
 
-    zce_smartptr<zdl_type> create_type(const std::string& name, zdl_type::zdl_type_e e);
+    zce::SmartPtr<zdl_type> create_type(const std::string& name, zdl_type::zdl_type_e e);
 
-    zce_smartptr<zdl_type> get_builtin_type(int tpid) const;
+    zce::SmartPtr<zdl_type> get_builtin_type(int tpid) const;
 
-    zce_smartptr<zdl_type> get_type(const std::string& name) const;
+    zce::SmartPtr<zdl_type> get_type(const std::string& name) const;
 
-    int add_type(const zce_smartptr<zdl_type>& type_ptr);
+    int add_type(const zce::SmartPtr<zdl_type>& type_ptr);
 
-    void visit(const zce_smartptr<zdl_visitor>& visitor) const;
+    void visit(const zce::SmartPtr<zdl_visitor>& visitor) const;
 
-    void visit(const zce_smartptr<zdl_visitor>& visitor, const std::string& meta, bool include) const;
+    void visit(const zce::SmartPtr<zdl_visitor>& visitor, const std::string& meta, bool include) const;
 
-    void visit_type_meta(const zce_smartptr<zdl_visitor>& visitor, const std::string& meta, bool include) const;
+    void visit_type_meta(const zce::SmartPtr<zdl_visitor>& visitor, const std::string& meta, bool include) const;
 };
 
-typedef zce_smartptr<zdl_module> zdl_module_ptr;
+typedef zce::SmartPtr<zdl_module> zdl_module_ptr;

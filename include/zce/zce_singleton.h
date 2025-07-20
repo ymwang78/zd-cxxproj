@@ -25,7 +25,7 @@ class ZCE_API Singleton {
             zce::Guard<L> g(lock_);
             if (instance_ == 0) {
                 instance_ = new T;
-                if constexpr (std::is_base_of<zce_object, T>::value) {
+                if constexpr (std::is_base_of<zce::Object, T>::value) {
                     instance_->__addref();
                 }
             }
@@ -36,7 +36,7 @@ class ZCE_API Singleton {
     static inline void release() {
         zce::Guard<L> g(lock_);
         if (instance_ != 0) {
-            if constexpr (std::is_base_of<zce_object, T>::value) {
+            if constexpr (std::is_base_of<zce::Object, T>::value) {
                 instance_->__decref();
             } else {
                 delete instance_;

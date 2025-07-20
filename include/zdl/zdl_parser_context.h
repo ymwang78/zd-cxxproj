@@ -29,15 +29,15 @@ class zdl_module;
 class zdl_parser;
 class zdl_type;
 
-class zdl_parser_context : public zce_object {
+class zdl_parser_context : public zce::Object {
     ZCE_OBJECT_DECLARE;
 
-    typedef zce_smartptr<zdl_type_container> zdl_type_container_ptr;
-    typedef zce_smartptr<zdl_enum> zdl_enum_ptr;
-    typedef zce_smartptr<zdl_struct> zdl_struct_ptr;
-    typedef zce_smartptr<zdl_member> zdl_member_ptr;
-    typedef zce_smartptr<zdl_module> zdl_module_ptr;
-    typedef zce_smartptr<zdl_type> zdl_type_ptr;
+    typedef zce::SmartPtr<zdl_type_container> zdl_type_container_ptr;
+    typedef zce::SmartPtr<zdl_enum> zdl_enum_ptr;
+    typedef zce::SmartPtr<zdl_struct> zdl_struct_ptr;
+    typedef zce::SmartPtr<zdl_member> zdl_member_ptr;
+    typedef zce::SmartPtr<zdl_module> zdl_module_ptr;
+    typedef zce::SmartPtr<zdl_type> zdl_type_ptr;
 
   public:
     zdl_parser_context(std::map<std::string, zdl_module_ptr>& modules);
@@ -84,4 +84,4 @@ class zdl_parser_context : public zce_object {
     std::map<std::string, zdl_module_ptr>& modules_;
 };
 
-typedef zce_smartptr<zdl_parser_context> zdl_parser_context_ptr;
+typedef zce::SmartPtr<zdl_parser_context> zdl_parser_context_ptr;

@@ -1,4 +1,4 @@
-/* ***************************************************************
+﻿/* ***************************************************************
  *  Copyright (C) 2006  Yongming Wang(wangym@gmail.com)
  *  All Rights Reserved
  *
@@ -22,4 +22,4 @@ class zdl_builtin : public zdl_type {
     static std::string signed_builtin_name(int tpid);
     virtual void visit(const zdl_visitor_ptr&) const;
 };
-typedef zce_smartptr<zdl_builtin> zdl_builtin_ptr;
+typedef zce::SmartPtr<zdl_builtin> zdl_builtin_ptr;

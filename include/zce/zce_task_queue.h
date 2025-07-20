@@ -26,15 +26,15 @@ class ZCE_API TaskQueue : public Task, public TaskDelegator {
     ZCE_OBJECT_DECLARE;
 
   protected:
-    zce_smartptr<Scheduler> scheduler_ptr_;
+    zce::SmartPtr<Scheduler> scheduler_ptr_;
 
     zce::AtomicLong inque_;
 
-    zce_smartptr<TaskQueue> proxy_ptr_;
+    zce::SmartPtr<TaskQueue> proxy_ptr_;
 
-    std::deque<zce_smartptr<Task>> deque_;
+    std::deque<zce::SmartPtr<Task>> deque_;
 
-    std::vector<zce_smartptr<zce_object>> release_vec_;
+    std::vector<zce::SmartPtr<zce::Object>> release_vec_;
 
     zce::Mutex task_lock_;
 
@@ -43,7 +43,7 @@ class ZCE_API TaskQueue : public Task, public TaskDelegator {
     bool paused_;
 
   public:
-    TaskQueue(const zce_smartptr<Scheduler>& scheduler_ptr, unsigned contproc = 10,
+    TaskQueue(const zce::SmartPtr<Scheduler>& scheduler_ptr, unsigned contproc = 10,
               const char* name = 0);
 
     int try_queue_length();  // if locked return -1
@@ -52,19 +52,19 @@ class ZCE_API TaskQueue : public Task, public TaskDelegator {
 
     int resume();
 
-    void attach(const zce_smartptr<TaskQueue>&);
+    void attach(const zce::SmartPtr<TaskQueue>&);
 
-    int delegateTask(const zce_smartptr<Task>& task_ptr) override;
+    int delegateTask(const zce::SmartPtr<Task>& task_ptr) override;
 
     // 有些对象的释放有同步要求，必须在相关队列或者线程释放
-    int delegateRelease(zce_object* obj) override;
+    int delegateRelease(zce::Object* obj) override;
 
     virtual void call();
 };
 
 template <typename QueueSubType, typename Params, typename Results>
-class TaskMapReduce : public zce_object {
-    zce_smartptr<QueueSubType>* queue_vec_;
+class TaskMapReduce : public zce::Object {
+    zce::SmartPtr<QueueSubType>* queue_vec_;
     size_t queue_size_;
     zce::AtomicLong remain_tasks_;
     std::vector<int> queue_idx_vec_;
@@ -73,7 +73,7 @@ class TaskMapReduce : public zce_object {
 
   public:
     template <typename QueueIdxVecType, typename ParamsType, typename ResultsType>
-    TaskMapReduce(zce_smartptr<QueueSubType>* queue_vec, size_t queue_size,
+    TaskMapReduce(zce::SmartPtr<QueueSubType>* queue_vec, size_t queue_size,
                   QueueIdxVecType&& queue_idx_vec, ParamsType&& params, ResultsType&& result)
         : queue_vec_(queue_vec),
           queue_size_(queue_size),
@@ -100,7 +100,7 @@ class TaskMapReduce : public zce_object {
 
         remain_tasks_ = (long)work_queue_count;
 
-        zce_smartptr<TaskMapReduce> this_ptr(this);
+        zce::SmartPtr<TaskMapReduce> this_ptr(this);
         for (size_t i = 0; i < queue_size_; ++i) {
             if (!if_work_queue[i]) continue;
             queue_vec_[i]->delegate(false, __FUNCTION__, [=]() {

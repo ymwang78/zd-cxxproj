@@ -15,7 +15,7 @@
 
 namespace zce {
 
-class ZCE_API Thread : virtual public zce_object {
+class ZCE_API Thread : virtual public zce::Object {
 
     struct pimpl;
     struct pimpl* pimpl_;
@@ -55,6 +55,6 @@ class ZCE_API Thread : virtual public zce_object {
     void operator=(const Thread&) {};  // Assignment is forbidden
 };
 
-typedef zce_smartptr<Thread> zce_thread_ptr;
+typedef zce::SmartPtr<Thread> zce_thread_ptr;
 
 }  // namespace zce

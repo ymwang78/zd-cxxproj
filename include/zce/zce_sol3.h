@@ -16,9 +16,9 @@
 namespace sol {
 
 template <typename T>
-struct unique_usertype_traits<zce_smartptr<T>> {
+struct unique_usertype_traits<zce::SmartPtr<T>> {
     typedef T type;
-    typedef zce_smartptr<T> actual_type;
+    typedef zce::SmartPtr<T> actual_type;
     static const bool value = true;
 
     static bool is_null(const actual_type& ptr) { return ptr == nullptr; }

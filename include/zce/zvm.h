@@ -45,9 +45,9 @@ namespace zdp {
     constexpr bool is_builtin_type();
 }
 
-class zvm : public zce_object
+class zvm : public zce::Object
 {
-    zce_smartptr<zvm_pimpl> pimpl_ptr_;
+    zce::SmartPtr<zvm_pimpl> pimpl_ptr_;
 
 public:
     typedef std::function<void(int error_code, zce::RefBlock&& retdata)> response_cb;
@@ -56,30 +56,30 @@ public:
 
     ~zvm();
 
-    int init(const zce_smartptr<zce::Scheduler>&,
-        const zce_smartptr<zce::Reactor>&);
+    int init(const zce::SmartPtr<zce::Scheduler>&,
+        const zce::SmartPtr<zce::Reactor>&);
 
-    zce_smartptr<zce_object> boot(const std::string& svc_name,
+    zce::SmartPtr<zce::Object> boot(const std::string& svc_name,
         const std::string& path, zce::RefBlock& args);
 
-    zce_smartptr<zce_object> boot(const std::string& svc_name,
+    zce::SmartPtr<zce::Object> boot(const std::string& svc_name,
         const std::string& host, 
         unsigned short port,
         bool ssl,
         int default_timeout);
 
-    zce_smartptr<zce_object> get_vm(const std::string& svc_name) const;
+    zce::SmartPtr<zce::Object> get_vm(const std::string& svc_name) const;
 
-    void destroy(const zce_smartptr<zce_object>& vm);
+    void destroy(const zce::SmartPtr<zce::Object>& vm);
 
-    int rpc_call_dblock(const zce_smartptr<zce_object>& vmptr,
+    int rpc_call_dblock(const zce::SmartPtr<zce::Object>& vmptr,
         zce_int64 objectid,
         const std::string& method,
         zce::RefBlock&& dblock,
         const response_cb& response);
 
     template<typename T>
-    int rpc_call_builtin(const zce_smartptr<zce_object>& vmptr,
+    int rpc_call_builtin(const zce::SmartPtr<zce::Object>& vmptr,
         zce_int64 objectid,
         const std::string& method,
         const T& t,
@@ -99,7 +99,7 @@ public:
     }
 
     template<typename T>
-    int rpc_call_msg(const zce_smartptr<zce_object>& vmptr,
+    int rpc_call_msg(const zce::SmartPtr<zce::Object>& vmptr,
         zce_int64 objectid,
         const std::string& method,
         const T& t,
@@ -119,7 +119,7 @@ public:
     }
 
     template<typename T>
-    int rpc_call(const zce_smartptr<zce_object>& vmptr,
+    int rpc_call(const zce::SmartPtr<zce::Object>& vmptr,
         zce_int64 objectid,
         const std::string& method,
         T t,
@@ -177,7 +177,7 @@ public:
     }
 
     template<typename... Args>
-    int rpc_call(const zce_smartptr<zce_object>& vmptr,
+    int rpc_call(const zce::SmartPtr<zce::Object>& vmptr,
         zce_int64 objectid,
         const std::string& method,
         const response_cb& response,

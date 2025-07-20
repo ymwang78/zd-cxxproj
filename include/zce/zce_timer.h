@@ -21,22 +21,22 @@ class Reactor;
 class TaskQueue;
 class TimerDoozer;
 
-class ZCE_API Timer : public zce_object
+class ZCE_API Timer : public zce::Object
 {
     friend class TimerDoozer;
     ZCE_OBJECT_DECLARE;
     struct pimpl;
-    zce_smartptr<pimpl> pimpl_;
+    zce::SmartPtr<pimpl> pimpl_;
 
 public:
-    Timer(const zce_smartptr<Reactor>& reactor, 
-        const zce_smartptr<TaskQueue>& syncque,
+    Timer(const zce::SmartPtr<Reactor>& reactor, 
+        const zce::SmartPtr<TaskQueue>& syncque,
         unsigned msecond, 
         bool repeat = true);
 
     ~Timer();
 
-    int start(const zce_smartptr<TimerDoozer>& doozer_ptr);
+    int start(const zce::SmartPtr<TimerDoozer>& doozer_ptr);
 
     int start(const std::function<void(void)>& cb, bool noaccumulate = false);
 
@@ -44,7 +44,7 @@ public:
 
 };
 
-class ZCE_API TimerDoozer : public zce_object
+class ZCE_API TimerDoozer : public zce::Object
 {
     friend struct Timer::pimpl;
 

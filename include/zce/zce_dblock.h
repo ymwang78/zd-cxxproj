@@ -21,7 +21,7 @@ namespace zce {
 
 class Allocator;
 
-class ZCE_API DataBlock : public zce_object {
+class ZCE_API DataBlock : public zce::Object {
     zce_byte* buffer_;
     zce_object_counter* obj_;  // for alloc position statistics
     Allocator* alloc_;
@@ -47,7 +47,7 @@ class ZCE_API DataBlock : public zce_object {
 };
 
 class ZCE_API RefBlock {
-    zce_smartptr<DataBlock> dt_ptr_;
+    zce::SmartPtr<DataBlock> dt_ptr_;
     size_t rd_pos_;
     size_t wr_pos_;
 
@@ -96,7 +96,7 @@ class ZCE_API RefBlock {
     virtual ~RefBlock();
 
   public:
-    const zce_smartptr<DataBlock>& dt_ptr() const { return dt_ptr_; };
+    const zce::SmartPtr<DataBlock>& dt_ptr() const { return dt_ptr_; };
 
     const zce_byte* base_ptr() const;
 

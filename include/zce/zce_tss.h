@@ -12,12 +12,12 @@
 #include <zce/zce_inc.h>
 #include <zce/zce_types.h>
 
-class zce_object;
 typedef struct _JavaVM JavaVM;
 typedef struct _JNIEnv JNIEnv;
 typedef struct AAssetManager AAssetManager;
 
 namespace zce {
+class Object;
 class Semaphore;
 class TaskDelegator;
 
@@ -30,9 +30,9 @@ class ZCE_API Tss {
 
     ~Tss();
 
-    zce_object* ts_object(zce_object* ptr);
+    zce::Object* ts_object(zce::Object* ptr);
 
-    zce_object* ts_object();
+    zce::Object* ts_object();
 
   public:
     struct global_t {

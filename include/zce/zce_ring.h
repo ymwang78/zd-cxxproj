@@ -6,7 +6,7 @@
 namespace zce {
 
 template <typename T, typename Lock = zce::MutexNull>
-class Ring : public zce_object {
+class Ring : public zce::Object {
   public:
     Ring(const Ring&) = delete;
 

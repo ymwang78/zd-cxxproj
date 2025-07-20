@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 // ***************************************************************
 //  zdl_template_arg   version:  1.0   date: 04/05/2007
 //  -------------------------------------------------------------
@@ -14,7 +14,7 @@
 #include <zce/zce_object.h>
 #include <string>
 
-class zdl_template_arg : public zce_object
+class zdl_template_arg : public zce::Object
 {
 public:
     zdl_template_arg(const std::string& name)
@@ -26,6 +26,6 @@ public:
 private:
     std::string name_;
 };
-typedef zce_smartptr<zdl_template_arg> zdl_template_arg_ptr;
+typedef zce::SmartPtr<zdl_template_arg> zdl_template_arg_ptr;
 
 #endif /*__zdl_template_arg_h__*/

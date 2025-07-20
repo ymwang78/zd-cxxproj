@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <zce/zce_config.h>
 #include <zce/zce_object.h>
@@ -18,7 +18,7 @@ static auto ci_less = [](const std::string & s1, const std::string & s2) -> bool
             });  // comparison
 };
 
-struct ZCE_API TEXT_HEADER : virtual public zce_object
+struct ZCE_API TEXT_HEADER : virtual public zce::Object
 {
     static const std::string emptystr;
 

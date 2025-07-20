@@ -16,7 +16,7 @@ class zce::RefBlock;
 namespace zce
 {
 
-class ZCE_API FileMonitor : public zce_object {
+class ZCE_API FileMonitor : public zce::Object {
     time_t st_mtime_;
 
     std::string getFullpath(const char* filename);

@@ -65,7 +65,7 @@ const char* ZCE_API getFileName(const char* str);
 
 zce_int64 ZCE_API getFileSize(const char* path);
 
-class ZCE_API File : public zce_object {
+class ZCE_API File : public zce::Object {
     handle_t handle_;
 
     zce_byte block_size_;

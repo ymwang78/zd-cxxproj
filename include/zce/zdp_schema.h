@@ -521,7 +521,7 @@ namespace zdp
 };
 
 #define ZDP_PROC_MSG(Y, X, C) case Y::X::MSG_TYPE : {\
-    zce_smartptr<Y::X> msgptr(new Y::X());\
+    zce::SmartPtr<Y::X> msgptr(new Y::X());\
     len = zdp::zdp_unpack(*msgptr, buf, size, head.rev());\
     if (len < 0) {\
         ZCE_ERROR((ZLOG_ERROR, "ASSERT! %s::%s ret:%d", #Y, #X, len)); \
@@ -532,7 +532,7 @@ namespace zdp
 
 #define ZDP_PROC_RES(Y, X) case Y::X::MSG_TYPE : {\
     if (head.msglen() != -1) { \
-        zce_smartptr<Y::X> msgptr(new Y::X());\
+        zce::SmartPtr<Y::X> msgptr(new Y::X());\
         len = zdp::zdp_unpack(*msgptr, buf, size, head.rev());\
         if (len < 0) {\
             ZCE_ERROR((ZLOG_ERROR, "ASSERT! %s::%s ret:%d", #Y, #X, len)); \
@@ -541,7 +541,7 @@ namespace zdp
         proc_##X(head, msgptr, ctx);\
     }\
     else {\
-        proc_##X(head, zce_smartptr<Y::X>(0), ctx);\
+        proc_##X(head, zce::SmartPtr<Y::X>(0), ctx);\
     }\
 } break;
 

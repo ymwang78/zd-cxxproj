@@ -42,13 +42,13 @@ class ZCE_API Reactor : public zce::TaskDelegator {
 
     void stop();
 
-    int dns_resolve(const std::string& domain, const zce_smartptr<zce::DnsResolve>& resolve_ptr);
+    int dns_resolve(const std::string& domain, const zce::SmartPtr<zce::DnsResolve>& resolve_ptr);
 
-    int delegateTask(const zce_smartptr<zce::Task>& task_ptr) override;
+    int delegateTask(const zce::SmartPtr<zce::Task>& task_ptr) override;
 
-    int delegate_delay(const zce_smartptr<zce::Task>& task_ptr, int ms_second);
+    int delegate_delay(const zce::SmartPtr<zce::Task>& task_ptr, int ms_second);
 
-    int delegateRelease(zce_object* obj) override;
+    int delegateRelease(zce::Object* obj) override;
 
     void delegate_work();
 

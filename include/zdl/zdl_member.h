@@ -132,4 +132,4 @@ class zdl_member : public meta_base {
     std::vector<zdl_template_arg_ptr> args_;
 };
 
-typedef zce_smartptr<zdl_member> zdl_member_ptr;
+typedef zce::SmartPtr<zdl_member> zdl_member_ptr;

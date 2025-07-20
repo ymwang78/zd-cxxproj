@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 /* ***************************************************************
  *  Copyright (C) 2006  Yongming Wang(wangym@gmail.com)
  *  All Rights Reserved
@@ -18,9 +18,9 @@
 
 class zdl_parser_context;
 
-class zdl_parser : public zce_object
+class zdl_parser : public zce::Object
 {
-    typedef zce_smartptr<zdl_parser_context> zdl_parser_context_ptr;
+    typedef zce::SmartPtr<zdl_parser_context> zdl_parser_context_ptr;
 public:
     zdl_parser();
     ~zdl_parser();
@@ -38,6 +38,6 @@ private:
     char* filename_;
 };
 
-typedef zce_smartptr<zdl_parser> zdl_parser_ptr;
+typedef zce::SmartPtr<zdl_parser> zdl_parser_ptr;
 
 #endif //__zdl_parser_h

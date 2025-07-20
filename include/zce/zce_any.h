@@ -18,7 +18,7 @@
 #include <vector>
 #include <limits>
 
-class zce_object;
+class zce::Object;
 class zce::RefBlock;
 
 namespace zce {
@@ -55,7 +55,7 @@ class ZCE_API Any {
             struct in_addr ipv4_;
             struct in6_addr ipv6_;
 
-            zce_object* obj_;
+            zce::Object* obj_;
             zce::RefBlock* dblock_;  // string or bytearray limit to 4M, use dblock if larger
             zce_byte* bytearray_;
             char* str_;
@@ -134,7 +134,7 @@ class ZCE_API Any {
         data_.u_.rawptr_[0] = (void*)raw;
     }
 
-    Any(zce_object* obj) noexcept : data_{} {
+    Any(zce::Object* obj) noexcept : data_{} {
         data_.type_ = any_object;
         data_.u_.obj_ = obj;
         if (data_.u_.obj_) data_.u_.obj_->__addref();
@@ -227,7 +227,7 @@ class ZCE_API Any {
 
     inline bool is_object() const noexcept { return data_.type_ == any_object; }
 
-    inline zce_object* object() const noexcept {
+    inline zce::Object* object() const noexcept {
         ZCE_ASSERT_RETURN(data_.type_ == any_object, 0);
         return data_.u_.obj_;
     }

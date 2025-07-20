@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 // ***************************************************************
 //  zxml_node_factory   version:  1.0   -  date: 2002/07/31
 //  -------------------------------------------------------------
@@ -23,14 +23,14 @@ class ZCE_API zxml_proc
 {
 public:
     template<typename T, typename MSGT>
-    void zxml_proc_packet_tpl(const zce_object_ptr& ctx, const zce_object_ptr& root)
+    void zxml_proc_packet_tpl(const zce::ObjectPtr& ctx, const zce::ObjectPtr& root)
     {
-        zce_smartptr<MSGT> msgptr = zce_smartptr<MSGT>::__dynamic_cast(root);
+        zce::SmartPtr<MSGT> msgptr = zce::SmartPtr<MSGT>::__dynamic_cast(root);
         ((T*)this)->zxml_proc_packet(ctx, msgptr);
     }
 };
 
-class ZCE_API zxml_node_base_pack : public zce_object
+class ZCE_API zxml_node_base_pack : public zce::Object
 {
 public:
     zxml_node_base_pack() { };
@@ -48,7 +48,7 @@ public:
     int generate_node_tail(char* buffer, int size, const char* name,bool sepa = false) const;
 };
 
-class ZCE_API zxml_node_base_unpack : public zce_object
+class ZCE_API zxml_node_base_unpack : public zce::Object
 {
 public:
     enum E_CHILD_STATUS
@@ -69,8 +69,8 @@ public:
 public:
     //used for framework only
     virtual int parser_attrs() = 0;
-    virtual int query_child(zce_smartptr<zxml_node_base_unpack>& child_unpack_ptr, const char* name, const std::string& id = "") = 0;
-    virtual int query_all_child(std::vector<zce_smartptr<zxml_node_base_unpack> >& vec_ptrs) = 0;
+    virtual int query_child(zce::SmartPtr<zxml_node_base_unpack>& child_unpack_ptr, const char* name, const std::string& id = "") = 0;
+    virtual int query_all_child(std::vector<zce::SmartPtr<zxml_node_base_unpack> >& vec_ptrs) = 0;
     virtual int get_attrs(std::map<std::string, std::string>& /*valmap*/) { return 0; }
     virtual bool match_name(const char*) { return true; }   
     void insert_attribute(const std::string& name, const std::string& value);
@@ -86,7 +86,7 @@ protected:
     std::map<std::string, std::string> attrs_map_;
 };
 
-typedef zce_smartptr<zxml_node_base_unpack> zxml_node_base_unpack_ptr;
+typedef zce::SmartPtr<zxml_node_base_unpack> zxml_node_base_unpack_ptr;
 
 #define UXML_QUERY_CHILD_VECTOR_VALIDATE(TYPE_NAME, VAR_TYPE, VAR_NAME, ID_NAME) \
 {\
@@ -114,7 +114,7 @@ typedef zce_smartptr<zxml_node_base_unpack> zxml_node_base_unpack_ptr;
         std::vector<TYPE_NAME>::iterator iter;\
         for (iter = _val.VAR_NAME.begin(); iter != _val.VAR_NAME.end(); ++iter)\
         {\
-            children.push_back(zce_smartptr<zxml_node_base_unpack>(new _unpack_##TYPE_NAME(*iter, this, NULL, #VAR_NAME, std::string(""))));\
+            children.push_back(zce::SmartPtr<zxml_node_base_unpack>(new _unpack_##TYPE_NAME(*iter, this, NULL, #VAR_NAME, std::string(""))));\
         }\
     }
 

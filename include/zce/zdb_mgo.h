@@ -14,7 +14,7 @@ class zce::RefBlock;
 #if ZCE_ZDB_MONGODB
 #include <mongocxx/client.hpp>
 
-class ZCE_API zdb_mgo_connection : public zce_object, public mongocxx::v_noabi::client
+class ZCE_API zdb_mgo_connection : public zce::Object, public mongocxx::v_noabi::client
 {
     bool connection_ok_;
 
@@ -47,7 +47,7 @@ public:
 
     zdb_mgo_database(const std::string& uri, const std::string& dbname);
 
-    zce_smartptr<zdb_mgo_connection> get_connection();
+    zce::SmartPtr<zdb_mgo_connection> get_connection();
 };
 
 #endif //ZCE_ZDB_MONGODB

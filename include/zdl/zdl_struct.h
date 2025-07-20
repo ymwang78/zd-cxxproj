@@ -28,8 +28,8 @@ class zdl_member;
 class zdl_visitor;
 
 class zdl_struct : public zdl_type {
-    typedef zce_smartptr<zdl_member> zdl_member_ptr;
-    typedef zce_smartptr<zdl_visitor> zdl_visitor_ptr;
+    typedef zce::SmartPtr<zdl_member> zdl_member_ptr;
+    typedef zce::SmartPtr<zdl_visitor> zdl_visitor_ptr;
 
   public:
     zdl_struct(const zdl_module_ptr& module_ptr, const std::string& name);
@@ -122,7 +122,7 @@ class zdl_struct : public zdl_type {
     unsigned refcount_;
 };
 
-typedef zce_smartptr<zdl_struct> zdl_struct_ptr;
+typedef zce::SmartPtr<zdl_struct> zdl_struct_ptr;
 
 template <typename predicate>
 void zdl_struct::visit(const zdl_visitor_ptr& visitor, predicate p) const {

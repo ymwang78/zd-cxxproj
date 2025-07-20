@@ -39,13 +39,13 @@ struct ZCE_API AllocStat {
     unsigned chunk_max_used_;     // the max number of chunks used in history
 };
 
-class ZCE_API Allocator : public zce_object {
+class ZCE_API Allocator : public zce::Object {
   public:
     enum ALLOCATOR_TYPE { CHUNK, V2 };
 
-    static zce_smartptr<Allocator> createChunk(size_t chunk_size, size_t n_chunks, bool lock);
+    static zce::SmartPtr<Allocator> createChunk(size_t chunk_size, size_t n_chunks, bool lock);
 
-    static zce_smartptr<Allocator> createDynamic(size_t chunk_size, size_t n_chunks, bool lock);
+    static zce::SmartPtr<Allocator> createDynamic(size_t chunk_size, size_t n_chunks, bool lock);
 
     virtual size_t getTotalSize() const noexcept = 0;
 

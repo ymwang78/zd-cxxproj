@@ -26,7 +26,7 @@ namespace zdp
     class zdp_stream;
     struct zds_context_t;
 
-    class ZCE_API zdp_resctx : public zce_object
+    class ZCE_API zdp_resctx : public zce::Object
     {
         unsigned short seq_;
 
@@ -34,13 +34,13 @@ namespace zdp
 
         zce::Any ctx_;
 
-        zce_smartptr<zdp_stream> stream_ptr_;
+        zce::SmartPtr<zdp_stream> stream_ptr_;
 
-        zce_smartptr<zce::Timer> timeout_ptr_;
+        zce::SmartPtr<zce::Timer> timeout_ptr_;
 
     public:
 
-        zdp_resctx(const zce_smartptr<zdp_stream>& stream_ptr, unsigned short seq, unsigned short msgid, const zce::Any& ctx);
+        zdp_resctx(const zce::SmartPtr<zdp_stream>& stream_ptr, unsigned short seq, unsigned short msgid, const zce::Any& ctx);
 
         const zce::Any& context() const {
             return ctx_;
@@ -65,13 +65,13 @@ namespace zdp
     {
         zce::RefBlock dblock_;
 
-        zce_smartptr<zce::Reactor> reactor_ptr_;
+        zce::SmartPtr<zce::Reactor> reactor_ptr_;
 
         unsigned last_recv_tick_;
 
         zce::AtomicLong seq_;
 
-        std::map<unsigned short, zce_smartptr<zdp_resctx> > res_dict_;
+        std::map<unsigned short, zce::SmartPtr<zdp_resctx> > res_dict_;
 
         int proc_next(const zdp_head& head, zce::RefBlock& dblock_ptr);
 
@@ -80,7 +80,7 @@ namespace zdp
         int _do_request(const zdp_head& head, zce::RefBlock& dblock_ptr, int mstimeout, const zce::Any& ctx);
     public:
 
-        zdp_stream(const zce_smartptr<zce::Reactor>& reactor_ptr, unsigned preserv = 0);
+        zdp_stream(const zce::SmartPtr<zce::Reactor>& reactor_ptr, unsigned preserv = 0);
 
         ~zdp_stream();
 
@@ -88,7 +88,7 @@ namespace zdp
 
         zce_uint32 next_seq();
 
-        const zce_smartptr<zce::Reactor>& reactor_ptr() const {
+        const zce::SmartPtr<zce::Reactor>& reactor_ptr() const {
             return reactor_ptr_;
         }
 

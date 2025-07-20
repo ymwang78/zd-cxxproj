@@ -13,13 +13,13 @@ class zdb_mgo_connection;
 
 class zdb_redis_connection;
 
-class zds_persist : public zce_object {
+class zds_persist : public zce::Object {
   protected:
-    zce_smartptr<zce::Scheduler> write_schedule_;
-    zce_smartptr<zce::TaskQueue> queue_ptr_;
+    zce::SmartPtr<zce::Scheduler> write_schedule_;
+    zce::SmartPtr<zce::TaskQueue> queue_ptr_;
 
     class async_write_task : public zce::Task {
-        zce_smartptr<zds_persist> persist_ptr_;
+        zce::SmartPtr<zds_persist> persist_ptr_;
         std::string dbname_;
         std::string coll_;
         zce::RefBlock key_;
@@ -27,7 +27,7 @@ class zds_persist : public zce_object {
         bool upsert_;
 
       public:
-        async_write_task(const zce_smartptr<zds_persist>& ptr, const std::string& dbname,
+        async_write_task(const zce::SmartPtr<zds_persist>& ptr, const std::string& dbname,
                          const std::string& coll, const zce::RefBlock& key, const zce::RefBlock& obj,
                          bool upsert);
 
@@ -36,9 +36,9 @@ class zds_persist : public zce_object {
 
     ~zds_persist(){};
 
-    virtual zce_smartptr<zdb_mgo_connection> get_mgo_conn(const std::string& dbname) = 0;
+    virtual zce::SmartPtr<zdb_mgo_connection> get_mgo_conn(const std::string& dbname) = 0;
 
-    virtual zce_smartptr<zdb_redis_connection> get_redis_conn() = 0;
+    virtual zce::SmartPtr<zdb_redis_connection> get_redis_conn() = 0;
 
   public:
     int init();

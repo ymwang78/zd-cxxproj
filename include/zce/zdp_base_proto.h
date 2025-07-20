@@ -162,7 +162,7 @@ namespace zdp_base
         zce_byte    keepalive;
         zce_byte    dummy;
     };
-    struct MSG_NONE_REQ : public zce_object
+    struct MSG_NONE_REQ : public zce::Object
     {
         const static unsigned short MSG_TYPE = E_MSG_NONE_REQ;
         static const char* type_name() { return ("MSG_NONE_REQ");}
@@ -176,9 +176,9 @@ namespace zdp_base
 
         std::vector<zdp_base::nspair_t> ie_ns;
     };
-    typedef zce_smartptr<MSG_NONE_REQ> MSG_NONE_REQ_PTR;
+    typedef zce::SmartPtr<MSG_NONE_REQ> MSG_NONE_REQ_PTR;
 
-    struct MSG_DISCONN_REQ : public zce_object
+    struct MSG_DISCONN_REQ : public zce::Object
     {
         const static unsigned short MSG_TYPE = E_MSG_DISCONN_REQ;
         static const char* type_name() { return ("MSG_DISCONN_REQ");}
@@ -190,9 +190,9 @@ namespace zdp_base
         }
 
     };
-    typedef zce_smartptr<MSG_DISCONN_REQ> MSG_DISCONN_REQ_PTR;
+    typedef zce::SmartPtr<MSG_DISCONN_REQ> MSG_DISCONN_REQ_PTR;
 
-    struct MSG_CONTAINER_REQ : public zce_object
+    struct MSG_CONTAINER_REQ : public zce::Object
     {
         const static unsigned short MSG_TYPE = E_MSG_CONTAINER_REQ;
         static const char* type_name() { return ("MSG_CONTAINER_REQ");}
@@ -206,9 +206,9 @@ namespace zdp_base
 
         zdp_container_t    ie_req;
     };
-    typedef zce_smartptr<MSG_CONTAINER_REQ> MSG_CONTAINER_REQ_PTR;
+    typedef zce::SmartPtr<MSG_CONTAINER_REQ> MSG_CONTAINER_REQ_PTR;
 
-    struct MSG_CONTAINER_RES : public zce_object
+    struct MSG_CONTAINER_RES : public zce::Object
     {
         const static unsigned short MSG_TYPE = E_MSG_CONTAINER_RES;
         static const char* type_name() { return ("MSG_CONTAINER_RES");}
@@ -224,9 +224,9 @@ namespace zdp_base
         zce_int32    ie_result;
         std::vector<zdp_base::zdp_container_t> ie_res;
     };
-    typedef zce_smartptr<MSG_CONTAINER_RES> MSG_CONTAINER_RES_PTR;
+    typedef zce::SmartPtr<MSG_CONTAINER_RES> MSG_CONTAINER_RES_PTR;
 
-    struct MSG_RPCCALL_REQ : public zce_object
+    struct MSG_RPCCALL_REQ : public zce::Object
     {
         const static unsigned short MSG_TYPE = E_MSG_RPCCALL_REQ;
         static const char* type_name() { return ("MSG_RPCCALL_REQ");}
@@ -246,9 +246,9 @@ namespace zdp_base
         zce::RefBlock    payload;
         zce_int32    mstimeout;
     };
-    typedef zce_smartptr<MSG_RPCCALL_REQ> MSG_RPCCALL_REQ_PTR;
+    typedef zce::SmartPtr<MSG_RPCCALL_REQ> MSG_RPCCALL_REQ_PTR;
 
-    struct MSG_RPCCALL_RES : public zce_object
+    struct MSG_RPCCALL_RES : public zce::Object
     {
         const static unsigned short MSG_TYPE = E_MSG_RPCCALL_RES;
         static const char* type_name() { return ("MSG_RPCCALL_RES");}
@@ -264,6 +264,6 @@ namespace zdp_base
         zce_int32    ie_result;
         zce::RefBlock    payload;
     };
-    typedef zce_smartptr<MSG_RPCCALL_RES> MSG_RPCCALL_RES_PTR;
+    typedef zce::SmartPtr<MSG_RPCCALL_RES> MSG_RPCCALL_RES_PTR;
 
 } //namespace zdp_base

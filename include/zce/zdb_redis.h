@@ -59,7 +59,7 @@ public:
     }
 };
 
-class ZCE_API zdb_redis_connection : public zce_object
+class ZCE_API zdb_redis_connection : public zce::Object
 {
     redisContext* context_;
 
@@ -136,7 +136,7 @@ public:
 
 };
 
-class ZCE_API zdb_redis_databse : public zce_object
+class ZCE_API zdb_redis_databse : public zce::Object
 {
     bool ssl_;
     std::string ip_;
@@ -148,7 +148,7 @@ public:
 
     zdb_redis_databse(bool ssl, const std::string& ip, unsigned short port, const char* passwd);
 
-    zce_smartptr<zdb_redis_connection> get_connection();
+    zce::SmartPtr<zdb_redis_connection> get_connection();
 
 	inline void get_conninfo(std::string& ip, unsigned short& port, std::string& passwd) const {
 		ip = ip_;

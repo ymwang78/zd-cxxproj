@@ -63,7 +63,7 @@ struct TaskResult<void> : public TaskResultBase {
     }
 };
 
-class ZCE_API Task : virtual public zce_object {
+class ZCE_API Task : virtual public zce::Object {
   protected:
     const char* task_name_;
 
@@ -75,13 +75,13 @@ class ZCE_API Task : virtual public zce_object {
     virtual void call() = 0;
 };
 
-typedef zce_smartptr<Task> TaskPtr;
+typedef zce::SmartPtr<Task> TaskPtr;
 
-class ZCE_API TaskDelegator : virtual public zce_object {
+class ZCE_API TaskDelegator : virtual public zce::Object {
   public:
     virtual int delegateTask(const TaskPtr& task_ptr) = 0;
 
-    virtual int delegateRelease(zce_object* obj) = 0;
+    virtual int delegateRelease(zce::Object* obj) = 0;
 
     template <typename F, typename... Args>
     auto delegateFuture(const char* name, F&& f, Args&&... args)
@@ -121,7 +121,7 @@ class ZCE_API TaskDelegator : virtual public zce_object {
             }
         };
 
-        auto task = zce_smartptr<Task>(
+        auto task = zce::SmartPtr<Task>(
             new FutureTask(promise_ptr, std::forward<F>(f), std::forward<Args>(args)...));
 
         int ret = delegateTask(task);
@@ -137,7 +137,7 @@ class ZCE_API TaskDelegator : virtual public zce_object {
     template <typename F>
     int delegate(bool bwait, const char* name, F f) {
         class Fr_task : public zce::Task {
-            zce_smartptr<zce::TaskDelegator> delegator_;
+            zce::SmartPtr<zce::TaskDelegator> delegator_;
             zce::Semaphore* sem_;
             F f_;
 
@@ -167,12 +167,12 @@ class ZCE_API TaskDelegator : virtual public zce_object {
             }
         };
 
-        zce_smartptr<zce::Task> task_ptr(new Fr_task(name, this, 0, f));
+        zce::SmartPtr<zce::Task> task_ptr(new Fr_task(name, this, 0, f));
         return delegateTask(task_ptr);
     };
 };
 
-class ZCE_API Scheduler : public zce_object {
+class ZCE_API Scheduler : public zce::Object {
     struct zce_worker_contex;
 
     class zce_worker;
@@ -204,7 +204,7 @@ class ZCE_API Scheduler : public zce_object {
             FuncTask(F f) : zce::Task("FuncTask"), f_(f) {}
             virtual void call() { f_(); }
         };
-        zce_smartptr<zce::Task> task_ptr(new FuncTask(f));
+        zce::SmartPtr<zce::Task> task_ptr(new FuncTask(f));
         return perform(task_ptr);
     };
 
@@ -245,7 +245,7 @@ class ZCE_API Scheduler : public zce_object {
             }
         };
 
-        auto task = zce_smartptr<Task>(
+        auto task = zce::SmartPtr<Task>(
             new FutureTask(promise_ptr, std::forward<F>(f), std::forward<Args>(args)...));
 
         int ret = perform(task);
@@ -267,7 +267,7 @@ typedef zce::Singleton<Scheduler> SchedulerSigt;
 
 template <typename H, typename T0, typename T1, typename T2>
 class DelegateTask : public Task {
-    zce_smartptr<H> host_ptr_;
+    zce::SmartPtr<H> host_ptr_;
     T0 t0_;
     T1 t1_;
     T2 t2_;

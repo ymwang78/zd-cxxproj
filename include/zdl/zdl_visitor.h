@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 /* ***************************************************************
  *  Copyright (C) 2006  Yongming Wang(wangym@gmail.com)
  *  All Rights Reserved
@@ -26,13 +26,13 @@ class zdl_struct;
 class zdl_member;
 class zdl_builtin;
 
-class zdl_visitor : public zce_object
+class zdl_visitor : public zce::Object
 {
 protected:
-    typedef zce_smartptr<zdl_module>  zdl_module_ptr;
-    typedef zce_smartptr<zdl_enum>    zdl_enum_ptr;
-    typedef zce_smartptr<zdl_struct>  zdl_struct_ptr;
-    typedef zce_smartptr<zdl_member>  zdl_member_ptr;
+    typedef zce::SmartPtr<zdl_module>  zdl_module_ptr;
+    typedef zce::SmartPtr<zdl_enum>    zdl_enum_ptr;
+    typedef zce::SmartPtr<zdl_struct>  zdl_struct_ptr;
+    typedef zce::SmartPtr<zdl_member>  zdl_member_ptr;
 
 public:
     virtual bool visit_module_start(const zdl_module_ptr& module){ return true; };
@@ -48,6 +48,6 @@ public:
 
     virtual void visit_member(const zdl_member* member, bool is_last) {};
 };
-typedef zce_smartptr<zdl_visitor> zdl_visitor_ptr;
+typedef zce::SmartPtr<zdl_visitor> zdl_visitor_ptr;
 
 #endif /*__zdl_visitor_h__*/

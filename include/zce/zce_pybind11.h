@@ -16,25 +16,24 @@ namespace pybind11 {
 namespace detail {
 
 template <typename T>
-struct type_caster<zce_smartptr<T>> {
-    using SmartPtr = zce_smartptr<T>;
-    using type = SmartPtr;
-    PYBIND11_TYPE_CASTER(SmartPtr, _("zce_smartptr"));
+struct type_caster<zce::SmartPtr<T>> {
+    using type = zce::SmartPtr<T>;
+    PYBIND11_TYPE_CASTER(type, _("SmartPtr"));
 
     bool load(handle src, bool) {
         // 不支持从 Python 转为 zce_smartptr<T>，可选实现
         return false;
     }
 
-    static handle cast(const SmartPtr& src, return_value_policy, handle) {
+    static handle cast(const type& src, return_value_policy, handle) {
         if (!src) return pybind11::none().release();
         return pybind11::cast(src.operator->(), return_value_policy::take_ownership).release();
     }
 };
 
 template <typename T>
-struct holder_helper<zce_smartptr<T>> {
-    static const T* get(const zce_smartptr<T>& p) { return p.operator->(); }
+struct holder_helper<zce::SmartPtr<T>> {
+    static const T* get(const zce::SmartPtr<T>& p) { return p.operator->(); }
 };
 
 }  // namespace detail
