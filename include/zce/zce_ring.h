@@ -5,7 +5,7 @@
 
 namespace zce {
 
-template <typename T, typename Lock = zce_mutex_null>
+template <typename T, typename Lock = zce::MutexNull>
 class Ring : public zce_object {
   public:
     Ring(const Ring&) = delete;
@@ -17,7 +17,7 @@ class Ring : public zce_object {
     }
 
     Ring(Ring&& other) noexcept {
-        zce_guard<Lock> lock(_mutex);
+        zce::Guard<Lock> lock(_mutex);
         _buffer = std::move(other._buffer);
         _capacity = other._capacity;
         _size = other._size;
@@ -31,8 +31,8 @@ class Ring : public zce_object {
 
     Ring& operator=(Ring&& other) noexcept {
         if (this != &other) {
-            zce_guard<Lock> lock(_mutex);
-            zce_guard<Lock> lock_other(other._mutex);
+            zce::Guard<Lock> lock(_mutex);
+            zce::Guard<Lock> lock_other(other._mutex);
             _buffer = std::move(other._buffer);
             _capacity = other._capacity;
             _size = other._size;
@@ -48,7 +48,7 @@ class Ring : public zce_object {
 
     /** 清空队列，重置所有指针 */
     void reset() {
-        zce_guard<Lock> lock(_mutex);
+        zce::Guard<Lock> lock(_mutex);
         _head = 0;
         _tail = 0;
         _size = 0;
@@ -56,7 +56,7 @@ class Ring : public zce_object {
 
     /** 添加元素到队列（自动覆盖最老数据） */
     void push(const T& item) {
-        zce_guard<Lock> lock(_mutex);
+        zce::Guard<Lock> lock(_mutex);
 
         _buffer[_tail] = item;
         _tail = (_tail + 1) % _capacity;
@@ -70,7 +70,7 @@ class Ring : public zce_object {
 
     /** 读取单个元素（如果队列为空，阻塞等待） */
     bool pop(T& item) {
-        zce_guard<Lock> lock(_mutex);
+        zce::Guard<Lock> lock(_mutex);
         if (_size == 0) return false;
 
         item = _buffer[_head];
@@ -82,7 +82,7 @@ class Ring : public zce_object {
 
     /** 批量写入（支持 `memcpy` 加速，自动覆盖最老数据） */
     void write(size_t count, const T* src) {
-        zce_guard<Lock> lock(_mutex);
+        zce::Guard<Lock> lock(_mutex);
 
         if (count >= _capacity) {
             // 如果写入数据超过队列容量，则只保留最新的 `_capacity` 个数据
@@ -120,7 +120,7 @@ class Ring : public zce_object {
 
     /** 读取多个元素（删除已读取数据，支持 `memcpy` 加速） */
     size_t read(size_t count, T* dst) {
-        zce_guard<Lock> lock(_mutex);
+        zce::Guard<Lock> lock(_mutex);
         size_t available = peek_no_lock(count, dst);
 
         _head = (_head + available) % _capacity;
@@ -131,25 +131,25 @@ class Ring : public zce_object {
 
     /** 预览多个元素（不会修改 `_head`，支持 `memcpy` 加速） */
     size_t peek(size_t count, T* dst) {
-        zce_guard<Lock> lock(_mutex);
+        zce::Guard<Lock> lock(_mutex);
         return peek_no_lock(count, dst);
     }
 
     /** 队列是否为空 */
     bool empty() const {
-        zce_guard<Lock> lock(_mutex);
+        zce::Guard<Lock> lock(_mutex);
         return _size == 0;
     }
 
     /** 队列是否已满 */
     bool full() const {
-        zce_guard<Lock> lock(_mutex);
+        zce::Guard<Lock> lock(_mutex);
         return _size == _capacity;
     }
 
     /** 获取当前元素个数 */
     size_t size() const {
-        zce_guard<Lock> lock(_mutex);
+        zce::Guard<Lock> lock(_mutex);
         return _size;
     }
 

@@ -103,7 +103,7 @@ class zce_smartptr_lock {
 template <typename ZCE_LOCK>
 ZCE_LOCK zce_smartptr_lock<ZCE_LOCK>::mutex_;
 
-template <typename IMPL_CLASS, typename ZCE_LOCK = zce_mutex_null>
+template <typename IMPL_CLASS, typename ZCE_LOCK = zce::MutexNull>
 class zce_smartptr {
     template <typename IMPL_OTHER, typename ZCE_LOCK_OTHER>
     friend class zce_smartptr;
@@ -215,7 +215,7 @@ class zce_smartptr {
     IMPL_CLASS* handler_;
 
     IMPL_CLASS* __lock_addref() const {
-        zce_guard<ZCE_LOCK> g(zce_smartptr_lock<ZCE_LOCK>().get());
+        zce::Guard<ZCE_LOCK> g(zce_smartptr_lock<ZCE_LOCK>().get());
         if (this->handler_) this->handler_->__addref();
         return this->handler_;
     }
@@ -223,7 +223,7 @@ class zce_smartptr {
     void __lock_sign(IMPL_CLASS* rhs) {
         IMPL_CLASS* ptr = NULL;
         {
-            zce_guard<ZCE_LOCK> g(zce_smartptr_lock<ZCE_LOCK>().get());
+            zce::Guard<ZCE_LOCK> g(zce_smartptr_lock<ZCE_LOCK>().get());
             ptr = this->handler_;
             this->handler_ = rhs;
         }

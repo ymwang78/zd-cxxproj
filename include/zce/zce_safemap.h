@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 // ***************************************************************
 //  zce_safemap   version:  1.0     date: 2003/07/31
 //  -------------------------------------------------------------
@@ -17,7 +17,7 @@
 
 template<typename key_t, 
 typename val_t, 
-typename lock_t = zce_mutex,
+typename lock_t = zce::Mutex,
 typename map_t = std::map<key_t, val_t> 
 >
 class zce_safemap
@@ -29,7 +29,7 @@ public:
     
     int insert(const key_t& key, const val_t& val)
     {
-          zce_guard<lock_t> g(lock_);
+          zce::Guard<lock_t> g(lock_);
         map_iter iter = map_.find(key);
         if (iter == map_.end())
         {
@@ -41,7 +41,7 @@ public:
     //return 0 if ok; return >0 if exists; return <0 if insert failed or unknow failed
     int insert(const key_t& key, const val_t& val, val_t& exists_val, bool replace_if_exist = false)
     {
-        zce_guard<lock_t> g(lock_);
+        zce::Guard<lock_t> g(lock_);
         map_iter iter = map_.find(key);
         if (iter == map_.end())
         {
@@ -61,7 +61,7 @@ public:
 
     int query(const key_t& key, val_t& val) const
     {
-        zce_guard<lock_t> g(lock_);
+        zce::Guard<lock_t> g(lock_);
         const_map_iter iter = map_.find(key);
         if (iter != map_.end())
         {
@@ -73,7 +73,7 @@ public:
 
     int query_first(val_t& val) const
     {
-        zce_guard<lock_t> g(lock_);
+        zce::Guard<lock_t> g(lock_);
         if (!map_.empty())
         {
             val = map_.begin()->second;
@@ -85,7 +85,7 @@ public:
     //return 0 if ok; < 0, query failed
     int query(const key_t& key, val_t& val, bool erase_if_exists)
     {
-        zce_guard<lock_t> g(lock_);
+        zce::Guard<lock_t> g(lock_);
         map_iter iter = map_.find(key);
         if (iter != map_.end())
         {
@@ -99,7 +99,7 @@ public:
 
     int query_first(val_t& val, bool erase_if_exists)
     {
-        zce_guard<lock_t> g(lock_);
+        zce::Guard<lock_t> g(lock_);
         if (!map_.empty())
         {
             map_iter iter = map_.begin();
@@ -114,7 +114,7 @@ public:
     template <typename tdoozer>
     int query_if(val_t& val, bool erase_if_exists, tdoozer doozer)
     {
-        zce_guard<lock_t> g(lock_);
+        zce::Guard<lock_t> g(lock_);
         map_iter iter = std::find_if(map_.begin(), map_.end(), doozer);
         if (iter != map_.end())
         {
@@ -128,19 +128,19 @@ public:
 
     void erase(const key_t& key)
     {
-        zce_guard<lock_t> g(lock_);
+        zce::Guard<lock_t> g(lock_);
         map_.erase(key);
     };
 
     size_t size() const
     {
-        zce_guard<lock_t> g(lock_);
+        zce::Guard<lock_t> g(lock_);
         return map_.size();
     };
 
     void lock_copy(map_t&  mapt, bool eraseall = false)
     {
-        zce_guard<lock_t> g(lock_);
+        zce::Guard<lock_t> g(lock_);
         mapt =  map_;
         if (eraseall)
             map_.clear();
@@ -148,7 +148,7 @@ public:
 
     void clear()
     {
-        zce_guard<lock_t> g(lock_);
+        zce::Guard<lock_t> g(lock_);
         map_.clear();
     }
 

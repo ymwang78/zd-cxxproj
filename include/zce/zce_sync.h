@@ -9,68 +9,67 @@
 // ***************************************************************
 // 
 // ***************************************************************
-#ifndef __zce_mutex_h__
-#define __zce_mutex_h__
-
 #include <zce/zce_inc.h>
 
-class ZCE_API zce_semaphore
+namespace zce {
+
+class ZCE_API Semaphore
 {
     struct pimpl;
     struct pimpl *pimpl_;
 
 public:
-    zce_semaphore(int initcount);
-    ~zce_semaphore();
+    Semaphore(int initcount);
+    ~Semaphore();
     void acquire();
     void release();
     bool try_acquire();
 private:
-    zce_semaphore(const zce_semaphore&) {};// noncopyable
-    void operator=(const zce_semaphore&) {};
+    Semaphore(const Semaphore&) {};// noncopyable
+    void operator=(const Semaphore&) {};
 };
 
-class ZCE_API zce_mutex_null
+class ZCE_API MutexNull
 {
 public:
-    inline zce_mutex_null() {};
-    ~zce_mutex_null() {};
+    inline MutexNull() {};
+    ~MutexNull() {};
 
     void acquire() {};
     void release() {};
     bool try_acquire() { return true; };
 private:
-    zce_mutex_null(const zce_mutex_null&) {};// noncopyable
-    void operator=(const zce_mutex_null&) {};
+    MutexNull(const MutexNull&) {};// noncopyable
+    void operator=(const MutexNull&) {};
 };
 
-class ZCE_API zce_mutex
+class ZCE_API Mutex
 {
     struct pimpl;
     struct pimpl *pimpl_;
 
 public:
-    zce_mutex();
-    ~zce_mutex();
+    Mutex();
+    ~Mutex();
 
     void acquire();
     void release();
 	bool try_acquire();
 private:
-    zce_mutex(const zce_mutex&) {};// noncopyable
-    void operator=(const zce_mutex&) {};
+    Mutex(const Mutex&) {};// noncopyable
+    void operator=(const Mutex&) {};
 };
 
-class ZCE_API zce_mutex_rw
+class ZCE_API MutexReadWrite
 {
     struct pimpl;
     struct pimpl *pimpl_;
 
 public:
 
-    zce_mutex_rw();
+    MutexReadWrite();
 
-    ~zce_mutex_rw();
+    ~MutexReadWrite();
 
     void acquire_read();
 
@@ -81,58 +80,56 @@ public:
     void release_write();
 
 private:
-    zce_mutex_rw(const zce_mutex_rw&) {};// noncopyable
-    void operator=(const zce_mutex_rw&) {};
+    MutexReadWrite(const MutexReadWrite&) {};// noncopyable
+    void operator=(const MutexReadWrite&) {};
 };
 
 template<typename T>
-class ZCE_API zce_guard
+class ZCE_API Guard
 {
     T& lock_;
 public:
     // = Initialization and termination methods.
-    zce_guard(T& l):lock_(l)
+    Guard(T& l):lock_(l)
     {
         lock_.acquire();
     };
-    ~zce_guard()
+    ~Guard()
     {
         lock_.release();
     };
 };
 
 template<typename T>
-class ZCE_API zce_guard_read
+class ZCE_API GuardRead
 {
     T& lock_;
 public:
     // = Initialization and termination methods.
-    zce_guard_read(T& l) :lock_(l)
+    GuardRead(T& l) :lock_(l)
     {
         lock_.acquire_read();
     };
-    ~zce_guard_read()
+    ~GuardRead()
     {
         lock_.release_read();
     };
 };
 
 template<typename T>
-class ZCE_API zce_guard_write
+class ZCE_API GuardWrite
 {
     T& lock_;
 public:
     // = Initialization and termination methods.
-    zce_guard_write(T& l) :lock_(l)
+    GuardWrite(T& l) :lock_(l)
     {
         lock_.acquire_write();
     };
-    ~zce_guard_write()
+    ~GuardWrite()
     {
         lock_.release_write();
     };
 };
 
-
-
-#endif // __zce_mutex_h__
+}  // namespace zce

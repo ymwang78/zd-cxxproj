@@ -17,12 +17,12 @@
 
 namespace zce {
 
-template <typename T, typename L = zce_mutex>
+template <typename T, typename L = zce::Mutex>
 class ZCE_API Singleton {
   public:
     static inline T* instance() {
         if (instance_ == 0) {
-            zce_guard<L> g(lock_);
+            zce::Guard<L> g(lock_);
             if (instance_ == 0) {
                 instance_ = new T;
                 if constexpr (std::is_base_of<zce_object, T>::value) {
@@ -34,7 +34,7 @@ class ZCE_API Singleton {
     }
 
     static inline void release() {
-        zce_guard<L> g(lock_);
+        zce::Guard<L> g(lock_);
         if (instance_ != 0) {
             if constexpr (std::is_base_of<zce_object, T>::value) {
                 instance_->__decref();
@@ -49,7 +49,7 @@ class ZCE_API Singleton {
     Singleton() {}
 
     virtual ~Singleton() {
-        zce_guard<L> g(lock_);
+        zce::Guard<L> g(lock_);
         if (instance_ != 0) {
             delete instance_;
             instance_ = 0;

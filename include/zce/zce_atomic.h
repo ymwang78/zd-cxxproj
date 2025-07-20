@@ -13,7 +13,7 @@
 /*
     ATOMIC_USE_ARMSPIN: arm SINGLE core
     ATOMIC_USE_GCCBUILTIN: http://gcc.gnu.org/onlinedocs/gcc-4.1.2/gcc/Atomic-Builtins.html
-    ATOMIC_USE_MUTEX: use one zce_mutex to implement atomic
+    ATOMIC_USE_MUTEX: use one zce::Mutex to implement atomic
 */
 
 #include <zce/zce_inc.h>

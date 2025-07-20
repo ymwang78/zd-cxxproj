@@ -36,7 +36,7 @@ class ZCE_API TaskQueue : public Task, public TaskDelegator {
 
     std::vector<zce_smartptr<zce_object>> release_vec_;
 
-    zce_mutex task_lock_;
+    zce::Mutex task_lock_;
 
     unsigned cont_proc_;
 

@@ -16,10 +16,9 @@ class zce_object;
 typedef struct _JavaVM JavaVM;
 typedef struct _JNIEnv JNIEnv;
 typedef struct AAssetManager AAssetManager;
-class zce_semaphore;
 
 namespace zce {
-
+class Semaphore;
 class TaskDelegator;
 
 class ZCE_API Tss {
@@ -45,7 +44,7 @@ class ZCE_API Tss {
         int last_errcode_;
         char* last_errdesc_;
         zce::TaskDelegator* current_delegator_;  // 当前线程的任务委托者环境
-        std::vector<zce_semaphore*> sem_vec_;     // for wait delegate task
+        std::vector<zce::Semaphore*> sem_vec_;     // for wait delegate task
         static constexpr int last_errdesc_size_ = 4096;
 
         global_t();
@@ -54,9 +53,9 @@ class ZCE_API Tss {
 
         inline zce_int64 next_oid() { return ++oid_; }
 
-        zce_semaphore* get_semaphore();
+        zce::Semaphore* get_semaphore();
 
-        void return_semaphore(zce_semaphore* sem);
+        void return_semaphore(zce::Semaphore* sem);
     };
 
     static global_t* get_global(bool create_if_not_exists = true);
@@ -66,7 +65,7 @@ class ZCE_API Tss {
         zce_global_semaphore& operator=(const zce_global_semaphore&) = delete;
 
         Tss::global_t* tss;
-        zce_semaphore* sem;
+        zce::Semaphore* sem;
         zce_global_semaphore();
         ~zce_global_semaphore();
     };

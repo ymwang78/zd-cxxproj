@@ -205,7 +205,7 @@ class ZCE_API Tcp : public Socket {
         bool operator()(const data_item& rhs) const { return rhs.option_ < opt_; }
     };
 
-    zce_mutex dblock_lock_;
+    zce::Mutex dblock_lock_;
 
     std::deque<data_item> dblock_deque_;
 
@@ -324,7 +324,7 @@ class ZCE_API Acceptor : public zce_object {
     bool isclose_;
 
     zce::AtomicLong block_count_;
-    zce_mutex_rw block_lock_;
+    zce::MutexReadWrite block_lock_;
     struct block_t {
         unsigned start_timet;
         unsigned end_timet;

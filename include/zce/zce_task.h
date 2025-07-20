@@ -138,11 +138,11 @@ class ZCE_API TaskDelegator : virtual public zce_object {
     int delegate(bool bwait, const char* name, F f) {
         class Fr_task : public zce::Task {
             zce_smartptr<zce::TaskDelegator> delegator_;
-            zce_semaphore* sem_;
+            zce::Semaphore* sem_;
             F f_;
 
           public:
-            Fr_task(const char* name, zce::TaskDelegator* delegate_ptr, zce_semaphore* sem, F f)
+            Fr_task(const char* name, zce::TaskDelegator* delegate_ptr, zce::Semaphore* sem, F f)
                 : zce::Task(name ? name : "delegateTask"),
                   delegator_(delegate_ptr),
                   sem_(sem),
