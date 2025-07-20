@@ -39,7 +39,7 @@ public:
     int get_objects(const char* name, std::vector<object_stat>& vec);
 };
 
-class ZCE_API zce_monitor_sigt : public zce_singleton<zce_monitor, zce_mutex_null>
+class ZCE_API zce_monitor_sigt : public zce::Singleton<zce_monitor, zce_mutex_null>
 {
     zce_monitor_sigt();
     ~zce_monitor_sigt();

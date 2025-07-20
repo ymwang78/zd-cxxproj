@@ -1,34 +1,34 @@
-#pragma once
+﻿#pragma once
 /* ***************************************************************
-//  zce_service   version:  1.0  date: 2006/6/22
+//  zce::Service   version:  1.0  date: 2006/6/22
 //  -------------------------------------------------------------
 //  Yongming Wang(wangym@gmail.com)
 //  -------------------------------------------------------------
 //  This is a part of ZCE lib, which inherited from ubeda/utiny.
 //  Copyright (C) 2006 - All Rights Reserved
 // ***************************************************************
-// 
+//
 // **************************************************************/
-#ifndef __zce_service_h__
-#define __zce_service_h__
-
 #include <vector>
 #include <string>
 #include <zce/zce_config.h>
 
+namespace zce {
+class Allocator;
+class TaskDelegator;
+class RefBlock;
 
-class ZCE_API zce_service
-{
+class ZCE_API Service {
     enum _PROCESS_FLAG {
         PROCESS_FLAG_CONSOLE = 1,
         PROCESS_FLAG_SERVICE,
         PROCESS_FLAG_WORK,
     };
-public:
 
-    zce_service();
+  public:
+    Service();
 
-    virtual ~zce_service();
+    virtual ~Service();
 
     virtual bool shutdown();
 
@@ -38,7 +38,7 @@ public:
 
     int main(int&, char*[]);
 
-    static zce_service* instance();
+    static Service* instance();
 
     bool service() const;
 
@@ -58,12 +58,11 @@ public:
     void initlicense(const char* name);
     void set_license(void* param);
     bool checklicense();
-    unsigned getlicnum()const { return lic_num_; }
-    unsigned getlicexp()const { return lic_exp_; }
+    unsigned getlicnum() const { return lic_num_; }
+    unsigned getlicexp() const { return lic_exp_; }
 #endif
 
-protected:
-
+  protected:
     virtual bool on_start(int, char*[]) = 0;
 
     virtual bool on_stop() = 0;
@@ -74,13 +73,13 @@ protected:
 
     void disable_interrupt();
 
-private:
-    unsigned    process_flag_;
-    bool        nohup_;
+  private:
+    unsigned process_flag_;
+    bool nohup_;
     std::string name_;
     bool exit_success_;
     volatile bool running_;
-    static zce_service* instance_;
+    static zce::Service* instance_;
 
 #ifdef _WIN32
     int run_service(int, char*[]);
@@ -91,10 +90,10 @@ private:
     std::vector<std::string> service_args_;
     HANDLE work_event_;
     HANDLE work_process_;
-    
+
     std::string guid_;
 
-public:
+  public:
     void service_main(int, char*[]);
     void control(int);
 #else
@@ -110,7 +109,7 @@ public:
     void configure_service(const std::string&);
 
     int install_service(bool, const std::string&, const std::string&, const std::string&,
-        const std::vector<std::string>&);
+                        const std::vector<std::string>&);
 
     int uninstall_service(bool, const std::string&);
 
@@ -120,9 +119,7 @@ public:
 
     static void set_module_handle(HMODULE);
 
-#else
-
-#endif
+#endif  // _WIN32
 };
 
-#endif // __zce_service_h__
+}  // namespace zce

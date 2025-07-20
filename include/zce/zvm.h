@@ -190,4 +190,4 @@ public:
 #endif
 };
 
-typedef zce_singleton<zvm> zvm_sigt;
+typedef zce::Singleton<zvm> zvm_sigt;

@@ -261,7 +261,7 @@ class ZCE_API Scheduler : public zce_object {
 
 #include <zce/zce_singleton.h>
 
-typedef zce_singleton<Scheduler> SchedulerSigt;
+typedef zce::Singleton<Scheduler> SchedulerSigt;
 
 //////////////////////////////////////////////////////////////////////////
 

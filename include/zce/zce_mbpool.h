@@ -13,6 +13,7 @@
 #include <zce/zce_sync.h>
 #include <zce/zce_allocator.h>
 #include <map>
+#include <zce/zce_singleton.h>
 
 namespace zce {
 
@@ -56,17 +57,17 @@ public:
 };
 
 template <typename T>
-class zce_objpool
+class ObjectPool
 {
     zce_smartptr<zce::Allocator> vt_allocator_;
 
 public:
 
-    zce_objpool()
+    ObjectPool()
         :vt_allocator_( zce::Allocator::createChunk(sizeof(T), 4096, true)) {
     }
 
-    virtual ~zce_objpool() {
+    virtual ~ObjectPool() {
     };
 
     template<typename V>
@@ -78,12 +79,11 @@ public:
     }
 };
 
-}  // namespace zce
+typedef zce::Singleton<zce::BlockPool> BlockPoolSigt;
 
-#include <zce/zce_singleton.h>
-typedef zce_singleton<zce::BlockPool> zce_mbpool_sigt;
+}  // namespace zce
 
 #define ZCE_MBACQUIRE(RET, x) do{ \
     static zce_object_counter obj(__FUNCTION__); \
-    RET = zce_mbpool_sigt::instance()->acquire_dblock(x, obj);\
+    RET = zce::BlockPoolSigt::instance()->acquire_dblock(x, obj);\
 }while(0)

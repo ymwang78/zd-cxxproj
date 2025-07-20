@@ -1,6 +1,6 @@
-#pragma once
+﻿#pragma once
 // ***************************************************************
-//  zce_singleton   version:  1.0   -  date: 2002/03/01
+//  zce::Singleton   version:  1.0   -  date: 2002/03/01
 //  -------------------------------------------------------------
 //  Yongming Wang(wangym@gmail.com)
 //  -------------------------------------------------------------
@@ -15,8 +15,10 @@
 #endif
 #include <zce/zce_sync.h>
 
+namespace zce {
+
 template <typename T, typename L = zce_mutex>
-class ZCE_API zce_singleton {
+class ZCE_API Singleton {
   public:
     static inline T* instance() {
         if (instance_ == 0) {
@@ -44,8 +46,9 @@ class ZCE_API zce_singleton {
     }
 
   protected:
-    zce_singleton() {}
-    virtual ~zce_singleton() {
+    Singleton() {}
+
+    virtual ~Singleton() {
         zce_guard<L> g(lock_);
         if (instance_ != 0) {
             delete instance_;
@@ -54,8 +57,8 @@ class ZCE_API zce_singleton {
     }
 
   private:
-    zce_singleton(const zce_singleton&) {}
-    zce_singleton& operator=(const zce_singleton&) {}
+    Singleton(const Singleton&) {}
+    Singleton& operator=(const Singleton&) {}
 
   private:
     static T* instance_;
@@ -63,7 +66,9 @@ class ZCE_API zce_singleton {
 };
 
 template <typename T, typename L>
-T* zce_singleton<T, L>::instance_ = NULL;
+T* Singleton<T, L>::instance_ = NULL;
 
 template <typename T, typename L>
-L zce_singleton<T, L>::lock_;
+L Singleton<T, L>::lock_;
+
+}  // namespace zce
