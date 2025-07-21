@@ -26,6 +26,8 @@
 #   define FALSE 0
 #endif
 
+using namespace zce;
+
 const char _lib_privkey[] = "-----BEGIN RSA PRIVATE KEY-----\n"
 "MIIG4wIBAAKCAYEAzYi25hUYlS5eMgQXa5tMZj5Nc8Z5RBcr1Fc0sFWQkS5HKP4D\n"
 "JYhN281fBEMR3GZMUeWbmS4NYI9bzRMXO31Fjq9dNmBwyVCtIhG+P0l8n1RbyI+I\n"

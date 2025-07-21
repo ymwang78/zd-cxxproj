@@ -18,21 +18,37 @@
 #include <zce/zce_dblock.h>
 #include <zce/zce_any.h>
 
-namespace zdp
-{
-    struct zds_context_t;
-    int zds_pack(zce_byte* buf, int size, const zdp_comm::simpinfo_t& _t, zds_context_t* ctx, bool has_prefix);
-    int zds_unpack(zdp_comm::simpinfo_t& _t, const zce_byte* buf, int size, zds_context_t* ctx, bool has_prefix);
-    int zds_pack(zce_byte* buf, int size, const zdp_comm::userextra_t& _t, zds_context_t* ctx, bool has_prefix);
-    int zds_unpack(zdp_comm::userextra_t& _t, const zce_byte* buf, int size, zds_context_t* ctx, bool has_prefix);
-    int zds_pack(zce_byte* buf, int size, const zdp_comm::user_t& _t, zds_context_t* ctx, bool has_prefix);
-    int zds_unpack(zdp_comm::user_t& _t, const zce_byte* buf, int size, zds_context_t* ctx, bool has_prefix);
-    int zds_pack(zce_byte* buf, int size, const zdp_comm::prop_t& _t, zds_context_t* ctx, bool has_prefix);
-    int zds_unpack(zdp_comm::prop_t& _t, const zce_byte* buf, int size, zds_context_t* ctx, bool has_prefix);
-    int zds_pack(zce_byte* buf, int size, const zdp_comm::nameval_t& _t, zds_context_t* ctx, bool has_prefix);
-    int zds_unpack(zdp_comm::nameval_t& _t, const zce_byte* buf, int size, zds_context_t* ctx, bool has_prefix);
-    int zds_pack(zce_byte* buf, int size, const zdp_comm::ua_basic_t& _t, zds_context_t* ctx, bool has_prefix);
-    int zds_unpack(zdp_comm::ua_basic_t& _t, const zce_byte* buf, int size, zds_context_t* ctx, bool has_prefix);
-    int zds_pack(zce_byte* buf, int size, const zdp_comm::notify_t& _t, zds_context_t* ctx, bool has_prefix);
-    int zds_unpack(zdp_comm::notify_t& _t, const zce_byte* buf, int size, zds_context_t* ctx, bool has_prefix);
-} //namespace zdp_comm
+namespace zce {
+namespace zdp {
+struct zds_context_t;
+int zds_pack(zce_byte* buf, int size, const zdp_comm::simpinfo_t& _t, zds_context_t* ctx,
+             bool has_prefix);
+int zds_unpack(zdp_comm::simpinfo_t& _t, const zce_byte* buf, int size, zds_context_t* ctx,
+               bool has_prefix);
+int zds_pack(zce_byte* buf, int size, const zdp_comm::userextra_t& _t, zds_context_t* ctx,
+             bool has_prefix);
+int zds_unpack(zdp_comm::userextra_t& _t, const zce_byte* buf, int size, zds_context_t* ctx,
+               bool has_prefix);
+int zds_pack(zce_byte* buf, int size, const zdp_comm::user_t& _t, zds_context_t* ctx,
+             bool has_prefix);
+int zds_unpack(zdp_comm::user_t& _t, const zce_byte* buf, int size, zds_context_t* ctx,
+               bool has_prefix);
+int zds_pack(zce_byte* buf, int size, const zdp_comm::prop_t& _t, zds_context_t* ctx,
+             bool has_prefix);
+int zds_unpack(zdp_comm::prop_t& _t, const zce_byte* buf, int size, zds_context_t* ctx,
+               bool has_prefix);
+int zds_pack(zce_byte* buf, int size, const zdp_comm::nameval_t& _t, zds_context_t* ctx,
+             bool has_prefix);
+int zds_unpack(zdp_comm::nameval_t& _t, const zce_byte* buf, int size, zds_context_t* ctx,
+               bool has_prefix);
+int zds_pack(zce_byte* buf, int size, const zdp_comm::ua_basic_t& _t, zds_context_t* ctx,
+             bool has_prefix);
+int zds_unpack(zdp_comm::ua_basic_t& _t, const zce_byte* buf, int size, zds_context_t* ctx,
+               bool has_prefix);
+int zds_pack(zce_byte* buf, int size, const zdp_comm::notify_t& _t, zds_context_t* ctx,
+             bool has_prefix);
+int zds_unpack(zdp_comm::notify_t& _t, const zce_byte* buf, int size, zds_context_t* ctx,
+               bool has_prefix);
+}  // namespace zdp
+
+}  // namespace zce

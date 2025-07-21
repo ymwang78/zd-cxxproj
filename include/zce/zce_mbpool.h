@@ -43,9 +43,9 @@ public:
 
     zce::SmartPtr<zce::Allocator> get_v2() const;
 
-    zce::DataBlock* acquire(size_t len, zce_object_counter& obj);
+    zce::DataBlock* acquire(size_t len, zce::ObjectCounter& obj);
 
-    zce::RefBlock acquire_dblock(size_t len, zce_object_counter& obj);
+    zce::RefBlock acquire_dblock(size_t len, zce::ObjectCounter& obj);
 
     void* zmalloc(size_t len, size_t* nreal);
 
@@ -84,6 +84,6 @@ typedef zce::Singleton<zce::BlockPool> BlockPoolSigt;
 }  // namespace zce
 
 #define ZCE_MBACQUIRE(RET, x) do{ \
-    static zce_object_counter obj(__FUNCTION__); \
+    static zce::ObjectCounter obj(__FUNCTION__); \
     RET = zce::BlockPoolSigt::instance()->acquire_dblock(x, obj);\
 }while(0)

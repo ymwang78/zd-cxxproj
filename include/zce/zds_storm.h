@@ -11,14 +11,13 @@
 #include <zce/zce_task_queue.h>
 #include <map>
 
-namespace zdp {
-class zdp_storm_client;
-};
 namespace zce {
-class TaskQueue;
-}
 
-class zds_storm_requester : virtual public zce::Object {
+class TaskQueue;
+
+namespace zds {
+
+class StormRequester : virtual public zce::Object {
   public:
     virtual const zce::SmartPtr<zce::TaskQueue>& taskdeque_ptr() = 0;
 
@@ -27,11 +26,11 @@ class zds_storm_requester : virtual public zce::Object {
     virtual void on_response(const zce::RefBlock& dblockptr, void* ctx) = 0;
 };
 
-class zds_storm : public zce::Reactor {
-    class zds_storm_task : public zce::Task {
+class Storm : public zce::Reactor {
+    class Storm_task : public zce::Task {
         enum { TO_STORM, FROM_STORM } step_;
-        zce::SmartPtr<zds_storm> stormptr_;
-        zce::SmartPtr<zds_storm_requester> requester_;
+        zce::SmartPtr<Storm> stormptr_;
+        zce::SmartPtr<StormRequester> requester_;
         zce_int64 topic_;
         zce::RefBlock dblockptr_;
         int timeoutms_;
@@ -40,11 +39,11 @@ class zds_storm : public zce::Reactor {
         zce::RefBlock response_dblockptr_;
 
       public:
-        zds_storm_task(const zce::SmartPtr<zds_storm>& stormptr,
-                       const zce::SmartPtr<zds_storm_requester>& requester, zce_int64 topic,
+        Storm_task(const zce::SmartPtr<Storm>& stormptr,
+                       const zce::SmartPtr<StormRequester>& requester, zce_int64 topic,
                        const zce::RefBlock& dblockptr, int timeoutms, void* ctx);
 
-        ~zds_storm_task();
+        ~Storm_task();
 
         virtual void call();
 
@@ -53,16 +52,16 @@ class zds_storm : public zce::Reactor {
 
     zce::SmartPtr<zdp::zdp_stream> stream_ptr_;
 
-    zce::SmartPtr<zdp::zdp_storm_stream_adapter> adapter_ptr_;
+    zce::SmartPtr<zce::zdp::StormStreamAdapter> adapter_ptr_;
 
-    zce::SmartPtr<zdp::zdp_storm_client> storm_ptr_;
+    zce::SmartPtr<zce::zdp::StormClient> storm_ptr_;
 
   public:
-    zds_storm();
+    Storm();
 
-    ~zds_storm();
+    ~Storm();
 
-    const zce::SmartPtr<zdp::zdp_storm_client>& storm_client() const { return storm_ptr_; }
+    const zce::SmartPtr<zdp::StormClient>& storm_client() const { return storm_ptr_; }
 
     void subscribe(const std::string& topic);
 
@@ -116,15 +115,15 @@ class zds_storm : public zce::Reactor {
     //////////////////////////////////////////////////////////////////////////
 
     virtual const zce::SmartPtr<zdp::zdp_stream>& create_stream(zce_int64 topic,
-                                                               const zdp::zdp_storm_peer& peer);
+                                                                const zdp::zdp_storm_peer& peer);
 
     template <typename T>
-    int request_async(const zce::SmartPtr<zds_storm_requester>& cbdeque, zce_int64 topic,
+    int request_async(const zce::SmartPtr<StormRequester>& cbdeque, zce_int64 topic,
                       const T& msg, int timeoutms, void* ctx);
 };
 
 template <typename T>
-int zds_storm::zdp_publish(zce_int64 topic, const T& msg, const zdp::zdp_storm_peer& peer, int seq,
+int Storm::zdp_publish(zce_int64 topic, const T& msg, const zdp::zdp_storm_peer& peer, int seq,
                            zce_int64 trace) {
     zce::SmartPtr<zdp::zdp_storm_client> storm_ptr = storm_ptr_;
     if (storm_ptr == 0) return -1;
@@ -132,7 +131,7 @@ int zds_storm::zdp_publish(zce_int64 topic, const T& msg, const zdp::zdp_storm_p
 }
 
 template <typename T>
-int zds_storm::zdp_publish(const std::vector<zce_int64>& topics, const T& msg,
+int Storm::zdp_publish(const std::vector<zce_int64>& topics, const T& msg,
                            const zdp::zdp_storm_peer& peer, int seq) {
     zce::SmartPtr<zdp::zdp_storm_client> storm_ptr = storm_ptr_;
     if (storm_ptr == 0) return -1;
@@ -140,16 +139,16 @@ int zds_storm::zdp_publish(const std::vector<zce_int64>& topics, const T& msg,
 }
 
 template <typename T>
-int zds_storm::request_async(const zce::SmartPtr<zds_storm_requester>& requestptr, zce_int64 topic,
+int Storm::request_async(const zce::SmartPtr<StormRequester>& requestptr, zce_int64 topic,
                              const T& msg, int timeoutms, void* ctx) {
     zce::RefBlock dblock_ptr;
     int ret = zdp::zdp_serialize(dblock_ptr, 0, msg, 0, ZCE_COMPRESS_NONE, 32);
     ZCE_ASSERT(ret >= 0);
     if (ret < 0) return ret;
 
-    zce::SmartPtr<zds_storm> this_ptr(this);
+    zce::SmartPtr<Storm> this_ptr(this);
     zce::SmartPtr<zce_task> task_ptr(
-        new zds_storm_task(this_ptr, requestptr, topic, dblock_ptr, timeoutms, ctx));
+        new Storm_task(this_ptr, requestptr, topic, dblock_ptr, timeoutms, ctx));
     ret = delegate_task(task_ptr);
     ZCE_ASSERT(ret >= 0);
     return ret;
@@ -157,12 +156,12 @@ int zds_storm::request_async(const zce::SmartPtr<zds_storm_requester>& requestpt
 //////////////////////////////////////////////////////////////////////////
 
 template <typename SESSION, typename RES>
-class zds_storm_requester_impl : public zds_storm_requester {
+class StormRequester_impl : public StormRequester {
     SESSION session_;
     zdp::zdp_storm_peer peer_;
 
   public:
-    zds_storm_requester_impl(const SESSION& s, const zdp::zdp_storm_peer& peer)
+    StormRequester_impl(const SESSION& s, const zdp::zdp_storm_peer& peer)
         : session_(s), peer_(peer) {}
 
     const zdp::zdp_storm_peer& peer() const { return peer_; }
@@ -197,3 +196,6 @@ class zds_storm_requester_impl : public zds_storm_requester {
         session_->zdp_execute(ret, msgres, ctx);
     }
 };
+
+}  // namespace zdp
+}  // namespace zce

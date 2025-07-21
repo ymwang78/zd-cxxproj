@@ -6,7 +6,7 @@
 //  This is a part of ZCE lib, which inherited from ubeda/utiny.
 //  Copyright (C) 2003 - All Rights Reserved
 // ***************************************************************
-// 
+//
 // ***************************************************************
 #pragma once
 #include <functional>
@@ -14,124 +14,97 @@
 #include <zce/zce_mbpool.h>
 #include <zce/zce_singleton.h>
 
-class zvm_pimpl;
+extern "C" {
+typedef struct lua_State lua_State;
+typedef void (*lpfn_lual_openlibs)(lua_State* L);
+}
 
 namespace zce {
+
 class Reactor;
 class Scheduler;
-}
-
-extern "C" {
-    typedef struct lua_State lua_State;
-    typedef void (*lpfn_lual_openlibs)(lua_State* L);
-}
-
-class zua_register
-{
-public:
-
-    zua_register(lpfn_lual_openlibs openlibs);
-
-    ~zua_register();
-};
 
 namespace zdp {
-    struct zds_context_t;
-    template<typename T>
-    int zds_pack(zce_byte *buffer, int buffer_size, const T& t, zds_context_t* ctx, bool some_flag);
-    template<typename T>
-    int zds_pack_builtin(zce_byte *buffer, int buffer_size, const T& t, zds_context_t* ctx, bool some_flag);
-    template<typename T>
-    constexpr bool is_builtin_type();
-}
+struct zds_context_t;
+template <typename T>
+int zds_pack(zce_byte* buffer, int buffer_size, const T& t, zds_context_t* ctx, bool some_flag);
+template <typename T>
+int zds_pack_builtin(zce_byte* buffer, int buffer_size, const T& t, zds_context_t* ctx,
+                     bool some_flag);
+template <typename T>
+constexpr bool is_builtin_type();
+}  // namespace zdp
 
-class zvm : public zce::Object
-{
-    zce::SmartPtr<zvm_pimpl> pimpl_ptr_;
+namespace zvm {
 
-public:
+    class VirtualMachineStubPimpl;
+
+class VirtualMachineStub : public zce::Object {
+    zce::SmartPtr<VirtualMachineStubPimpl> pimpl_ptr_;
+
+  public:
     typedef std::function<void(int error_code, zce::RefBlock&& retdata)> response_cb;
 
-    zvm();
+    VirtualMachineStub();
 
-    ~zvm();
+    ~VirtualMachineStub();
 
-    int init(const zce::SmartPtr<zce::Scheduler>&,
-        const zce::SmartPtr<zce::Reactor>&);
+    int init(const zce::SmartPtr<zce::Scheduler>&, const zce::SmartPtr<zce::Reactor>&);
 
-    zce::SmartPtr<zce::Object> boot(const std::string& svc_name,
-        const std::string& path, zce::RefBlock& args);
+    zce::SmartPtr<zce::Object> boot(const std::string& svc_name, const std::string& path,
+                                    zce::RefBlock& args);
 
-    zce::SmartPtr<zce::Object> boot(const std::string& svc_name,
-        const std::string& host, 
-        unsigned short port,
-        bool ssl,
-        int default_timeout);
+    zce::SmartPtr<zce::Object> boot(const std::string& svc_name, const std::string& host,
+                                    unsigned short port, bool ssl, int default_timeout);
 
     zce::SmartPtr<zce::Object> get_vm(const std::string& svc_name) const;
 
     void destroy(const zce::SmartPtr<zce::Object>& vm);
 
-    int rpc_call_dblock(const zce::SmartPtr<zce::Object>& vmptr,
-        zce_int64 objectid,
-        const std::string& method,
-        zce::RefBlock&& dblock,
-        const response_cb& response);
+    int rpc_call_dblock(const zce::SmartPtr<zce::Object>& vmptr, zce_int64 objectid,
+                        const std::string& method, zce::RefBlock&& dblock,
+                        const response_cb& response);
 
-    template<typename T>
-    int rpc_call_builtin(const zce::SmartPtr<zce::Object>& vmptr,
-        zce_int64 objectid,
-        const std::string& method,
-        const T& t,
-        const response_cb& response) {
+    template <typename T>
+    int rpc_call_builtin(const zce::SmartPtr<zce::Object>& vmptr, zce_int64 objectid,
+                         const std::string& method, const T& t, const response_cb& response) {
         zce::RefBlock dblock;
         int ret = zdp::zds_pack_builtin(0, 0, t, 0, true);
-        if (ret < 0)
-            return ret;
+        if (ret < 0) return ret;
         ZCE_MBACQUIRE(dblock, ret);
-        if ((int)dblock.space() < ret)
-            return ZCE_ERROR_MALLOC;
+        if ((int)dblock.space() < ret) return ZCE_ERROR_MALLOC;
         ret = zdp::zds_pack_builtin(dblock.rd_ptr_cow(), (int)dblock.space(), t, 0, true);
-        if (ret < 0)
-            return ret;
+        if (ret < 0) return ret;
         dblock.wr_ptr(ret);
         return rpc_call_dblock(vmptr, objectid, method, std::move(dblock), response);
     }
 
-    template<typename T>
-    int rpc_call_msg(const zce::SmartPtr<zce::Object>& vmptr,
-        zce_int64 objectid,
-        const std::string& method,
+    template <typename T>
+    int rpc_call_msg(
+        const zce::SmartPtr<zce::Object>& vmptr, zce_int64 objectid, const std::string& method,
         const T& t,
         const std::function<void(int error_code, const zce::RefBlock& retdata)>& response) {
         zce::RefBlock dblock;
         int ret = zdp::zds_pack(0, 0, t, 0, true);
-        if (ret < 0)
-            return ret;
+        if (ret < 0) return ret;
         ZCE_MBACQUIRE(dblock, ret);
-        if ((int)dblock.space() < ret)
-            return ZCE_ERROR_MALLOC;
+        if ((int)dblock.space() < ret) return ZCE_ERROR_MALLOC;
         ret = zdp::zds_pack(dblock.rd_ptr_cow(), (int)dblock.space(), t, 0, true);
-        if (ret < 0)
-            return ret;
+        if (ret < 0) return ret;
         dblock.wr_ptr(ret);
         return rpc_call_dblock(vmptr, objectid, method, std::move(dblock), response);
     }
 
-    template<typename T>
-    int rpc_call(const zce::SmartPtr<zce::Object>& vmptr,
-        zce_int64 objectid,
-        const std::string& method,
-        T t,
+    template <typename T>
+    int rpc_call(
+        const zce::SmartPtr<zce::Object>& vmptr, zce_int64 objectid, const std::string& method, T t,
         const std::function<void(int error_code, const zce::RefBlock& retdata)>& response) {
         typedef typename std::remove_cv<typename std::remove_reference<T>::type>::type TT;
         if constexpr (std::is_same<TT, zce::RefBlock>::value) {
             return rpc_call_dblock(vmptr, objectid, method, std::move(t), response);
-        }
-        else if constexpr (zdp::is_builtin_type<TT>()) {
+        } else if constexpr (zdp::is_builtin_type<TT>()) {
             return rpc_call_builtin(vmptr, objectid, method, t, response);
-        }
-        else {
+        } else {
             return rpc_call_msg(vmptr, objectid, method, t, response);
         }
     }
@@ -190,4 +163,8 @@ public:
 #endif
 };
 
-typedef zce::Singleton<zvm> zvm_sigt;
+typedef zce::Singleton<VirtualMachineStub> VirtualMachineStubSigt;
+
+}  // namespace zvm
+
+}  // namespace zce

@@ -156,7 +156,19 @@ typedef zce_matrix<double> zce_dblmat;
 
 namespace zce {
 class Allocator;
+class Object;
+class ObjectCounter;
+class Reactor;
 class RefBlock;
+class TaskQueue;
+class Timer;
+class TimerDoozer;
+class Tss;
+
+namespace zdp {
+struct zds_context_t;
+} // namespace zdp
+
 }  // namespace zce
 
 #endif  //__cplusplus

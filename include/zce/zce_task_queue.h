@@ -20,7 +20,7 @@
 
 namespace zce {
 
-    class Scheduler;
+class Scheduler;
 
 class ZCE_API TaskQueue : public Task, public TaskDelegator {
     ZCE_OBJECT_DECLARE;

@@ -11,6 +11,7 @@
 #include "license_pack.h"
 #include "zce/zds_schema.h"
 
+using namespace zce;
 using namespace zdp;
 zlicense::name_value_t zlicense::name_value_t::_empty;
 int zdp::zds_pack(zce_byte* buf, int size, const zlicense::name_value_t& _t, zds_context_t* ctx, bool has_prefix)

@@ -9,17 +9,17 @@
 //
 // ***************************************************************
 #pragma once
-#ifndef __zce_http_stream__
-#    define __zce_http_stream__
 
-#    include <zce/zce_config.h>
-#    include <zce/zce_handler.h>
-#    include <zce/zce_object.h>
-#    include <zce/text_stream.h>
+#include <zce/zce_config.h>
+#include <zce/zce_handler.h>
+#include <zce/zce_object.h>
+#include <zce/text_stream.h>
 
-#    define HTTP_VERSION_BIND(x, y) (((x) << 16) | (y))
-#    define HTTP_VERSION_MAJOR(v) (((v) >> 16) & 0x0000ffff)
-#    define HTTP_VERSION_MINOR(v) ((v) & 0x0000ffff)
+#define HTTP_VERSION_BIND(x, y) (((x) << 16) | (y))
+#define HTTP_VERSION_MAJOR(v) (((v) >> 16) & 0x0000ffff)
+#define HTTP_VERSION_MINOR(v) ((v) & 0x0000ffff)
+
+namespace zce {
 
 enum HTTP_CGI_E {
     HTTP_CGI_STANDARD,
@@ -115,14 +115,14 @@ struct ZCE_API ZCE_HTTP_RESPONSE : public ZCE_HTTP_HEADER {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-class ZCE_API zce_http_stream : public zce::IStream {
+class ZCE_API zce_http_stream : public IStream {
   protected:
     HTTP_CGI_E cgi_;
-    zce::SmartPtr<ZCE_HTTP_REQUEST> org_request_;
-    zce::SmartPtr<ZCE_HTTP_REQUEST> request_;
+    SmartPtr<ZCE_HTTP_REQUEST> org_request_;
+    SmartPtr<ZCE_HTTP_REQUEST> request_;
     std::string remote_ip_;
     unsigned short remote_port_;
-    zce::RefBlock dblock_;
+    RefBlock dblock_;
     bool chunked_ack_;
     bool gzip_ack_;
     zce_int64 body_length_ack_;
@@ -138,17 +138,17 @@ class ZCE_API zce_http_stream : public zce::IStream {
 
     const std::string& get_x_forward_for() const;
 
-    void proc_dblock(zce::RefBlock& dblock, const zce::Any&);
+    void proc_dblock(RefBlock& dblock, const Any&);
 
   public:
     void on_open(bool passive, const zce_sockaddr_t& remote) override;
 
-    void on_read(zce::RefBlock& dblock, const zce::Any&) override;
+    void on_read(RefBlock& dblock, const Any&) override;
 
-    virtual void on_http_request(const zce::SmartPtr<ZCE_HTTP_REQUEST>&,
-                                 const zce::RefBlock& dblock);
+    virtual void on_http_request(const SmartPtr<ZCE_HTTP_REQUEST>&,
+                                 const RefBlock& dblock);
 
-    virtual void on_http_continue(zce::RefBlock& dblock) {};
+    virtual void on_http_continue(RefBlock& dblock) {};
 
     virtual void on_prepare_nextreq();
 
@@ -160,19 +160,19 @@ class ZCE_API zce_http_stream : public zce::IStream {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-class ZCE_API zce_http_client : public zce::IStream {
+class ZCE_API zce_http_client : public IStream {
     HTTP_CGI_E cgi_ = HTTP_CGI_STANDARD;
     // ZCE_HTTP_REQUEST request_;
     ZCE_HTTP_RESPONSE response_;
-    zce::RefBlock dblock_;
-    zce::RefBlock cont_dblock_;
+    RefBlock dblock_;
+    RefBlock cont_dblock_;
 
   public:
-    virtual void on_read(zce::RefBlock& dblock, const zce::Any&);
+    virtual void on_read(RefBlock& dblock, const Any&);
 
-    virtual void on_http_response(const ZCE_HTTP_RESPONSE& header, const zce::RefBlock& dblock) = 0;
+    virtual void on_http_response(const ZCE_HTTP_RESPONSE& header, const RefBlock& dblock) = 0;
 
-    virtual void on_http_continue(zce::RefBlock& dblock);
+    virtual void on_http_continue(RefBlock& dblock);
 
     virtual void on_http_close() = 0;
 
@@ -190,7 +190,7 @@ class ZCE_API zce_http_client : public zce::IStream {
 struct zce_websocket_pimpl;
 
 class zce_websocket_stream : public zce_http_stream {
-    zce::SmartPtr<zce_websocket_pimpl> pimpl_ptr_;
+    SmartPtr<zce_websocket_pimpl> pimpl_ptr_;
 
     int opcode_;
 
@@ -201,28 +201,28 @@ class zce_websocket_stream : public zce_http_stream {
 
     void on_open(bool passive, const zce_sockaddr_t& remote) override;
 
-    void on_http_request(const zce::SmartPtr<ZCE_HTTP_REQUEST>& request,
-                         const zce::RefBlock& dblock) override;
+    void on_http_request(const SmartPtr<ZCE_HTTP_REQUEST>& request,
+                         const RefBlock& dblock) override;
 
-    void on_http_continue(zce::RefBlock& dblock) override;
+    void on_http_continue(RefBlock& dblock) override;
 
-    int write(zce::RefBlock& dblock, ERV_ISTREAM_WRITEOPT opt) override;
+    int write(RefBlock& dblock, ERV_ISTREAM_WRITEOPT opt) override;
 
     void on_prepare_nextreq() override {};  // websocket just continue process
 };
 
 ///////////////////////////////////////////////////////////////////////////////
 
-class zce_websocket_client : public zce::IStream {
+class zce_websocket_client : public IStream {
     ZCE_OBJECT_DECLARE;
 
-    zce::SmartPtr<zce_websocket_pimpl> pimpl_ptr_;
+    SmartPtr<zce_websocket_pimpl> pimpl_ptr_;
 
     HTTP_CGI_E cgi_ = HTTP_CGI_STANDARD;
 
     ZCE_HTTP_RESPONSE response_;
 
-    zce::RefBlock dblock_;
+    RefBlock dblock_;
 
     std::string key_;
 
@@ -242,15 +242,13 @@ class zce_websocket_client : public zce::IStream {
 
     void on_open(bool passive, const zce_sockaddr_t& remote) override;
 
-    void on_read(zce::RefBlock& dblock, const zce::Any& ctx) override;
+    void on_read(RefBlock& dblock, const Any& ctx) override;
 
-    void on_http_response(const ZCE_HTTP_RESPONSE& header, const zce::RefBlock& dblock);
+    void on_http_response(const ZCE_HTTP_RESPONSE& header, const RefBlock& dblock);
 
-    void on_http_continue(zce::RefBlock& dblock);
+    void on_http_continue(RefBlock& dblock);
 
-    int write(zce::RefBlock& dblock, ERV_ISTREAM_WRITEOPT opt) override;
+    int write(RefBlock& dblock, ERV_ISTREAM_WRITEOPT opt) override;
 };
 
-///////////////////////////////////////////////////////////////////////////////
-
-#endif
+}  // namespace zce 

@@ -23,7 +23,10 @@
 class zdl_member;
 typedef struct _object PyObject;
 
+namespace zce {
+
 namespace zdp {
+
 enum ERV_ZDS_PAYLOAD : zce_byte {
     ZDS_PAYLOAD_SIMPBINT,
     ZDS_PAYLOAD_VARUINT,
@@ -398,3 +401,4 @@ inline int zds_unpack(_dummy_t& /*_t*/, const zce_byte* /*buf*/, int /*size*/, z
     return -1;
 };
 }  // namespace zdp
+}  // namespace zce

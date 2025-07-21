@@ -17,7 +17,6 @@
 
 namespace zlicense
 {
-    struct zds_context_t;
     struct name_value_t
     {
         static name_value_t _empty;

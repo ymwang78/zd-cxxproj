@@ -17,11 +17,15 @@
 #include <zce/zce_dblock.h>
 #include <zce/zce_any.h>
 
-namespace zdp
-{
-    struct zds_context_t;
-    int zds_pack(zce_byte* buf, int size, const zlicense::name_value_t& _t, zds_context_t* ctx, bool has_prefix);
-    int zds_unpack(zlicense::name_value_t& _t, const zce_byte* buf, int size, zds_context_t* ctx, bool has_prefix);
-    int zds_pack(zce_byte* buf, int size, const zlicense::license_t& _t, zds_context_t* ctx, bool has_prefix);
-    int zds_unpack(zlicense::license_t& _t, const zce_byte* buf, int size, zds_context_t* ctx, bool has_prefix);
-} //namespace zlicense
+namespace zce {
+namespace zdp {
+int zds_pack(zce_byte* buf, int size, const zlicense::name_value_t& _t, zds_context_t* ctx,
+             bool has_prefix);
+int zds_unpack(zlicense::name_value_t& _t, const zce_byte* buf, int size, zds_context_t* ctx,
+               bool has_prefix);
+int zds_pack(zce_byte* buf, int size, const zlicense::license_t& _t, zds_context_t* ctx,
+             bool has_prefix);
+int zds_unpack(zlicense::license_t& _t, const zce_byte* buf, int size, zds_context_t* ctx,
+               bool has_prefix);
+}  // namespace zdp
+}  // namespace zce

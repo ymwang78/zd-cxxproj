@@ -16,7 +16,6 @@
 
 namespace zdp_base
 {
-    struct zds_context_t;
     enum ERV_ZDP_ERRO: int
     {
         ZDP_ERRO_BASE = (int)0x80001000,

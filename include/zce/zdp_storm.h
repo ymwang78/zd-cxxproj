@@ -1,5 +1,5 @@
 ﻿// ***************************************************************
-//  zdp_storm   version:  1.0   -  date: 2015/01/01
+//  Storm   version:  1.0   -  date: 2015/01/01
 //  -------------------------------------------------------------
 //  Yongming Wang(wangym@gmail.com)
 //  -------------------------------------------------------------
@@ -15,24 +15,20 @@
 #include <zce/zce_api.h>
 #include <zce/zce_handler.h>
 
-class zce::RefBlock;
-class zce_reactor;
 namespace zce {
+
 class Scheduler;
-};
+class RefBlock;
+class Any;
+class Reactor;
 
 namespace zdp {
-struct ZCE_API zdp_storm_peer {
-    zce_int64 to;
-    zce_int64 from;
-    zdp_storm_peer() : to(0), from(0) {}
-};
 
 extern "C" {
-typedef int (*publish_callback)(const zce::Any& ctx, int cnt, zce_int64* topics, zce_int64 from,
+typedef int (*publish_callback)(const ::zce::Any& ctx, int cnt, zce_int64* topics, zce_int64 from,
                                 zce_byte* data, zce_uint32 len);
 
-typedef int (*set_callback)(const zce::Any& ctx, zce_int64 topic, const zce_string& name,
+typedef int (*set_callback)(const ::zce::Any& ctx, zce_int64 topic, const zce_string& name,
                             zce_int64 seq, zce_int64 tick, zce_int64 uid, zce_int64 flag,
                             const std::vector<zce_byte>& data);
 
@@ -47,37 +43,45 @@ zce_int64 ZCE_API zdp_service_ident(zce_uint32 seq, const char siteid[4]);
 zce_int64 ZCE_API zdp_user_ident(unsigned uid, const char siteid[4]);
 };
 
-class ZCE_API zdp_storm : public zce::Object {
+
+struct ZCE_API zdp_storm_peer {
+    zce_int64 to;
+    zce_int64 from;
+    zdp_storm_peer() : to(0), from(0) {}
+};
+
+class ZCE_API Storm : public ::zce::Object {
   public:
     struct Pimpl;
 
   private:
-    zce::SmartPtr<Pimpl> pimpl_ptr_;
+    ::zce::SmartPtr<Pimpl> pimpl_ptr_;
 
   public:
-    zdp_storm(const zce::SmartPtr<zce::Reactor>&, const zce::SmartPtr<zce::Scheduler>&,
-              zce_uint16 uniqueid, const zce_string& token, const zce::Any& ctx,
+    Storm(const ::zce::SmartPtr<::zce::Reactor>&, const ::zce::SmartPtr<::zce::Scheduler>&,
+              zce_uint16 uniqueid, const zce_string& token, const ::zce::Any& ctx,
               publish_callback child_cb, set_callback set_cb);
 
-    ~zdp_storm();
+    ~Storm();
 
     int listen(const char* localip, zce_uint16 localport);
 
     int stop();
 };
 
-class ZCE_API zdp_storm_client : public zce::Object {
+class ZCE_API StormClient : public ::zce::Object {
   public:
     struct Pimpl;
 
   private:
-    zce::SmartPtr<Pimpl> pimpl_ptr_;
+    ::zce::SmartPtr<Pimpl> pimpl_ptr_;
 
   public:
-    zdp_storm_client(const zce::SmartPtr<zce::Reactor>&, zce_int64 uniqueid, const zce_string& token,
-                     const zce::Any& ctx, publish_callback father_cb, set_callback set_cb);
+    StormClient(const ::zce::SmartPtr<::zce::Reactor>&, zce_int64 uniqueid,
+                     const zce_string& token, const ::zce::Any& ctx, publish_callback father_cb,
+                     set_callback set_cb);
 
-    ~zdp_storm_client();
+    ~StormClient();
 
     int stop();
 
@@ -109,9 +113,9 @@ class ZCE_API zdp_storm_client : public zce::Object {
 };
 
 template <typename T, typename TTOPIC>
-int zdp_storm_client::publish(TTOPIC topic, const T& msg, const zdp_storm_peer& peer, int seq,
+int StormClient::publish(TTOPIC topic, const T& msg, const zdp_storm_peer& peer, int seq,
                               zce_int64 trace) {
-    zce::RefBlock dblock_ptr;
+    ::zce::RefBlock dblock_ptr;
     bool preserv = !(peer.to == 0 && peer.from == 0);
     int ret = zdp_serialize(dblock_ptr, seq, msg, 0, default_cps(), preserv ? 16 : 0);
     ZCE_ASSERT(ret >= 0);
@@ -125,32 +129,34 @@ int zdp_storm_client::publish(TTOPIC topic, const T& msg, const zdp_storm_peer& 
 }
 
 template <typename T>
-int zdp_storm_client::set(zce_int64 topic, const zce_string& name, zce_int64 oldseq, zce_int64 uid,
+int StormClient::set(zce_int64 topic, const zce_string& name, zce_int64 oldseq, zce_int64 uid,
                           zce_int64 flag, const T& msg) {
-    zce::RefBlock data_ptr, cond_ptr;
+    ::zce::RefBlock data_ptr, cond_ptr;
     zdp_serialize(data_ptr, 0, msg, 0, default_cps());
     return set(topic, name, oldseq, uid, flag, data_ptr.rd_ptr(), data_ptr.length());
 }
 
 //////////////////////////////////////////////////////////////////////////
 
-class ZCE_API zdp_storm_stream_adapter : public zce::IStream {
+class ZCE_API StormStreamAdapter : public ::zce::IStream {
     zce_int64 topic_;
 
     zdp::zdp_storm_peer peer_;
 
-    zce::SmartPtr<zdp::zdp_storm_client> stormclient_ptr_;
+    ::zce::SmartPtr<zdp::StormClient> stormclient_ptr_;
 
   public:
-    zdp_storm_stream_adapter(zce_int64 topic, const zdp_storm_peer& peer,
-                             const zce::SmartPtr<zdp::zdp_storm_client>& stormclient);
+    StormStreamAdapter(zce_int64 topic, const zdp_storm_peer& peer,
+                             const ::zce::SmartPtr<zdp::StormClient>& stormclient);
 
     void set_peer(zce_int64 topic, const zdp::zdp_storm_peer& p) {
         topic_ = topic;
         peer_ = p;
     }
 
-    int write(zce::RefBlock& dblock, ERV_ISTREAM_WRITEOPT) override;
+    int write(::zce::RefBlock& dblock, ERV_ISTREAM_WRITEOPT) override;
 };
 
 }  // namespace zdp
+
+}  // namespace zce

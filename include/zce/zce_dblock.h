@@ -15,7 +15,7 @@
 #include <zce/zce_object.h>
 #include <zce/zce_dblock.h>
 
-class zce_object_counter;
+class zce::ObjectCounter;
 
 namespace zce {
 
@@ -23,7 +23,7 @@ class Allocator;
 
 class ZCE_API DataBlock : public zce::Object {
     zce_byte* buffer_;
-    zce_object_counter* obj_;  // for alloc position statistics
+    zce::ObjectCounter* obj_;  // for alloc position statistics
     Allocator* alloc_;
     struct _size_t {
         zce_uint64 refbuf : 1;
@@ -35,7 +35,7 @@ class ZCE_API DataBlock : public zce::Object {
     friend class BlockPool;
 
   public:
-    DataBlock(size_t len, zce_object_counter* obj = NULL, Allocator* alloc = NULL);
+    DataBlock(size_t len, zce::ObjectCounter* obj = NULL, Allocator* alloc = NULL);
 
     DataBlock(size_t len, zce_byte* buf);
 
