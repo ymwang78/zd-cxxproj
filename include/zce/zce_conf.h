@@ -11,10 +11,10 @@
 // ***************************************************************
 #include <zce/zce_object.h>
 
-class zce::RefBlock;
 
 namespace zce
 {
+class RefBlock;
 
 class ZCE_API FileMonitor : public zce::Object {
     time_t st_mtime_;

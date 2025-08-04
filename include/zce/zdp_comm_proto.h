@@ -16,7 +16,6 @@
 
 namespace zdp_comm
 {
-    struct zds_context_t;
     enum ERV_PROTOERR_TYPE: int
     {
         ERV_OK = (int)0x00000000,

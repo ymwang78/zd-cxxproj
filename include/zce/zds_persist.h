@@ -9,17 +9,18 @@
 #include <zce/zdb_mgo.h>
 #include <zce/zdb_redis.h>
 
+namespace zce {
 class zdb_mgo_connection;
 
-class zdb_redis_connection;
+class ZdbRedisConnection;
 
-class zds_persist : public zce::Object {
+class ZdsPersist : public zce::Object {
   protected:
     zce::SmartPtr<zce::Scheduler> write_schedule_;
     zce::SmartPtr<zce::TaskQueue> queue_ptr_;
 
     class async_write_task : public zce::Task {
-        zce::SmartPtr<zds_persist> persist_ptr_;
+        zce::SmartPtr<ZdsPersist> persist_ptr_;
         std::string dbname_;
         std::string coll_;
         zce::RefBlock key_;
@@ -27,18 +28,18 @@ class zds_persist : public zce::Object {
         bool upsert_;
 
       public:
-        async_write_task(const zce::SmartPtr<zds_persist>& ptr, const std::string& dbname,
+        async_write_task(const zce::SmartPtr<ZdsPersist>& ptr, const std::string& dbname,
                          const std::string& coll, const zce::RefBlock& key, const zce::RefBlock& obj,
                          bool upsert);
 
         virtual void call();
     };
 
-    ~zds_persist(){};
+    ~ZdsPersist(){};
 
     virtual zce::SmartPtr<zdb_mgo_connection> get_mgo_conn(const std::string& dbname) = 0;
 
-    virtual zce::SmartPtr<zdb_redis_connection> get_redis_conn() = 0;
+    virtual zce::SmartPtr<ZdbRedisConnection> get_redis_conn() = 0;
 
   public:
     int init();
@@ -89,7 +90,7 @@ class zds_persist : public zce::Object {
 };
 
 template <typename T>
-int zds_persist::redist_read_data(const std::string& coll, const std::string& key, T& dblock) {
+int ZdsPersist::redist_read_data(const std::string& coll, const std::string& key, T& dblock) {
     int ret = -1;
 
     do {
@@ -104,7 +105,7 @@ int zds_persist::redist_read_data(const std::string& coll, const std::string& ke
 }
 
 template <typename KEYT>
-int zds_persist::inc(const std::string& dbname, const std::string& coll, const KEYT& key,
+int ZdsPersist::inc(const std::string& dbname, const std::string& coll, const KEYT& key,
                      zce_int64 incv, int expiresec, zce_int64* outvptr, bool tologdb,
                      bool logconsist) {
     zce_int64 outv = 0;
@@ -132,7 +133,7 @@ int zds_persist::inc(const std::string& dbname, const std::string& coll, const K
 }
 
 template <typename KEYRANK, typename KEYT>
-int zds_persist::inc_rank(const std::string& dbname, const std::string& coll, const KEYRANK& rankid,
+int ZdsPersist::inc_rank(const std::string& dbname, const std::string& coll, const KEYRANK& rankid,
                           const KEYT& keyid, zce_int64 incv, int expiresec, zce_int64* outvptr,
                           bsoncxx::document::view* extraset, bool tologdb, bool logconsist) {
     if (incv == 0) return 0;
@@ -191,7 +192,7 @@ int zds_persist::inc_rank(const std::string& dbname, const std::string& coll, co
 }
 
 template <typename KEYT>
-int zds_persist::write_bson(const std::string& platname, const std::string& coll, const KEYT& key,
+int ZdsPersist::write_bson(const std::string& platname, const std::string& coll, const KEYT& key,
                             const zce::RefBlock& bsonobj, const zce::RefBlock* bsonextra, bool upsert) {
     int ret = redist_write_data(coll, zce::to_string(key), bsonobj);
 
@@ -209,3 +210,4 @@ int zds_persist::write_bson(const std::string& platname, const std::string& coll
         return mongo_write_async(platname, coll, to_query(key), to_dblock(objvalue.view()), upsert);
     }
 }
+}  // namespace zce

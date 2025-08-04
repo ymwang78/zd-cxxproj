@@ -18,10 +18,10 @@
 #include <vector>
 #include <limits>
 
-class zce::Object;
-class zce::RefBlock;
-
 namespace zce {
+
+class Object;
+class RefBlock;
 
 class ZCE_API Any {
     enum _any_types {
@@ -91,7 +91,7 @@ class ZCE_API Any {
 
     // called by template constructor
     Any(const zce_byte* buf, size_t len, _any_types any_types, bool issigned,
-            int shiftbits) noexcept;
+        int shiftbits) noexcept;
 
   public:
     Any(const Any& rhs);
@@ -143,7 +143,7 @@ class ZCE_API Any {
     template <typename T>
     Any(const T* barray, size_t len) noexcept {
         new (this) zce::Any((const zce_byte*)barray, (size_t)len * sizeof(T), _to_type<T>(),
-                           std::is_signed<T>::value, zce_bits_msb_index(sizeof(T)));
+                            std::is_signed<T>::value, zce_bits_msb_index(sizeof(T)));
     }
 
     Any(const std::vector<bool>& vec) noexcept;

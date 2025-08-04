@@ -18,6 +18,7 @@
 #include <deque>
 #include <future>
 #include <optional>
+#include <functional>
 
 namespace zce {
 

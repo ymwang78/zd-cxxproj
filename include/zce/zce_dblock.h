@@ -15,11 +15,11 @@
 #include <zce/zce_object.h>
 #include <zce/zce_dblock.h>
 
-class zce::ObjectCounter;
 
 namespace zce {
 
 class Allocator;
+class ObjectCounter;
 
 class ZCE_API DataBlock : public zce::Object {
     zce_byte* buffer_;

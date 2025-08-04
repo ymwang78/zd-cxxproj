@@ -69,11 +69,11 @@ class VirtualMachineStub : public zce::Object {
     int rpc_call_builtin(const zce::SmartPtr<zce::Object>& vmptr, zce_int64 objectid,
                          const std::string& method, const T& t, const response_cb& response) {
         zce::RefBlock dblock;
-        int ret = zdp::zds_pack_builtin(0, 0, t, 0, true);
+        int ret = zce::zdp::zds_pack_builtin(0, 0, t, 0, true);
         if (ret < 0) return ret;
         ZCE_MBACQUIRE(dblock, ret);
         if ((int)dblock.space() < ret) return ZCE_ERROR_MALLOC;
-        ret = zdp::zds_pack_builtin(dblock.rd_ptr_cow(), (int)dblock.space(), t, 0, true);
+        ret = zce::zdp::zds_pack_builtin(dblock.rd_ptr_cow(), (int)dblock.space(), t, 0, true);
         if (ret < 0) return ret;
         dblock.wr_ptr(ret);
         return rpc_call_dblock(vmptr, objectid, method, std::move(dblock), response);
@@ -85,11 +85,11 @@ class VirtualMachineStub : public zce::Object {
         const T& t,
         const std::function<void(int error_code, const zce::RefBlock& retdata)>& response) {
         zce::RefBlock dblock;
-        int ret = zdp::zds_pack(0, 0, t, 0, true);
+        int ret = zce::zdp::zds_pack(0, 0, t, 0, true);
         if (ret < 0) return ret;
         ZCE_MBACQUIRE(dblock, ret);
         if ((int)dblock.space() < ret) return ZCE_ERROR_MALLOC;
-        ret = zdp::zds_pack(dblock.rd_ptr_cow(), (int)dblock.space(), t, 0, true);
+        ret = zce::zdp::zds_pack(dblock.rd_ptr_cow(), (int)dblock.space(), t, 0, true);
         if (ret < 0) return ret;
         dblock.wr_ptr(ret);
         return rpc_call_dblock(vmptr, objectid, method, std::move(dblock), response);
@@ -102,7 +102,7 @@ class VirtualMachineStub : public zce::Object {
         typedef typename std::remove_cv<typename std::remove_reference<T>::type>::type TT;
         if constexpr (std::is_same<TT, zce::RefBlock>::value) {
             return rpc_call_dblock(vmptr, objectid, method, std::move(t), response);
-        } else if constexpr (zdp::is_builtin_type<TT>()) {
+        } else if constexpr (zce::zdp::is_builtin_type<TT>()) {
             return rpc_call_builtin(vmptr, objectid, method, t, response);
         } else {
             return rpc_call_msg(vmptr, objectid, method, t, response);

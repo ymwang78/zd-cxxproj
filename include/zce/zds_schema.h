@@ -41,7 +41,9 @@ enum ERV_ZDS_PAYLOAD : zce_byte {
     ZDS_PAYLOAD_DICT,
 
     ZDS_PAYLOAD_ANY,
-    ZDS_PAYLOAD_PTR,
+    ZDS_PAYLOAD_TAGSTRUCT,
+
+    ZDS_PAYLOAD_PTR,  // pointer type, only used in ?
 };
 
 enum ERV_ZDS_SUBTYPE : zce_byte {
@@ -83,6 +85,15 @@ struct is_std_map : std::false_type {};
 
 template <typename Key, typename Value, typename Compare, typename Alloc>
 struct is_std_map<std::map<Key, Value, Compare, Alloc>> : std::true_type {};
+
+template <typename T, typename = void>
+struct is_tagstruct : std::false_type {};
+
+template <typename T>
+struct is_tagstruct<T, std::void_t<typename T::is_tagstruct>> 
+    : std::conditional_t<std::is_same_v<typename T::is_tagstruct, std::true_type>, 
+                        std::true_type, 
+                        std::false_type> {};
 
 template <typename T>
 constexpr bool is_builtin_type() {
@@ -363,6 +374,9 @@ constexpr zce_byte _get_payload() {
     } else if constexpr (std::is_array<decayed_type>::value) {
         return _get_payload<typename std::remove_extent<decayed_type>::type>();
     } else {
+        if constexpr (zdp::is_tagstruct<T>::value) {
+            return ZDS_PAYLOAD_TAGSTRUCT;
+        }
         return ZDS_PAYLOAD_STRUCT;
     }
 }

@@ -14,7 +14,9 @@
 
 #include <zce/zce_config.h>
 
-class zce::RefBlock;
+namespace zce {
+class RefBlock;
+}
 
 int zce_rsa_genkey(zce::RefBlock& pubkey, zce::RefBlock& prikey);
 

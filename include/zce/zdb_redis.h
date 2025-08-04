@@ -7,69 +7,73 @@
 //  This is a part of ZCE lib, which inherited from ubeda/utiny.
 //  Copyright (C) 2002 - All Rights Reserved
 // ***************************************************************
-// 
+//
 // ***************************************************************
-#ifndef __zdb_redis_h__
-#define __zdb_redis_h__
 
 #include <zce/zce_config.h>
 #include <zce/zce_task.h>
 #include <zce/zce_types.h>
 #include <zce/zce_dblock.h>
+#include <zce/zce_string.h>
 #include <map>
 #include <functional>
 
 struct redisContext;
 struct redisReply;
-class zdb_redis_ptr;
 
-class ZCE_API zdb_redis_ptr
-{
+namespace zce {
+class Object;
+
+class ZCE_API ZdbRedis {
     redisReply* reply_;
 
 #ifdef WIN32
-    //don't know why gcc call this
-    zdb_redis_ptr(const zdb_redis_ptr& rhs) {}; 
+    // don't know why gcc call this
+    ZdbRedis(const ZdbRedis& rhs) {};
 #endif
 
-public:
+  public:
+    ZdbRedis(redisReply* r = 0) : reply_(r) {}
 
-    zdb_redis_ptr(redisReply* r = 0)
-        :reply_(r) {
-    }
+    ZdbRedis& operator=(redisReply* r);
 
-    zdb_redis_ptr& operator = (redisReply* r);
+    ~ZdbRedis();
 
-    ~zdb_redis_ptr();
+    inline operator redisReply*() const noexcept { return this->reply_; }
 
-    inline operator redisReply*() const noexcept {
-        return this->reply_;
-    }
+    inline redisReply* operator->() const noexcept { return this->reply_; }
 
-    inline redisReply* operator->() const noexcept {
-        return this->reply_;
-    }
+    inline bool operator==(redisReply* right) const noexcept { return (this->reply_ == right); }
 
-    inline bool operator == (redisReply* right) const noexcept {
-        return (this->reply_ == right);
-    }
-
-    inline bool operator != (redisReply* right) const noexcept {
-        return !(this->reply_ == right);
-    }
+    inline bool operator!=(redisReply* right) const noexcept { return !(this->reply_ == right); }
 };
 
-class ZCE_API zdb_redis_connection : public zce::Object
-{
+///////////////////////////////////////////////////////////////////////////////
+
+int ZCE_API zdb_redis_toval(zce::RefBlock& v, const zce::ZdbRedis& r);
+
+int ZCE_API zdb_redis_toval(zce_astring& v, const zce::ZdbRedis& r);
+
+int ZCE_API zdb_redis_toval(zce_int64& v, const zce::ZdbRedis& r);
+
+template <typename T>
+int zdb_redis_toval(T& v, const zce::ZdbRedis& r) {
+    zce_int64 i64v = 0;
+    int ret = zdb_redis_toval(i64v, r);
+    if (ret < 0) return ret;
+    v = i64v;
+    return ret;
+}
+
+class ZCE_API ZdbRedisConnection : public zce::Object {
     redisContext* context_;
 
-public:
-
+  public:
     typedef std::vector<std::pair<std::string, zce_int64> > kvpair_vec_t;
 
-    zdb_redis_connection();
+    ZdbRedisConnection();
 
-    zdb_redis_connection(bool ssl, const std::string& ip, unsigned short port, const char* passwd);
+    ZdbRedisConnection(bool ssl, const std::string& ip, unsigned short port, const char* passwd);
 
     bool connetion_ok() const;
 
@@ -79,24 +83,27 @@ public:
 
     bool key_exists(const std::string& k);
 
-    int hget(zdb_redis_ptr& ptr, const std::string& k, const std::string& h);
+    int hget(ZdbRedis& ptr, const std::string& k, const std::string& h);
 
-    template<typename KEY, typename VAL>
+    template <typename KEY, typename VAL>
     int hget(const std::string& k, const KEY& h, VAL& v);
 
     int hgetall(const std::string& k, std::map<std::string, std::string>&);
 
     int hgetall(const std::string& k, std::map<zce_int64, std::string>&);
 
-    int hgetall(const std::string& k, std::function<int(const char*, size_t, const char*, size_t)>& f);
+    int hgetall(const std::string& k,
+                std::function<int(const char*, size_t, const char*, size_t)>& f);
 
     int hdel(const std::string& k, const std::string& h);
 
     int hset(const std::string& k, const std::string& h, zce_int64 v, zce_uint32 expiresec);
 
-    int hset(const std::string& k, const std::string& h, const zce_byte* v, unsigned l, zce_uint32 expiresec);
+    int hset(const std::string& k, const std::string& h, const zce_byte* v, unsigned l,
+             zce_uint32 expiresec);
 
-    int hinc(const std::string& k, const std::string& h, zce_int64 v, zce_uint32 expiresec, zce_int64* outv = 0);
+    int hinc(const std::string& k, const std::string& h, zce_int64 v, zce_uint32 expiresec,
+             zce_int64* outv = 0);
 
     int set(const std::string& k, zce_int64 v, zce_uint32 expiresec);
 
@@ -104,7 +111,7 @@ public:
 
     int set(const std::string& k, const zce_byte* v, unsigned l, zce_uint32 expiresec);
 
-    int get(const std::string& k, std::function<int(zdb_redis_ptr& ptr)>& f);
+    int get(const std::string& k, std::function<int(ZdbRedis& ptr)>& f);
 
     int get(const std::string& k, zce_int64& v);
 
@@ -116,7 +123,8 @@ public:
 
     int inc(const std::string& k, zce_int64 val = 1, zce_int64 expiresec = 0, zce_int64* outv = 0);
 
-    int zinc(const std::string& k, const std::string& m, zce_int64 val = 1, zce_int64 expiresec = 0, zce_int64* outv = 0);
+    int zinc(const std::string& k, const std::string& m, zce_int64 val = 1, zce_int64 expiresec = 0,
+             zce_int64* outv = 0);
 
     int zset(const std::string& k, const std::string& m, zce_int64 val, zce_int64 expiresec = 0);
 
@@ -133,54 +141,31 @@ public:
     int rpush(const std::string& k, const zce_byte* v, unsigned l, zce_uint32 expiresec = 0);
 
     int lpop(const std::string& k, zce::RefBlock& v);
-
 };
 
-class ZCE_API zdb_redis_databse : public zce::Object
-{
+class ZCE_API ZdbRedisDatabase : public zce::Object {
     bool ssl_;
     std::string ip_;
     unsigned short port_;
     std::string passwd_;
     zce::Tss tss_conn_;
 
-public:
+  public:
+    ZdbRedisDatabase(bool ssl, const std::string& ip, unsigned short port, const char* passwd);
 
-    zdb_redis_databse(bool ssl, const std::string& ip, unsigned short port, const char* passwd);
+    zce::SmartPtr<ZdbRedisConnection> get_connection();
 
-    zce::SmartPtr<zdb_redis_connection> get_connection();
-
-	inline void get_conninfo(std::string& ip, unsigned short& port, std::string& passwd) const {
-		ip = ip_;
-		port = port_;
-		passwd = passwd_;
-	}
+    inline void get_conninfo(std::string& ip, unsigned short& port, std::string& passwd) const {
+        ip = ip_;
+        port = port_;
+        passwd = passwd_;
+    }
 };
 
 
-int ZCE_API zdb_redis_toval(zce::RefBlock& v, const zdb_redis_ptr& r);
-
-int ZCE_API zdb_redis_toval(zce_astring& v, const zdb_redis_ptr& r);
-
-int ZCE_API zdb_redis_toval(zce_int64& v, const zdb_redis_ptr& r);
-///////////////////////////////////////////////////////////////////////////////
-#include <zce/zce_string.h>
-
-template<typename T>
-int zdb_redis_toval(T& v, const zdb_redis_ptr& r)
-{
-    zce_int64 i64v = 0;
-    int ret = zdb_redis_toval(i64v, r);
-    if (ret < 0)
-        return ret;
-    v = i64v;
-    return ret;
-}
-
-template<typename KEY, typename VAL>
-int zdb_redis_connection::hget(const std::string& k, const KEY& h, VAL& v)
-{
-    zdb_redis_ptr r;
+template <typename KEY, typename VAL>
+int ZdbRedisConnection::hget(const std::string& k, const KEY& h, VAL& v) {
+    ZdbRedis r;
     int ret = hget(r, k, zce::to_string(h));
     if (ret < 0) {
         ZERROR(k, h, hex_t<int>(ret));
@@ -193,4 +178,6 @@ int zdb_redis_connection::hget(const std::string& k, const KEY& h, VAL& v)
     return ret;
 }
 
-#endif // __zdb_redis_h__
+}  // namespace zce
+
+

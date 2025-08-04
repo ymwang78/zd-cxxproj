@@ -16,59 +16,35 @@
 #include <zce/zce_dblock.h>
 #include <zce/zce_any.h>
 
-namespace zce {
-namespace zdp {
-int zds_pack(zce_byte* buf, int size, const zdp_base::err_t& _t, ::zce::zdp::zds_context_t* ctx,
-             bool has_prefix);
-int zds_unpack(zdp_base::err_t& _t, const zce_byte* buf, int size, ::zce::zdp::zds_context_t* ctx,
-               bool has_prefix);
-int zds_pack(zce_byte* buf, int size, const zdp_base::zdp_addr_t& _t,
-             ::zce::zdp::zds_context_t* ctx, bool has_prefix);
-int zds_unpack(zdp_base::zdp_addr_t& _t, const zce_byte* buf, int size,
-               ::zce::zdp::zds_context_t* ctx, bool has_prefix);
-int zds_pack(zce_byte* buf, int size, const zdp_base::zdp_container_t& _t,
-             ::zce::zdp::zds_context_t* ctx, bool has_prefix);
-int zds_unpack(zdp_base::zdp_container_t& _t, const zce_byte* buf, int size,
-               ::zce::zdp::zds_context_t* ctx, bool has_prefix);
-int zds_pack(zce_byte* buf, int size, const zdp_base::nspair_t& _t, ::zce::zdp::zds_context_t* ctx,
-             bool has_prefix);
-int zds_unpack(zdp_base::nspair_t& _t, const zce_byte* buf, int size,
-               ::zce::zdp::zds_context_t* ctx, bool has_prefix);
-int zds_pack(zce_byte* buf, int size, const zdp_base::nipair_t& _t, ::zce::zdp::zds_context_t* ctx,
-             bool has_prefix);
-int zds_unpack(zdp_base::nipair_t& _t, const zce_byte* buf, int size,
-               ::zce::zdp::zds_context_t* ctx, bool has_prefix);
-int zds_pack(zce_byte* buf, int size, const zdp_base::nllpair_t& _t, ::zce::zdp::zds_context_t* ctx,
-             bool has_prefix);
-int zds_unpack(zdp_base::nllpair_t& _t, const zce_byte* buf, int size,
-               ::zce::zdp::zds_context_t* ctx, bool has_prefix);
-int zds_pack(zce_byte* buf, int size, const zdp_base::zobject_proxy_t& _t,
-             ::zce::zdp::zds_context_t* ctx, bool has_prefix);
-int zds_unpack(zdp_base::zobject_proxy_t& _t, const zce_byte* buf, int size,
-               ::zce::zdp::zds_context_t* ctx, bool has_prefix);
-int zds_pack(zce_byte* buf, int size, const zdp_base::MSG_NONE_REQ& _t,
-             ::zce::zdp::zds_context_t* ctx, bool has_prefix);
-int zds_unpack(zdp_base::MSG_NONE_REQ& _t, const zce_byte* buf, int size,
-               ::zce::zdp::zds_context_t* ctx, bool has_prefix);
-int zds_pack(zce_byte* buf, int size, const zdp_base::MSG_DISCONN_REQ& _t,
-             ::zce::zdp::zds_context_t* ctx, bool has_prefix);
-int zds_unpack(zdp_base::MSG_DISCONN_REQ& _t, const zce_byte* buf, int size,
-               ::zce::zdp::zds_context_t* ctx, bool has_prefix);
-int zds_pack(zce_byte* buf, int size, const zdp_base::MSG_CONTAINER_REQ& _t,
-             ::zce::zdp::zds_context_t* ctx, bool has_prefix);
-int zds_unpack(zdp_base::MSG_CONTAINER_REQ& _t, const zce_byte* buf, int size,
-               ::zce::zdp::zds_context_t* ctx, bool has_prefix);
-int zds_pack(zce_byte* buf, int size, const zdp_base::MSG_CONTAINER_RES& _t,
-             ::zce::zdp::zds_context_t* ctx, bool has_prefix);
-int zds_unpack(zdp_base::MSG_CONTAINER_RES& _t, const zce_byte* buf, int size,
-               ::zce::zdp::zds_context_t* ctx, bool has_prefix);
-int zds_pack(zce_byte* buf, int size, const zdp_base::MSG_RPCCALL_REQ& _t,
-             ::zce::zdp::zds_context_t* ctx, bool has_prefix);
-int zds_unpack(zdp_base::MSG_RPCCALL_REQ& _t, const zce_byte* buf, int size,
-               ::zce::zdp::zds_context_t* ctx, bool has_prefix);
-int zds_pack(zce_byte* buf, int size, const zdp_base::MSG_RPCCALL_RES& _t,
-             ::zce::zdp::zds_context_t* ctx, bool has_prefix);
-int zds_unpack(zdp_base::MSG_RPCCALL_RES& _t, const zce_byte* buf, int size,
-               ::zce::zdp::zds_context_t* ctx, bool has_prefix);
-}  // namespace zdp
-}  // namespace zce
+namespace zce
+{
+    namespace zdp
+    {
+        int zds_pack(zce_byte* buf, int size, const zdp_base::err_t& _t, zds_context_t* ctx, bool has_prefix);
+        int zds_unpack(zdp_base::err_t& _t, const zce_byte* buf, int size, zds_context_t* ctx, bool has_prefix);
+        int zds_pack(zce_byte* buf, int size, const zdp_base::zdp_addr_t& _t, zds_context_t* ctx, bool has_prefix);
+        int zds_unpack(zdp_base::zdp_addr_t& _t, const zce_byte* buf, int size, zds_context_t* ctx, bool has_prefix);
+        int zds_pack(zce_byte* buf, int size, const zdp_base::zdp_container_t& _t, zds_context_t* ctx, bool has_prefix);
+        int zds_unpack(zdp_base::zdp_container_t& _t, const zce_byte* buf, int size, zds_context_t* ctx, bool has_prefix);
+        int zds_pack(zce_byte* buf, int size, const zdp_base::nspair_t& _t, zds_context_t* ctx, bool has_prefix);
+        int zds_unpack(zdp_base::nspair_t& _t, const zce_byte* buf, int size, zds_context_t* ctx, bool has_prefix);
+        int zds_pack(zce_byte* buf, int size, const zdp_base::nipair_t& _t, zds_context_t* ctx, bool has_prefix);
+        int zds_unpack(zdp_base::nipair_t& _t, const zce_byte* buf, int size, zds_context_t* ctx, bool has_prefix);
+        int zds_pack(zce_byte* buf, int size, const zdp_base::nllpair_t& _t, zds_context_t* ctx, bool has_prefix);
+        int zds_unpack(zdp_base::nllpair_t& _t, const zce_byte* buf, int size, zds_context_t* ctx, bool has_prefix);
+        int zds_pack(zce_byte* buf, int size, const zdp_base::zobject_proxy_t& _t, zds_context_t* ctx, bool has_prefix);
+        int zds_unpack(zdp_base::zobject_proxy_t& _t, const zce_byte* buf, int size, zds_context_t* ctx, bool has_prefix);
+        int zds_pack(zce_byte* buf, int size, const zdp_base::MSG_NONE_REQ& _t, zds_context_t* ctx, bool has_prefix);
+        int zds_unpack(zdp_base::MSG_NONE_REQ& _t, const zce_byte* buf, int size, zds_context_t* ctx, bool has_prefix);
+        int zds_pack(zce_byte* buf, int size, const zdp_base::MSG_DISCONN_REQ& _t, zds_context_t* ctx, bool has_prefix);
+        int zds_unpack(zdp_base::MSG_DISCONN_REQ& _t, const zce_byte* buf, int size, zds_context_t* ctx, bool has_prefix);
+        int zds_pack(zce_byte* buf, int size, const zdp_base::MSG_CONTAINER_REQ& _t, zds_context_t* ctx, bool has_prefix);
+        int zds_unpack(zdp_base::MSG_CONTAINER_REQ& _t, const zce_byte* buf, int size, zds_context_t* ctx, bool has_prefix);
+        int zds_pack(zce_byte* buf, int size, const zdp_base::MSG_CONTAINER_RES& _t, zds_context_t* ctx, bool has_prefix);
+        int zds_unpack(zdp_base::MSG_CONTAINER_RES& _t, const zce_byte* buf, int size, zds_context_t* ctx, bool has_prefix);
+        int zds_pack(zce_byte* buf, int size, const zdp_base::MSG_RPCCALL_REQ& _t, zds_context_t* ctx, bool has_prefix);
+        int zds_unpack(zdp_base::MSG_RPCCALL_REQ& _t, const zce_byte* buf, int size, zds_context_t* ctx, bool has_prefix);
+        int zds_pack(zce_byte* buf, int size, const zdp_base::MSG_RPCCALL_RES& _t, zds_context_t* ctx, bool has_prefix);
+        int zds_unpack(zdp_base::MSG_RPCCALL_RES& _t, const zce_byte* buf, int size, zds_context_t* ctx, bool has_prefix);
+    } //namespace zdp
+} //namespace zce

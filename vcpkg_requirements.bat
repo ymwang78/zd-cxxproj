@@ -3,6 +3,10 @@ rem .\vcpkg integrate install
 
 vcpkg install boost-algorithm:x64-windows-static-md 
 vcpkg install boost-tokenizer:x64-windows-static-md 
+vcpkg install boost-lexical-cast:x64-windows-static-md
+vcpkg install boost-program-options:x64-windows-static-md
+
+
 vcpkg install open62541:x64-windows-static-md
 vcpkg install openssl:x64-windows-static-md 
 vcpkg install uriparser:x64-windows-static-md 
@@ -16,7 +20,6 @@ vcpkg install nlohmann-json:x64-windows-static-md
 vcpkg install mongo-cxx-driver:x64-windows-static-md
 vcpkg install lua:x64-windows-static-md 
 vcpkg install gtest:x64-windows-static-md
-
 
 rem TaijiMPC client requirements
 vcpkg install bzip2:x86-windows-static
