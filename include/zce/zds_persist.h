@@ -44,15 +44,15 @@ class ZdsPersist : public zce::Object {
   public:
     int init();
 
-    static zce::RefBlock to_dblock(const bsoncxx::document::view& v);
+    static zce::RefBlock to_dblock(const bson_document_view& v);
 
     static zce::RefBlock to_setdblock(const zce::RefBlock& dblock);
 
-    static bsoncxx::document::value to_query(const std::string& v);
+    static bson_document_value to_query(const std::string& v);
 
-    static bsoncxx::document::value to_query(unsigned v);
+    static bson_document_value to_query(unsigned v);
 
-    static bsoncxx::document::value to_query(int64_t v);
+    static bson_document_value to_query(int64_t v);
 
     ///////////////////////////////////////////////////////////////////////////
 
@@ -71,7 +71,7 @@ class ZdsPersist : public zce::Object {
     ///////////////////////////////////////////////////////////////////////////
 
     int mongo_write_async(const std::string& dbname, const std::string& coll,
-                          const bsoncxx::document::value& key, const zce::RefBlock& obj, bool upsert);
+                          const bson_document_value& key, const zce::RefBlock& obj, bool upsert);
 
     ///////////////////////////////////////////////////////////////////////////
 
@@ -82,7 +82,7 @@ class ZdsPersist : public zce::Object {
     template <typename KEYRANK, typename KEYT>
     int inc_rank(const std::string& dbname, const std::string& coll, const KEYRANK& rankid,
                  const KEYT& keyid, zce_int64 incv, int expiresec, zce_int64* outv,
-                 bsoncxx::document::view* extraset, bool tologdb, bool logconsist);
+                 bson_document_view* extraset, bool tologdb, bool logconsist);
 
     template <typename KEYT>
     int write_bson(const std::string& platname, const std::string& coll, const KEYT& key,
@@ -135,7 +135,7 @@ int ZdsPersist::inc(const std::string& dbname, const std::string& coll, const KE
 template <typename KEYRANK, typename KEYT>
 int ZdsPersist::inc_rank(const std::string& dbname, const std::string& coll, const KEYRANK& rankid,
                           const KEYT& keyid, zce_int64 incv, int expiresec, zce_int64* outvptr,
-                          bsoncxx::document::view* extraset, bool tologdb, bool logconsist) {
+                          bson_document_view* extraset, bool tologdb, bool logconsist) {
     if (incv == 0) return 0;
 
     zce_int64 outv = 0;
@@ -196,8 +196,8 @@ int ZdsPersist::write_bson(const std::string& platname, const std::string& coll,
                             const zce::RefBlock& bsonobj, const zce::RefBlock* bsonextra, bool upsert) {
     int ret = redist_write_data(coll, zce::to_string(key), bsonobj);
 
-    bsoncxx::document::view obj(bsonobj.rd_ptr(), bsonobj.length());
-    bsoncxx::document::view extra(bsonextra ? bsonextra->rd_ptr() : 0,
+    bson_document_view obj(bsonobj.rd_ptr(), bsonobj.length());
+    bson_document_view extra(bsonextra ? bsonextra->rd_ptr() : 0,
                                   bsonextra ? bsonextra->length() : 0);
 
     if (bsonextra == 0) {
