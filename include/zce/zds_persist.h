@@ -6,11 +6,9 @@
 #include <zce/zce_task_queue.h>
 #include <zce/zce_dblock.h>
 #include <zce/zce_string.h>
-#include <zce/zdb_mgo.h>
 #include <zce/zdb_redis.h>
 
 namespace zce {
-class zdb_mgo_connection;
 
 class ZdbRedisConnection;
 
@@ -37,22 +35,13 @@ class ZdsPersist : public zce::Object {
 
     ~ZdsPersist(){};
 
-    virtual zce::SmartPtr<zdb_mgo_connection> get_mgo_conn(const std::string& dbname) = 0;
-
     virtual zce::SmartPtr<ZdbRedisConnection> get_redis_conn() = 0;
 
   public:
     int init();
 
-    static zce::RefBlock to_dblock(const bson_document_view& v);
-
     static zce::RefBlock to_setdblock(const zce::RefBlock& dblock);
 
-    static bson_document_value to_query(const std::string& v);
-
-    static bson_document_value to_query(unsigned v);
-
-    static bson_document_value to_query(int64_t v);
 
     ///////////////////////////////////////////////////////////////////////////
 
@@ -70,11 +59,6 @@ class ZdsPersist : public zce::Object {
 
     ///////////////////////////////////////////////////////////////////////////
 
-    int mongo_write_async(const std::string& dbname, const std::string& coll,
-                          const bson_document_value& key, const zce::RefBlock& obj, bool upsert);
-
-    ///////////////////////////////////////////////////////////////////////////
-
     template <typename KEYT>
     int inc(const std::string& dbname, const std::string& coll, const KEYT& key, zce_int64 incv,
             int expiresec, zce_int64* outv, bool tologdb, bool logconsist);
@@ -82,7 +66,7 @@ class ZdsPersist : public zce::Object {
     template <typename KEYRANK, typename KEYT>
     int inc_rank(const std::string& dbname, const std::string& coll, const KEYRANK& rankid,
                  const KEYT& keyid, zce_int64 incv, int expiresec, zce_int64* outv,
-                 bson_document_view* extraset, bool tologdb, bool logconsist);
+                 bool tologdb, bool logconsist);
 
     template <typename KEYT>
     int write_bson(const std::string& platname, const std::string& coll, const KEYT& key,
@@ -116,26 +100,13 @@ int ZdsPersist::inc(const std::string& dbname, const std::string& coll, const KE
 
     if (!tologdb) return ret;
 
-    if (logconsist) {
-        auto objv = bsoncxx::builder::stream::document{}
-                    << "$set" << bsoncxx::builder::stream::open_document << "value" << (int64_t)outv
-                    << bsoncxx::builder::stream::close_document
-                    << bsoncxx::builder::stream::finalize;
-
-        return mongo_write_async(dbname, coll, to_query(key), to_dblock(objv.view()), true);
-    } else {
-        auto objv = bsoncxx::builder::stream::document{}
-                    << "$inc" << bsoncxx::builder::stream::open_document << "value" << (int64_t)incv
-                    << bsoncxx::builder::stream::close_document
-                    << bsoncxx::builder::stream::finalize;
-        return mongo_write_async(dbname, coll, to_query(key), to_dblock(objv.view()), true);
-    }
+    return -1;  // TODO: Implement logging to db if needed
 }
 
 template <typename KEYRANK, typename KEYT>
 int ZdsPersist::inc_rank(const std::string& dbname, const std::string& coll, const KEYRANK& rankid,
                           const KEYT& keyid, zce_int64 incv, int expiresec, zce_int64* outvptr,
-                          bson_document_view* extraset, bool tologdb, bool logconsist) {
+                          bool tologdb, bool logconsist) {
     if (incv == 0) return 0;
 
     zce_int64 outv = 0;
@@ -146,49 +117,7 @@ int ZdsPersist::inc_rank(const std::string& dbname, const std::string& coll, con
 
     if (!tologdb) return ret;
 
-    auto key = zce::to_string(rankid) + "_" + zce::to_string(keyid);
-
-    if (logconsist) {
-        if (extraset) {
-            auto objv = bsoncxx::builder::stream::document{}
-                        << "$set" << bsoncxx::builder::stream::open_document << "rankid" << rankid
-                        << "keyid" << keyid << "value" << (int64_t)outv << "wincoin"
-                        << (int64_t)outv << bsoncxx::builder::stream::close_document << "$set"
-                        << *extraset << bsoncxx::builder::stream::finalize;
-
-            return mongo_write_async(dbname, coll, to_query(key), to_dblock(objv), true);
-        } else {
-            auto objv = bsoncxx::builder::stream::document{}
-                        << "$set" << bsoncxx::builder::stream::open_document << "rankid" << rankid
-                        << "keyid" << keyid << "value" << (int64_t)outv << "wincoin"
-                        << (int64_t)outv << bsoncxx::builder::stream::close_document
-                        << bsoncxx::builder::stream::finalize;
-
-            return mongo_write_async(dbname, coll, to_query(key), to_dblock(objv), true);
-        }
-
-    } else {
-        if (extraset) {
-            auto objv = bsoncxx::builder::stream::document{}
-                        << "$inc" << bsoncxx::builder::stream::open_document << "value"
-                        << (int64_t)incv << "wincoin" << (int64_t)incv
-                        << bsoncxx::builder::stream::close_document << "$set"
-                        << bsoncxx::builder::stream::open_document << "rankid" << rankid << "keyid"
-                        << keyid << bsoncxx::builder::stream::close_document << "$set" << *extraset
-                        << bsoncxx::builder::stream::finalize;
-
-            return mongo_write_async(dbname, coll, to_query(key), to_dblock(objv), true);
-        } else {
-            auto objv =
-                bsoncxx::builder::stream::document{}
-                << "$inc" << bsoncxx::builder::stream::open_document << "value" << (int64_t)incv
-                << "wincoin" << (int64_t)incv << bsoncxx::builder::stream::close_document << "$set"
-                << bsoncxx::builder::stream::open_document << "rankid" << rankid << "keyid" << keyid
-                << bsoncxx::builder::stream::close_document << bsoncxx::builder::stream::finalize;
-
-            return mongo_write_async(dbname, coll, to_query(key), to_dblock(objv), true);
-        }
-    }
+    return -1;  // TODO: Implement logging to db if needed
 }
 
 template <typename KEYT>
@@ -196,18 +125,6 @@ int ZdsPersist::write_bson(const std::string& platname, const std::string& coll,
                             const zce::RefBlock& bsonobj, const zce::RefBlock* bsonextra, bool upsert) {
     int ret = redist_write_data(coll, zce::to_string(key), bsonobj);
 
-    bson_document_view obj(bsonobj.rd_ptr(), bsonobj.length());
-    bson_document_view extra(bsonextra ? bsonextra->rd_ptr() : 0,
-                                  bsonextra ? bsonextra->length() : 0);
-
-    if (bsonextra == 0) {
-        auto objvalue = bsoncxx::builder::stream::document{} << "$set" << obj
-                                                             << bsoncxx::builder::stream::finalize;
-        return mongo_write_async(platname, coll, to_query(key), to_dblock(objvalue.view()), upsert);
-    } else {
-        auto objvalue = bsoncxx::builder::stream::document{} << "$set" << obj << "$set" << extra
-                                                             << bsoncxx::builder::stream::finalize;
-        return mongo_write_async(platname, coll, to_query(key), to_dblock(objvalue.view()), upsert);
-    }
+    //@todo 
 }
 }  // namespace zce
