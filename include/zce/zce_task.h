@@ -137,39 +137,12 @@ class ZCE_API TaskDelegator : virtual public zce::Object {
 
     template <typename F>
     int delegate(bool bwait, const char* name, F f) {
-        class Fr_task : public zce::Task {
-            zce::SmartPtr<zce::TaskDelegator> delegator_;
-            zce::Semaphore* sem_;
-            F f_;
-
-          public:
-            Fr_task(const char* name, zce::TaskDelegator* delegate_ptr, zce::Semaphore* sem, F f)
-                : zce::Task(name ? name : "delegateTask"),
-                  delegator_(delegate_ptr),
-                  sem_(sem),
-                  f_(f) {
-#ifdef _DEBUG
-                if (sem_) {  // ensure sem is 0
-                    bool isget = sem_->try_acquire();
-                    ZCE_ASSERT_TEXT(!isget, "deadlock detected!");
-                    if (isget) sem_->release();
-                }
-#endif
-            }
-            virtual void call() {
-                try {
-                    f_();
-                } catch (const std::exception& ex) {
-                    ZCE_ASSERT_TEXT(false, ex.what());
-                } catch (...) {
-                    ZCE_ASSERT_TEXT(false, "unknow exception");
-                }
-                if (sem_) sem_->release();
-            }
-        };
-
-        zce::SmartPtr<zce::Task> task_ptr(new Fr_task(name, this, 0, f));
-        return delegateTask(task_ptr);
+        if (bwait) {
+            delegateFuture(name, F(f)).wait();
+        } else {
+            delegateFuture(name, F(f));
+        }
+        return 0;
     };
 };
 
