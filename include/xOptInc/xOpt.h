@@ -106,6 +106,7 @@ struct xOptParsedVariable {
     std::string unit;
     int expand_index;  // 展开后的数组下标
     double current;  // 当前值
+    std::string link_variable;
 };
 
 using xOptParsedVariableMap = std::unordered_map<std::string, xOptParsedVariable>;
