@@ -179,6 +179,18 @@ void Scintilla::Internal::ScintillaQt::qt_static_metacall(QObject *_o, QMetaObje
         default: ;
         }
     }
+    if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
+        switch (_id) {
+        default: *reinterpret_cast<QMetaType *>(_a[0]) = QMetaType(); break;
+        case 9:
+            switch (*reinterpret_cast<int*>(_a[1])) {
+            default: *reinterpret_cast<QMetaType *>(_a[0]) = QMetaType(); break;
+            case 0:
+                *reinterpret_cast<QMetaType *>(_a[0]) = QMetaType::fromType< QAction* >(); break;
+            }
+            break;
+        }
+    }
     if (_c == QMetaObject::IndexOfMethod) {
         int *result = reinterpret_cast<int *>(_a[0]);
         {
@@ -267,7 +279,7 @@ int Scintilla::Internal::ScintillaQt::qt_metacall(QMetaObject::Call _c, int _id,
     }
     if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
         if (_id < 11)
-            *reinterpret_cast<QMetaType *>(_a[0]) = QMetaType();
+            qt_static_metacall(this, _c, _id, _a);
         _id -= 11;
     }
     return _id;
