@@ -34,6 +34,8 @@ class ZCE_API Reactor : public zce::TaskDelegator {
 
     unsigned long thread_id() const;
 
+    bool isStart() const;
+
     void* loop_t() const;
 
     int set_thread_priority(int priority);

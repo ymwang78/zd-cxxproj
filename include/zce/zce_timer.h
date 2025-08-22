@@ -36,12 +36,13 @@ public:
 
     ~Timer();
 
+    int getMilliSecondSpan() const;
+
     int start(const zce::SmartPtr<TimerDoozer>& doozer_ptr);
 
     int start(const std::function<void(void)>& cb, bool noaccumulate = false);
 
     void cancel();
-
 };
 
 class ZCE_API TimerDoozer : public zce::Object

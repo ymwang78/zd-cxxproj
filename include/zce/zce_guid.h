@@ -21,7 +21,7 @@ class ZCE_API Guid32 {
     Guid32(bool tmseq = true);
     Guid32(const std::vector<unsigned char>&);
     const std::vector<unsigned char>& get_byte_array() const;
-    std::string to_string() const;
+    std::string toString() const;
     bool operator<(const Guid32& rhs) const;
 };
 
@@ -35,7 +35,7 @@ class ZCE_API Guid15 {
   public:
     Guid15(int machine_id = 0);
     Guid15(const std::string& str) : uuid_(str) {};
-    const std::string& to_string() const { return uuid_; };
+    const std::string& toString() const { return uuid_; };
     bool operator<(const Guid15& rhs) const { return uuid_ < rhs.uuid_; };
 };
 

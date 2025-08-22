@@ -63,9 +63,9 @@ class Storm : public zce::Reactor {
 
     const zce::SmartPtr<zdp::StormClient>& storm_client() const { return storm_ptr_; }
 
-    void subscribe(const std::string& topic);
+    void subscribe(zce_int64 topic);
 
-    void unsubscribe(const std::string& topic);
+    void unsubscribe(zce_int64 topic);
 
     int set(zce_int64 topic, const zce_string& name, zce_int64 oldseq, zce_int64 uid,
             zce_int64 flag, const zce_byte* data, zce_uint32 len);

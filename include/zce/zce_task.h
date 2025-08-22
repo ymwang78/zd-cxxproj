@@ -161,6 +161,8 @@ class ZCE_API Scheduler : public zce::Object {
 
     ~Scheduler();
 
+    bool isActive() const;
+
     int active(int work_thread_cnt);
 
     void stop();

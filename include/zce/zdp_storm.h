@@ -92,9 +92,9 @@ class ZCE_API StormClient : public ::zce::Object {
     int connect(const char* fatherip, zce_uint16 fatherport);
 
     // subscribe topic
-    int subscribe(const std::string& topic);
+    int subscribe(zce_int64 topic);
 
-    int unsubscribe(const std::string& topic);
+    int unsubscribe(zce_int64 topic);
 
     int publish(zce_int64 topic, const zce_byte* data, size_t len, zce_int64 trace);
 

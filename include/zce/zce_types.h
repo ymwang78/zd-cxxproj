@@ -84,6 +84,9 @@ typedef struct _zce_addr_t {
 #    include <vector>
 #    include <string_view>
 #    include <memory>
+#    include <fstream> // Added for file operations
+#    include <sstream> // Added for string stream
+#    include <iomanip>  // Added for precision
 
 #    ifdef _UNICODE
 typedef std::u16string zce_tstring;
@@ -150,6 +153,94 @@ class zce_matrix {
         _y = 0;
         _vec.clear();
     }
+
+    /**
+     * @brief Returns a new, transposed copy of the matrix.
+     * This method does not modify the original matrix.
+     * @return A new zce_matrix object that is the transpose of this one.
+     */
+    inline zce_matrix<T> transpose() const {
+        if (empty()) {
+            return zce_matrix<T>();  // Return an empty matrix
+        }
+
+        // Create a new matrix with swapped dimensions
+        zce_matrix<T> transposed_matrix(_y, _x);
+
+        for (int i = 0; i < _x; ++i) {
+            for (int j = 0; j < _y; ++j) {
+                // The element at (i, j) in the old matrix goes to (j, i) in the new one
+                transposed_matrix(j, i) = (*this)(i, j);
+            }
+        }
+
+        return transposed_matrix;
+    }
+
+    /**
+     * @brief Export matrix to CSV file
+     * @param filename The output CSV file path
+     * @param delimiter The delimiter character (default: ',')
+     * @param precision The precision for floating point numbers (default: 6)
+     * @return true if successful, false otherwise
+     */
+    inline bool export_to_csv(const std::string& filename, char delimiter = ',', int precision = 6) const {
+        if (empty()) {
+            return false;
+        }
+
+        std::ofstream file(filename);
+        if (!file.is_open()) {
+            return false;
+        }
+
+        // Set precision for floating point output
+        file.precision(precision);
+        file << std::fixed;
+
+        for (int i = 0; i < _x; ++i) {
+            for (int j = 0; j < _y; ++j) {
+                file << (*this)(i, j);
+                if (j < _y - 1) {
+                    file << delimiter;
+                }
+            }
+            file << std::endl;
+        }
+
+        file.close();
+        return true;
+    }
+
+    /**
+     * @brief Export matrix to CSV string
+     * @param delimiter The delimiter character (default: ',')
+     * @param precision The precision for floating point numbers (default: 6)
+     * @return CSV string representation of the matrix
+     */
+    inline std::string to_csv_string(char delimiter = ',', int precision = 6) const {
+        if (empty()) {
+            return "";
+        }
+
+        std::ostringstream oss;
+        oss.precision(precision);
+        oss << std::fixed;
+
+        for (int i = 0; i < _x; ++i) {
+            for (int j = 0; j < _y; ++j) {
+                oss << (*this)(i, j);
+                if (j < _y - 1) {
+                    oss << delimiter;
+                }
+            }
+            if (i < _x - 1) {
+                oss << std::endl;
+            }
+        }
+
+        return oss.str();
+    }
 };
 
 typedef zce_matrix<double> zce_dblmat;
@@ -167,7 +258,7 @@ class Tss;
 
 namespace zdp {
 struct zds_context_t;
-} // namespace zdp
+}  // namespace zdp
 
 }  // namespace zce
 
