@@ -225,6 +225,13 @@ class ZCE_API Any {
 
     inline void subtype_indicate(zce_uint16 v) noexcept { data_.subtype_indicate_ = v; }
 
+    inline bool is_rawptr() const noexcept { return data_.type_ == any_rawptr; }
+
+    inline void* rawptr() const noexcept {
+        ZCE_ASSERT_RETURN(data_.type_ == any_rawptr, 0);
+        return data_.u_.rawptr_[0];
+    }
+
     inline bool is_object() const noexcept { return data_.type_ == any_object; }
 
     inline zce::Object* object() const noexcept {

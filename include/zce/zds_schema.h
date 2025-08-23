@@ -414,5 +414,6 @@ inline int zds_unpack(_dummy_t& /*_t*/, const zce_byte* /*buf*/, int /*size*/, z
                       bool /*has_prefix*/) {
     return -1;
 };
+
 }  // namespace zdp
 }  // namespace zce
