@@ -32,18 +32,10 @@ struct xOptModelDescT {
 };
 extern xOptModelDescT loadFromJson(const char* path);
 
-class xOptStreamType {
+class xOptStreamSlate {
   public:
-    struct VariableTemplate {
-        std::string name;          // 变量名 (如 "temperature", "mole_frac")
-        std::string comp_binding;  // 绑定的组分("*"=所有, ""=全局, "H2O"=特定组分)
-        std::string unit;          // 单位 ("K", "Pa", "kg/s")
-        double lower = -1e20;
-        double upper = 1e20;
-        double initial = 1.0;
-    };
 
-    explicit xOptStreamType(const std::string& type_name);
+    explicit xOptStreamSlate(const std::string& type_name);
 
     const std::string& getName() const;
 
@@ -58,17 +50,6 @@ class xOptStreamType {
     const std::vector<std::string>& getVariableNames() const;
 
     bool hasComponent(const std::string& comp_name) const;
-
-    int addVariableTemplate(const VariableTemplate& var_def);
-
-    int removeVariableTemplate(const std::string& var_name);
-
-    const std::vector<VariableTemplate>& getVariableTemplates() const;
-
-    // 展开所有实际变量名（{portname}.temperature, {portname}.{component}.{variablen}）
-    std::vector<std::string> expandVariables(const std::string& port_name) const;
-
-    bool validateVariable(const std::string& full_var_name) const;
 
   private:
     struct Impl;
@@ -185,7 +166,7 @@ class xOptModelBase {
 
     virtual const xOptModelFixableVariables& getFlowsheetFixedVariables() const;
 
-    virtual std::vector<int> getStreamVariableIndexes(const xOptStreamType& stream,
+    virtual std::vector<int> getStreamVariableIndexes(const xOptStreamSlate& stream,
                                                       bool is_input_port, int index) const;
 
     virtual xOptProblem* getProblem() const = 0;

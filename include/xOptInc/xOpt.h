@@ -15,6 +15,7 @@
 #include <unordered_map>
 #include <memory>
 #include <zce/zce_array.h>
+#include <zce/zce_object.h>
 #include "xOpt/xOptSolver.h"
 #ifndef XOPT_API
 #    ifdef _WIN32
@@ -61,7 +62,7 @@ struct SolverParameter {
     std::string description;
 };
 
-struct SolverInfo {
+struct SolverInfo : public zce::Object {
     std::string name;
     std::string solver_path;
     std::string status;
@@ -69,6 +70,23 @@ struct SolverInfo {
     DestroySolverFunc lpfn_release_solver;
     std::vector<SolverParameter> parameters;
 };
+typedef zce::SmartPtr<SolverInfo> SolverInfoPtr;
+
+class XOPT_API xOptSolverWrapper : public zce::Object {
+    SolverInfoPtr solver_info_;
+    xOptSolver* solver_;
+
+  public:
+    xOptSolverWrapper(xOptSolver* solver, const SolverInfoPtr& solver_info);
+
+    ~xOptSolverWrapper();
+
+    xOptSolver* operator->() const { return solver_; };
+
+    xOptSolver* get() const { return solver_; }
+};
+
+typedef zce::SmartPtr<xOptSolverWrapper> xOptSolverWrapperPtr;
 
 using xOptIndexMap = std::map<std::string, std::pair<std::string, std::string>>;
 
@@ -105,14 +123,14 @@ struct xOptParsedVariable {
     std::vector<double> initial;
     std::string unit;
     int expand_index;  // 展开后的数组下标
-    double current;  // 当前值
+    double current;    // 当前值
     std::string link_variable;
 };
 
 using xOptParsedVariableMap = std::unordered_map<std::string, xOptParsedVariable>;
 using xOptParsedVariableArr =
     zce::ArrayWithIndex<xOptParsedVariable, std::string,
-                      std::function<std::string(const xOptParsedVariable&)>>;
+                        std::function<std::string(const xOptParsedVariable&)>>;
 
 struct xOptParsedConstraint {
     std::string name;
@@ -126,7 +144,7 @@ struct xOptParsedConstraint {
 using xOptParsedConstraintMap = std::unordered_map<std::string, xOptParsedConstraint>;
 using xOptParsedConstraintArr =
     zce::ArrayWithIndex<xOptParsedConstraint, std::string,
-                      std::function<std::string(const xOptParsedConstraint&)>>;
+                        std::function<std::string(const xOptParsedConstraint&)>>;
 
 struct xOptParsedModel {
     std::string name;
@@ -141,12 +159,13 @@ struct xOptParsedModel {
 
 class XOPT_API xOpt {
   public:
-    static const std::map<std::string, SolverInfo>& getSolvers();
+    static const std::map<std::string, SolverInfoPtr>& getSolvers();
 
-    static int registerSolver(const SolverInfo& solver);
+    static int registerSolver(const SolverInfoPtr& solver);
 
-    static xOptSolver* createSolver(const char* name, xOptProblem* problem,
-                                    const char* solver_name, xOptLogFunc loggerFunction);
+    static xOptSolverWrapperPtr createSolver(const char* name, xOptProblem* problem,
+                                                     const char* solver_name,
+                                    xOptLogFunc loggerFunction);
 
     static void printX(xOptSolver*);
 

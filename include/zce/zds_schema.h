@@ -60,7 +60,8 @@ template <typename T>
 struct is_builtin_basic
     : std::integral_constant<
           bool, std::is_arithmetic<T>::value || std::is_same<T, std::string>::value ||
-                    std::is_same<T, zce::RefBlock>::value || std::is_same<T, zce::Any>::value> {};
+                    std::is_same<T, zce::RefBlock>::value || std::is_same<T, zce::Any>::value ||
+                    std::is_same<T, zce_dblmat>::value> {};
 
 template <typename T>
 struct is_builtin_vector : std::false_type {};
@@ -90,10 +91,9 @@ template <typename T, typename = void>
 struct is_tagstruct : std::false_type {};
 
 template <typename T>
-struct is_tagstruct<T, std::void_t<typename T::is_tagstruct>> 
-    : std::conditional_t<std::is_same_v<typename T::is_tagstruct, std::true_type>, 
-                        std::true_type, 
-                        std::false_type> {};
+struct is_tagstruct<T, std::void_t<typename T::is_tagstruct>>
+    : std::conditional_t<std::is_same_v<typename T::is_tagstruct, std::true_type>, std::true_type,
+                         std::false_type> {};
 
 template <typename T>
 constexpr bool is_builtin_type() {
@@ -410,8 +410,8 @@ inline int zds_pack(zce_byte* /*buf*/, int /*size*/, const _dummy_t& /*_t*/, zds
                     bool /*has_prefix*/) {
     return -1;
 };
-inline int zds_unpack(_dummy_t& /*_t*/, const zce_byte* /*buf*/, int /*size*/, zds_context_t* /*ctx*/,
-                      bool /*has_prefix*/) {
+inline int zds_unpack(_dummy_t& /*_t*/, const zce_byte* /*buf*/, int /*size*/,
+                      zds_context_t* /*ctx*/, bool /*has_prefix*/) {
     return -1;
 };
 

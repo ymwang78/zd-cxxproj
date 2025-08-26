@@ -99,4 +99,5 @@ class XOPTIF_API xOptProblem {
 };
 
 extern "C" typedef xOptProblem* (*createProblemFunc)();
+
 extern "C" typedef void (*destroyProblemFunc)(xOptProblem*);

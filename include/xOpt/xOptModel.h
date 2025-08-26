@@ -74,4 +74,8 @@ class XOPTIF_API xOptModel {
     virtual int getReportMetaDims(const char* dim_names[], const char* dim_units[], const char* name, int dim_size) = 0;
 
     virtual int getReportData(double data[], int shape[], const char* name, int& data_size, int& shape_size) = 0;
+
+    // 查询测度/单位接口
+
+    // 热力学接口
 };
