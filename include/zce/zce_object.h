@@ -271,3 +271,14 @@ class SmartPtrDecRef {
 };
 
 }  // namespace zce
+
+namespace std {
+
+template <typename T>
+struct hash<zce::SmartPtr<T>> {
+    size_t operator()(zce::SmartPtr<T> const& sp) const noexcept {
+        return std::hash<T*>()(sp.get());
+    }
+};
+
+}  // namespace std

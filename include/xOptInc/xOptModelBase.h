@@ -27,6 +27,7 @@ using xOptVarCompMap = std::unordered_map<std::string, std::string>;
 struct xOptModelDescT {
     xOptModelParameters parameters;
     std::vector<std::string> fixable_varnames;
+    std::unordered_map<std::string, xOptParsedVariable> variables;
     std::vector<xOptVarCompMap> inports_var_comp_map_vec;
     std::vector<xOptVarCompMap> outports_var_comp_map_vec;
 };
