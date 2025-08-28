@@ -39,6 +39,8 @@ class xOptStreamSlate {
   public:
     explicit xOptStreamSlate(const std::string& type_name);
 
+    ~xOptStreamSlate();
+
     const std::string& getName() const;
 
     void setName(const std::string& name);
@@ -115,9 +117,13 @@ class xOptModelBase : public zce::Object {
 
   protected:
     std::string name_;
-    struct xOptModelImplBase* pimpl_;
+    xOptModelImplBase* pimpl_ = nullptr;
 
   public:
+
+    template<typename T> T* impl() const {
+        return dynamic_cast<T*>(pimpl_);
+    }
 
     virtual ~xOptModelBase();
 
