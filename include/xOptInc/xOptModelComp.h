@@ -14,6 +14,8 @@
 class xOptModelSym;
 
 class xOptModelComp : public xOptModelBase {
+    ZCE_OBJECT_DECLARE;
+
     friend class xOptProblemComp;
 
   public:
@@ -21,7 +23,10 @@ class xOptModelComp : public xOptModelBase {
 
     ~xOptModelComp();
 
-    int addModel(const std::string& name, xOptModelBase* sub_model);
+    int addModel(const std::string& name, const zce::SmartPtr<xOptModelBase>& sub_model,
+                 bool keep_problem_null = false);
+
+    int resetModel(const std::string& name, const zce::SmartPtr<xOptModelBase>& sub_model);
 
     int addLink(const std::string& from_model_name, int from_var_index,
                 const std::string& from_var_name, const std::string& to_model_name,
@@ -67,11 +72,7 @@ class xOptModelComp : public xOptModelBase {
 
     xOptVarCompMap getVarCompMap(bool isInPort, int iIndex) const override;
 
-    xOptProblem* getProblem() const override;
-
     std::vector<ReportMetaInfo> getReportMetas() const override;
 
     ReportData getReportByMetaName(const std::string& name) const override;
-
-
 };

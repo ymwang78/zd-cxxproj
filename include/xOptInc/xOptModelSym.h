@@ -12,6 +12,8 @@
 #include "xOptInc/xOptModelBase.h"
 
 class xOptModelSym : public xOptModelBase {
+    ZCE_OBJECT_DECLARE;
+
     friend struct xOptModelSymProblem;
 
   public:
@@ -49,8 +51,6 @@ class xOptModelSym : public xOptModelBase {
     int getPortNum(bool is_input_port) const override;
 
     xOptVarCompMap getVarCompMap(bool isInPort, int iIndex) const override;
-
-    xOptProblem* getProblem() const override;
 
     std::vector<ReportMetaInfo> getReportMetas() const override;
 

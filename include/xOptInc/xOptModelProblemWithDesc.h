@@ -13,14 +13,19 @@
 #include "xOptInc/xOptModelBase.h"
 
 class xOptModelProblemWithDesc : public xOptModelBase {
+    ZCE_OBJECT_DECLARE;
+
     friend class xOptProblemWithDesc;
 
   public:
-    xOptModelProblemWithDesc(xOptProblem* external_problem, const xOptModelDescT& desc);
+    xOptModelProblemWithDesc(const zce::SmartPtr<xOptProblemBase>& external_problem,
+                             const xOptModelDescT& desc);
 
-    xOptModelProblemWithDesc(xOptProblem* external_problem, xOptModelDescT&& desc);
+    xOptModelProblemWithDesc(const zce::SmartPtr<xOptProblemBase>& external_problem,
+                             xOptModelDescT&& desc);
 
-    xOptModelProblemWithDesc(xOptProblem* external_problem, const char* json_desc_path);
+    xOptModelProblemWithDesc(const zce::SmartPtr<xOptProblemBase>& external_problem,
+                             const char* json_desc_path);
 
     ~xOptModelProblemWithDesc();
 
@@ -54,8 +59,6 @@ class xOptModelProblemWithDesc : public xOptModelBase {
     int getPortNum(bool is_input_port) const override;
 
     xOptVarCompMap getVarCompMap(bool isInPort, int iIndex) const override;
-
-    xOptProblem* getProblem() const override;
 
     std::vector<ReportMetaInfo> getReportMetas() const override;
 

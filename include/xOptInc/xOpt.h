@@ -16,7 +16,10 @@
 #include <memory>
 #include <zce/zce_array.h>
 #include <zce/zce_object.h>
+#include <zce/zce_object_counter.h>
 #include "xOpt/xOptSolver.h"
+#include "xOpt/xOptProblem.h"
+
 #ifndef XOPT_API
 #    ifdef _WIN32
 #        ifdef XOPT_EXPORTS
@@ -72,7 +75,7 @@ struct SolverInfo : public zce::Object {
 };
 typedef zce::SmartPtr<SolverInfo> SolverInfoPtr;
 
-class XOPT_API xOptSolverWrapper : public zce::Object {
+class xOptSolverWrapper : public zce::Object {
     SolverInfoPtr solver_info_;
     xOptSolver* solver_;
 
@@ -158,6 +161,13 @@ struct xOptParsedModel {
     std::vector<xOptParsedConstraint> constraints;
 };
 
+class xOptProblemBase : public zce::Object, public xOptProblem {
+  public:
+    virtual ~xOptProblemBase() {}
+};
+
+typedef zce::SmartPtr<xOptProblemBase> xOptProblemBasePtr;
+
 class XOPT_API xOpt {
   public:
     static const std::map<std::string, SolverInfoPtr>& getSolvers();
@@ -172,7 +182,7 @@ class XOPT_API xOpt {
 
     static void printF(xOptSolver*);
 
-    static xOptProblem* createProblem(const char* problem_name, const char* problem_type,
+    static xOptProblemBasePtr createProblem(const char* problem_name, const char* problem_type,
                                       const char* problem_path, const void* arg);
 
     static xOptModelBase* createModel(const char* model_name, const xOptModelArgs* context);

@@ -13,6 +13,8 @@
 #include "xOptInc/xOptModelBase.h"
 
 class xOptModelBlackBox : public xOptModelBase {
+    ZCE_OBJECT_DECLARE;
+
   public:
     // 构造函数接受动态库路径
     xOptModelBlackBox(const std::string& dll_path);
@@ -42,8 +44,6 @@ class xOptModelBlackBox : public xOptModelBase {
     int getPortNum(bool is_input_port) const override;
 
     xOptVarCompMap getVarCompMap(bool isInPort, int iIndex) const override;
-
-    xOptProblem* getProblem() const override;
 
     std::vector<ReportMetaInfo> getReportMetas() const override;
 

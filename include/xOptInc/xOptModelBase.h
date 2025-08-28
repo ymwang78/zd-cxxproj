@@ -15,6 +15,8 @@
 #include <string>
 #include <map>
 #include <unordered_map>
+#include <zce/zce_object.h>
+#include <zce/zce_object_counter.h>
 
 using xOptModelParameter = std::pair<std::string, double>;
 
@@ -35,7 +37,6 @@ extern xOptModelDescT loadFromJson(const char* path);
 
 class xOptStreamSlate {
   public:
-
     explicit xOptStreamSlate(const std::string& type_name);
 
     const std::string& getName() const;
@@ -110,19 +111,21 @@ struct xOptPort {
 class xOptProblem;
 struct xOptModelImplBase;
 
-class xOptModelBase {
+class xOptModelBase : public zce::Object {
+
   protected:
-    struct xOptModelImplBase* pimpl_;
     std::string name_;
+    struct xOptModelImplBase* pimpl_;
 
   public:
+
+    virtual ~xOptModelBase();
+
     const std::string& getName() const { return name_; };
 
     void setName(const std::string& name) { name_ = name; };
 
     int getVariableIndex(const std::string& varname, int hint_index = -1) const;
-
-    virtual ~xOptModelBase() = default;
 
     // 初始化模型, 获取默认参数等，做好接受参数等准备
     virtual int initializeModel() = 0;
@@ -146,7 +149,8 @@ class xOptModelBase {
 
     virtual xOptModelFixableVariables getFixableVariables() const = 0;
 
-    virtual int fixVariables(const xOptModelFixableVariables& varnames, bool try_fixed_in_model_first) = 0;
+    virtual int fixVariables(const xOptModelFixableVariables& varnames,
+                             bool try_fixed_in_model_first) = 0;
 
     virtual int validateModel() const = 0;
 
@@ -170,7 +174,7 @@ class xOptModelBase {
     virtual std::vector<int> getStreamVariableIndexes(const xOptStreamSlate& stream,
                                                       bool is_input_port, int index) const;
 
-    virtual xOptProblem* getProblem() const = 0;
+    virtual const zce::SmartPtr<xOptProblemBase>& getProblem() const;
 
     virtual std::vector<ReportMetaInfo> getReportMetas() const = 0;
 

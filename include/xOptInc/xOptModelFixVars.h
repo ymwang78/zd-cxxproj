@@ -12,6 +12,8 @@
 #include "xOptInc/xOptModelBase.h"
 
 class xOptModelFixVars : public xOptModelBase {
+    ZCE_OBJECT_DECLARE;
+
     friend class xOptProblemFixVars;
 
   public:
@@ -58,8 +60,6 @@ class xOptModelFixVars : public xOptModelBase {
     int getPortNum(bool is_input_port) const override;
 
     xOptVarCompMap getVarCompMap(bool is_input_port, int index) const override;
-
-    xOptProblem* getProblem() const override;
 
     std::vector<ReportMetaInfo> getReportMetas() const override;
     

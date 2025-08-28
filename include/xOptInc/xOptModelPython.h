@@ -13,6 +13,8 @@
 #include "xOptInc/xOptModelBase.h"
 
 class xOptModelPython : public xOptModelBase {
+    ZCE_OBJECT_DECLARE;
+
   public:
     xOptModelPython(const std::string& python_module_file,
                     const std::string& factory_function = "createModel");
@@ -43,8 +45,6 @@ class xOptModelPython : public xOptModelBase {
     int getPortNum(bool is_input_port) const override;
 
     xOptVarCompMap getVarCompMap(bool is_input_port, int index) const override;
-
-    xOptProblem* getProblem() const override;
 
     std::vector<ReportMetaInfo> getReportMetas() const override;
 
