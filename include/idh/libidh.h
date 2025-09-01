@@ -23,6 +23,20 @@
 extern "C" {
 #endif
 
+#ifndef ZCE_DEFINED_LOGLEVEL
+typedef enum _zlog_level {
+    ZLOG_TRACE = 0,
+    ZLOG_DEBUG = 1,   /* debug */
+    ZLOG_INFOR = 2,   /* info */
+    ZLOG_WARNI = 3,   /* warn */
+    ZLOG_ERROR = 4,   /* error */
+    ZLOG_FATAL = 5,   /* fatal */
+    ZLOG_BIZDT = 100, /* bizdata */
+    ZLOG_NONEL = 255, /* none */
+} ZLOG_LEVEL;
+#    define ZCE_DEFINED_LOGLEVEL
+#endif
+
 typedef enum _IDH_ERRCODE {
     IDH_ERRCODE_SUCCESS = 0,
 
@@ -156,6 +170,11 @@ typedef struct _idh_browse_item {
 LIBIDH_API idh_handle_t idh_instance_create();
 
 LIBIDH_API void idh_instance_destroy(idh_handle_t handle);
+
+// 日志级别设置函数
+LIBIDH_API int idh_set_log_level(ZLOG_LEVEL level);
+
+LIBIDH_API int idh_get_log_level(ZLOG_LEVEL* level);
 
 LIBIDH_API int idh_instance_discovery(idh_handle_t handle, idh_source_desc_t* source_vec,
                                       unsigned source_size, const char* hostname,
