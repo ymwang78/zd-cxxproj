@@ -10,6 +10,7 @@
 //
 // ***************************************************************
 #include <zce/zce_string.h>
+#include <zce/zce_matrix.h>
 #ifndef CHECKLEN_MOVEBUF_ADDRET_DECSIZE
 #    define CHECKLEN_MOVEBUF_ADDRET_DECSIZE \
         do {                                \
