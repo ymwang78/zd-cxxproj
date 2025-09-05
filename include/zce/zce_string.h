@@ -16,6 +16,7 @@
 #include <vector>
 #include <string.h>
 #include <zce/zce_inc.h>
+#include <locale>
 
 #if __cplusplus >= 201703L || (defined(_MSC_VER) && _MSVC_LANG >= 201703L)
 #    include <string_view>
@@ -34,7 +35,7 @@ using string_view = std::string_view;
 #else
 #    if BOOST_VERSION < 106400
 #    else
-        using string_view = boost::string_view;
+using string_view = boost::string_view;
 #    endif
 #endif
 
@@ -105,35 +106,39 @@ inline void trim(std::string& _str, bool _left = true, bool _right = true,
 
 inline std::string to_lower(const std::string& str) {
     std::string t = str;
-    std::transform(t.begin(), t.end(), t.begin(), ::tolower);
+    std::locale loc;
+    std::transform(t.begin(), t.end(), t.begin(), [&loc](char c) { return std::tolower(c, loc); });
     return t;
 }
 
 inline std::string to_upper(const std::string& str) {
     std::string t = str;
-    std::transform(t.begin(), t.end(), t.begin(), ::toupper);
+    std::locale loc;
+    std::transform(t.begin(), t.end(), t.begin(), [&loc](char c) { return std::toupper(c, loc); });
     return t;
 }
 
 inline std::string to_formula(const std::string& str) {
-    struct formular {
-        bool is_first_;
-        formular() : is_first_(true) {}
-        int operator()(int v) {
-            if (is_first_) {
-                is_first_ = false;
-                return ::toupper(v);
-            } else {
-                if (v == '-' || v == ' ' || v == '\r' || v == '\n') {
-                    is_first_ = true;
-                }
-                return ::tolower(v);
-            }
-        }
-    };
-    std::string t = str;
-    std::transform(t.begin(), t.end(), t.begin(), formular());
-    return t;
+    std::string result = str;
+    bool is_first_in_word = true;
+    std::locale loc;
+
+    std::transform(result.begin(), result.end(), result.begin(),
+                   [&is_first_in_word, &loc](unsigned char c) -> char {
+                       if (c == '-' || std::isspace(c, loc)) {
+                           is_first_in_word = true;
+                           return c;
+                       }
+
+                       if (is_first_in_word) {
+                           is_first_in_word = false;
+                           return std::toupper(c, loc);
+                       } else {
+                           return std::tolower(c, loc);
+                       }
+                   });
+
+    return result;
 }
 
 template <typename T>

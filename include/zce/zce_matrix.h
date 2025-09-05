@@ -350,5 +350,4 @@ class Matrix {
 
 }  // namespace zce
 
-
 typedef zce::Matrix<double> zce_dblmat;
