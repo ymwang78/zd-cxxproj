@@ -85,6 +85,7 @@ typedef struct _zce_addr_t {
 #    include <string_view>
 #    include <memory>
 #    include <zce/zce_matrix.h>
+#    include <optional>
 #    ifdef _UNICODE
 typedef std::u16string zce_tstring;
 typedef char16_t zce_tchar;

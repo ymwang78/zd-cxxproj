@@ -55,16 +55,17 @@ class ZCE_API Object {
 
     inline void __set_release_delegator(TaskDelegator* v) { release_delegator_ = v; }
 
-    inline void __addref() noexcept { ++this->ref_count_; }
+    inline void __addref() const noexcept { ++this->ref_count_; }
 
-    inline void __decref() noexcept {
+    inline void __decref() const noexcept {
         if (--this->ref_count_ != 0) return;
-        if (release_delegator_) {
-            __delegate_release();
-        } else if (zce_alloc_) {
-            __free_me();
+        auto non_const_this = const_cast<Object*>(this);
+        if (non_const_this->release_delegator_) {
+            non_const_this->__delegate_release();
+        } else if (non_const_this->zce_alloc_) {
+            non_const_this->__free_me();
         } else {
-            delete this;
+            delete non_const_this;
         }
     }
 
@@ -89,7 +90,7 @@ class ZCE_API Object {
   private:
     Allocator* zce_alloc_;
     TaskDelegator* release_delegator_;
-    AtomicLong ref_count_;
+    mutable AtomicLong ref_count_;
     const zce_int64 obj_idx_;
 };
 
