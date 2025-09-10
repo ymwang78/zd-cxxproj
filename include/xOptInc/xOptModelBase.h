@@ -117,15 +117,20 @@ class xOptModelBase : public zce::Object {
 
   protected:
     std::string name_;
-    xOptModelImplBase* pimpl_ = nullptr;
+    zce::SmartPtr<xOptModelImplBase> pimpl_;
 
+    xOptModelBase(const xOptModelBase&) = delete;
+    xOptModelBase& operator=(const xOptModelBase&) = delete;
   public:
 
-    template<typename T> T* impl() const {
-        return dynamic_cast<T*>(pimpl_);
+    template <typename T>
+    zce::SmartPtr<T> impl() const {
+        return zce::SmartPtr<T>::__dynamic_cast(pimpl_);
     }
 
-    virtual ~xOptModelBase();
+    xOptModelBase();
+
+    ~xOptModelBase();
 
     const std::string& getName() const { return name_; };
 
