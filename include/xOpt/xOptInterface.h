@@ -53,6 +53,12 @@ enum XOPTF_ERRCODE : int {
     XOPTF_ERROR_INVALID,      // 数据无效, 例如固定的变量列表不合法
 };
 
+#ifdef __cplusplus
 extern "C" {
-    typedef void (*xOptLogFunc)(ZLOG_LEVEL level, const char *format, ...);
+#endif
+
+typedef void (*xOptLogFunc)(ZLOG_LEVEL level, const char *format, ...);
+
+#ifdef __cplusplus
 }
+#endif

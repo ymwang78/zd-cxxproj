@@ -26,8 +26,6 @@ class xOptModelComp : public xOptModelBase {
     int addModel(const std::string& name, const zce::SmartPtr<xOptModelBase>& sub_model,
                  bool keep_problem_null = false);
 
-    int resetModel(const std::string& name, const zce::SmartPtr<xOptModelBase>& sub_model);
-
     int addLink(const std::string& from_model_name, int from_var_index,
                 const std::string& from_var_name, const std::string& to_model_name,
                 int to_var_index, const std::string& to_var_name);

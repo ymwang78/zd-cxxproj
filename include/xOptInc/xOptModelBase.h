@@ -114,15 +114,14 @@ class xOptProblem;
 struct xOptModelImplBase;
 
 class xOptModelBase : public zce::Object {
-
   protected:
     std::string name_;
     zce::SmartPtr<xOptModelImplBase> pimpl_;
 
     xOptModelBase(const xOptModelBase&) = delete;
     xOptModelBase& operator=(const xOptModelBase&) = delete;
-  public:
 
+  public:
     template <typename T>
     zce::SmartPtr<T> impl() const {
         return zce::SmartPtr<T>::__dynamic_cast(pimpl_);
@@ -193,4 +192,14 @@ class xOptModelBase : public zce::Object {
 
     // 把当前值设置为更新值
     virtual int updateCurrentToInitialValue();
+
+    // ***************************************热力学************************************************
+
+    virtual int getNumberOfSlate() { return 0; };
+
+    virtual int setSlates(int count, const xOptSlate* slate[]) { return 0; };
+
+    virtual int getNumberOfThermoBlock() { return 0; };
+
+    virtual int getThermoBlocks(int count, xOptThermoBlock blocks[]) { return 0; };
 };
