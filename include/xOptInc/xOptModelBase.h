@@ -165,10 +165,15 @@ class xOptModelBase : public zce::Object {
     virtual int validateModel() const = 0;
 
     // 以上是模型初始化准备，以下是运行时准备
+
     virtual int prepareRuntime(const xOptParsedVariableArr& arr) = 0;
 
     virtual const xOptParsedVariableArr& getVariables() const;
 
+    // 生成估计，给出当前初值
+    virtual int generateEstimate(std::vector<double>& initx);
+
+    // 以下API更新内置的变量当前值，供外部查看
     virtual int setVariableValues(const std::vector<double>& values);
 
     // hint index是帮助提示索引，不是必须的，不清楚的情况下填-1
