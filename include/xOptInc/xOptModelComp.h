@@ -31,7 +31,8 @@ class xOptModelComp : public xOptModelBase {
                 int to_var_index, const std::string& to_var_name);
 
     int addLink(const std::string& from_model_name, const std::vector<std::string>& from_names,
-                const std::string& to_model_name, const std::vector<int>& to_indexes);
+                const std::string& to_model_name, const std::vector<int>& to_indexes,
+                bool overwrite_initx);
 
     int addLink(const std::string& from_model_name, const std::vector<int>& from_indexes,
                 const std::string& to_model_name, const std::vector<int>& to_indexes);

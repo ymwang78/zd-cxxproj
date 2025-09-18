@@ -117,7 +117,12 @@ static int idh_is_good_quality(unsigned short quality) {
 
 static const long long IDH_INVALID_HANDLE = ~0;
 
-typedef enum _IDH_RTSOURCE { IDH_RTSOURCE_UA, IDH_RTSOURCE_DA, IDH_RTSOURCE_COUNT } IDH_RTSOURCE;
+typedef enum _IDH_RTSOURCE {
+    IDH_RTSOURCE_UA,
+    IDH_RTSOURCE_DA,
+    IDH_RTSOURCE_CSV,
+    IDH_RTSOURCE_COUNT
+} IDH_RTSOURCE;
 
 typedef long long idh_handle_t;
 
@@ -157,14 +162,14 @@ typedef enum _IDH_NODETYPE {
 
 typedef struct _idh_browse_item {
     unsigned short namespace_index;
-    char node_name[256];        // 节点名称
-    char display_name[256];     // 显示名称
-    char description[512];      // 节点描述
-    IDH_NODETYPE node_type;     // 节点类型
-    IDH_DATATYPE data_type;     // 数据类型（仅变量节点有效）
-    unsigned char is_readable;  // 是否可读
-    unsigned char is_writable;  // 是否可写
-    unsigned char has_children; // 是否有子节点
+    char node_name[256];         // 节点名称
+    char display_name[256];      // 显示名称
+    char description[512];       // 节点描述
+    IDH_NODETYPE node_type;      // 节点类型
+    IDH_DATATYPE data_type;      // 数据类型（仅变量节点有效）
+    unsigned char is_readable;   // 是否可读
+    unsigned char is_writable;   // 是否可写
+    unsigned char has_children;  // 是否有子节点
 } idh_browse_item_t;
 
 LIBIDH_API idh_handle_t idh_instance_create();

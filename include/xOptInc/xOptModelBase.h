@@ -177,7 +177,7 @@ class xOptModelBase : public zce::Object {
     virtual int setVariableValues(const std::vector<double>& values);
 
     // hint index是帮助提示索引，不是必须的，不清楚的情况下填-1
-    virtual const xOptParsedVariable& getVariable(const std::string& varname, int hint_index);
+    virtual xOptParsedVariable& getVariable(const std::string& varname, int hint_index);
 
     virtual int setVariableValue(const std::string& varname, int hint_index, double value);
 
