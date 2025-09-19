@@ -86,20 +86,18 @@ class ZCE_API TaskDelegator : virtual public zce::Object {
 
     template <typename F, typename... Args>
     auto delegateFuture(const char* name, F&& f, Args&&... args)
-        -> std::future<TaskResult<decltype(f(args...))>> {
+        -> std::shared_ptr<std::promise<TaskResult<decltype(f(args...))>>> {
         using ReturnType = decltype(f(args...));
         using ResultType = TaskResult<ReturnType>;
 
         auto promise_ptr = std::make_shared<std::promise<ResultType>>();
-
-        std::future<ResultType> result_future = promise_ptr->get_future();
 
         class FutureTask : public Task {
             std::shared_ptr<std::promise<ResultType>> promise_;
             std::function<ReturnType()> func_;
 
           public:
-            FutureTask(std::shared_ptr<std::promise<ResultType>> p, F&& f, Args&&... args)
+            FutureTask(const std::shared_ptr<std::promise<ResultType>>& p, F&& f, Args&&... args)
                 : Task("future_task_no_except"), promise_(p) {
                 func_ = std::bind(std::forward<F>(f), std::forward<Args>(args)...);
             }
@@ -132,16 +130,59 @@ class ZCE_API TaskDelegator : virtual public zce::Object {
                 ResultType::error(ResultType::Status::SubmitFailed, "Failed to schedule task."));
         }
 
-        return result_future;
+        return promise_ptr;
     }
 
-    template <typename F>
-    int delegate(bool bwait, const char* name, F f) {
-        if (bwait) {
-            delegateFuture(name, F(f)).wait();
-        } else {
-            delegateFuture(name, F(f));
+    template<typename F>
+    class Fr_task : public zce::Task {
+        zce::SmartPtr<zce::TaskDelegator> delegator_;
+        zce::Semaphore* sem_;
+        F f_;
+
+      public:
+        Fr_task(const char* name, zce::TaskDelegator* delegate_ptr, zce::Semaphore* sem, F f)
+            : zce::Task(name ? name : "delegateTask"), delegator_(delegate_ptr), sem_(sem), f_(f) {
+#ifdef _DEBUG
+            if (sem_) {  // ensure sem is 0
+                bool isget = sem_->try_acquire();
+                ZCE_ASSERT_TEXT(!isget, "deadlock detected!");
+                if (isget) sem_->release();
+            }
+#endif
         }
+        virtual void call() {
+            try {
+                f_();
+            } catch (const std::exception& ex) {
+                ZCE_ASSERT_TEXT(false, ex.what());
+            } catch (...) {
+                ZCE_ASSERT_TEXT(false, "unknow exception");
+            }
+            if (sem_) sem_->release();
+        }
+    };
+
+    template <typename F>
+    int delegate(bool bwait, const char* name, F&& f) {
+        #if 0
+        auto promise_ptr = delegateFuture(name, std::forward<F>(f));
+        if (bwait) {
+            auto result_future = promise_ptr->get_future();
+            ZCE_ASSERT(result_future.valid());
+            result_future.wait();
+        }
+        #else
+        if (bwait) {
+            zce::Tss::zce_global_semaphore global_semaphore;
+            zce::SmartPtr<zce::Task> task_ptr(new Fr_task(name, this, global_semaphore.sem, f));
+            int ret = delegateTask(task_ptr);
+            global_semaphore.sem->acquire();
+            return ret;
+        } else {
+            zce::SmartPtr<zce::Task> task_ptr(new Fr_task(name, this, 0, f));
+            return delegateTask(task_ptr);
+        }
+        #endif
         return 0;
     };
 };
