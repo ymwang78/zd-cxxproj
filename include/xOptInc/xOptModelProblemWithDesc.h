@@ -54,7 +54,7 @@ class xOptModelProblemWithDesc : public xOptModelBase {
 
     xOptParsedVariable& getVariable(const std::string& varname, int hint_index) override;
 
-    int setVariableValue(const std::string& varname, int hint_index, double value) override;
+    int setVariableValue(const std::string& varname, int hint_index, double value, bool update_initx) override;
 
     int getPortNum(bool is_input_port) const override;
 

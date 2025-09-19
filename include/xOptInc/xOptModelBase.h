@@ -179,7 +179,8 @@ class xOptModelBase : public zce::Object {
     // hint index是帮助提示索引，不是必须的，不清楚的情况下填-1
     virtual xOptParsedVariable& getVariable(const std::string& varname, int hint_index);
 
-    virtual int setVariableValue(const std::string& varname, int hint_index, double value);
+    virtual int setVariableValue(const std::string& varname, int hint_index, double value,
+                                 bool update_initx);
 
     // 这里是返回需要流程固定的变量的索引, 单元模块自己能固定的索引不需要返回
     virtual std::vector<int> getFlowsheetFixedVariableIndexes() const;
