@@ -150,7 +150,7 @@ class LockRead {
             lock_read_.lock_.acquire_read();
         }
 
-        T* operator->() const { return dynamic_cast<T*>(&lock_read_.obj_); }
+        T* operator->() const { return (T*)(&lock_read_.obj_); }
 
         T& operator*() const { return lock_read_.obj_; }
 

@@ -84,8 +84,9 @@ class ZCE_API TaskDelegator : virtual public zce::Object {
 
     virtual int delegateRelease(zce::Object* obj) = 0;
 
+    // unknow buggy
     template <typename F, typename... Args>
-    auto delegateFuture(const char* name, F&& f, Args&&... args)
+    auto _delegateFuture(const char* name, F&& f, Args&&... args)
         -> std::shared_ptr<std::promise<TaskResult<decltype(f(args...))>>> {
         using ReturnType = decltype(f(args...));
         using ResultType = TaskResult<ReturnType>;

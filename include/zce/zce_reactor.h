@@ -28,7 +28,7 @@ class ZCE_API Reactor : public zce::TaskDelegator {
     friend class ReactorThread;
 
   public:
-    Reactor();
+    Reactor(const char* name = nullptr);
 
     ~Reactor();
 
@@ -59,6 +59,8 @@ class ZCE_API Reactor : public zce::TaskDelegator {
     void zfree(void*);
 
     virtual int on_start() { return 0; };
+
+    virtual void on_stopped() { };
 
   private:
     int loop();
