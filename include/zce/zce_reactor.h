@@ -12,6 +12,7 @@
 
 #include <zce/zce_object.h>
 #include <zce/zce_task.h>
+#include <zce/zce_singleton.h>
 #include <deque>
 
 namespace zce {
@@ -67,5 +68,9 @@ class ZCE_API Reactor : public zce::TaskDelegator {
 
     void terminate();
 };
+
+typedef ::zce::SmartPtr<::zce::Reactor> ReactorPtr;
+
+typedef ::zce::Singleton<::zce::Reactor, ::zce::MutexNull> ReactorSigt;
 
 }  // namespace zce

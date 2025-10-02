@@ -49,7 +49,7 @@ class VirtualMachineStub : public zce::Object {
 
     ~VirtualMachineStub();
 
-    int init(const zce::SmartPtr<zce::Scheduler>&, const zce::SmartPtr<zce::Reactor>&);
+    int initStub(const zce::SmartPtr<zce::Scheduler>&, const zce::SmartPtr<zce::Reactor>&);
 
     zce::SmartPtr<zce::Object> boot(const std::string& svc_name, const std::string& path,
                                     zce::RefBlock& args);

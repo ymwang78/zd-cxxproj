@@ -131,6 +131,7 @@ void ZCE_API zlog_cleanup(int keep_days);
 #    include <zce/zce_object.h>
 #    include <sstream>
 #    include <vector>
+#    include <functional>
 
 class zce_loglevel {
   public:
@@ -173,7 +174,7 @@ class ZCE_API Logger : public zce::Object {
 
   public:
     Logger(_zlog_level level, const char* func, const char* fname, int line,
-               const char* splitter = "|");
+           const char* splitter = "|");
 
     void flush();
 
@@ -217,38 +218,41 @@ class ZCE_API Logger : public zce::Object {
         log_args(oss_, args...);
         flush();
     }
+
+    static void setCallback(std::function<void(unsigned level, const char* msg, size_t len)>&& callback);
 };
+
 
 }  // namespace zce
 
-#    define ZTRACE(...)                                                                      \
-        do {                                                                                 \
-            if (zlog_getlevel() <= ZLOG_TRACE)                                               \
+#    define ZTRACE(...)                                                                       \
+        do {                                                                                  \
+            if (zlog_getlevel() <= ZLOG_TRACE)                                                \
                 zce::Logger(ZLOG_TRACE, __FUNCTION__, __FILE__, __LINE__).write(__VA_ARGS__); \
         } while (0)
-#    define ZDEBUG(...)                                                                      \
-        do {                                                                                 \
-            if (zlog_getlevel() <= ZLOG_DEBUG)                                               \
+#    define ZDEBUG(...)                                                                       \
+        do {                                                                                  \
+            if (zlog_getlevel() <= ZLOG_DEBUG)                                                \
                 zce::Logger(ZLOG_DEBUG, __FUNCTION__, __FILE__, __LINE__).write(__VA_ARGS__); \
         } while (0)
-#    define ZINFOR(...)                                                                      \
-        do {                                                                                 \
-            if (zlog_getlevel() <= ZLOG_INFOR)                                               \
+#    define ZINFOR(...)                                                                       \
+        do {                                                                                  \
+            if (zlog_getlevel() <= ZLOG_INFOR)                                                \
                 zce::Logger(ZLOG_INFOR, __FUNCTION__, __FILE__, __LINE__).write(__VA_ARGS__); \
         } while (0)
-#    define ZWARNI(...)                                                                      \
-        do {                                                                                 \
-            if (zlog_getlevel() <= ZLOG_WARNI)                                               \
+#    define ZWARNI(...)                                                                       \
+        do {                                                                                  \
+            if (zlog_getlevel() <= ZLOG_WARNI)                                                \
                 zce::Logger(ZLOG_WARNI, __FUNCTION__, __FILE__, __LINE__).write(__VA_ARGS__); \
         } while (0)
-#    define ZERROR(...)                                                                      \
-        do {                                                                                 \
-            if (zlog_getlevel() <= ZLOG_ERROR)                                               \
+#    define ZERROR(...)                                                                       \
+        do {                                                                                  \
+            if (zlog_getlevel() <= ZLOG_ERROR)                                                \
                 zce::Logger(ZLOG_ERROR, __FUNCTION__, __FILE__, __LINE__).write(__VA_ARGS__); \
         } while (0)
-#    define ZFATAL(...)                                                                      \
-        do {                                                                                 \
-            if (zlog_getlevel() <= ZLOG_FATAL)                                               \
+#    define ZFATAL(...)                                                                       \
+        do {                                                                                  \
+            if (zlog_getlevel() <= ZLOG_FATAL)                                                \
                 zce::Logger(ZLOG_FATAL, __FUNCTION__, __FILE__, __LINE__).write(__VA_ARGS__); \
         } while (0)
 
