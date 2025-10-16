@@ -72,6 +72,12 @@ struct is_builtin_vector<std::vector<T>>
     : std::integral_constant<bool, is_builtin_basic<T>::value> {};
 
 template <typename T>
+struct is_vector : std::false_type {};
+
+template <typename T, typename Alloc>
+struct is_vector<std::vector<T, Alloc>> : std::true_type {};
+
+template <typename T>
 inline bool is_empty_member(const T& v) {
     static const T _empty{};
     return _empty == v;
@@ -403,6 +409,18 @@ int zds_pack_builtin(zce_byte* buf, zce_int32 size, const std::map<TKEY, TVAL>& 
         }
         CHECKLEN_MOVEBUF_ADDRET_DECSIZE;
     }
+    return ret;
+}
+
+template <typename ARG>
+int zds_pack(zce::RefBlock& dblock, const ARG& input) {
+    int ret = zce::zdp::zds_pack(0, 0, input, 0, true);
+    if (ret < 0) return ret;
+    ZCE_MBACQUIRE(dblock, ret);
+    if ((int)dblock.space() < ret) return ZCE_ERROR_MALLOC;
+    ret = zce::zdp::zds_pack(dblock.rd_ptr_cow(), (int)dblock.space(), input, 0, true);
+    if (ret < 0) return ret;
+    dblock.wr_ptr(ret);
     return ret;
 }
 

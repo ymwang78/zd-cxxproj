@@ -88,6 +88,22 @@ class ZCE_API Socket : public IStream {
     ZCE_OBJECT_DECLARE;
 
   protected:
+    struct data_item {
+        zce::RefBlock dblock_ptr_;
+        ERV_ISTREAM_WRITEOPT option_;
+
+        data_item();
+
+        data_item(const zce::RefBlock& dblock, ERV_ISTREAM_WRITEOPT opt);
+    };
+
+    struct data_item_isless {
+        ERV_ISTREAM_WRITEOPT opt_;
+        data_item_isless(ERV_ISTREAM_WRITEOPT opt) : opt_(opt) {};
+
+        bool operator()(const data_item& rhs) const { return rhs.option_ < opt_; }
+    };
+
     zce::AtomicLong onclose_refcnt_;
 
     zce::AtomicLong close_refcnt_;
@@ -188,22 +204,6 @@ class ZCE_API Tcp : public Socket {
     struct pimpl* pimpl_;
 
   protected:
-    struct data_item {
-        zce::RefBlock dblock_ptr_;
-        ERV_ISTREAM_WRITEOPT option_;
-
-        data_item();
-
-        data_item(const zce::RefBlock& dblock, ERV_ISTREAM_WRITEOPT opt);
-    };
-
-    struct data_item_isless {
-        ERV_ISTREAM_WRITEOPT opt_;
-        data_item_isless(ERV_ISTREAM_WRITEOPT opt) : opt_(opt) {};
-
-        bool operator()(const data_item& rhs) const { return rhs.option_ < opt_; }
-    };
-
     zce::Mutex dblock_lock_;
 
     std::deque<data_item> dblock_deque_;
@@ -357,6 +357,74 @@ class ZCE_API Acceptor : public zce::Object {
     void unblock_remote(const zce_sockaddr_t& remote);
 
     virtual zce::Tcp* make_handler() = 0;
+};
+
+class ZCE_API Pipe : public Socket {
+    struct Pimpl;
+    struct Pimpl* pimpl_;
+
+  protected:
+    int start_read();
+    int start_write();  //<0 error; ==0, empty; > 0, write ret
+
+    virtual int do_write(zce::RefBlock& dblock_ptr, const zce_sockaddr_t* addr,
+                         ERV_ISTREAM_WRITEOPT opt);
+
+  public:
+    Pipe(const zce::SmartPtr<zce::Reactor>& reactor, int preserved_size = 16);
+    ~Pipe();
+
+    virtual void* handle() const;
+
+    virtual void on_open(bool passive, const zce_sockaddr_t& remote);
+    virtual void on_close();
+    virtual void on_written(void* req, int status);
+    virtual void on_read_data(zce_byte*, zce_uint32);
+
+    // 对于Pipe，此函数获取的是管道路径名，而非sockaddr
+    virtual int get_local_addr(char* buffer, size_t* size) const;
+    // Socket的虚函数仍然需要实现，但对于Pipe意义不大
+    virtual int get_local_addr(zce_sockaddr_t& addr) const;
+};
+
+class ZCE_API PipeConnector : public zce::Object {
+    ZCE_OBJECT_DECLARE;
+
+    struct Pimpl;
+    struct Pimpl* pimpl_;
+
+  public:
+    PipeConnector(const zce::SmartPtr<zce::Pipe>& pipe_ptr, std::string name);
+
+    ~PipeConnector();
+
+    int start_connect();
+
+    void on_connect(int status);
+    // const zce::SmartPtr<zce::Reactor>& reactor() { return pipe_ptr_->reactor(); }
+};
+
+class ZCE_API PipeAcceptor : public zce::Object {
+    struct Pimpl;
+    struct Pimpl* pimpl_;
+
+  public:
+    using MakeHandlerFunc = std::function<Pipe*()>;
+
+    PipeAcceptor(const zce::SmartPtr<zce::Reactor>& reactor, MakeHandlerFunc make_handler,
+                 bool ipc = false);
+
+    ~PipeAcceptor();
+
+    const zce::SmartPtr<zce::Reactor>& reactor();
+
+    int listen(const char* name);
+
+    void close();
+
+    void on_connect(int status);
+
+    void on_close();
 };
 
 class TaskQueue;

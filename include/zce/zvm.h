@@ -37,7 +37,7 @@ constexpr bool is_builtin_type();
 
 namespace zvm {
 
-    class VirtualMachineStubPimpl;
+class VirtualMachineStubPimpl;
 
 class VirtualMachineStub : public zce::Object {
     zce::SmartPtr<VirtualMachineStubPimpl> pimpl_ptr_;
@@ -110,60 +110,155 @@ class VirtualMachineStub : public zce::Object {
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#if 0
-    void zds_push(zce::RefBlock& dblock,
-        const char* v) {
-        zds_push_string(dblock, v);
-    }
-
-    void luas_push(zce::RefBlock& dblock,
-        const std::string& v) {
-        luas_push_lstring(dblock, v.c_str(), (zce_int32)v.length());
-    }
-
-    void luas_push(zce::RefBlock& dblock,
-        zce_int64 v) {
-        luas_push_integer(dblock, v);
-    }
-
-    void luas_push(zce::RefBlock& dblock,
-        zce_int32 v) {
-        luas_push_integer(dblock, v);
-    }
-
-    void luas_push(zce::RefBlock& dblock,
-        bool v) {
-        luas_push_bool(dblock, v);
-    }
-
-    void luas_push(zce::RefBlock& dblock,
-        void* ctx) {
-        luas_push_lightuserdata(dblock, ctx);
-    }
-
-    template <typename T, typename... Args>
-    void luas_push(zce::RefBlock& dblock,
-        const T& v,
-        Args... args) {
-        luas_push(dblock, v);
-        luas_push(dblock, args...);
-    }
-
-    template<typename... Args>
-    int rpc_call(const zce::SmartPtr<zce::Object>& vmptr,
-        zce_int64 objectid,
-        const std::string& method,
-        const response_cb& response,
-        Args... args) {
-        zce::RefBlock dblock;
-        zds_pack()
-        luas_push(dblock, args...);
-        return lpc_call_dblock(svrname, method, dblock);
-    }
-#endif
 };
 
 typedef zce::Singleton<VirtualMachineStub> VirtualMachineStubSigt;
+
+namespace detail {
+
+template <typename... T>
+auto unpack_recursive_impl(const zce::RefBlock&, size_t, const char*)
+    -> std::enable_if_t<sizeof...(T) == 0, std::pair<int, std::tuple<>>> {
+    return {0, {}};
+}
+
+template <typename First, typename... Rest>
+inline std::pair<int, std::tuple<First, Rest...>> unpack_recursive_impl(const zce::RefBlock& data,
+                                                                        size_t offset,
+                                                                        const char* func) {
+    int bytes_read = 0;
+    First current_value{};
+    if constexpr (zce::zdp::is_builtin_type<First>()) {
+        bytes_read = zce::zdp::zds_unpack_builtin(current_value, data.rd_ptr() + offset,
+                                                  data.length() - offset, nullptr);
+    } else if constexpr (zce::zdp::is_vector<First>()) {
+        bytes_read = zce::zdp::zds_unpack_array(current_value, data.rd_ptr() + offset,
+                                                data.length() - offset, nullptr);
+
+    } else {
+        bytes_read = zce::zdp::zds_unpack(current_value, data.rd_ptr() + offset,
+                                          data.length() - offset, nullptr, true);
+    }
+
+    if (bytes_read < 0) {
+        ZCE_ERROR((ZLOG_ERROR, "unpack %s failed for one of the types: 0x%x", func, bytes_read));
+        return {bytes_read, {}};
+    }
+
+    auto rest_pair = unpack_recursive_impl<Rest...>(data, offset + bytes_read, func);
+
+    if (rest_pair.first < 0) {
+        return {rest_pair.first, {}};
+    }
+
+    std::tuple<First, Rest...> result_tuple =
+        std::tuple_cat(std::make_tuple(std::move(current_value)), std::move(rest_pair.second));
+
+    return {bytes_read + rest_pair.first, std::move(result_tuple)};
+}
+
+template <typename... Results>
+inline std::pair<int, std::tuple<Results...>> unpack_to_tuple(const zce::RefBlock& data,
+                                                              const char* func) {
+    // 从偏移量 0 开始调用递归实现
+    return unpack_recursive_impl<Results...>(data, 0, func);
+}
+
+}  // namespace detail
+
+class VirtualMachineProxy : public zce::Object {
+  protected:
+    virtual int doCallTwoWay(const char* func, const zce::RefBlock& input,
+                             std::function<void(int errcode, const zce::RefBlock& output)> cb) = 0;
+
+  public:
+    template <typename... RESULTs>
+    struct RpcResult {
+        int errcode;
+        std::string errdesc;
+        std::tuple<RESULTs...> data;
+        bool isSuccess() const { return errcode >= 0; }
+
+        const std::string& errorMessage() const { return errdesc; }
+
+        template <std::size_t I>
+        auto& get() & {
+            return std::get<I>(data);
+        }
+
+        template <std::size_t I>
+        const auto& get() const& {
+            return std::get<I>(data);
+        }
+
+        template <std::size_t I>
+        auto&& get() && {
+            return std::get<I>(std::move(data));
+        }
+    };
+
+    template <typename ARG>
+    int pack(zce::RefBlock& dblock, const ARG& input) {
+        int ret = zce::zdp::zds_pack(0, 0, input, 0, true);
+        if (ret < 0) return ret;
+        ZCE_MBACQUIRE(dblock, ret);
+        if ((int)dblock.space() < ret) return ZCE_ERROR_MALLOC;
+        ret = zce::zdp::zds_pack(dblock.rd_ptr_cow(), (int)dblock.space(), input, 0, true);
+        if (ret < 0) return ret;
+        dblock.wr_ptr(ret);
+        return ret;
+    }
+
+    template <typename... Results, typename... Args, typename F>
+    int callTwoWayAsync(const char* func, F&& async_cb, Args&&... args) {
+        int ret = 0;
+        ZTRACE(func);
+
+        zce::RefBlock dblock;
+        {
+            ret = zce::zdp::zds_pack_multi(0, 0, nullptr, true, std::forward<Args>(args)...);
+            if (ret < 0) return ret;
+            if (ret > 0) {
+                ZCE_MBACQUIRE(dblock, ret);
+                if ((int)dblock.space() < ret) return ZCE_ERROR_MALLOC;
+                ret = zce::zdp::zds_pack_multi(dblock.wr_ptr_cow(), (int)dblock.space(), nullptr,
+                                               true, std::forward<Args>(args)...);
+                if (ret < 0) return ret;
+                dblock.wr_ptr(ret);
+            }
+        }
+
+        ret = doCallTwoWay(func, dblock, [=](int errcode, const zce::RefBlock& retdata) {
+            RpcResult<Results...> result;
+            result.errcode = errcode;
+            if (errcode < 0) {
+                result.errdesc = "callTwoWay failed";
+                ZCE_DEBUG((ZLOG_DEBUG, "rpc call %s ret: 0x%x, desc: %s", func, errcode,
+                           result.errdesc.c_str()));
+                async_cb(result);
+                return;
+            }
+
+            auto [unpack_code, data_tuple] = detail::unpack_to_tuple<Results...>(retdata, func);
+
+            result.errcode = unpack_code;
+            if (unpack_code < 0) {
+                result.errdesc = "unpack result failed";
+            } else {
+                result.errdesc = "success";
+                result.data = std::move(data_tuple);  // ✨ 移动解包后的元组
+            }
+
+            async_cb(result);
+        });
+
+        if (ret < 0) {
+            ZCE_ERROR((ZLOG_ERROR, "rpc call %s failed: 0x%x", func, ret));
+            return ret;
+        }
+        return ret;
+    }
+};
 
 }  // namespace zvm
 

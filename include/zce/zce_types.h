@@ -65,11 +65,17 @@ typedef struct timespec zce_timespec_t;
 typedef zce_int64 zce_timestamp;  // same as pgsql timestamp, microsecond from 2000-1-1 00:00:00
 
 // to simplify type cast or type safety
+struct zce_sockaddr_pipe {
+    zce_uint16 family;
+    zce_uint16 flags /*bit0: 0server,1 client;*/;
+    unsigned char path[96];
+};
 typedef union _zce_sockaddr_t {
     struct sockaddr sa;
     struct sockaddr_in sa_in;
     struct sockaddr_in6 sa_in6;
     struct sockaddr_storage sa_stor;
+    struct zce_sockaddr_pipe sa_pipe;
 } zce_sockaddr_t;
 
 typedef struct _zce_addr_t {
