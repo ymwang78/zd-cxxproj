@@ -13,6 +13,7 @@
 #include <zce/zce_dblock.h>
 #include <zce/zce_mbpool.h>
 #include <zce/zce_singleton.h>
+#include <zce/zds_schema.h>
 
 extern "C" {
 typedef struct lua_State lua_State;
@@ -50,6 +51,8 @@ class VirtualMachineStub : public zce::Object {
     ~VirtualMachineStub();
 
     int initStub(const zce::SmartPtr<zce::Scheduler>&, const zce::SmartPtr<zce::Reactor>&);
+
+    int listen(const char* host, unsigned short port);
 
     zce::SmartPtr<zce::Object> boot(const std::string& svc_name, const std::string& path,
                                     zce::RefBlock& args);
@@ -134,7 +137,6 @@ inline std::pair<int, std::tuple<First, Rest...>> unpack_recursive_impl(const zc
     } else if constexpr (zce::zdp::is_vector<First>()) {
         bytes_read = zce::zdp::zds_unpack_array(current_value, data.rd_ptr() + offset,
                                                 data.length() - offset, nullptr);
-
     } else {
         bytes_read = zce::zdp::zds_unpack(current_value, data.rd_ptr() + offset,
                                           data.length() - offset, nullptr, true);

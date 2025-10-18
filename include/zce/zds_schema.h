@@ -74,8 +74,8 @@ struct is_builtin_vector<std::vector<T>>
 template <typename T>
 struct is_vector : std::false_type {};
 
-template <typename T, typename Alloc>
-struct is_vector<std::vector<T, Alloc>> : std::true_type {};
+template <typename T>
+struct is_vector<std::vector<T>> : std::true_type {};
 
 template <typename T>
 inline bool is_empty_member(const T& v) {
@@ -342,6 +342,27 @@ int zds_pack_multi(zce_byte* buf, zce_int32 size, zds_context_t* ctx, bool has_p
     }
     if constexpr (sizeof...(args) > 0) {
         len = zds_pack_multi(buf, size, ctx, has_prefix, std::forward<Args>(args)...);
+        CHECKLEN_MOVEBUF_ADDRET_DECSIZE;
+    }
+
+    return ret;
+}
+
+template <typename T, typename... Args>
+int zds_unpack_multi(const zce_byte* buf, zce_int32 size, zds_context_t* ctx, bool has_prefix,
+                     T& val, Args&&... args) {
+    int len = 0, ret = 0;
+    if constexpr (zce::zdp::is_builtin_type<T>()) {
+        len = zce::zdp::zds_unpack_builtin(val, buf, size, nullptr);
+    } else if constexpr (zce::zdp::is_vector<T>()) {
+        len = zce::zdp::zds_unpack_array(val, buf, size, nullptr);
+    } else {
+        len = zce::zdp::zds_unpack(val, buf, size, nullptr, true);
+    }
+    if (len < 0) return len;
+    ret += len;
+    if constexpr (sizeof...(args) > 0) {
+        len = zds_pack_multi(buf + len, size - len, ctx, has_prefix, std::forward<Args>(args)...);
         CHECKLEN_MOVEBUF_ADDRET_DECSIZE;
     }
 

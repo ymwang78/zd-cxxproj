@@ -49,6 +49,8 @@ int ZCE_API zce_close(handle_t handle);
 
 namespace zce {
 
+std::string ZCE_API getModulePath();
+
 std::string ZCE_API matchModulePath(const char* filename);
 
 void ZCE_API chdirToModulePath();

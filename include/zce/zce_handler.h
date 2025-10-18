@@ -316,6 +316,8 @@ class ZCE_API Acceptor : public zce::Object {
   protected:
     zce::SmartPtr<zce::Reactor> reactor_ptr_;
 
+    std::function<zce::Tcp*()> make_handler_;
+
     std::string local_ip_;
 
     unsigned short local_port_;
@@ -336,7 +338,7 @@ class ZCE_API Acceptor : public zce::Object {
     void do_close();
 
   public:
-    Acceptor(const zce::SmartPtr<zce::Reactor>& reactor);
+    Acceptor(const zce::SmartPtr<zce::Reactor>& reactor, std::function<zce::Tcp*()> make_handler);
 
     ~Acceptor();
 
@@ -355,8 +357,6 @@ class ZCE_API Acceptor : public zce::Object {
     void block_remote(const zce_sockaddr_t& remote, unsigned end_timet, const std::string& reason);
 
     void unblock_remote(const zce_sockaddr_t& remote);
-
-    virtual zce::Tcp* make_handler() = 0;
 };
 
 class ZCE_API Pipe : public Socket {
