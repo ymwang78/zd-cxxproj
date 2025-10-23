@@ -118,6 +118,14 @@ class ZCE_API zdp_stream : public zce::IStream {
     template <typename MSG_T>
     int response(const MSG_T& msg, unsigned seq, zce_byte rev = 0,
                  ERV_ZCE_COMPRESS cps = ZCE_COMPRESS_NONE);
+
+    template <typename T, typename... Args>
+    int requestArgs(int msgmid, int mstimeout, const zce::Any& ctx, ERV_ZCE_COMPRESS cps,
+                    int preserv, const T& val, Args&&... args);
+
+    template <typename T, typename... Args>
+    int responseArgs(int msgmid, unsigned seq, zce_byte rev, ERV_ZCE_COMPRESS cps, const T& val,
+                     Args&&... args);
 };
 
 int ZCE_API zdp_serialize_dblock(zce::RefBlock& dblock_ptr, zce_uint16 msgmid, zce_uint32 seq,
@@ -194,6 +202,71 @@ int zdp_stream::response(const MSG_T& msg, unsigned seq, zce_byte rev, ERV_ZCE_C
     if (ret < 0) return ret;
     return write(dblock_ptr, zce::IStream::ERV_ISTREAM_DEFAULT);
 }
+
+template <typename T, typename... Args>
+int zdp_stream::requestArgs(int msgmid, int mstimeout, const zce::Any& ctx, ERV_ZCE_COMPRESS cps,
+                            int preserv, const T& val, Args&&... args) {
+    int bodylen = zds_pack_multi(0, 0, nullptr, true, val, std::forward<Args>(args)...);
+    if (bodylen < 0) return bodylen;
+    zce::RefBlock dblock_ptr;
+    ZCE_MBACQUIRE(dblock_ptr, bodylen + zdp_headlen(0) + 32);
+    if (dblock_ptr.space() <= 0) return ZCE_ERROR_MALLOC;
+    dblock_ptr.preserv(preserv);
+
+    if (bodylen > 0) {
+        int ret = zds_pack_multi(dblock_ptr.wr_ptr_cow() + zdp_headlen(0),
+                                 (int)(dblock_ptr.space() - zdp_headlen(0)), nullptr, true, val,
+                                 std::forward<Args>(args)...);
+        ZCE_ASSERT(bodylen == ret);
+        if (ret < 0) return ret;
+        if (bodylen != ret) return ZCE_ERROR_SYNTAX;
+        dblock_ptr.wr_ptr(bodylen + zdp_headlen(0));
+    } else {
+        cps = ZCE_COMPRESS_NONE;
+        dblock_ptr.wr_ptr(zdp_headlen(0));
+    }
+
+    int ret = zdp_serialize_dblock(dblock_ptr, msgmid, 0, cps, bodylen, preserv, 0);
+    ZCE_ASSERT(ret >= 0);
+    if (ret < 0) {
+        return ret;
+    }
+
+    return do_request(dblock_ptr, mstimeout, ctx);
+}
+
+template <typename T, typename... Args>
+int zdp_stream::responseArgs(int msgmid, unsigned seq, zce_byte rev, ERV_ZCE_COMPRESS cps,
+                             const T& val, Args&&... args) {
+    const int preserv = 32;
+    int bodylen = zds_pack_multi(0, 0, nullptr, true, val, std::forward<Args>(args)...);
+    if (bodylen < 0) return bodylen;
+    zce::RefBlock dblock_ptr;
+    ZCE_MBACQUIRE(dblock_ptr, bodylen + zdp_headlen(0) + 32);
+    if (dblock_ptr.space() <= 0) return ZCE_ERROR_MALLOC;
+    dblock_ptr.preserv(preserv);
+
+    if (bodylen > 0) {
+        int ret = zds_pack_multi(dblock_ptr.wr_ptr_cow() + zdp_headlen(0),
+                                 (int)(dblock_ptr.space() - zdp_headlen(0)), nullptr, true, val,
+                                 std::forward<Args>(args)...);
+        ZCE_ASSERT(bodylen == ret);
+        if (ret < 0) return ret;
+        if (bodylen != ret) return ZCE_ERROR_SYNTAX;
+        dblock_ptr.wr_ptr(bodylen + zdp_headlen(0));
+    } else {
+        cps = ZCE_COMPRESS_NONE;
+        dblock_ptr.wr_ptr(zdp_headlen(0));
+    }
+
+    int ret = zdp_serialize_dblock(dblock_ptr, msgmid, seq, cps, bodylen, preserv, 0);
+    ZCE_ASSERT(ret >= 0);
+    if (ret < 0) {
+        return ret;
+    }
+    return write(dblock_ptr, zce::IStream::ERV_ISTREAM_DEFAULT);
+}
+
 };  // namespace zdp
 
 }  // namespace zce

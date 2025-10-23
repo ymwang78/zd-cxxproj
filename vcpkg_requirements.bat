@@ -6,6 +6,7 @@ vcpkg install boost-tokenizer:x64-windows-static-md
 vcpkg install boost-lexical-cast:x64-windows-static-md
 vcpkg install boost-program-options:x64-windows-static-md
 
+vcpkg install cxxopts:x64-windows-static-md 
 
 vcpkg install open62541:x64-windows-static-md
 vcpkg install openssl:x64-windows-static-md 

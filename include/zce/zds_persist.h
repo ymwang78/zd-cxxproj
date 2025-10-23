@@ -9,8 +9,9 @@
 #include <zce/zdb_redis.h>
 
 namespace zce {
-
-class ZdbRedisConnection;
+namespace zdb {
+class RedisConnection;
+}
 
 class ZdsPersist : public zce::Object {
   protected:
@@ -35,7 +36,7 @@ class ZdsPersist : public zce::Object {
 
     ~ZdsPersist(){};
 
-    virtual zce::SmartPtr<ZdbRedisConnection> get_redis_conn() = 0;
+    virtual zce::SmartPtr<zce::zdb::RedisConnection> get_redis_conn() = 0;
 
   public:
     int init();

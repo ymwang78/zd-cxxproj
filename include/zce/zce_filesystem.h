@@ -85,6 +85,8 @@ class ZCE_API File : public zce::Object {
 
     ssize_t read(void* buf, size_t len);
 
+    ssize_t write(const void* buf, size_t nbyte);
+
     ssize_t writev(const iovec* iov, int iovcnt);
 
     int lseek_block(zce_uint64 block_id);

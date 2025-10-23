@@ -11,6 +11,7 @@
 // ***************************************************************
 #include <zce/zce_string.h>
 #include <zce/zce_matrix.h>
+#include <zce/zce_dblock.h>
 #ifndef CHECKLEN_MOVEBUF_ADDRET_DECSIZE
 #    define CHECKLEN_MOVEBUF_ADDRET_DECSIZE \
         do {                                \
@@ -329,46 +330,6 @@ int zds_unpack_array(std::vector<T>& val, const zce_byte* buf, zce_int32 size, z
 // skip one object
 int ZCE_API zds_unpack_skip(const zce_byte* buf, zce_int32 size, zds_context_t* ctx);
 
-template <typename T, typename... Args>
-int zds_pack_multi(zce_byte* buf, zce_int32 size, zds_context_t* ctx, bool has_prefix, const T& val,
-                   Args&&... args) {
-    int len = 0, ret = 0;
-    if constexpr (is_builtin_type<T>()) {
-        len = zds_pack_builtin(buf, size, val, ctx);
-        CHECKLEN_MOVEBUF_ADDRET_DECSIZE;
-    } else {
-        len = zds_pack(buf, size, val, ctx, has_prefix);
-        CHECKLEN_MOVEBUF_ADDRET_DECSIZE;
-    }
-    if constexpr (sizeof...(args) > 0) {
-        len = zds_pack_multi(buf, size, ctx, has_prefix, std::forward<Args>(args)...);
-        CHECKLEN_MOVEBUF_ADDRET_DECSIZE;
-    }
-
-    return ret;
-}
-
-template <typename T, typename... Args>
-int zds_unpack_multi(const zce_byte* buf, zce_int32 size, zds_context_t* ctx, bool has_prefix,
-                     T& val, Args&&... args) {
-    int len = 0, ret = 0;
-    if constexpr (zce::zdp::is_builtin_type<T>()) {
-        len = zce::zdp::zds_unpack_builtin(val, buf, size, nullptr);
-    } else if constexpr (zce::zdp::is_vector<T>()) {
-        len = zce::zdp::zds_unpack_array(val, buf, size, nullptr);
-    } else {
-        len = zce::zdp::zds_unpack(val, buf, size, nullptr, true);
-    }
-    if (len < 0) return len;
-    ret += len;
-    if constexpr (sizeof...(args) > 0) {
-        len = zds_pack_multi(buf + len, size - len, ctx, has_prefix, std::forward<Args>(args)...);
-        CHECKLEN_MOVEBUF_ADDRET_DECSIZE;
-    }
-
-    return ret;
-}
-
 int ZCE_API zds_pack_dict_header(zce_byte* buf, zce_int32 size, zce_byte key_payload,
                                  zce_byte val_payload, unsigned dict_size, zds_context_t* ctx,
                                  bool has_prefix = true);
@@ -454,6 +415,46 @@ inline int zds_unpack(_dummy_t& /*_t*/, const zce_byte* /*buf*/, int /*size*/,
                       zds_context_t* /*ctx*/, bool /*has_prefix*/) {
     return -1;
 };
+
+template <typename T, typename... Args>
+int zds_pack_multi(zce_byte* buf, zce_int32 size, zds_context_t* ctx, bool has_prefix, const T& val,
+                   Args&&... args) {
+    int len = 0, ret = 0;
+    if constexpr (is_builtin_type<T>()) {
+        len = zds_pack_builtin(buf, size, val, ctx);
+        CHECKLEN_MOVEBUF_ADDRET_DECSIZE;
+    } else {
+        len = zds_pack(buf, size, val, ctx, has_prefix);
+        CHECKLEN_MOVEBUF_ADDRET_DECSIZE;
+    }
+    if constexpr (sizeof...(args) > 0) {
+        len = zds_pack_multi(buf, size, ctx, has_prefix, std::forward<Args>(args)...);
+        CHECKLEN_MOVEBUF_ADDRET_DECSIZE;
+    }
+
+    return ret;
+}
+
+template <typename T, typename... Args>
+int zds_unpack_multi(const zce_byte* buf, zce_int32 size, zds_context_t* ctx, bool has_prefix,
+                     T& val, Args&&... args) {
+    int len = 0, ret = 0;
+    if constexpr (zce::zdp::is_builtin_type<T>()) {
+        len = zce::zdp::zds_unpack_builtin(val, buf, size, nullptr);
+    } else if constexpr (zce::zdp::is_vector<T>()) {
+        len = zce::zdp::zds_unpack_array(val, buf, size, nullptr);
+    } else {
+        len = zce::zdp::zds_unpack(val, buf, size, nullptr, true);
+    }
+    if (len < 0) return len;
+    ret += len;
+    if constexpr (sizeof...(args) > 0) {
+        len = zds_unpack_multi(buf + len, size - len, ctx, has_prefix, std::forward<Args>(args)...);
+        CHECKLEN_MOVEBUF_ADDRET_DECSIZE;
+    }
+
+    return ret;
+}
 
 }  // namespace zdp
 }  // namespace zce

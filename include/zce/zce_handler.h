@@ -333,7 +333,7 @@ class ZCE_API Acceptor : public zce::Object {
     };
     std::map<zce_sockaddr_t, block_t> block_dict_;
 
-    int do_listen();
+    int do_listen(std::function<void(unsigned short port)> listen_start_cb);
 
     void do_close();
 
@@ -344,7 +344,7 @@ class ZCE_API Acceptor : public zce::Object {
 
     const zce::SmartPtr<zce::Reactor>& reactor() { return reactor_ptr_; }
 
-    int listen(const char* localip, unsigned short port);
+    int listen(const char* localip, unsigned short port, std::function<void(unsigned short port)> listen_start_cb = nullptr);
 
     void close();
 

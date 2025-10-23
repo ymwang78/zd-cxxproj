@@ -24,6 +24,8 @@ struct redisReply;
 namespace zce {
 class Object;
 
+namespace zdb {
+
 class ZCE_API ZdbRedis {
     redisReply* reply_;
 
@@ -50,14 +52,14 @@ class ZCE_API ZdbRedis {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-int ZCE_API zdb_redis_toval(zce::RefBlock& v, const zce::ZdbRedis& r);
+int ZCE_API zdb_redis_toval(zce::RefBlock& v, const zce::zdb::ZdbRedis& r);
 
-int ZCE_API zdb_redis_toval(zce_astring& v, const zce::ZdbRedis& r);
+int ZCE_API zdb_redis_toval(zce_astring& v, const zce::zdb::ZdbRedis& r);
 
-int ZCE_API zdb_redis_toval(zce_int64& v, const zce::ZdbRedis& r);
+int ZCE_API zdb_redis_toval(zce_int64& v, const zce::zdb::ZdbRedis& r);
 
 template <typename T>
-int zdb_redis_toval(T& v, const zce::ZdbRedis& r) {
+int zdb_redis_toval(T& v, const zce::zdb::ZdbRedis& r) {
     zce_int64 i64v = 0;
     int ret = zdb_redis_toval(i64v, r);
     if (ret < 0) return ret;
@@ -65,15 +67,15 @@ int zdb_redis_toval(T& v, const zce::ZdbRedis& r) {
     return ret;
 }
 
-class ZCE_API ZdbRedisConnection : public zce::Object {
+class ZCE_API RedisConnection : public zce::Object {
     redisContext* context_;
 
   public:
     typedef std::vector<std::pair<std::string, zce_int64> > kvpair_vec_t;
 
-    ZdbRedisConnection();
+    RedisConnection();
 
-    ZdbRedisConnection(bool ssl, const std::string& ip, unsigned short port, const char* passwd);
+    RedisConnection(bool ssl, const std::string& ip, unsigned short port, const char* passwd);
 
     bool connetion_ok() const;
 
@@ -143,7 +145,7 @@ class ZCE_API ZdbRedisConnection : public zce::Object {
     int lpop(const std::string& k, zce::RefBlock& v);
 };
 
-class ZCE_API ZdbRedisDatabase : public zce::Object {
+class ZCE_API RedisDatabase : public zce::Object {
     bool ssl_;
     std::string ip_;
     unsigned short port_;
@@ -151,9 +153,9 @@ class ZCE_API ZdbRedisDatabase : public zce::Object {
     zce::Tss tss_conn_;
 
   public:
-    ZdbRedisDatabase(bool ssl, const std::string& ip, unsigned short port, const char* passwd);
+    RedisDatabase(bool ssl, const std::string& ip, unsigned short port, const char* passwd);
 
-    zce::SmartPtr<ZdbRedisConnection> get_connection();
+    zce::SmartPtr<RedisConnection> getConnection();
 
     inline void get_conninfo(std::string& ip, unsigned short& port, std::string& passwd) const {
         ip = ip_;
@@ -162,9 +164,8 @@ class ZCE_API ZdbRedisDatabase : public zce::Object {
     }
 };
 
-
 template <typename KEY, typename VAL>
-int ZdbRedisConnection::hget(const std::string& k, const KEY& h, VAL& v) {
+int RedisConnection::hget(const std::string& k, const KEY& h, VAL& v) {
     ZdbRedis r;
     int ret = hget(r, k, zce::to_string(h));
     if (ret < 0) {
@@ -178,6 +179,7 @@ int ZdbRedisConnection::hget(const std::string& k, const KEY& h, VAL& v) {
     return ret;
 }
 
+}  // namespace zdb
 }  // namespace zce
 
 

@@ -254,7 +254,7 @@ class ZCE_API Database : public zce::Object {
   public:
     class DatabaseImpl : public zce::Object {
       public:
-        virtual zce::SmartPtr<Connection> get_connection() = 0;
+        virtual zce::SmartPtr<Connection> getConnection() = 0;
         virtual void close() = 0;
     };
 
@@ -273,7 +273,7 @@ class ZCE_API Database : public zce::Object {
 
     virtual ~Database();
 
-    zce::SmartPtr<Connection> get_connection();
+    zce::SmartPtr<Connection> getConnection();
 
     ERV_DATABASE database_type() const { return database_; }
 

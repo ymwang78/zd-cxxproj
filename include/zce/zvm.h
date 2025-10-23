@@ -217,7 +217,7 @@ class VirtualMachineProxy : public zce::Object {
         ZTRACE(func);
 
         zce::RefBlock dblock;
-        {
+        if constexpr (sizeof...(Args) > 0) {
             ret = zce::zdp::zds_pack_multi(0, 0, nullptr, true, std::forward<Args>(args)...);
             if (ret < 0) return ret;
             if (ret > 0) {
@@ -251,7 +251,7 @@ class VirtualMachineProxy : public zce::Object {
                 result.data = std::move(data_tuple);  // ✨ 移动解包后的元组
             }
 
-            async_cb(result);
+            async_cb(std::move(result));
         });
 
         if (ret < 0) {

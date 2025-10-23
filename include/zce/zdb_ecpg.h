@@ -68,7 +68,7 @@ class ZCE_API zdb_ecpg_connection : public zce::Object {
 
     zdb_ecpg_conn_t* conn_ptr() { return &conn_t; };
 
-    bool connection_ok() { return conn_t.lasterr != -200 && conn_t.lasterr != -221; }
+    bool isConnectionOK() { return conn_t.lasterr != -200 && conn_t.lasterr != -221; }
 
     void close();
 };
@@ -85,7 +85,7 @@ class ZCE_API zdb_ecpg_database : public zce::Object {
     zdb_ecpg_database(const std::string& dbhost, const std::string& dbname,
                       const std::string& dbuser, const std::string& dbpasswd);
 
-    zce::SmartPtr<zdb_ecpg_connection> get_connection();
+    zce::SmartPtr<zdb_ecpg_connection> getConnection();
 
     void reset_connection();
 
