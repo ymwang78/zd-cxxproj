@@ -65,12 +65,13 @@ class VirtualMachineStub : public zce::Object {
     void destroy(const zce::SmartPtr<zce::Object>& vm);
 
     int rpc_call_dblock(const zce::SmartPtr<zce::Object>& vmptr, zce_int64 objectid,
-                        const std::string& method, zce::RefBlock&& dblock,
+                        const std::string& method, zce::RefBlock&& dblock, int mstimeout,
                         const response_cb& response);
 
     template <typename T>
     int rpc_call_builtin(const zce::SmartPtr<zce::Object>& vmptr, zce_int64 objectid,
-                         const std::string& method, const T& t, const response_cb& response) {
+                         const std::string& method, const T& t, int mstimeout,
+                         const response_cb& response) {
         zce::RefBlock dblock;
         int ret = zce::zdp::zds_pack_builtin(0, 0, t, 0, true);
         if (ret < 0) return ret;
@@ -79,13 +80,13 @@ class VirtualMachineStub : public zce::Object {
         ret = zce::zdp::zds_pack_builtin(dblock.rd_ptr_cow(), (int)dblock.space(), t, 0, true);
         if (ret < 0) return ret;
         dblock.wr_ptr(ret);
-        return rpc_call_dblock(vmptr, objectid, method, std::move(dblock), response);
+        return rpc_call_dblock(vmptr, objectid, method, std::move(dblock), mstimeout, response);
     }
 
     template <typename T>
     int rpc_call_msg(
         const zce::SmartPtr<zce::Object>& vmptr, zce_int64 objectid, const std::string& method,
-        const T& t,
+        const T& t, int mstimeout,
         const std::function<void(int error_code, const zce::RefBlock& retdata)>& response) {
         zce::RefBlock dblock;
         int ret = zce::zdp::zds_pack(0, 0, t, 0, true);
@@ -95,20 +96,21 @@ class VirtualMachineStub : public zce::Object {
         ret = zce::zdp::zds_pack(dblock.rd_ptr_cow(), (int)dblock.space(), t, 0, true);
         if (ret < 0) return ret;
         dblock.wr_ptr(ret);
-        return rpc_call_dblock(vmptr, objectid, method, std::move(dblock), response);
+        return rpc_call_dblock(vmptr, objectid, method, std::move(dblock), mstimeout, response);
     }
 
     template <typename T>
     int rpc_call(
         const zce::SmartPtr<zce::Object>& vmptr, zce_int64 objectid, const std::string& method, T t,
+        int mstimeout,
         const std::function<void(int error_code, const zce::RefBlock& retdata)>& response) {
         typedef typename std::remove_cv<typename std::remove_reference<T>::type>::type TT;
         if constexpr (std::is_same<TT, zce::RefBlock>::value) {
-            return rpc_call_dblock(vmptr, objectid, method, std::move(t), response);
+            return rpc_call_dblock(vmptr, objectid, method, std::move(t), mstimeout, response);
         } else if constexpr (zce::zdp::is_builtin_type<TT>()) {
-            return rpc_call_builtin(vmptr, objectid, method, t, response);
+            return rpc_call_builtin(vmptr, objectid, method, t, mstimeout, response);
         } else {
-            return rpc_call_msg(vmptr, objectid, method, t, response);
+            return rpc_call_msg(vmptr, objectid, method, t, mstimeout, response);
         }
     }
 
@@ -170,7 +172,7 @@ inline std::pair<int, std::tuple<Results...>> unpack_to_tuple(const zce::RefBloc
 
 class VirtualMachineProxy : public zce::Object {
   protected:
-    virtual int doCallTwoWay(const char* func, const zce::RefBlock& input,
+    virtual int doCallTwoWay(const char* func, const zce::RefBlock& input, int mstimeout,
                              std::function<void(int errcode, const zce::RefBlock& output)> cb) = 0;
 
   public:
@@ -212,7 +214,7 @@ class VirtualMachineProxy : public zce::Object {
     }
 
     template <typename... Results, typename... Args, typename F>
-    int callTwoWayAsync(const char* func, F&& async_cb, Args&&... args) {
+    int callTwoWayAsync(const char* func, int mstimeout, F&& async_cb, Args&&... args) {
         int ret = 0;
         ZTRACE(func);
 
@@ -230,14 +232,14 @@ class VirtualMachineProxy : public zce::Object {
             }
         }
 
-        ret = doCallTwoWay(func, dblock, [=](int errcode, const zce::RefBlock& retdata) {
+        ret = doCallTwoWay(func, dblock, mstimeout, [=](int errcode, const zce::RefBlock& retdata) {
             RpcResult<Results...> result;
             result.errcode = errcode;
             if (errcode < 0) {
                 result.errdesc = "callTwoWay failed";
                 ZCE_DEBUG((ZLOG_DEBUG, "rpc call %s ret: 0x%x, desc: %s", func, errcode,
                            result.errdesc.c_str()));
-                async_cb(result);
+                async_cb(std::move(result));
                 return;
             }
 

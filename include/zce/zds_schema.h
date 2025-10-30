@@ -420,8 +420,11 @@ template <typename T, typename... Args>
 int zds_pack_multi(zce_byte* buf, zce_int32 size, zds_context_t* ctx, bool has_prefix, const T& val,
                    Args&&... args) {
     int len = 0, ret = 0;
-    if constexpr (is_builtin_type<T>()) {
+    if constexpr(is_builtin_type<T>() || is_builtin_vector<T>()) {
         len = zds_pack_builtin(buf, size, val, ctx);
+        CHECKLEN_MOVEBUF_ADDRET_DECSIZE;
+    } else if constexpr (is_vector<T>::value) {
+        len = zds_pack_array(buf, size, val, ctx);
         CHECKLEN_MOVEBUF_ADDRET_DECSIZE;
     } else {
         len = zds_pack(buf, size, val, ctx, has_prefix);

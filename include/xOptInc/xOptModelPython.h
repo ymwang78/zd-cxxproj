@@ -29,6 +29,8 @@ class xOptModelPython : public xOptModelBase {
 
     xOptModelParameters getParameters() const override;
 
+    xOptNameStrValueMap getParameterDescs() const override;
+
     int setParameters(const xOptModelParameters& parameters) override;
 
     int validateModel() const override;

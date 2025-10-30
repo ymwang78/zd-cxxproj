@@ -26,6 +26,8 @@ using xOptModelFixableVariables = std::unordered_map<std::string, double>;
 
 using xOptVarCompMap = std::unordered_map<std::string, std::string>;
 
+using xOptNameStrValueMap = std::unordered_map<std::string, std::string>;
+
 struct xOptModelDescT {
     xOptModelParameters parameters;
     std::vector<std::string> fixable_varnames;
@@ -145,6 +147,8 @@ class xOptModelBase : public zce::Object {
     virtual int setComponents(const std::vector<std::string>& components) = 0;
 
     virtual xOptModelParameters getParameters() const = 0;
+
+    virtual xOptNameStrValueMap getParameterDescs() const { return {}; }
 
     virtual int setParameters(const xOptModelParameters& parameters) = 0;
 
