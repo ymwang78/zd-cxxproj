@@ -27,11 +27,14 @@ class ZCE_API Reactor : public zce::TaskDelegator {
     struct pimpl* pimpl_;
 
     friend class ReactorThread;
+    friend class ReactorInPlaceThread;
 
   public:
     Reactor(const char* name = nullptr);
 
     ~Reactor();
+
+    const std::string& name() const;
 
     unsigned long thread_id() const;
 
@@ -39,9 +42,9 @@ class ZCE_API Reactor : public zce::TaskDelegator {
 
     void* loop_t() const;
 
-    int set_thread_priority(int priority);
+    int setThreadPriority(int priority);
 
-    int start();
+    int start(bool in_place = false);
 
     void stop();
 
@@ -59,9 +62,9 @@ class ZCE_API Reactor : public zce::TaskDelegator {
 
     void zfree(void*);
 
-    virtual int on_start() { return 0; };
+    virtual int onReactorStart() { return 0; };
 
-    virtual void on_stopped() { };
+    virtual void onReactorStop() {};
 
   private:
     int loop();

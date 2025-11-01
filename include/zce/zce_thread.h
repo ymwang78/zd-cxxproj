@@ -33,20 +33,23 @@ class ZCE_API Thread : virtual public Object {
 
     virtual ~Thread();
 
-    virtual void run() = 0;
-    virtual void terminate() = 0;
+    virtual void onThreadStart() = 0;
 
-    int start();
-    void join();
-    int set_priority(THREAD_PRIORITY v);
-    unsigned long id() const;
+    virtual void onThreadTerminate() = 0;
+
+    int startThread(bool in_place = false);
+    
+    void joinThread();
+    
+    int setThreadPriority(THREAD_PRIORITY v);
+    
+    unsigned long getThreadId() const;
 
     bool operator==(const Thread&) const;
+    
     bool operator!=(const Thread&) const;
+    
     bool operator<(const Thread&) const;
-
-    void __runi();
-    void __done();
 
   private:
 

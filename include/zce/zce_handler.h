@@ -374,6 +374,8 @@ class ZCE_API Pipe : public Socket {
     Pipe(const zce::SmartPtr<zce::Reactor>& reactor, int preserved_size = 16);
     ~Pipe();
 
+    int open(int fd);
+
     virtual void* handle() const;
 
     virtual void on_open(bool passive, const zce_sockaddr_t& remote);
@@ -425,6 +427,38 @@ class ZCE_API PipeAcceptor : public zce::Object {
     void on_connect(int status);
 
     void on_close();
+};
+
+class ZCE_API Tty : public Socket {
+    struct Pimpl;
+    struct Pimpl* pimpl_;
+  protected:
+    int start_read();
+    int do_write(zce::RefBlock&, const zce_sockaddr_t*,
+                 zce::IStream::ERV_ISTREAM_WRITEOPT) override {
+        return 0;
+    };
+  public:
+    Tty(const zce::SmartPtr<zce::Reactor>& reactor, int preserved_size = 16);
+    ~Tty();
+    int open(int fd); 
+    virtual void* handle() const;
+    virtual void on_open(bool passive, const zce_sockaddr_t& remote);
+    virtual void on_close();
+    virtual void on_read_data(zce_byte*, zce_uint32);
+    virtual int get_local_addr(zce_sockaddr_t& addr) const;
+};
+
+class ZCE_API Signal : public zce::Object {
+    ZCE_OBJECT_DECLARE;
+    struct Pimpl;
+    struct Pimpl* pimpl_;
+  public:
+    Signal(const zce::SmartPtr<zce::Reactor>& reactor, int signum, std::function<void(int signum)> cb);
+    ~Signal();
+    int start();
+    void close();
+    virtual void onSignal(int signum);
 };
 
 class TaskQueue;

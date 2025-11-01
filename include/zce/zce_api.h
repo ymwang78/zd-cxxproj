@@ -157,6 +157,8 @@ std::string ZCE_API zce_get_hostname();
 
 std::string ZCE_API zce_format_scientific(double value);
 
+std::string ZCE_API zce_error_msg(int errnum);
+
 template<typename T>
 inline T zce_min(T v1, T v2) 
 {

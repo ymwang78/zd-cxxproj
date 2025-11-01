@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 // ***************************************************************
 //  zxml_convertor   version:  1.0   -  date: 2002/07/31
 //  -------------------------------------------------------------
@@ -46,6 +46,8 @@ int             ZCE_API   zxml_double_to_attr(char* buffer, int size, const char
 double          ZCE_API   zxml_double_from_attr(const char* val);
 int             ZCE_API   zxml_string_to_attr(char* buffer, int size, const char* name, const std::string& val);
 std::string     ZCE_API   zxml_string_from_attr(const char* val);
+int             ZCE_API   zxml_astring_to_attr(char* buffer, int size, const char* name, const std::string& val);
+std::string     ZCE_API   zxml_astring_from_attr(const char* val);
 int             ZCE_API   zxml_char_to_elem(char* buffer, int size, const char* name, char val);
 int             ZCE_API   zxml_uchar_to_elem(char* buffer, int size, const char* name, unsigned char val);
 int             ZCE_API   zxml_short_to_elem(char* buffer, int size, const char* name, short val);

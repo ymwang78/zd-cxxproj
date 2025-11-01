@@ -9,116 +9,139 @@
 // ***************************************************************
 //
 // **************************************************************/
+#include <zce/zce_config.h>
+#include <zce/zce_reactor.h>
+#include <zce/zce_handler.h>
 #include <vector>
 #include <string>
-#include <zce/zce_config.h>
 
 namespace zce {
 class Allocator;
 class TaskDelegator;
 class RefBlock;
+class Pipe;
+class Tty;
+class SubProcessHost;
+class Process;
 
-class ZCE_API Service {
-    enum _PROCESS_FLAG {
-        PROCESS_FLAG_CONSOLE = 1,
-        PROCESS_FLAG_SERVICE,
-        PROCESS_FLAG_WORK,
+struct ZCE_API AppOptions {
+    std::string mode;                 // daemon, work, service
+    std::string guid;                 // --guid <guid>
+    std::string pidfile;              // --pidfile <path>
+    std::string logsuffix;            // --logsuffix <suffix>
+    std::string configpath;           // --configpath <path>
+
+    std::string vmname;               // --vmname <vm name>
+    std::string vmpath;               // --vmpath <vm path>
+    std::string vmaddr;               // --vmaddr <vm listen address>
+    unsigned short vmport;            // --vmport <vm listen port>
+    std::vector<std::string> extras;  // 存放未定义参数
+
+    std::string help_target;
+#ifdef _WIN32
+    std::string service_action;     // install, remove, start, stop, restart, status
+    std::string service_name;       // <name>
+    std::string service_exec_path;  // 可执行文件路径及参数
+    std::string service_display;
+#endif
+};
+
+class ZCE_API Service : public Reactor {
+    struct ServiceStdInput : public IStream {
+        Service* service_;
+        ServiceStdInput(Service* service) : service_(service) {}
+        virtual void on_read(zce::RefBlock& dblock, const zce::Any&) override;
     };
 
+  protected:
+    static zce::Service* instance_;
+    AppOptions options_{};
+    std::string name_;
+    bool exit_success_;
+    volatile bool running_;
+    SmartPtr<zce::Pipe> pipe_;
+    SmartPtr<zce::Tty> tty_;
+    SmartPtr<Signal> signal_hup_;
+    SmartPtr<Signal> signal_int_;
+    SmartPtr<Signal> signal_term_;
+    SmartPtr<Timer> timer_;
+    zce::SmartPtr<zce::SubProcessHost> process_host_;
+    zce::SmartPtr<zce::Process> sub_process_;
+
+#ifdef _WIN32
+    SERVICE_STATUS_HANDLE win_service_handle_;
+    SERVICE_STATUS win_service_status_{};
+#endif
+
+    int onReactorStart() override;
+
+    void onReactorStop() override;
+
+    virtual void onTimer();
+
+    virtual void onStdinCommand(std::string line);
+
+    virtual bool onDaemonStart();
+
+    virtual void onDaemonStop();
+
+    virtual bool onWorkerStart() = 0;
+
+    virtual bool onWorkerStop() = 0;
+
   public:
-    Service();
+    Service(const char* name);
 
-    virtual ~Service();
+    ~Service() override;
 
-    virtual bool shutdown();
+    virtual bool shutdownDaemonAndWorker();
 
-    virtual void interrupt();
-
-    virtual void handle_interrupt(int);
+    virtual void onSignal(int);
 
     int main(int&, char*[]);
 
     static Service* instance();
 
-    bool service() const;
+    bool isDaemonProcess() const;
+
+    bool isWorkProcess() const;
 
     std::string name() const;
 
-    int run(int&, char*[]);
-
-    void wait_for_shutdown();
-
     bool stop();
 
-#ifdef __HASVXML__
-    std::vector<unsigned char> vec_pubkey_;
-    unsigned lic_num_;
-    unsigned lic_exp_;
-
-    void initlicense(const char* name);
-    void set_license(void* param);
-    bool checklicense();
-    unsigned getlicnum() const { return lic_num_; }
-    unsigned getlicexp() const { return lic_exp_; }
-#endif
-
   protected:
-    virtual bool on_start(int, char*[]) = 0;
-
-    virtual bool on_stop() = 0;
-
     virtual void print_object_stat();
 
-    void enable_interrupt();
-
-    void disable_interrupt();
-
-  private:
-    unsigned process_flag_;
-    bool nohup_;
-    std::string name_;
-    bool exit_success_;
-    volatile bool running_;
-    static zce::Service* instance_;
-
 #ifdef _WIN32
-    int run_service(int, char*[]);
-    void terminate_service(DWORD);
-    bool wait_for_service_state(SC_HANDLE, DWORD, SERVICE_STATUS&);
-    void show_service_status(const std::string&, SERVICE_STATUS&);
-    SERVICE_STATUS_HANDLE status_handle_;
-    std::vector<std::string> service_args_;
-    HANDLE work_event_;
-    HANDLE work_process_;
+    static void _cbWindowsServiceMain(DWORD argc, LPSTR* argv);
+    static void _cbWindowsServiceCtrlHandler(DWORD);
 
-    std::string guid_;
+    int startWindowsService();
+    void onWindowsServiceMain(DWORD, LPSTR*);
+
+    bool waitForServiceState(SC_HANDLE, DWORD, SERVICE_STATUS&);
 
   public:
-    void service_main(int, char*[]);
-    void control(int);
+    int installWindowsService(bool, const std::string&, const std::string&, const std::string&,
+                              const std::vector<std::string>&);
+
+    int removeWindowsService(bool, const std::string&);
+
+    int startWindowsService(const std::string&, const std::vector<std::string>&);
+
+    int queryWindowsServiceStatus(const std::string&);
+
+    int stopWindowsService(const std::string&);
+
+    void showServiceStatus(const std::string& msg, SERVICE_STATUS& status);
 #else
+  protected:
     int run_daemon(int, char*[]);
     std::string pid_file_;
     pid_t work_process_;
     const char* exepath_;
     int pipe_[2];
-#endif
-
-#ifdef _WIN32
-
-    void configure_service(const std::string&);
-
-    int install_service(bool, const std::string&, const std::string&, const std::string&,
-                        const std::vector<std::string>&);
-
-    int uninstall_service(bool, const std::string&);
-
-    int start_service(const std::string&, const std::vector<std::string>&);
-
-    int stop_service(const std::string&);
-
-    static void set_module_handle(HMODULE);
-
 #endif  // _WIN32
 };
 
