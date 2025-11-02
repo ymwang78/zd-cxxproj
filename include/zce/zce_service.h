@@ -22,14 +22,14 @@ class RefBlock;
 class Pipe;
 class Tty;
 class SubProcessHost;
-class Process;
+class SubProcess;
 
 struct ZCE_API AppOptions {
-    std::string mode;                 // daemon, work, service
-    std::string guid;                 // --guid <guid>
-    std::string pidfile;              // --pidfile <path>
-    std::string logsuffix;            // --logsuffix <suffix>
-    std::string configpath;           // --configpath <path>
+    std::string mode;        // daemon, work, service
+    std::string guid;        // --guid <guid>
+    std::string pidfile;     // --pidfile <path>
+    std::string logsuffix;   // --logsuffix <suffix>
+    std::string configpath;  // --configpath <path>
 
     std::string vmname;               // --vmname <vm name>
     std::string vmpath;               // --vmpath <vm path>
@@ -66,7 +66,7 @@ class ZCE_API Service : public Reactor {
     SmartPtr<Signal> signal_term_;
     SmartPtr<Timer> timer_;
     zce::SmartPtr<zce::SubProcessHost> process_host_;
-    zce::SmartPtr<zce::Process> sub_process_;
+    zce::SmartPtr<zce::SubProcess> sub_process_;
 
 #ifdef _WIN32
     SERVICE_STATUS_HANDLE win_service_handle_;
@@ -98,6 +98,8 @@ class ZCE_API Service : public Reactor {
 
     virtual void onSignal(int);
 
+    int runWorkerProcess();
+
     int main(int&, char*[]);
 
     static Service* instance();
@@ -108,9 +110,9 @@ class ZCE_API Service : public Reactor {
 
     std::string name() const;
 
-    bool stop();
-
   protected:
+    
+
     virtual void print_object_stat();
 
 #ifdef _WIN32

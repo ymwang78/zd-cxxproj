@@ -111,6 +111,9 @@ class ZCE_API zdp_stream : public zce::IStream {
     int do_request(zce::RefBlock& plain_body, int mstimeout = 0,
                    const zce::Any& ctx = zce::Any((zce_int64)0));
 
+    int request(int msgmid, zce::RefBlock dblock_with_prespace, int mstimeout = 0,
+                const zce::Any& ctx = zce::Any((zce_int64)0));
+
     template <typename MSG_T>
     int request(const MSG_T& msg, int mstimeout = 0, const zce::Any& ctx = zce::Any((zce_int64)0),
                 ERV_ZCE_COMPRESS cps = ZCE_COMPRESS_NONE);

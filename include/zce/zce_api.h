@@ -87,6 +87,7 @@ extern "C"
     unsigned ZCE_API zce_getcpu();
 
     enum ERV_ZCE_COMPRESS {
+        ZCE_COMPRESS_AUTO = -1,
         ZCE_COMPRESS_NONE,
         ZCE_COMPRESS_BZIP2,
     };

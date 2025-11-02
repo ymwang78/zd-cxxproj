@@ -16,23 +16,32 @@
 
 namespace zce {
 class Reactor;
+
 namespace zdb {
 class Database;
 class Statement;
 }  // namespace zdb
+
+namespace zdp {
+struct zdp_head;
+}  // namespace zdp
+
 }  // namespace zce
 
 namespace zce {
 
-    // guid在全系统唯一，考虑到同一个服务可能被多个部署，例如HOSTVM/HOSTPY，需要确保唯一来包装管道唯一
+// guid在全系统唯一，考虑到同一个服务可能被多个部署，例如HOSTVM/HOSTPY，需要确保唯一来包装管道唯一
 struct ZCE_API SubProcessInfo {
     std::string name;  // name在本进程内唯一
     std::string guid;
-    unsigned int pid;
     std::string workdir;
     std::string exepath;
     std::vector<std::string> args;
     std::map<std::string, std::string> env;
+    unsigned int delayed;  // 延迟启动时间，单位秒
+    unsigned int pid;
+    zce_timestamp starttime;
+    zce_timestamp endtime;
 };
 
 extern zce::zdb::Statement& operator>>(zce::zdb::Statement& stmt, zce::SubProcessInfo& inst);
@@ -48,9 +57,11 @@ class ZCE_API SubProcessHost : public Object {
 
     ~SubProcessHost() override;
 
-    int invoke(std::string name, std::string work_dir, std::string exepath,
+    void checkDelayedStart();
+
+    int invoke(std::string name, std::string guid_hint, std::string work_dir, std::string exepath,
                const std::vector<std::string>& exeargs,
-               const std::map<std::string, std::string>& env);
+               const std::map<std::string, std::string>& env, int delayed = 0);
 
     int querySubProcessInfo(const std::string& name, struct SubProcessInfo& info);
 };
@@ -68,7 +79,10 @@ class ZCE_API Process : virtual public Object {
 
     ~Process();
 
-    int start(std::string pipe_name, SmartPtr<IStream> subprocess_istream);
+    int attachProcess(unsigned long process_id, std::string pipe_id,
+                      SmartPtr<IStream> subprocess_istream);
+
+    int startProcess(std::string pipe_id, SmartPtr<IStream> subprocess_istream);
 
     int kill(int signum = 0);
 
@@ -82,11 +96,23 @@ class SubProcess : virtual public Object {
     Impl* pimpl_;
 
   public:
+    using ConnectCallback = std::function<void(zce::SmartPtr<SubProcess>)>;
+    using DisconnectCallback = std::function<void(zce::SmartPtr<SubProcess>)>;
+    using DataCallback = std::function<void(zce::SmartPtr<SubProcess>, const zce::zdp::zdp_head&,
+                                            zce::RefBlock, const zce::Any&)>;
+
     explicit SubProcess(const SmartPtr<Reactor>& reactor);
 
     ~SubProcess() override;
 
-    int connect(const std::string& pipe_name, SmartPtr<IStream> process_istream);
+    int connect(const std::string& pipe_id, SmartPtr<IStream> process_istream);
+
+    int connect(const std::string& pipe_id, ConnectCallback connect_cb,
+                DisconnectCallback disconnect, DataCallback data_cb);
+
+    void close();
+
+    SmartPtr<IStream> getStreamPtr();
 };
 
 }  // namespace zce
