@@ -30,6 +30,18 @@ struct zdp_head;
 
 namespace zce {
 
+enum PRECESS_MSGID {
+    PRECESS_MSGID_S2MSTART_REQ = 0,
+    PRECESS_MSGID_S2MSTART_RES,
+    PRECESS_MSGID_M2SHBEAT_REQ,
+    PRECESS_MSGID_M2SHBEAT_RES,
+    PRECESS_MSGID_S2MQUIT_REQ,
+    PRECESS_MSGID_S2MQUIT_RES,
+
+    PRECESS_MSGID_M2SQUIT_REQ = 0x100,
+    PRECESS_MSGID_M2SQUIT_RES,
+};
+
 // guid在全系统唯一，考虑到同一个服务可能被多个部署，例如HOSTVM/HOSTPY，需要确保唯一来包装管道唯一
 struct ZCE_API SubProcessInfo {
     std::string name;  // name在本进程内唯一
@@ -56,6 +68,8 @@ class ZCE_API SubProcessHost : public Object {
                    const char* table_name = "subprocess");
 
     ~SubProcessHost() override;
+    
+    void stopAllSubProcess();
 
     void checkDelayedStart();
 
@@ -105,9 +119,9 @@ class SubProcess : virtual public Object {
 
     ~SubProcess() override;
 
-    int connect(const std::string& pipe_id, SmartPtr<IStream> process_istream);
+    int connectProcess(const std::string& pipe_id, SmartPtr<IStream> process_istream);
 
-    int connect(const std::string& pipe_id, ConnectCallback connect_cb,
+    int connectProcess(const std::string& pipe_id, ConnectCallback connect_cb,
                 DisconnectCallback disconnect, DataCallback data_cb);
 
     void close();

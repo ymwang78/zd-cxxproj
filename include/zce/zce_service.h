@@ -24,6 +24,7 @@ class Tty;
 class SubProcessHost;
 class SubProcess;
 
+
 struct ZCE_API AppOptions {
     std::string mode;        // daemon, work, service
     std::string guid;        // --guid <guid>
