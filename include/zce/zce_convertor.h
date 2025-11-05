@@ -59,6 +59,7 @@ class ZCE_API ToUtf8 {
 
     int utf8_len() const { return utf8_len_; }
     operator const char*() const { return utf8_str_; }
+    const char* c_str() const { return utf8_str_; }
     bool result() const { return E_OK == error_; };
 
   private:
@@ -74,6 +75,7 @@ class ZCE_API FromUtf8 {
     FromUtf8(const char* utf8_str, int len = 0);
     ~FromUtf8();
     operator const char*() const { return str_; }
+    const char* c_str() const { return str_; }
     int str_len() const { return str_len_; }
     bool result() const { return E_OK == error_; }
 

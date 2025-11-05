@@ -57,7 +57,7 @@ class ZCE_API Service : public Reactor {
   protected:
     static zce::Service* instance_;
     AppOptions options_{};
-    std::string name_;
+    std::string exepath_;
     bool exit_success_;
     volatile bool running_;
     SmartPtr<zce::Pipe> pipe_;
@@ -90,6 +90,8 @@ class ZCE_API Service : public Reactor {
 
     virtual bool onWorkerStop() = 0;
 
+    virtual void printServiceStatus();
+
   public:
     Service(const char* name);
 
@@ -109,23 +111,17 @@ class ZCE_API Service : public Reactor {
 
     bool isWorkProcess() const;
 
-    std::string name() const;
-
   protected:
     
-
-    virtual void print_object_stat();
-
 #ifdef _WIN32
-    static void _cbWindowsServiceMain(DWORD argc, LPSTR* argv);
-    static void _cbWindowsServiceCtrlHandler(DWORD);
+    static void WINAPI _cbWindowsServiceMain(DWORD argc, LPSTR* argv);
+    static void WINAPI _cbWindowsServiceCtrlHandler(DWORD);
 
     int startWindowsService();
     void onWindowsServiceMain(DWORD, LPSTR*);
 
     bool waitForServiceState(SC_HANDLE, DWORD, SERVICE_STATUS&);
 
-  public:
     int installWindowsService(bool, const std::string&, const std::string&, const std::string&,
                               const std::vector<std::string>&);
 
@@ -139,12 +135,7 @@ class ZCE_API Service : public Reactor {
 
     void showServiceStatus(const std::string& msg, SERVICE_STATUS& status);
 #else
-  protected:
-    int run_daemon(int, char*[]);
-    std::string pid_file_;
-    pid_t work_process_;
-    const char* exepath_;
-    int pipe_[2];
+    int runPosixDaemon(int, char*[]);
 #endif  // _WIN32
 };
 

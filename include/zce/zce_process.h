@@ -32,11 +32,11 @@ namespace zce {
 
 enum PRECESS_MSGID {
     PRECESS_MSGID_S2MSTART_REQ = 0,
-    PRECESS_MSGID_S2MSTART_RES,
-    PRECESS_MSGID_M2SHBEAT_REQ,
-    PRECESS_MSGID_M2SHBEAT_RES,
-    PRECESS_MSGID_S2MQUIT_REQ,
-    PRECESS_MSGID_S2MQUIT_RES,
+    PRECESS_MSGID_S2MSTART_RES = 2,
+    PRECESS_MSGID_M2SHBEAT_REQ = 4,
+    PRECESS_MSGID_M2SHBEAT_RES = 6,
+    PRECESS_MSGID_S2MQUIT_REQ = 8,
+    PRECESS_MSGID_S2MQUIT_RES = 10,
 
     PRECESS_MSGID_M2SQUIT_REQ = 0x100,
     PRECESS_MSGID_M2SQUIT_RES,
@@ -87,7 +87,7 @@ class ZCE_API Process : virtual public Object {
   public:
     using ExitCallback = std::function<void(int)>;
 
-    Process(const SmartPtr<Reactor>& reactor, const char* process_path,
+    Process(const SmartPtr<Reactor>& reactor, const std::string& process_path,
             std::vector<std::string> args, const char* work_dir = "",
             std::map<std::string, std::string> env = {}, ExitCallback exit_cb = nullptr);
 

@@ -159,7 +159,10 @@ class xOptModelBase : public zce::Object {
     // 这里不能用fixVariables的原因是因为setInPortVariableValues是必须的
     virtual xOptModelFixableVariables getInPortVariableValues() const;
 
+    // 在generateEstimate的时候需要setInPortVariableValues, 因为此时没有完整变量表值
     virtual int setInPortVariableValues(const xOptModelFixableVariables& nvpairs);
+
+    virtual const xOptModelFixableVariables& getDefaultFixableVariables() const;
 
     virtual xOptModelFixableVariables getFixableVariables() const = 0;
 
