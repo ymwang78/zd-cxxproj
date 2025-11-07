@@ -29,9 +29,12 @@ struct iovec {
     u_long iov_len;
     char* iov_base;
 };
+
 #    else   //_WIN32
+#include <pthread.h>
 typedef pthread_t threadid_t;
 typedef int handle_t;
+
 #    endif  //_WIN32
 
 #endif  // ZCE_TYPES_DEFINED

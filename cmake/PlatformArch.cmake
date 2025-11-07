@@ -47,14 +47,19 @@ message(STATUS "Solution directory: ${PLATFORM_SOLUTION_DIR}")
 set(PLATFORM_LIB_DIR "lib/${PLATFORM_ARCH}")
 set(PLATFORM_BIN_DIR "bin/${PLATFORM_ARCH}")
 
-# 导出变量到父作用域，使其可以被调用者使用
-set(ARCH_NAME ${ARCH_NAME} PARENT_SCOPE)
-set(PLATFORM_ARCH ${PLATFORM_ARCH} PARENT_SCOPE)
-set(PLATFORM_LIB_DIR ${PLATFORM_LIB_DIR} PARENT_SCOPE)
-set(PLATFORM_BIN_DIR ${PLATFORM_BIN_DIR} PARENT_SCOPE)
-set(PLATFORM_SOLUTION_DIR ${PLATFORM_SOLUTION_DIR} PARENT_SCOPE)
+if (CMAKE_CURRENT_FUNCTION)
+    # 导出变量到父作用域，使其可以被调用者使用
+    set(ARCH_NAME ${ARCH_NAME} PARENT_SCOPE)
+    set(PLATFORM_ARCH ${PLATFORM_ARCH} PARENT_SCOPE)
+    set(PLATFORM_LIB_DIR ${PLATFORM_LIB_DIR} PARENT_SCOPE)
+    set(PLATFORM_BIN_DIR ${PLATFORM_BIN_DIR} PARENT_SCOPE)
+    set(PLATFORM_SOLUTION_DIR ${PLATFORM_SOLUTION_DIR} PARENT_SCOPE)
+endif()
 
-# 消除常见警告
-add_compile_options(-Wreorder)
-add_compile_options(-Wunused-function)
+# 消除常见警告（仅针对 GCC/Clang）
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    add_compile_options(-Wno-unused-function)
+    # for C++
+    add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wno-reorder>)
+endif()
 
