@@ -65,7 +65,7 @@ class ZCE_API SubProcessHost : public Object {
 
   public:
     SubProcessHost(const zce::SmartPtr<zce::Reactor>& reactor_ptr, const std::string& config_path,
-                   const char* table_name = "subprocess");
+                   const char* table_name = "subprocess", bool debug_mode = false);
 
     ~SubProcessHost() override;
     
@@ -89,7 +89,8 @@ class ZCE_API Process : virtual public Object {
 
     Process(const SmartPtr<Reactor>& reactor, const std::string& process_path,
             std::vector<std::string> args, const char* work_dir = "",
-            std::map<std::string, std::string> env = {}, ExitCallback exit_cb = nullptr);
+            std::map<std::string, std::string> env = {}, bool debug = false,
+            ExitCallback exit_cb = nullptr);
 
     ~Process();
 

@@ -5,7 +5,8 @@
  * sources The data sources can be OPC UA, OPC DA, SQL, etc.
  * Note:
  * 1. Don't support abs(int64/uint64) >= 2^52, because of the precision of double.
- * 2. Minimal support OPC DA 2.0. opc.da://{hostname}/{ProgID} opc.da://{hostname}/{CLSID}
+ * 2. Minimal support OPC DA 2.0.
+ * 3. DA Schema: opc.da://{hostname}/{ProgID}?ds_device=1 opc.da://{hostname}/{CLSID}?ds_device=0
  */
 
 #ifdef _WIN32

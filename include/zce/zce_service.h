@@ -24,7 +24,6 @@ class Tty;
 class SubProcessHost;
 class SubProcess;
 
-
 struct ZCE_API AppOptions {
     std::string mode;        // daemon, work, service
     std::string guid;        // --guid <guid>
@@ -32,11 +31,11 @@ struct ZCE_API AppOptions {
     std::string logsuffix;   // --logsuffix <suffix>
     std::string configpath;  // --configpath <path>
 
-    std::string vmname;               // --vmname <vm name>
-    std::string vmpath;               // --vmpath <vm path>
-    std::string vmaddr;               // --vmaddr <vm listen address>
-    unsigned short vmport;            // --vmport <vm listen port>
-    std::vector<std::string> extras;  // 存放未定义参数
+    std::string vmname;                  // --vmname <vm name>
+    std::string vmpath;                  // --vmpath <vm path>
+    std::string vmaddr;                  // --vmaddr <vm listen address>
+    zce_uint16 vmport = (zce_uint16)~0;  // --vmport <vm listen port>
+    std::vector<std::string> extras;     // 存放未定义参数
 
     std::string help_target;
 #ifdef _WIN32
@@ -112,7 +111,6 @@ class ZCE_API Service : public Reactor {
     bool isWorkProcess() const;
 
   protected:
-    
 #ifdef _WIN32
     static void WINAPI _cbWindowsServiceMain(DWORD argc, LPSTR* argv);
     static void WINAPI _cbWindowsServiceCtrlHandler(DWORD);
