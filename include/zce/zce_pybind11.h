@@ -11,6 +11,7 @@
 // ***************************************************************
 #include <pybind11/pybind11.h>
 #include <zce/zce_object.h>
+#include <zce/zce_any.h>
 
 namespace pybind11 {
 namespace detail {
@@ -38,3 +39,7 @@ struct holder_helper<zce::SmartPtr<T>> {
 
 }  // namespace detail
 }  // namespace pybind11
+
+namespace zce {
+extern pybind11::object any_to_pyobject(const zce::Any& v);
+}  // namespace zce

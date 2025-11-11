@@ -205,6 +205,15 @@ class ZCE_API Logger : public zce::Object {
         if (splitter_) ost << splitter_;
     }
 
+    void log_args(std::ostream& ost, const wchar_t* t) {
+        if (t == 0) {
+            ost << "null";
+        } else {
+            ost << t;
+        }
+        if (splitter_) ost << splitter_;
+    }
+
     void log_args(std::ostream& ost, const zce_sockaddr_t& t);
 
     template <typename T, typename... Args>
@@ -219,9 +228,9 @@ class ZCE_API Logger : public zce::Object {
         flush();
     }
 
-    static void setCallback(std::function<void(unsigned level, const char* msg, size_t len)>&& callback);
+    static void setCallback(
+        std::function<void(unsigned level, const char* msg, size_t len)>&& callback);
 };
-
 
 }  // namespace zce
 

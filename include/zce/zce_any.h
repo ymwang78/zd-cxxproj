@@ -376,6 +376,8 @@ class ZCE_API Any {
 
     inline void quality(unsigned short q) noexcept { data_.quality_ = q; }
 
+    inline bool is_string() const noexcept { return data_.type_ == any_str; }
+
     std::string to_string() const noexcept;
 };
 
