@@ -27,13 +27,11 @@ class ZCE_API Any {
     enum _any_types {
         any_int64 = 0,
         any_double,
-        any_rawptr,
         any_ipv4,
         any_ipv6,
         any_datetime,
-
-        any_object,
-        any_dblock,
+        any_boolean,
+        any_dblock = 8,
         any_intarray,
         any_fltarray,
         any_dblarray,
@@ -41,6 +39,9 @@ class ZCE_API Any {
         any_boolarray,  // not fully supported
         any_dict,
         any_vector,
+
+        any_rawptr =30,
+        any_object,
     };
 
     static constexpr int MAX_UNION_BYTES = sizeof(struct in6_addr);
@@ -114,6 +115,11 @@ class ZCE_API Any {
 
     bool operator<(const Any& rhs) const noexcept;
 
+    Any(bool boolean) noexcept : data_{} {
+        data_.type_ = any_boolean;
+        data_.u_.i64_[0] = boolean ? 1 : 0;
+    }
+
     Any(int i32 = 0) noexcept : data_{} {
         data_.type_ = any_int64;
         data_.u_.i64_[0] = i32;
@@ -148,6 +154,8 @@ class ZCE_API Any {
 
     Any(const std::vector<bool>& vec) noexcept;
 
+    Any(const std::string& str) noexcept;
+
     Any(const char* str, size_t len) noexcept;
 
     Any(const char* str) noexcept;
@@ -166,6 +174,16 @@ class ZCE_API Any {
         data_.len_or_port_ = port;
     }
 
+    Any(const std::map<Any, Any>& dict) noexcept : data_{} {
+        data_.type_ = any_dict;
+        data_.u_.dict_ = new std::map<Any, Any>(dict);
+    }
+
+    Any(std::map<Any, Any>&& dict) noexcept : data_{} {
+        data_.type_ = any_dict;
+        data_.u_.dict_ = new std::map<Any, Any>(dict);
+    }
+
     static Any create_dict();
 
     static Any create_vector();
@@ -175,6 +193,10 @@ class ZCE_API Any {
     static Any create_datetime_from_msec(zce_int64 msec);
 
     inline int get_type() const noexcept { return data_.type_; }
+
+    inline bool is_none() const noexcept {
+        return data_.type_ == any_rawptr && data_.u_.rawptr_[0] == nullptr;
+    }
 
     inline bool is_i64() const noexcept { return data_.type_ == any_int64; }
 
@@ -187,7 +209,7 @@ class ZCE_API Any {
     }
 
     inline zce_int64 i64() const noexcept {
-        ZCE_ASSERT_RETURN(data_.type_ == any_int64, 0);
+        ZCE_ASSERT_RETURN(data_.type_ == any_int64 || data_.type_ == any_boolean, 0);
         return data_.u_.i64_[0];
     }
 
@@ -199,11 +221,11 @@ class ZCE_API Any {
     inline bool is_double() const noexcept { return data_.type_ == any_double; }
 
     inline zce_double dbl() const noexcept {
-        ZCE_ASSERT_RETURN(data_.type_ == any_double || data_.type_ == any_int64, 0.0);
+        ZCE_ASSERT_RETURN(data_.type_ == any_double || data_.type_ == any_int64 || data_.type_ == any_boolean, 0.0);
         if (data_.type_ == any_double) {
             return data_.u_.dbl_[0];
         }
-        if (data_.type_ == any_int64) {
+        if (data_.type_ == any_int64 || data_.type_ == any_boolean) {
             constexpr zce_int64 max_precise = (1ll << 52) - 1;
             if (data_.u_.i64_[0] > max_precise) return std::numeric_limits<double>::infinity();
             if (data_.u_.i64_[0] < -max_precise) return -std::numeric_limits<double>::infinity();
@@ -301,6 +323,13 @@ class ZCE_API Any {
         return *data_.u_.dict_;
     }
 
+    inline bool is_boolean() const noexcept { return data_.type_ == any_boolean; }
+
+    inline bool boolean() const noexcept {
+        ZCE_ASSERT(data_.type_ == any_boolean);
+        return data_.u_.i64_[0] != 0;
+    }
+
     inline bool is_boolvec() const noexcept { return data_.type_ == any_boolarray; }
 
     inline const std::vector<bool>& boolvec() const noexcept {
@@ -344,7 +373,7 @@ class ZCE_API Any {
     }
 
     inline bool is_addr() const noexcept {
-        return data_.type_ == any_ipv6 || data_.type_ == any_int64;
+        return data_.type_ == any_ipv6 || data_.type_ == any_ipv4;
     }
 
     inline bool is_ipv4() const noexcept { return data_.type_ == any_ipv4; }
@@ -379,6 +408,10 @@ class ZCE_API Any {
     inline bool is_string() const noexcept { return data_.type_ == any_str; }
 
     std::string to_string() const noexcept;
+
+    std::string toJsonString(bool pretty = false) const noexcept;
+
+    static Any fromJsonString(const std::string& json_str) noexcept;
 };
 
 }  // namespace zce

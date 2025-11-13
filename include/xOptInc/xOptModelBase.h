@@ -20,7 +20,7 @@
 
 using xOptModelParameter = std::pair<std::string, double>;
 
-using xOptModelParameters = std::unordered_map<std::string, double>;
+using xOptModelParameters = std::unordered_map<std::string, zce::Any>;
 
 using xOptModelFixableVariables = std::unordered_map<std::string, double>;
 
