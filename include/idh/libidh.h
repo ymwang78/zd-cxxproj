@@ -14,7 +14,6 @@
 #        define LIBIDH_API __declspec(dllexport)
 #    else
 #        define LIBIDH_API __declspec(dllimport)
-#        pragma comment(lib, "libidh.lib")
 #    endif
 #else
 #    define LIBIDH_API

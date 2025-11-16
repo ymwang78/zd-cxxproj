@@ -3,37 +3,38 @@
 #ifdef _WIN32
 
 #    define NOMINMAX
-#    if defined(_UNICODE)
-#        //include <vld.h>
-#        define ZCE_ZDB_MONGODB 0
+#    ifndef ZCE_ZDB_MYSQL
 #        define ZCE_ZDB_MYSQL 0
-#        define ZCE_ZDB_PGSQL 0
-#        define ZCE_ZDB_REDIS 0
-#        define ZCE_SUPPORT_PYVM 0
-#        define ZCE_SUPPORT_LUAVM 0
-#        define ZCE_SUPPORT_CCVM 0
-#        define ZCE_SUPPORT_SSL 0
-#    else
-#        define ZCE_ZDB_MONGODB 0
-#        define ZCE_ZDB_MYSQL 0
+#    endif
+#    ifndef ZCE_ZDB_PGSQL
 #        define ZCE_ZDB_PGSQL 1
+#    endif
+#    ifndef ZCE_ZDB_REDIS
 #        define ZCE_ZDB_REDIS 1
+#    endif
+#    ifndef ZCE_SUPPORT_PYVM
 #        define ZCE_SUPPORT_PYVM 1
+#    endif
+#    ifndef ZCE_SUPPORT_LUAVM
 #        define ZCE_SUPPORT_LUAVM 1
+#    endif
+#    ifndef ZCE_SUPPORT_CCVM
 #        define ZCE_SUPPORT_CCVM 1
+#    endif
+#    ifndef ZCE_SUPPORT_SSL
 #        define ZCE_SUPPORT_SSL 1
 #    endif
 
-#    include <winsock2.h>
-#    include <ws2tcpip.h>
-#    include <stdio.h>
-#    include <stdlib.h>
-#    include <stdint.h>
-#    include <windows.h>
-#    include <direct.h>
-#    include <io.h>
-#    include <sys/stat.h>
-#    define ZDP_GEP
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdint.h>
+#include <windows.h>
+#include <direct.h>
+#include <io.h>
+#include <sys/stat.h>
+#define ZDP_GEP
 #elif defined(__APPLE__)
 #    include <unistd.h>
 #    include <fcntl.h>
@@ -86,7 +87,6 @@
 #        define HASNOT_UUID 1
 #        define ZCE_API __attribute__((visibility("default")))
 #    else
-#        define ZCE_ZDB_MONGODB 0
 #        define ZCE_ZDB_MYSQL 0
 #        define ZCE_ZDB_PGSQL 1
 #        define ZCE_ZDB_REDIS 1
@@ -146,10 +146,10 @@
 enum ERV_ZCE_ERROR {
     ZCE_ERROR_OK = 0,
 
-    ZDB_SUCCE_COMMON = 0x2000000,       // ZDB SUCCESS
+    ZDB_SUCCE_COMMON = 0x2000000,  // ZDB SUCCESS
     ZDB_SUCCE_MULTIRESPONSE,
 
-    ZCE_ERROR_BASE = 0x81000000,        // keep for stdc error
+    ZCE_ERROR_BASE = 0x81000000,  // keep for stdc error
 
     ZCE_ERROR_COMMON = 0x81010000,      // ZCE ERROR
     ZCE_ERROR_MALLOC = 0x81010001,      // 内存分配错误
@@ -175,14 +175,14 @@ enum ERV_ZCE_ERROR {
 
     ZCE_ERROR_UVBASE = 0x81020000,
 
-    ZDB_ERROR_COMMON = 0x82000000,          // ZDB ERROR
+    ZDB_ERROR_COMMON = 0x82000000,  // ZDB ERROR
     ZDB_ERROR_CONNECTION,
     ZDB_ERROR_SQLINVALID,
     ZDB_ERROR_COLUMNOVERLOW,
     ZDB_ERROR_BINDERROR,
     ZDB_ERROR_PARAMCNT,
     ZDB_ERROR_FOPEN,
-    ZDB_ERROR_FILEEXPAND,                   // 文件增长错误
+    ZDB_ERROR_FILEEXPAND,  // 文件增长错误
     ZDB_ERROR_TAGNOTEXISTS,
 
     ZDB_ERROR_SQLITE_COMMON = 0x82010000,  // 以下错误代码对应SQLITE自身的错误代码
