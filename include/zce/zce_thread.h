@@ -33,6 +33,8 @@ class ZCE_API Thread : virtual public Object {
 
     virtual ~Thread();
 
+    const char* getName() const;
+
     virtual void onThreadStart() = 0;
 
     virtual void onThreadTerminate() = 0;

@@ -8,7 +8,7 @@ setlocal enabledelayedexpansion
 rem ========================================
 rem 指定要扫描的目录列表
 rem ========================================
-set DIRS=%CD% libsrc
+set DIRS="%CD%" libsrc
 
 echo ===============================================
 echo   Updating Git repositories

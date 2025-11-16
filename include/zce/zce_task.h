@@ -189,14 +189,14 @@ class ZCE_API TaskDelegator : virtual public zce::Object {
 };
 
 class ZCE_API Scheduler : public zce::Object {
-    struct zce_worker_contex;
+    struct WorkerContext;
 
-    class zce_worker;
+    class Worker;
 
     struct pimpl;
     struct pimpl* pimpl_;
 
-    void doWork(zce_worker_contex& ctx);
+    void doWork(WorkerContext& ctx);
 
   public:
     Scheduler();
