@@ -214,6 +214,10 @@ class ZCE_API Logger : public zce::Object {
         if (splitter_) ost << splitter_;
     }
 
+    void log_args(std::ostream& ost, const std::wstring& t) {
+        log_args(ost, t.c_str());
+    }
+
     void log_args(std::ostream& ost, const zce_sockaddr_t& t);
 
     template <typename T, typename... Args>

@@ -103,7 +103,9 @@ class ZCE_API Process : virtual public Object {
 
     int pid() const;
 
-    static bool isProcessExists(unsigned long process_id);
+    const std::string& processPath() const;
+
+    static bool isProcessExists(unsigned long process_id, const std::string& process_name);
 };
 
 class SubProcess : virtual public Object {

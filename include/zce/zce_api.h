@@ -282,6 +282,8 @@ std::string ZCE_API zce_to_utf8(const wchar_t* src, unsigned len);
 
 std::wstring ZCE_API zce_to_utf16(const char* src, unsigned len);
 
+std::wstring ZCE_API zce_hresult_message(HRESULT hr);
+
 #endif
 
 template<typename T>
