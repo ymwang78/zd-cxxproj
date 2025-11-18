@@ -35,6 +35,7 @@ struct ZCE_API AppOptions {
     std::string vmpath;                  // --vmpath <vm path>
     std::string vmaddr;                  // --vmaddr <vm listen address>
     zce_uint16 vmport = (zce_uint16)~0;  // --vmport <vm listen port>
+    zce_uint16 stormport = (zce_uint16)~0;  // --stormport <storm listen port>
     std::vector<std::string> extras;     // 存放未定义参数
 
     std::string help_target;
