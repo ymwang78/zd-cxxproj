@@ -18,6 +18,7 @@ struct hostvm_start_t {
     const char *vm_path;
     const char *vm_listen_addr;
     unsigned short vm_listen_port;
+    unsigned short vm_storm_port;
     int extra_argc;
     const char **extra_argv;
 };
@@ -26,7 +27,7 @@ struct hostvm_start_t {
 
 typedef struct hostvm_entry_t *hostvm_entry_ptr_t;
 typedef hostvm_entry_ptr_t(WINAPI *pfn_hostvm_entry_init)(void);
-typedef int(WINAPI *pfn_hostvm_entry_start)(hostvm_entry_ptr_t, const hostvm_start_t* args);
+typedef int(WINAPI *pfn_hostvm_entry_start)(hostvm_entry_ptr_t, hostvm_start_t* args);
 typedef void(WINAPI *pfn_hostvm_entry_objprint)(void);
 
 #else
@@ -34,7 +35,7 @@ typedef void(WINAPI *pfn_hostvm_entry_objprint)(void);
 extern "C" {
 typedef struct hostvm_entry_t *hostvm_entry_ptr_t;
 hostvm_entry_ptr_t LIBHOST_API hostvm_entry_init();
-int LIBHOST_API hostvm_entry_start(hostvm_entry_ptr_t entry_ptr, const hostvm_start_t* args);
+int LIBHOST_API hostvm_entry_start(hostvm_entry_ptr_t entry_ptr, hostvm_start_t* args);
 void LIBHOST_API hostvm_entry_objprint();
 }
 
