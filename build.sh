@@ -52,5 +52,5 @@ build_module libsrc/libcoin
 build_module libsrc/libmpc
 build_module HostVM
 
-cd HostVM/dist/debian
-./x_package.sh hostvm
+#cd HostVM/dist/debian
+#./x_package.sh hostvm
