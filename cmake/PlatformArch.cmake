@@ -59,6 +59,11 @@ endif()
 # 消除常见警告（仅针对 GCC/Clang）
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     add_compile_options(-Wno-unused-function)
+    add_compile_options(-Wno-unused-variable)
+    add_compile_options(-Wno-unused-parameter)
+    add_compile_options(-Wno-unused-value)
+    add_compile_options(-Wno-unknown-pragmas)
+    add_compile_options(-Wno-missing-field-initializers)
     # for C++
     add_compile_options($<$<COMPILE_LANGUAGE:CXX>:-Wno-reorder>)
 endif()
