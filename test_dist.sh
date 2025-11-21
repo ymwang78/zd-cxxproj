@@ -2,7 +2,7 @@
 
 set -e
 
-source /zdata/venv/bin/activate
+source /opt/venv/bin/activate
 
 export CXXPROJ_PATH=/zdata/share/cxxproj
 cd ${CXXPROJ_PATH}
