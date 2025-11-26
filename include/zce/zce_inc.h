@@ -87,13 +87,6 @@
 #        define HASNOT_UUID 1
 #        define ZCE_API __attribute__((visibility("default")))
 #    else
-#        define ZCE_ZDB_MYSQL 0
-#        define ZCE_ZDB_PGSQL 1
-#        define ZCE_ZDB_REDIS 1
-#        define ZCE_SUPPORT_PYVM 1
-#        define ZCE_SUPPORT_LUAVM 1
-#        define ZCE_SUPPORT_CCVM 1
-#        define ZCE_SUPPORT_SSL 1
 #    endif
 #endif
 
