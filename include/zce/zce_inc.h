@@ -1,8 +1,4 @@
 ﻿#pragma once
-
-#ifdef _WIN32
-
-#    define NOMINMAX
 #    ifndef ZCE_ZDB_MYSQL
 #        define ZCE_ZDB_MYSQL 0
 #    endif
@@ -25,16 +21,18 @@
 #        define ZCE_SUPPORT_SSL 1
 #    endif
 
-#include <winsock2.h>
-#include <ws2tcpip.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdint.h>
-#include <windows.h>
-#include <direct.h>
-#include <io.h>
-#include <sys/stat.h>
-#define ZDP_GEP
+#ifdef _WIN32
+#   define NOMINMAX
+#   include <winsock2.h>
+#   include <ws2tcpip.h>
+#   include <stdio.h>
+#   include <stdlib.h>
+#   include <stdint.h>
+#   include <windows.h>
+#   include <direct.h>
+#   include <io.h>
+#   include <sys/stat.h>
+#   define ZDP_GEP
 #elif defined(__APPLE__)
 #    include <unistd.h>
 #    include <fcntl.h>
