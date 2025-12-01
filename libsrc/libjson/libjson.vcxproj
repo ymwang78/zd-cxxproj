@@ -156,6 +156,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <PrecompiledHeaderFile />
+      <LanguageStandard_C>stdc11</LanguageStandard_C>
     </ClCompile>
     <Lib />
   </ItemDefinitionGroup>
