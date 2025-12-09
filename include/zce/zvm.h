@@ -232,7 +232,12 @@ class VirtualMachineProxy : public zce::Object {
             }
         }
 
+        int tick_begin_call = zce_tick();
         ret = doCallTwoWay(func, dblock, mstimeout, [=](int errcode, const zce::RefBlock& retdata) {
+            int tick_end_call = zce_tick();
+            if (tick_end_call - tick_begin_call > 1000) {
+                ZTRACE("Slow RPC", func, tick_end_call - tick_begin_call, "size", retdata.length());
+            }
             RpcResult<Results...> result;
             result.errcode = errcode;
             if (errcode < 0) {
@@ -242,9 +247,11 @@ class VirtualMachineProxy : public zce::Object {
                 async_cb(std::move(result));
                 return;
             }
-
             auto [unpack_code, data_tuple] = detail::unpack_to_tuple<Results...>(retdata, func);
-
+            int tick_parsed = zce_tick();
+            if (tick_parsed - tick_end_call > 300) {
+                ZTRACE("Slow Unpack", func, tick_parsed - tick_begin_call);
+            }
             result.errcode = unpack_code;
             if (unpack_code < 0) {
                 result.errdesc = "unpack result failed";
@@ -252,7 +259,6 @@ class VirtualMachineProxy : public zce::Object {
                 result.errdesc = "success";
                 result.data = std::move(data_tuple);  // ✨ 移动解包后的元组
             }
-
             async_cb(std::move(result));
         });
 
