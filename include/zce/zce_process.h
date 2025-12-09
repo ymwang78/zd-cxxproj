@@ -11,6 +11,7 @@
 // ***************************************************************
 #include <zce/zce_object.h>
 #include <zce/zce_handler.h>
+#include <zce/zdp_stream.h>
 #include <map>
 #include <functional>
 
@@ -42,70 +43,105 @@ enum PRECESS_MSGID {
     PRECESS_MSGID_M2SQUIT_RES,
 };
 
-// guid在全系统唯一，考虑到同一个服务可能被多个部署，例如HOSTVM/HOSTPY，需要确保唯一来包装管道唯一
-struct ZCE_API SubProcessInfo {
-    std::string name;  // name在本进程内唯一
-    std::string guid;
-    std::string workdir;
-    std::string exepath;
-    std::vector<std::string> args;
-    std::map<std::string, std::string> env;
-    unsigned int delayed;  // 延迟启动时间，单位秒
-    unsigned int pid;
-    zce_timestamp starttime;
-    zce_timestamp endtime;
-};
+class SubProcessHost;
 
-extern zce::zdb::Statement& operator>>(zce::zdb::Statement& stmt, zce::SubProcessInfo& inst);
-extern zce::zdb::Statement& operator<<(zce::zdb::Statement& stmt, const zce::SubProcessInfo& inst);
-
-class ZCE_API SubProcessHost : public Object {
+class ZCE_API Process : public zce::zdp::zdp_stream {
     struct Impl;
     Impl* pimpl_;
 
   public:
-    SubProcessHost(const zce::SmartPtr<zce::Reactor>& reactor_ptr, const std::string& config_path,
-                   const char* table_name = "subprocess", bool debug_mode = false);
+    struct ZCE_API ProcessInfo {
+        std::string name;       // name在本进程内唯一
+        std::string pipeid;     // pipe id, guid, 全局唯一
+        std::string workdir;
+        std::string exepath;
+        std::vector<std::string> args;
+        std::map<std::string, std::string> env;
+        unsigned int delayed;  // 延迟启动时间，单位秒
 
-    ~SubProcessHost() override;
-    
-    void stopAllSubProcess();
+        unsigned int pid;
+        zce_timestamp starttime;
+        zce_timestamp endtime;
 
-    void checkDelayedStart();
+        std::string extra;  // 扩展字段
+    };
 
-    int invoke(std::string name, std::string guid_hint, std::string work_dir, std::string exepath,
-               const std::vector<std::string>& exeargs,
-               const std::map<std::string, std::string>& env, int delayed = 0);
-
-    int querySubProcessInfo(const std::string& name, struct SubProcessInfo& info);
-};
-
-class ZCE_API Process : virtual public Object {
-    struct Impl;
-    Impl* pimpl_;
-
-  public:
     using ExitCallback = std::function<void(int)>;
 
-    Process(const SmartPtr<Reactor>& reactor, const std::string& process_path,
-            std::vector<std::string> args, const char* work_dir = "",
-            std::map<std::string, std::string> env = {}, bool debug = false,
+    Process(SubProcessHost* host, ProcessInfo info, bool debug = false,
             ExitCallback exit_cb = nullptr);
 
     ~Process();
 
-    int attachProcess(unsigned long process_id, std::string pipe_id,
-                      SmartPtr<IStream> subprocess_istream);
+    int startProcess();
 
-    int startProcess(std::string pipe_id, SmartPtr<IStream> subprocess_istream);
+    int upsert();
 
     int kill(int signum = 0);
 
     int pid() const;
 
-    const std::string& processPath() const;
+    void setContextPtr(const zce::SmartPtr<zce::Object>& context_ptr);
+
+    const zce::SmartPtr<zce::Object>& getContextPtr() const;
+
+    const ProcessInfo& processInfo() const;
+
+    bool isRunning() const;
 
     static bool isProcessExists(unsigned long process_id, const std::string& process_name);
+
+    // override from IStream
+    void on_open(bool passive, const zce_sockaddr_t& remote) override;
+
+    void on_packet(const zce::zdp::zdp_head& head, const zce::RefBlock& dblock,
+                   const zce::RefBlock& org_full, const zce::Any& ctx) override;
+
+    void on_close() override;
+};
+
+class ZCE_API SubProcessHost : public Object {
+    friend class Process;
+    struct Impl;
+    Impl* pimpl_;
+  public:
+    using ConnectCallback = std::function<void(const zce::SmartPtr<Process>&)>;
+    using DisconnectCallback = std::function<void(const zce::SmartPtr<Process>&)>;
+    using DataCallback = std::function<void(
+        const zce::SmartPtr<Process>&, const zce::zdp::zdp_head&, zce::RefBlock, const zce::Any&)>;
+    using ProcessPreCheckCallback = std::function<int(const zce::SmartPtr<zce::Process>&)>;
+
+    struct HostContext {
+        std::string config_path = "subprocess.db";
+        std::string table_name = "subprocess";
+        bool debug_mode = false;
+        ProcessPreCheckCallback precheck_cb = nullptr;
+        ConnectCallback connect_cb = nullptr;
+        DisconnectCallback disconnect_cb = nullptr;
+        DataCallback data_cb = nullptr;
+    };
+
+    SubProcessHost(const zce::SmartPtr<zce::Reactor>& reactor_ptr, HostContext context);
+
+    ~SubProcessHost() override;
+
+    const zce::SmartPtr<zce::Reactor>& reactor_ptr() const;
+
+    const HostContext& context() const;
+
+    void stopAllSubProcess();
+
+    void checkDelayedStart();
+
+    zce::SmartPtr<Process> createSubProcess(const Process::ProcessInfo& process_info, bool debug_mode);
+
+    int invoke(const zce::SmartPtr<Process>& subprocess_ptr);
+
+    int stopSubProcess(const std::string& name);
+
+    int querySubProcess(const std::string& name, zce::SmartPtr<Process>& subprocess_ptr);
+
+    const std::map<std::string, zce::SmartPtr<Process>>& queryAllSubProcess() const;
 };
 
 class SubProcess : virtual public Object {
@@ -125,7 +161,7 @@ class SubProcess : virtual public Object {
     int connectProcess(const std::string& pipe_id, SmartPtr<IStream> process_istream);
 
     int connectProcess(const std::string& pipe_id, ConnectCallback connect_cb,
-                DisconnectCallback disconnect, DataCallback data_cb);
+                       DisconnectCallback disconnect, DataCallback data_cb);
 
     void close();
 
