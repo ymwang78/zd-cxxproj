@@ -143,7 +143,7 @@ class ZCE_API TaskDelegator : virtual public zce::Object {
       public:
         Fr_task(const char* name, zce::TaskDelegator* delegate_ptr, zce::Semaphore* sem, F f)
             : zce::Task(name ? name : "delegateTask"), delegator_(delegate_ptr), sem_(sem), f_(f) {
-#ifdef _DEBUG
+#ifdef _WIN32
             if (sem_) {  // ensure sem is 0
                 bool isget = sem_->try_acquire();
                 ZCE_ASSERT_TEXT(!isget, "deadlock detected!");

@@ -117,7 +117,14 @@ static int idh_is_good_quality(unsigned short quality) {
 
 static const long long IDH_INVALID_HANDLE = ~0;
 
-typedef enum _IDH_RTSOURCE {
+
+typedef enum _IDH_RTSOURCE_FLAG {
+    IDH_RTSOURCE_FLAG_NONE = 0x0,
+    IDH_RTSOURCE_FLAG_SUBSCRIBE = 0x1,  // support subscribe
+    IDH_RTSOURCE_FLAG_RECONNECT = 0x2,  // auto reconnect on connection lost
+} IDH_RTSOURCE_FLAG;
+
+typedef enum _IDH_RTSOURCE : unsigned short {
     IDH_RTSOURCE_UA,
     IDH_RTSOURCE_DA,
     IDH_RTSOURCE_CSV,
@@ -188,7 +195,7 @@ LIBIDH_API int idh_instance_discovery(idh_handle_t handle, idh_source_desc_t* so
 
 LIBIDH_API idh_source_t idh_source_create(idh_handle_t handle, IDH_RTSOURCE source_type,
                                           const char* source_schema, int sample_timespan_msec,
-                                          int support_subscribe);
+                                          unsigned int source_flag);
 
 LIBIDH_API int idh_source_valid(idh_source_t source_id);
 
