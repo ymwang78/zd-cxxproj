@@ -194,6 +194,8 @@ class xOptModelBase : public zce::Object {
 
     virtual const xOptModelFixableVariables& getFlowsheetFixedVariables() const;
 
+    virtual const xOptModelFixableVariables& getModelFixedVariables() const;
+
     virtual std::vector<int> getStreamVariableIndexes(const xOptStreamSlate& stream,
                                                       bool is_input_port, int index) const;
 
