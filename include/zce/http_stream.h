@@ -65,29 +65,31 @@ struct ZCE_API ZCE_HTTP_HEADER : public TEXT_HEADER {
 ///////////////////////////////////////////////////////////////////////////////
 
 struct ZCE_API ZCE_HTTP_REQUEST : public ZCE_HTTP_HEADER {
-    enum HTTP_REQUEST_METHOD_E {
-        HTTP_REQUEST_METHOD_UNKNOW,
-        HTTP_REQUEST_METHOD_GET,
-        HTTP_REQUEST_METHOD_POST,
-        HTTP_REQUEST_METHOD_PUT,
-        HTTP_REQUEST_METHOD_DELETE,
-        HTTP_REQUEST_METHOD_OPTIONS,
-        HTTP_REQUEST_METHOD_HEAD,
-        HTTP_REQUEST_METHOD_TRACE,
-        HTTP_REQUEST_METHOD_LIMIT
+    enum METHOD_E {
+        METHOD_UNKNOW,
+        METHOD_GET,
+        METHOD_POST,
+        METHOD_PUT,
+        METHOD_DELETE,
+        METHOD_OPTIONS,
+        METHOD_HEAD,
+        METHOD_TRACE,
+        METHOD_LIMIT
     };
 
     ZCE_HTTP_REQUEST()
-        : ZCE_HTTP_HEADER(TEXT_HEADER_REQUEST), method_(HTTP_REQUEST_METHOD_UNKNOW), version_(0) {};
-    ZCE_HTTP_REQUEST(const std::string& url, HTTP_REQUEST_METHOD_E method,
+        : ZCE_HTTP_HEADER(TEXT_HEADER_REQUEST), method_(METHOD_UNKNOW), version_(0) {};
+    ZCE_HTTP_REQUEST(const std::string& url, METHOD_E method,
                      unsigned version = HTTP_VERSION_BIND(1, 1));
-    static const char* method_to_name(HTTP_REQUEST_METHOD_E e);
-    static HTTP_REQUEST_METHOD_E name_to_method(const char*);
+    static const char* method_to_name(METHOD_E e);
+    static METHOD_E name_to_method(const char*);
     std::string url_;
-    HTTP_REQUEST_METHOD_E method_;
+    METHOD_E method_;
     unsigned version_;
 
     virtual int pack(char* buf, int size) const;
+    const std::string& uri() const { return url_; }
+    METHOD_E method() { return method_; }
 
   private:
     virtual int parse_first_line(const char* buf, int size);
@@ -107,6 +109,17 @@ struct ZCE_API ZCE_HTTP_RESPONSE : public ZCE_HTTP_HEADER {
 
     virtual int pack(char* buf, int size) const;
 
+    void set_status(unsigned code, const std::string& status_str) {
+        result_code_ = code;
+        result_string_ = status_str;
+    }
+
+    void set_header(const std::string& key, const std::string& value) {
+        return exparam(key, value);
+    }
+
+    int encode(RefBlock& dblock) const;
+
   private:
     virtual int parse_first_line(const char* buf, int size);
 
@@ -115,7 +128,7 @@ struct ZCE_API ZCE_HTTP_RESPONSE : public ZCE_HTTP_HEADER {
 
 ///////////////////////////////////////////////////////////////////////////////
 
-class ZCE_API zce_http_stream : public IStream {
+class ZCE_API HttpStream : public IStream {
   protected:
     HTTP_CGI_E cgi_;
     SmartPtr<ZCE_HTTP_REQUEST> org_request_;
@@ -128,9 +141,9 @@ class ZCE_API zce_http_stream : public IStream {
     zce_int64 body_length_ack_;
 
   public:
-    zce_http_stream(HTTP_CGI_E cgi = HTTP_CGI_STANDARD);
+    HttpStream(HTTP_CGI_E cgi = HTTP_CGI_STANDARD);
 
-    virtual ~zce_http_stream();
+    virtual ~HttpStream();
 
     int header_length() const { return request_->header_length(); }
 
@@ -181,7 +194,7 @@ class ZCE_API zce_http_client : public IStream {
     virtual void on_prepare_nextres() {};  //@todo
 
     int request(
-        const std::string& url, ZCE_HTTP_REQUEST::HTTP_REQUEST_METHOD_E m, zce_byte* buf,
+        const std::string& url, ZCE_HTTP_REQUEST::METHOD_E m, zce_byte* buf,
         size_t length,
         const std::map<std::string, std::string>& paramdict = std::map<std::string, std::string>{});
 };
@@ -189,7 +202,7 @@ class ZCE_API zce_http_client : public IStream {
 ///////////////////////////////////////////////////////////////////////////////
 struct zce_websocket_pimpl;
 
-class zce_websocket_stream : public zce_http_stream {
+class WebSocketStream : public HttpStream {
     SmartPtr<zce_websocket_pimpl> pimpl_ptr_;
 
     int opcode_;
@@ -197,7 +210,7 @@ class zce_websocket_stream : public zce_http_stream {
   public:
     enum { OPCODE_TEXT = 1, OPCODE_BIN = 2 };
 
-    zce_websocket_stream(int opcode = OPCODE_BIN);
+    WebSocketStream(int opcode = OPCODE_BIN);
 
     void on_open(bool passive, const zce_sockaddr_t& remote) override;
 
