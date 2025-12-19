@@ -19,6 +19,14 @@ class xOptModelComp : public xOptModelBase {
     friend class xOptProblemComp;
 
   public:
+    enum VarDirection {
+        VarWeakRef = 0x0,
+        VarInput = 0x10,
+        VarInside = 0x20,
+        VarOutput = 0x30,
+        VarStrongRef = 0x40
+    };
+
     xOptModelComp();
 
     ~xOptModelComp();
@@ -26,16 +34,10 @@ class xOptModelComp : public xOptModelBase {
     int addModel(const std::string& name, const zce::SmartPtr<xOptModelBase>& sub_model,
                  bool keep_problem_null = false, bool force_prepare = false);
 
-    int addLink(const std::string& from_model_name, int from_var_index,
-                const std::string& from_var_name, const std::string& to_model_name,
-                int to_var_index, const std::string& to_var_name);
-
-    int addLink(const std::string& from_model_name, const std::vector<std::string>& from_names,
-                const std::string& to_model_name, const std::vector<int>& to_indexes,
-                bool overwrite_initx);
-
     int addLink(const std::string& from_model_name, const std::vector<int>& from_indexes,
-                const std::string& to_model_name, const std::vector<int>& to_indexes);
+                const std::vector<xOptModelComp::VarDirection>& from_dirs,
+                const std::string& to_model_name, const std::vector<int>& to_indexes,
+                const std::vector<xOptModelComp::VarDirection>& to_dirs, bool overwrite_initx);
 
     int fullfillInitialValue(const std::string& model_name,
                              const std::vector<const char*>& variable_names,
