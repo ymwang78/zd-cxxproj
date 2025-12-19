@@ -41,15 +41,18 @@ class xOptStreamSlate {
   public:
     explicit xOptStreamSlate(const std::string& type_name);
 
+    xOptStreamSlate(xOptStreamSlate&& rhs);
+
     ~xOptStreamSlate();
 
     const std::string& getName() const;
 
-    void setName(const std::string& name);
-
-    int addComponent(const std::string& comp_name, const std::string& description = "");
+    int addComponent(const std::string& comp_name, const std::string& var_name,
+                     const std::string& description = "");
 
     int removeComponent(const std::string& comp_name);
+
+    void clearComponents();
 
     const std::vector<std::string>& getComponents() const;
 
