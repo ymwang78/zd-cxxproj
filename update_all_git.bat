@@ -1,15 +1,12 @@
 @echo off
 chcp 65001 >nul
-set HTTP_PROXY=http://192.168.200.8:32080
-set HTTPS_PROXY=http://192.168.200.8:32080
-
+call "%USERPROFILE%\.env.bat"
 setlocal enabledelayedexpansion
 
 rem ========================================
 rem 指定要扫描的目录列表
 rem ========================================
 set DIRS="%CD%" libsrc
-
 echo ===============================================
 echo   Updating Git repositories
 echo ===============================================
@@ -46,6 +43,14 @@ for %%D in (%DIRS%) do (
             git pull --ff-only
             popd
         )
+    )
+
+    rem ---- 更新bin/x64子目录 ----
+    if exist "%%D\bin\x64\.git" (
+        echo [Self] Updating repo: %%D\bin\x64
+        pushd "%%D\bin\x64"
+        git pull --ff-only
+        popd
     )
 )
 

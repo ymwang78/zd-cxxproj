@@ -152,7 +152,7 @@ static bool machine_check(const zlicense::license_t& lic)
         return true;
     if (harddrive_match != 0 && harddrive_match == lic.vechd.size())
         return true;
-    if (mac_match * 2 >= lic.vecmac.size() && harddrive_match * 2 >= lic.vechd.size())
+    if (mac_match * 2 >= (int)lic.vecmac.size() && harddrive_match * 2 >= (int)lic.vechd.size())
         return true;
     return false;
 }
