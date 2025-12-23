@@ -49,6 +49,8 @@ int ZCE_API zce_close(handle_t handle);
 
 namespace zce {
 
+int ZCE_API statFile(const char* filename_utf8, struct stat* stat_buf);
+
 std::string ZCE_API getModulePath();
 
 std::string ZCE_API matchModulePath(const char* filename);

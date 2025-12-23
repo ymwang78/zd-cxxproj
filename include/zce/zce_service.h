@@ -103,7 +103,7 @@ class ZCE_API Service : public Reactor {
 
     int runWorkerProcess();
 
-    int main(int&, char*[]);
+    int main(int&, const char*[]);
 
     static Service* instance();
 

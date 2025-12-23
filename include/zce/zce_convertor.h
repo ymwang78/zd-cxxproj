@@ -49,6 +49,10 @@ class ZCE_API CharacterConvertor {
                               size_t target_size);
     static int wchart_to_utf8(const wchar_t* source, size_t source_size, char* target,
                               size_t target_size);
+
+    static std::wstring fromUtf8(const std::string_view& str);
+
+    static std::string toUtf8(const std::wstring_view& wstr);
 };
 
 class ZCE_API ToUtf8 {
