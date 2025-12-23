@@ -87,6 +87,8 @@ class ZCE_API Process : public zce::zdp::zdp_stream {
 
     const ProcessInfo& processInfo() const;
 
+    ProcessInfo& processInfo();
+
     bool isRunning() const;
 
     static bool isProcessExists(unsigned long process_id, const std::string& process_name);

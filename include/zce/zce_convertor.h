@@ -55,11 +55,11 @@ class ZCE_API CharacterConvertor {
     static std::string toUtf8(const std::wstring_view& wstr);
 };
 
-class ZCE_API ToUtf8 {
+class ZCE_API GBKToUtf8 {
   public:
     enum err_code { E_OK, E_ERR = ~0 };
-    ToUtf8(const char* gb2312_str, int len = 0);  // gb2312
-    ~ToUtf8();
+    GBKToUtf8(const char* gb2312_str, int len = 0);  // gb2312
+    ~GBKToUtf8();
 
     int utf8_len() const { return utf8_len_; }
     operator const char*() const { return utf8_str_; }
@@ -73,11 +73,11 @@ class ZCE_API ToUtf8 {
     enum err_code error_;
 };
 
-class ZCE_API FromUtf8 {
+class ZCE_API GBKFromUtf8 {
   public:
     enum err_code { E_OK, E_ERR = ~0 };
-    FromUtf8(const char* utf8_str, int len = 0);
-    ~FromUtf8();
+    GBKFromUtf8(const char* utf8_str, int len = 0);
+    ~GBKFromUtf8();
     operator const char*() const { return str_; }
     const char* c_str() const { return str_; }
     int str_len() const { return str_len_; }
@@ -90,11 +90,11 @@ class ZCE_API FromUtf8 {
     enum err_code error_;
 };
 
-class ZCE_API ToWChart {
+class ZCE_API GBKToWChart {
   public:
     enum err_code { E_OK, E_ERR = ~0 };
-    ToWChart(const char* gbk_str, int len = 0);
-    ~ToWChart();
+    GBKToWChart(const char* gbk_str, int len = 0);
+    ~GBKToWChart();
     operator const wchar_t*() const { return str_; }
     int str_len() const { return str_len_; }
     bool result() const { return E_OK == error_; }
