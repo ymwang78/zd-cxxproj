@@ -15,6 +15,8 @@
 #include <sstream>
 #include <iomanip>
 #include <string>
+#include <filesystem>
+#include <zce/zce_convertor.h>
 
 namespace zce {
 
@@ -295,7 +297,8 @@ inline std::string matrix_to_csv_string(const matrix_t& matrix, char delimiter =
  */
 inline zce_dblmat import_matrix_from_csv(const std::string& filename, char delimiter = ',',
                                          bool skip_headers = false) {
-    std::ifstream file(filename);
+    std::filesystem::path pth(zce::CharacterConvertor::fromUtf8(filename));
+    std::ifstream file(pth);
     if (!file.is_open()) {
         return zce_dblmat();
     }

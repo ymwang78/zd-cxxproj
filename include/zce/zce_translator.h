@@ -15,11 +15,14 @@
 #include <fstream>
 #include <iostream>
 #include <nlohmann/json.hpp>  // 使用 nlohmann/json 单头文件库
+#include <filesystem>
+#include <zce/zce_convertor.h>
 
 class zce_translator {
   public:
     bool load(const std::string& path) {
-        std::ifstream file(path);
+        std::filesystem::path pth(zce::CharacterConvertor::fromUtf8(path));
+        std::ifstream file(pth);
         if (!file.is_open()) return false;
 
         nlohmann::json j;
