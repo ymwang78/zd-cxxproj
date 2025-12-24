@@ -53,9 +53,9 @@ class xOptModelFixVars : public xOptModelBase {
 
     int prepareRuntime(const xOptParsedVariableArr& arr) override;
 
-    std::vector<int> getFlowsheetFixedVariableIndexes() const override;
+    std::vector<int> getFixedVariableIndexes() const override;
 
-    const xOptModelFixableVariables& getFlowsheetFixedVariables() const override;
+    const xOptModelFixableVariables& getFixedVariables() const override;
 
     int getPortNum(bool is_input_port) const override;
 

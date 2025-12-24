@@ -193,11 +193,9 @@ class xOptModelBase : public zce::Object {
                                  bool update_initx);
 
     // 这里是返回需要流程固定的变量的索引, 单元模块自己能固定的索引不需要返回
-    virtual std::vector<int> getFlowsheetFixedVariableIndexes() const;
+    virtual std::vector<int> getFixedVariableIndexes() const;
 
-    virtual const xOptModelFixableVariables& getFlowsheetFixedVariables() const;
-
-    virtual const xOptModelFixableVariables& getModelFixedVariables() const;
+    virtual const xOptModelFixableVariables& getFixedVariables() const;
 
     virtual std::vector<int> getStreamVariableIndexes(const xOptStreamSlate& stream,
                                                       bool is_input_port, int index) const;
