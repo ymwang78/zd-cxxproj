@@ -119,16 +119,19 @@ using xOptParsedParamterMap = std::unordered_map<std::string, xOptParsedParamter
 
 struct xOptParsedVariable {
     std::string name;
-    std::string array_expr;  // 数组长度表达式
     double lower;
     double upper;
     double initx;
-    std::vector<double> initial;
-    std::string unit;
-    int expand_index;  // 展开后的数组下标
-    double current;    // 当前值
+    double current;  // 当前值
+    int flags;
     std::string link_variable;
+    std::string unit;
+    double precision;
+    std::string external_tag;
     std::string description;
+    std::string array_expr;  // 数组长度表达式
+    int expand_index;        // 展开后的数组下标
+    std::vector<double> initial;
 };
 
 using xOptParsedVariableMap = std::unordered_map<std::string, xOptParsedVariable>;
