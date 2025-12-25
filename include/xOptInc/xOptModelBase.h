@@ -192,6 +192,8 @@ class xOptModelBase : public zce::Object {
     virtual int setVariableValue(const std::string& varname, int hint_index, double value,
                                  bool update_initx);
 
+    virtual int setVariableBounds(const std::string& varname, int hint_index, double lower,
+                                  double upper);
     // 这里是返回需要流程固定的变量的索引, 单元模块自己能固定的索引不需要返回
     virtual std::vector<int> getFixedVariableIndexes() const;
 

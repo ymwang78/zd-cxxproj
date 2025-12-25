@@ -47,6 +47,9 @@ class xOptModelComp : public xOptModelBase {
                        const std::map<std::string, std::pair<double, double>>& bounds,
                        bool will_setx);
 
+    int fullfillFixedBounds(const std::string& model_name, const xOptModelFixableVariables& bounds,
+                            bool will_setx);
+
     int printX() const;
 
     //================= 模型初始化 ==================
