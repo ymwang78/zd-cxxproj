@@ -50,6 +50,8 @@ class xOptModelComp : public xOptModelBase {
     int fullfillFixedBounds(const std::string& model_name, const xOptModelFixableVariables& bounds,
                             bool will_setx);
 
+    int prepareSolvingDone();
+
     int printX() const;
 
     //================= 模型初始化 ==================
