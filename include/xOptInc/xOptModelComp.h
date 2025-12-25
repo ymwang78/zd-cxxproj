@@ -41,7 +41,11 @@ class xOptModelComp : public xOptModelBase {
 
     int fullfillInitialValue(const std::string& model_name,
                              const std::vector<const char*>& variable_names,
-                             const std::vector<double>& initial_values);
+                             const std::vector<double>& initial_values, bool will_setx);
+
+    int fullfillBounds(const std::string& model_name,
+                       const std::map<std::string, std::pair<double, double>>& bounds,
+                       bool will_setx);
 
     int printX() const;
 
