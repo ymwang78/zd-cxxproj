@@ -55,7 +55,7 @@ class ZCE_API Thread : virtual public Object {
 
   private:
 
-    Thread(const Thread&) {};      // Copying is forbidden
+    Thread(const Thread&) : Object() {};      // Copying is forbidden
 
     void operator=(const Thread&) {};  // Assignment is forbidden
 };

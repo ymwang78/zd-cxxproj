@@ -71,7 +71,7 @@ class ZCE_API Task : virtual public zce::Object {
   public:
     Task(const char* const name);
 
-    inline const char* const name() const { return task_name_; }
+    inline const char* name() const { return task_name_; }
 
     virtual void call() = 0;
 };
