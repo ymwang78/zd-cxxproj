@@ -134,7 +134,7 @@ class ZCE_API Service : public Reactor {
 
     void showServiceStatus(const std::string& msg, SERVICE_STATUS& status);
 #else
-    int runPosixDaemon(int, char*[]);
+    int runPosixDaemon(int, const char*[]);
 #endif  // _WIN32
 };
 
