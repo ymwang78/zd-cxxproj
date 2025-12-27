@@ -19,6 +19,7 @@ vcpkg install lua:x64-windows-static-md
 vcpkg install gtest:x64-windows-static-md
 vcpkg install hiredis:x64-windows-static-md
 vcpkg install nlohmann-json:x64-windows-static-md
+vcpkg install expat:x64-windows-static-md
 
 vcpkg install lua:x64-windows-static
 vcpkg install nlohmann-json:x64-windows
