@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #ifdef _WIN32
 #    ifdef LIBHOST_EXPORTS
@@ -21,6 +21,7 @@ struct hostvm_start_t {
     unsigned short vm_storm_port;
     int extra_argc;
     const char **extra_argv;
+    void *log_handle;
 };
 
 #ifdef _WIN32
