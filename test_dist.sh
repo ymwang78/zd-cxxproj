@@ -46,5 +46,5 @@ else
 fi
 
 cp HostVM/dist/docker/*.xml /opt/hostvm/hostvm.xml
-cp HostVM/dist/docker/*.ptl /opt/hostvm/
+#cp HostVM/dist/docker/*.ptl /opt/hostvm/
 cp HostVM/dist/docker/*.py /opt/hostvm/
