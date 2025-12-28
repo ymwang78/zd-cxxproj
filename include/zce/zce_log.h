@@ -30,8 +30,8 @@ typedef enum _zlog_level {
     ZLOG_WARNI = 3,   /* warn */
     ZLOG_ERROR = 4,   /* error */
     ZLOG_FATAL = 5,   /* fatal */
-    ZLOG_BIZDT = 100, /* bizdata */
-    ZLOG_NONEL = 255, /* none */
+    ZLOG_BIZDT = 6,   /* bizdata */
+    ZLOG_NONEL = 7,   /* none */
 } ZLOG_LEVEL;
 #    define ZCE_DEFINED_LOGLEVEL
 #endif
@@ -40,6 +40,7 @@ typedef struct zlog_param {
     const char* name;
     int max_filesize;
     const char* logpath;
+    const char* prefix;
 } zlog_param;
 
 typedef struct _zlog_handle {

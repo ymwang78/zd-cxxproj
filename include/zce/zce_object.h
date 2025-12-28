@@ -27,13 +27,13 @@ class ZCE_API Object {
         : zce_alloc_(nullptr),
           release_delegator_(nullptr),
           ref_count_(0),
-          obj_idx_(Tss::get_global()->next_oid()) {};
+          obj_idx_(Tss::getGlobal()->next_oid()) {};
 
     Object(const Object& rhs)
         : zce_alloc_(nullptr),
           release_delegator_(rhs.release_delegator_),
           ref_count_(1),
-          obj_idx_(Tss::get_global()->next_oid()) {};
+          obj_idx_(Tss::getGlobal()->next_oid()) {};
 
     Object& operator=(const Object& rhs) {
         release_delegator_ = rhs.release_delegator_;

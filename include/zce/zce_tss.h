@@ -36,16 +36,17 @@ class ZCE_API Tss {
 
   public:
     struct global_t {
+        static constexpr int last_errdesc_size_ = 4096;
         static JavaVM* jvm_;
         static AAssetManager* aasset_manager_;
         JNIEnv* env_;
         void* spec_;
         zce_int64 oid_;
         int last_errcode_;
-        char* last_errdesc_;
+        char log_cache_[last_errdesc_size_];
+        char last_errdesc_[last_errdesc_size_];
         zce::TaskDelegator* current_delegator_;  // 当前线程的任务委托者环境
         std::vector<zce::Semaphore*> sem_vec_;     // for wait delegate task
-        static constexpr int last_errdesc_size_ = 4096;
 
         global_t();
 
@@ -58,7 +59,7 @@ class ZCE_API Tss {
         void return_semaphore(zce::Semaphore* sem);
     };
 
-    static global_t* get_global(bool create_if_not_exists = true);
+    static global_t* getGlobal(bool create_if_not_exists = true);
 
     struct zce_global_semaphore {
         zce_global_semaphore(const zce_global_semaphore&) = delete;
