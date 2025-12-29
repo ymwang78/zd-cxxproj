@@ -59,7 +59,7 @@ class VirtualMachineStub : public zce::Object {
 
     zce::SmartPtr<zce::Object> boot(const std::string& svc_name, const std::string& host,
                                     unsigned short port, bool ssl, int default_timeout,
-                                    std::function<void()> close_cb);
+                                    std::function<void()> open_cb, std::function<void()> close_cb);
 
     zce::SmartPtr<zce::Object> get_vm(const std::string& svc_name) const;
 
