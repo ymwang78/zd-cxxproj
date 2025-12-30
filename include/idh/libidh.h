@@ -173,7 +173,7 @@ typedef enum _IDH_QUALITY {
 
 } IDH_QUALITY;
 
-static int idh_is_good_quality(unsigned short quality) {
+static int idh_is_good_quality(uint8_t quality) {
     return (quality & IDH_HIGH_MASK) == IDH_HIGH_GOOD;
 }
 
@@ -185,7 +185,7 @@ typedef enum _IDH_RTSOURCE_FLAG {
     IDH_RTSOURCE_FLAG_RECONNECT = 0x2,  // auto reconnect on connection lost
 } IDH_RTSOURCE_FLAG;
 
-typedef enum _IDH_RTSOURCE : unsigned short {
+typedef enum _IDH_RTSOURCE : uint8_t {
     IDH_RTSOURCE_UA,
     IDH_RTSOURCE_DA,
     IDH_RTSOURCE_CSV,
@@ -205,8 +205,8 @@ typedef struct _idh_source_desc {
 typedef long long idh_group_t;
 
 typedef struct _idh_tag {
-    unsigned char data_type;
-    unsigned short namespace_index;
+    uint16_t data_type;
+    uint16_t namespace_index;
     const char* tag_name;
 } idh_tag_t;
 
@@ -218,17 +218,17 @@ typedef struct _idh_real {
 #define IDH_TQ_QUALITY_SHIFT 56
 #define IDH_TQ_TIME_MASK 0x0000FFFFFFFFFFFFULL
 
-static inline unsigned char idh_get_quality(uint64_t tq) {
-    return (unsigned char)(tq >> IDH_TQ_QUALITY_SHIFT);
+static inline uint8_t idh_get_quality(uint64_t tq) {
+    return (uint8_t)(tq >> IDH_TQ_QUALITY_SHIFT);
 }
 
-static inline unsigned char idh_get_quality_high(uint64_t tq) {
-    return (IDH_HIGH_MASK & (unsigned char)(tq >> IDH_TQ_QUALITY_SHIFT));
+static inline uint8_t idh_get_quality_high(uint64_t tq) {
+    return (IDH_HIGH_MASK & (uint8_t)(tq >> IDH_TQ_QUALITY_SHIFT));
 }
 
 static inline uint64_t idh_get_timestamp(uint64_t tq) { return tq & IDH_TQ_TIME_MASK; }
 
-static inline uint64_t idh_make_time_quality(unsigned char q, uint64_t ms) {
+static inline uint64_t idh_make_time_quality(uint8_t q, uint64_t ms) {
     return ((uint64_t)q << IDH_TQ_QUALITY_SHIFT) | (ms & IDH_TQ_TIME_MASK);
 }
 
@@ -245,15 +245,15 @@ typedef enum _IDH_NODETYPE {
 } IDH_NODETYPE;
 
 typedef struct _idh_browse_item {
-    unsigned short namespace_index;
+    uint16_t namespace_index;
     char node_name[256];         // 节点名称
     char display_name[256];      // 显示名称
     char description[512];       // 节点描述
     IDH_NODETYPE node_type;      // 节点类型
     IDH_DATATYPE data_type;      // 数据类型（仅变量节点有效）
-    unsigned char is_readable;   // 是否可读
-    unsigned char is_writable;   // 是否可写
-    unsigned char has_children;  // 是否有子节点
+    uint8_t is_readable;   // 是否可读
+    uint8_t is_writable;   // 是否可写
+    uint8_t has_children;  // 是否有子节点
 } idh_browse_item_t;
 
 LIBIDH_API idh_handle_t idh_instance_create();
@@ -267,7 +267,7 @@ LIBIDH_API int idh_get_log_level(ZLOG_LEVEL* level);
 
 LIBIDH_API int idh_instance_discovery(idh_handle_t handle, idh_source_desc_t* source_vec,
                                       unsigned source_size, const char* hostname,
-                                      unsigned short port);
+                                      uint16_t port);
 /* data source */
 
 LIBIDH_API idh_source_t idh_source_create(idh_handle_t handle, IDH_RTSOURCE source_type,
@@ -279,7 +279,7 @@ LIBIDH_API int idh_source_valid(idh_source_t source_id);
 LIBIDH_API void idh_source_destroy(idh_source_t source_id);
 
 LIBIDH_API int idh_source_browse(idh_source_t source_id, idh_browse_item_t* items,
-                                 unsigned* items_count, unsigned short parent_namespace_index,
+                                 unsigned* items_count, uint16_t parent_namespace_index,
                                  const char* parent_node_name);
 
 LIBIDH_API int idh_source_browse_root(idh_source_t source_id, idh_browse_item_t* items,
