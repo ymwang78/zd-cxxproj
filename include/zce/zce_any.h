@@ -31,7 +31,8 @@ class ZCE_API Any {
         any_ipv6,
         any_datetime,
         any_boolean,
-        any_dblock = 8,
+        any_idh,
+        any_dblock = 12,
         any_intarray,
         any_fltarray,
         any_dblarray,
@@ -40,7 +41,7 @@ class ZCE_API Any {
         any_dict,
         any_vector,
 
-        any_rawptr =30,
+        any_rawptr = 30,
         any_object,
     };
 
@@ -55,6 +56,10 @@ class ZCE_API Any {
             char str_inplace_[MAX_UNION_BYTES];
             struct in_addr ipv4_;
             struct in6_addr ipv6_;
+            struct {
+                double value;
+                zce_uint64 time_quality;
+            } idh_real_;
 
             zce::Object* obj_;
             zce::RefBlock* dblock_;  // string or bytearray limit to 4M, use dblock if larger
@@ -66,8 +71,7 @@ class ZCE_API Any {
         } u_;
         zce_uint16 len_or_port_;
         zce_uint16 subtype_indicate_;  // defined by app
-        zce_uint32 quality_ : 8;
-        zce_uint32 reserved_ : 8;
+        zce_uint32 reserved_ : 16;
         zce_uint32 padding_ : 6;
         zce_uint32 type_ : 5;
         zce_uint32 shiftbits_ : 3;
@@ -141,6 +145,15 @@ class ZCE_API Any {
         data_.u_.rawptr_[0] = (void*)raw;
     }
 
+    Any(zce_double value, zce_uint8 quality, zce_timestamp timestamp_microsec,
+        zce_uint16 subtype) noexcept
+        : data_{} {
+        data_.type_ = any_idh;
+        data_.u_.idh_real_.time_quality = ((zce_uint64)quality << 48) | (timestamp_microsec / 1000);
+        data_.u_.idh_real_.value = value;
+        data_.subtype_indicate_ = subtype;
+    }
+
     Any(zce::Object* obj) noexcept : data_{} {
         data_.type_ = any_object;
         data_.u_.obj_ = obj;
@@ -202,9 +215,13 @@ class ZCE_API Any {
     inline bool is_i64() const noexcept { return data_.type_ == any_int64; }
 
     inline zce_int64 i64ordouble() const noexcept {
-        ZCE_ASSERT_RETURN(data_.type_ == any_int64 || data_.type_ == any_double, 0);
+        ZCE_ASSERT_RETURN(
+            data_.type_ == any_int64 || data_.type_ == any_double || data_.type_ == any_idh, 0);
         if (data_.type_ == any_double) {
             return (zce_int64)data_.u_.dbl_[0];
+        }
+        if (data_.type_ == any_idh) {
+            return (zce_int64)data_.u_.idh_real_.value;
         }
         return data_.u_.i64_[0];
     }
@@ -222,15 +239,18 @@ class ZCE_API Any {
     inline bool is_double() const noexcept { return data_.type_ == any_double; }
 
     inline zce_double dbl() const noexcept {
-        ZCE_ASSERT_RETURN(data_.type_ == any_double || data_.type_ == any_int64 || data_.type_ == any_boolean, 0.0);
+        ZCE_ASSERT_RETURN(data_.type_ == any_double || data_.type_ == any_int64 ||
+                              data_.type_ == any_boolean || data_.type_ == any_idh,
+                          0.0);
         if (data_.type_ == any_double) {
             return data_.u_.dbl_[0];
-        }
-        if (data_.type_ == any_int64 || data_.type_ == any_boolean) {
+        } else if (data_.type_ == any_int64 || data_.type_ == any_boolean) {
             constexpr zce_int64 max_precise = (1ll << 52) - 1;
             if (data_.u_.i64_[0] > max_precise) return std::numeric_limits<double>::infinity();
             if (data_.u_.i64_[0] < -max_precise) return -std::numeric_limits<double>::infinity();
             return (zce_double)data_.u_.i64_[0];
+        } else if (data_.type_ == any_idh) {
+            return data_.u_.idh_real_.value;
         }
         return 0.0;
     }
@@ -240,6 +260,7 @@ class ZCE_API Any {
         if (data_.type_ == any_int64) {
             data_.type_ = any_double;
         }
+
         data_.u_.dbl_[0] = v;
     }
 
@@ -402,10 +423,6 @@ class ZCE_API Any {
         return data_.u_.i64_[0];
     }
 
-    inline unsigned char quality() const noexcept { return (unsigned char)data_.quality_; }
-
-    inline void quality(unsigned char q) noexcept { data_.quality_ = q; }
-
     inline bool is_string() const noexcept { return data_.type_ == any_str; }
 
     std::string to_string() const noexcept;
@@ -413,6 +430,27 @@ class ZCE_API Any {
     std::string toJsonString(bool pretty = false) const noexcept;
 
     static Any fromJsonString(const std::string& json_str) noexcept;
+
+    // make idh_real_t Any
+
+    inline bool is_idh() const noexcept { return data_.type_ == any_idh; }
+
+    inline double get_idh_value() const noexcept {
+        ZCE_ASSERT_RETURN(data_.type_ == any_idh, 0.0);
+        return data_.u_.idh_real_.value;
+    }
+    inline zce_uint8 get_idh_quality() const noexcept {
+        ZCE_ASSERT_RETURN(data_.type_ == any_idh, 0);
+        return (zce_uint8)(data_.u_.idh_real_.time_quality >> 48);
+    }
+    inline zce_timestamp get_idh_timestamp() const noexcept {
+        ZCE_ASSERT_RETURN(data_.type_ == any_idh, 0);
+        return (data_.u_.idh_real_.time_quality & 0x0000FFFFFFFFFFFFULL) * 1000;
+    }
+    inline zce_uint64 get_idh_time_quality() const noexcept {
+        ZCE_ASSERT_RETURN(data_.type_ == any_idh, 0);
+        return data_.u_.idh_real_.time_quality;
+    }
 };
 
 }  // namespace zce

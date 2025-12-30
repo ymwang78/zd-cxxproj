@@ -211,11 +211,11 @@ typedef struct _idh_tag {
 } idh_tag_t;
 
 typedef struct _idh_real {
-    uint64_t time_quality;    // [63:56]=quality, [55:0]=timestamp(ms since 2000-01-01)
-    double value;             // value
+    double value;           // value
+    uint64_t time_quality;  // [55:48]=quality, [48:0]=timestamp(ms since 2000-01-01)
 } idh_real_t;
 
-#define IDH_TQ_QUALITY_SHIFT 56
+#define IDH_TQ_QUALITY_SHIFT 48
 #define IDH_TQ_TIME_MASK 0x0000FFFFFFFFFFFFULL
 
 static inline uint8_t idh_get_quality(uint64_t tq) {
