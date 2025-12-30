@@ -66,7 +66,8 @@ class ZCE_API Any {
         } u_;
         zce_uint16 len_or_port_;
         zce_uint16 subtype_indicate_;  // defined by app
-        zce_uint32 quality_ : 16;
+        zce_uint32 quality_ : 8;
+        zce_uint32 reserved_ : 8;
         zce_uint32 padding_ : 6;
         zce_uint32 type_ : 5;
         zce_uint32 shiftbits_ : 3;
@@ -190,7 +191,7 @@ class ZCE_API Any {
 
     static Any create_dblock();
 
-    static Any create_datetime_from_msec(zce_int64 msec);
+    static Any create_datetime_from_msec_from1970(zce_int64 msec);
 
     inline int get_type() const noexcept { return data_.type_; }
 
@@ -401,9 +402,9 @@ class ZCE_API Any {
         return data_.u_.i64_[0];
     }
 
-    inline unsigned short quality() const noexcept { return data_.quality_; }
+    inline unsigned char quality() const noexcept { return (unsigned char)data_.quality_; }
 
-    inline void quality(unsigned short q) noexcept { data_.quality_ = q; }
+    inline void quality(unsigned char q) noexcept { data_.quality_ = q; }
 
     inline bool is_string() const noexcept { return data_.type_ == any_str; }
 

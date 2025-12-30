@@ -19,6 +19,8 @@
 #    define LIBIDH_API
 #endif
 
+#include <stdint.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -26,13 +28,13 @@ extern "C" {
 #ifndef ZCE_DEFINED_LOGLEVEL
 typedef enum _zlog_level {
     ZLOG_TRACE = 0,
-    ZLOG_DEBUG = 1,   /* debug */
-    ZLOG_INFOR = 2,   /* info */
-    ZLOG_WARNI = 3,   /* warn */
-    ZLOG_ERROR = 4,   /* error */
-    ZLOG_FATAL = 5,   /* fatal */
-    ZLOG_BIZDT = 100, /* bizdata */
-    ZLOG_NONEL = 255, /* none */
+    ZLOG_DEBUG = 1, /* debug */
+    ZLOG_INFOR = 2, /* info */
+    ZLOG_WARNI = 3, /* warn */
+    ZLOG_ERROR = 4, /* error */
+    ZLOG_FATAL = 5, /* fatal */
+    ZLOG_BIZDT = 6, /* bizdata */
+    ZLOG_NONEL = 7, /* none */
 } ZLOG_LEVEL;
 #    define ZCE_DEFINED_LOGLEVEL
 #endif
@@ -91,23 +93,83 @@ typedef enum _IDH_DATATYPE {
 } IDH_DATATYPE;
 
 typedef enum _IDH_QUALITY {
+    /* ---------------- High 2-bit Quality Class ---------------- */
+    IDH_HIGH_INVALID = 0x00,    // 00xxxxxx
+    IDH_HIGH_UNCERTAIN = 0x40,  // 01xxxxxx
+    IDH_HIGH_BAD = 0x80,        // 10xxxxxx
+    IDH_HIGH_GOOD = 0xC0,       // 11xxxxxx
+    IDH_HIGH_MASK = 0xC0,
 
-    IDH_HIGH_INVALID = 0x0,
-    IDH_HIGH_GOOD = 0x0100,
-    IDH_HIGH_BAD = 0x0200,
-    IDH_HIGH_UNCERTAIN = 0x0300,
-    IDH_HIGH_MASK = 0xff00,
+    /* ---------------- INVALID / BAD Base States (0x01–0x0F) ---------------- */
+    IDH_LOW_INVALID_NODATA = 0x01,       // BadNoData
+    IDH_LOW_INVALID_UNREAD = 0x02,       // BadWaitingForInitialData
+    IDH_LOW_INVALID_UNSUBSCRIBE = 0x03,  // BadNotConnected
+    IDH_LOW_INVALID_TYPE = 0x04,         // BadTypeMismatch
+    IDH_LOW_INVALID_HANDLE = 0x05,       // BadNodeIdUnknown / BadNodeIdInvalid
+    IDH_LOW_INVALID_OVERFLOW = 0x06,     // BadOutOfRange
+    IDH_LOW_INVALID_BADVALUE = 0x07,     // BadDataLost
+    IDH_LOW_INVALID_BADQUALITY = 0x08,   // BadUnexpectedError
+    IDH_LOW_INVALID_TIMEOUT = 0x09,      // BadTimeout
+    IDH_LOW_INVALID_COMM = 0x0A,         // BadCommunicationError
+    IDH_LOW_INVALID_DEVICE = 0x0B,       // BadDeviceFailure
+    IDH_LOW_INVALID_CONFIG = 0x0C,       // BadConfigurationError
+    IDH_LOW_INVALID_LICENSE = 0x0D,      // BadLicenseExpired
+    IDH_LOW_INVALID_RESOURCE = 0x0E,     // BadResourceUnavailable
+    IDH_LOW_INVALID_INTERNAL = 0x0F,     // BadInternalError
 
-    IDH_LOW_INVALID_NODATA = 0x01,       // tag value not exists
-    IDH_LOW_INVALID_UNREAD = 0x02,       // tag value has not been read
-    IDH_LOW_INVALID_UNSUBSCRIBE = 0x03,  // batch operation has unsubscribed item
-    IDH_LOW_INVALID_TYPE = 0x04,         // cannot convert data type
-    IDH_LOW_INVALID_HANDLE = 0x05,       // bad quality
-    IDH_LOW_INVALID_OVERFLOW = 0x06,     // overflow
-    IDH_LOW_INVALID_BADVALUE = 0x07,     // bad value
-    IDH_LOW_INVALID_BADQUALITY = 0x08,   // bad quality
+    /* ---------------- UNCERTAIN States (0x10–0x1F) ---------------- */
+    IDH_LOW_UNCERTAIN_DATA = 0x10,         // Uncertain
+    IDH_LOW_UNCERTAIN_LASTVALUE = 0x11,    // UncertainLastUsableValue
+    IDH_LOW_UNCERTAIN_ESTIMATED = 0x12,    // UncertainEstimatedValue
+    IDH_LOW_UNCERTAIN_SUBSTITUTE = 0x13,   // UncertainSubstituteValue
+    IDH_LOW_UNCERTAIN_CALIBRATING = 0x14,  // UncertainSensorNotAccurate
+    IDH_LOW_UNCERTAIN_ENGUNIT = 0x15,      // UncertainEngineeringUnitsExceeded
+    IDH_LOW_UNCERTAIN_LOWDATA = 0x16,      // UncertainDataSubNormal
+    IDH_LOW_UNCERTAIN_HOLD = 0x17,         // Hold last value
+    IDH_LOW_UNCERTAIN_DERIVED = 0x18,      // Derived value
+    IDH_LOW_UNCERTAIN_SIMULATED = 0x19,    // Simulated value
+    IDH_LOW_UNCERTAIN_MANUALINPUT = 0x1A,  // Manual input
+    IDH_LOW_UNCERTAIN_TIMESYNC = 0x1B,     // Time sync error
+    IDH_LOW_UNCERTAIN_FILTERED = 0x1C,     // Filtered value
+    IDH_LOW_UNCERTAIN_PREPROCESS = 0x1D,   // Preprocessed value
+    IDH_LOW_UNCERTAIN_AGGREGATED = 0x1E,   // Aggregated value
+    IDH_LOW_UNCERTAIN_RESERVED = 0x1F,
 
-    IDH_LOW_GOOD_MANUAL = 0x01,  // manually entered
+    /* ---------------- GOOD / LIMIT States (0x20–0x2F) ---------------- */
+    IDH_LOW_GOOD_NORMAL = 0x20,       // Good
+    IDH_LOW_GOOD_HIGHLIMIT = 0x21,    // GoodClamped - High limit
+    IDH_LOW_GOOD_LOWLIMIT = 0x22,     // GoodClamped - Low limit
+    IDH_LOW_GOOD_HIGHHIGH = 0x23,     // High alarm
+    IDH_LOW_GOOD_LOWLOW = 0x24,       // Low alarm
+    IDH_LOW_GOOD_RATELIMIT = 0x25,    // Rate limited
+    IDH_LOW_GOOD_MANUAL = 0x26,       // Manually entered
+    IDH_LOW_GOOD_OVERRIDE = 0x27,     // Manual override
+    IDH_LOW_GOOD_BYPASS = 0x28,       // Control bypass
+    IDH_LOW_GOOD_MAINTENANCE = 0x29,  // Maintenance mode
+    IDH_LOW_GOOD_STARTUP = 0x2A,      // Startup phase
+    IDH_LOW_GOOD_SHUTDOWN = 0x2B,     // Shutdown phase
+    IDH_LOW_GOOD_WARMUP = 0x2C,       // Warmup
+    IDH_LOW_GOOD_STANDBY = 0x2D,      // Standby
+    IDH_LOW_GOOD_TESTMODE = 0x2E,     // Test mode
+    IDH_LOW_GOOD_SIMULATION = 0x2F,   // Simulation mode
+
+    /* ---------------- SYSTEM / PLATFORM ERRORS (0x30–0x3F) ---------------- */
+    IDH_LOW_SYS_DBWRITEFAILED = 0x30,  // Database write failed
+    IDH_LOW_SYS_CACHEOVERFLOW = 0x31,  // Cache overflow
+    IDH_LOW_SYS_DISKFULL = 0x32,       // Disk full
+    IDH_LOW_SYS_PERMISSION = 0x33,     // Permission denied
+    IDH_LOW_SYS_PROTOCOL = 0x34,       // Protocol error
+    IDH_LOW_SYS_CODEC = 0x35,          // Codec error
+    IDH_LOW_SYS_CHECKSUM = 0x36,       // Checksum error
+    IDH_LOW_SYS_VERSION = 0x37,        // Version mismatch
+    IDH_LOW_SYS_DEPENDENCY = 0x38,     // Dependency failed
+    IDH_LOW_SYS_SERVICE = 0x39,        // Service unavailable
+    IDH_LOW_SYS_NODENOTFOUND = 0x3A,   // Node not found
+    IDH_LOW_SYS_TYPEMISMATCH = 0x3B,   // Type mismatch
+    IDH_LOW_SYS_ADDRINVALID = 0x3C,    // Address invalid
+    IDH_LOW_SYS_UNAUTHORIZED = 0x3D,   // Unauthorized
+    IDH_LOW_SYS_THROTTLED = 0x3E,      // Throttled
+    IDH_LOW_SYS_UNKNOWN = 0x3F         // Unknown error
 
 } IDH_QUALITY;
 
@@ -116,7 +178,6 @@ static int idh_is_good_quality(unsigned short quality) {
 }
 
 static const long long IDH_INVALID_HANDLE = ~0;
-
 
 typedef enum _IDH_RTSOURCE_FLAG {
     IDH_RTSOURCE_FLAG_NONE = 0x0,
@@ -150,10 +211,26 @@ typedef struct _idh_tag {
 } idh_tag_t;
 
 typedef struct _idh_real {
-    unsigned short quality;  // IDH_QUALITY
-    long long timestamp;     // million second from 1970-01-01 00:00:00
-    double value;            // value
+    uint64_t time_quality;    // [63:56]=quality, [55:0]=timestamp(ms since 2000-01-01)
+    double value;             // value
 } idh_real_t;
+
+#define IDH_TQ_QUALITY_SHIFT 56
+#define IDH_TQ_TIME_MASK 0x0000FFFFFFFFFFFFULL
+
+static inline unsigned char idh_get_quality(uint64_t tq) {
+    return (unsigned char)(tq >> IDH_TQ_QUALITY_SHIFT);
+}
+
+static inline unsigned char idh_get_quality_high(uint64_t tq) {
+    return (IDH_HIGH_MASK & (unsigned char)(tq >> IDH_TQ_QUALITY_SHIFT));
+}
+
+static inline uint64_t idh_get_timestamp(uint64_t tq) { return tq & IDH_TQ_TIME_MASK; }
+
+static inline uint64_t idh_make_time_quality(unsigned char q, uint64_t ms) {
+    return ((uint64_t)q << IDH_TQ_QUALITY_SHIFT) | (ms & IDH_TQ_TIME_MASK);
+}
 
 typedef enum _IDH_NODETYPE {
     IDH_NODETYPE_UNKNOWN = 0,
