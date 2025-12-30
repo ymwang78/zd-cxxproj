@@ -28,6 +28,7 @@ for %%D in (%DIRS%) do (
     if exist "%%D\.git" (
         echo [Self] Updating repo: %%D
         pushd "%%D"
+        git diff
         git pull
         popd
     ) else (
@@ -40,6 +41,7 @@ for %%D in (%DIRS%) do (
             echo.
             echo [Subdir] Updating repo: %%S
             pushd "%%S"
+            git diff
             git pull
             popd
         )
@@ -49,6 +51,7 @@ for %%D in (%DIRS%) do (
     if exist "%%D\bin\x64\.git" (
         echo [Self] Updating repo: %%D\bin\x64
         pushd "%%D\bin\x64"
+        git diff
         git pull
         popd
     )
