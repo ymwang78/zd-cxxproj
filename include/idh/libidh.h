@@ -185,7 +185,7 @@ typedef enum _IDH_RTSOURCE_FLAG {
     IDH_RTSOURCE_FLAG_RECONNECT = 0x2,  // auto reconnect on connection lost
 } IDH_RTSOURCE_FLAG;
 
-typedef enum _IDH_RTSOURCE : uint8_t {
+typedef enum _IDH_RTSOURCE  {
     IDH_RTSOURCE_UA,
     IDH_RTSOURCE_DA,
     IDH_RTSOURCE_CSV,
