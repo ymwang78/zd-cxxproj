@@ -22,9 +22,6 @@ class xOptModelSym : public xOptModelBase {
 
     ~xOptModelSym();
 
-    int fixVar(std::vector<std::string>& varname, const char* target_model_name,
-               xOptProblem* problem, const std::vector<int>& var_index);
-
     //////////////////////////////////////////////////////////////////////////////////
     // 以下函数为xOptModelBase的接口
     //////////////////////////////////////////////////////////////////////////////////
