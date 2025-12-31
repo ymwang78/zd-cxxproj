@@ -104,7 +104,7 @@ class zdl_type : public meta_base {
 
     // type itself indicator is a vector
     inline bool is_vector() const noexcept {
-        return (id() >= ZDL_ASTRING && id() <= ZDL_BYTEVEC || id() == ZDL_FLTMAT ||
+        return ((id() >= ZDL_ASTRING && id() <= ZDL_BYTEVEC) || id() == ZDL_FLTMAT ||
                 id() == ZDL_DBLMAT);
     }
 

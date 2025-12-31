@@ -315,7 +315,7 @@ int zds_unpack_array(std::vector<T>& val, const zce_byte* buf, zce_int32 size, z
 
     // fast size check, to avoid a very large array size
     // at least every struct has 1 byte
-    if (size < alen) return ZCE_ERROR_SHRTLEN;
+    if (size < (int)alen) return ZCE_ERROR_SHRTLEN;
 
     val.resize((size_t)alen);
 
