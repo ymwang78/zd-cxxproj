@@ -134,7 +134,7 @@ class ZCE_API TaskDelegator : virtual public zce::Object {
         return promise_ptr;
     }
 
-    template<typename F>
+    template <typename F>
     class Fr_task : public zce::Task {
         zce::SmartPtr<zce::TaskDelegator> delegator_;
         zce::Semaphore* sem_;
@@ -154,6 +154,8 @@ class ZCE_API TaskDelegator : virtual public zce::Object {
         virtual void call() {
             try {
                 f_();
+            } catch (const std::bad_cast& c) {
+                ZCE_ERROR((ZLOG_ERROR, "%s bad_cast exception:%s", this->name(), c.what()));
             } catch (const std::exception& ex) {
                 ZCE_ASSERT_TEXT(false, ex.what());
             } catch (...) {
@@ -165,14 +167,14 @@ class ZCE_API TaskDelegator : virtual public zce::Object {
 
     template <typename F>
     int delegate(bool bwait, const char* name, F&& f) {
-        #if 0
+#if 0
         auto promise_ptr = delegateFuture(name, std::forward<F>(f));
         if (bwait) {
             auto result_future = promise_ptr->get_future();
             ZCE_ASSERT(result_future.valid());
             result_future.wait();
         }
-        #else
+#else
         if (bwait) {
             zce::Tss::zce_global_semaphore global_semaphore;
             zce::SmartPtr<zce::Task> task_ptr(new Fr_task(name, this, global_semaphore.sem, f));
@@ -183,7 +185,7 @@ class ZCE_API TaskDelegator : virtual public zce::Object {
             zce::SmartPtr<zce::Task> task_ptr(new Fr_task(name, this, 0, f));
             return delegateTask(task_ptr);
         }
-        #endif
+#endif
         return 0;
     };
 };

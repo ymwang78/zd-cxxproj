@@ -24,7 +24,7 @@ extern "C" {
 
 #ifndef ZCE_DEFINED_LOGLEVEL
 typedef enum _zlog_level {
-    ZLOG_TRACE = 0,
+    ZLOG_TRACE = 0,   /* trace */
     ZLOG_DEBUG = 1,   /* debug */
     ZLOG_INFOR = 2,   /* info */
     ZLOG_WARNI = 3,   /* warn */
