@@ -16,10 +16,13 @@
 #include <zce/zce_tss.h>
 #include <zce/zce_sync.h>
 
+
 namespace zce {
 
 class Allocator;
 class TaskDelegator;
+
+
 
 class ZCE_API Object {
   protected:
@@ -193,6 +196,35 @@ class SmartPtr {
         return (this->handler_ < right.handler_);
     }
 
+    #if 1
+    template <class Y, class P>
+    static SmartPtr __dynamic_cast(const SmartPtr<Y, P>& rhs) {
+        Y* handler = rhs.__lock_addref();
+
+        if (!handler) {
+            std::cerr << "dynamic_cast: rhs is null";
+            return SmartPtr<IMPL_CLASS, ZCE_LOCK>();
+        }
+
+        // 必须是多态类型
+        if (!std::is_polymorphic<Y>::value) {
+            std::cerr << "dynamic_cast on non-polymorphic type: " << typeid(Y).name();
+        }
+
+        IMPL_CLASS* p = dynamic_cast<IMPL_CLASS*>(handler);
+
+        if (!p) {
+            std::cerr << "dynamic_cast failed: from [" << typeid(*handler).name()
+                      << "] to [" << typeid(IMPL_CLASS).name() << "], ptr=" << handler;
+            handler->__decref();
+            return SmartPtr<IMPL_CLASS, ZCE_LOCK>();
+        }
+
+        SmartPtr<IMPL_CLASS, ZCE_LOCK> lhs;
+        lhs.__assign(p);
+        return lhs;
+    }
+    #else
     template <class Y, class P>
     static SmartPtr __dynamic_cast(const SmartPtr<Y, P>& rhs) {
         Y* handler = rhs.__lock_addref();
@@ -204,6 +236,7 @@ class SmartPtr {
         lhs.__assign(p);
         return lhs;
     }
+    #endif
 
     template <class Y>
     static SmartPtr __dynamic_cast(Y* p) {
