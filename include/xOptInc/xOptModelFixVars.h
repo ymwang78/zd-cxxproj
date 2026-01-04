@@ -21,14 +21,14 @@ class xOptModelFixVars : public xOptModelBase {
 
     ~xOptModelFixVars() = default;
 
-    int fixVar(std::vector<std::string>& varname, const std::string& model_name,
-               xOptProblem* problem, const std::vector<int>& var_index);
+    //int fixVar(std::vector<std::string>& varname, const std::string& model_name,
+    //           xOptProblem* problem, const std::vector<int>& var_index);
 
-    int fixVar(std::vector<std::string>& varname, const std::string& model_name,
-               xOptProblem* problem, const xOptModelFixableVariables& tofix);
+    //int fixVar(std::vector<std::string>& varname, const std::string& model_name,
+    //           xOptProblem* problem, const xOptModelFixableVariables& tofix);
 
-    int fixVar(std::vector<std::string>& varname, std::vector<int>& var_indexes,
-                     xOptModelBase* ref_model, const xOptModelFixableVariables& tofix);
+    //int fixVar(std::vector<std::string>& varname, std::vector<int>& var_indexes,
+    //                 xOptModelBase* ref_model, const xOptModelFixableVariables& tofix);
 
     //================= 模型初始化 ==================
 
