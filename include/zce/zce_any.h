@@ -145,7 +145,7 @@ class ZCE_API Any {
         data_.u_.rawptr_[0] = (void*)raw;
     }
 
-    Any(zce_double value, zce_uint8 quality, zce_timestamp timestamp_microsec,
+    Any(zce_double value, zce_byte quality, zce_timestamp timestamp_microsec,
         zce_uint16 subtype) noexcept
         : data_{} {
         data_.type_ = any_idh;
@@ -439,9 +439,9 @@ class ZCE_API Any {
         ZCE_ASSERT_RETURN(data_.type_ == any_idh, 0.0);
         return data_.u_.idh_real_.value;
     }
-    inline zce_uint8 get_idh_quality() const noexcept {
+    inline zce_byte get_idh_quality() const noexcept {
         ZCE_ASSERT_RETURN(data_.type_ == any_idh, 0);
-        return (zce_uint8)(data_.u_.idh_real_.time_quality >> 48);
+        return (zce_byte)(data_.u_.idh_real_.time_quality >> 48);
     }
     inline zce_timestamp get_idh_timestamp() const noexcept {
         ZCE_ASSERT_RETURN(data_.type_ == any_idh, 0);

@@ -9,71 +9,61 @@
 // ***************************************************************
 //
 // ***************************************************************
-
-// fix defines in different platform
-#ifndef ZCE_TYPES_DEFINED
-#    define ZCE_TYPES_DEFINED
-
-#    ifdef _WIN32
-
-#        if !defined(_SSIZE_T_) && !defined(_SSIZE_T_DEFINED)
-typedef intptr_t ssize_t;
-#            define _SSIZE_T_
-#            define _SSIZE_T_DEFINED
-#        endif  //! defined(_SSIZE_T_) && !defined(_SSIZE_T_DEFINED)
-
-typedef DWORD threadid_t;
-typedef HANDLE handle_t;
-typedef int socklen_t;
-struct iovec {
-    u_long iov_len;
-    char* iov_base;
-};
-
-#    else   //_WIN32
-#include <pthread.h>
-typedef pthread_t threadid_t;
-typedef int handle_t;
-
-#    endif  //_WIN32
-
-#endif  // ZCE_TYPES_DEFINED
+#include <stdint.h>
+#include <stddef.h>  // size_t, ptrdiff_t
+#include <time.h>    // struct timespec
 
 #ifdef _WIN32
-#    define ZCE_INVALID_HANDLE INVALID_HANDLE_VALUE
-typedef long long int zce_int64;
-typedef unsigned long long int zce_uint64;
-#else
-#    define ZCE_INVALID_HANDLE -1
-#    if defined(__GNUC__) && (__WORDSIZE == 64)
-typedef long int zce_int64;
-typedef unsigned long int zce_uint64;
-#    else
-typedef long long int zce_int64;
-typedef unsigned long long int zce_uint64;
+#    include <WinSock2.h>
+#    include <Windows.h>
+#    include <ws2tcpip.h>
+#    if defined(_MSC_VER)
+#        include <BaseTsd.h>
+#        ifndef _SSIZE_T_DEFINED
+typedef SSIZE_T ssize_t;
+#            define _SSIZE_T_DEFINED
+#        endif
 #    endif
+typedef struct iovec {
+    unsigned long iov_len; /* Length of data.  */
+    char* iov_base;        /* Pointer to data.  */
+} iovec;
+typedef DWORD threadid_t;
+typedef HANDLE handle_t;
+#    define ZCE_INVALID_HANDLE INVALID_HANDLE_VALUE
+#else  // Linux / Unix / macOS
+#    include <sys/types.h>
+#    include <sys/socket.h>
+#    include <sys/uio.h>
+#    include <netinet/in.h>
+#    include <arpa/inet.h>
+#    include <pthread.h>
+#    include <unistd.h>
+#    define ZCE_INVALID_HANDLE -1
+typedef pthread_t threadid_t;
+typedef int handle_t;
 #endif
-
-typedef char zce_char;
-typedef char zce_int8;
-typedef short zce_int16;
-typedef int zce_int32;
+typedef int8_t zce_int8;
+typedef uint8_t zce_uint8;
+typedef int16_t zce_int16;
+typedef uint16_t zce_uint16;
+typedef int32_t zce_int32;
+typedef uint32_t zce_uint32;
+typedef int64_t zce_int64;
+typedef uint64_t zce_uint64;
 typedef unsigned char zce_byte;
-typedef unsigned char zce_uint8;
-typedef unsigned short zce_uint16;
-typedef unsigned int zce_uint32;
+typedef char zce_char;
 typedef float zce_float;
 typedef double zce_double;
 typedef struct timespec zce_timespec_t;
-typedef zce_int64 zce_timestamp;  // same as pgsql timestamp, microsecond from 2000-1-1 00:00:00
-
-// to simplify type cast or type safety
-struct zce_sockaddr_pipe {
+typedef zce_int64 zce_timestamp;
+typedef struct zce_sockaddr_pipe {
     zce_uint16 family;
-    zce_uint16 flags /*bit0: 0server,1 client;*/;
+    zce_uint16 flags; /*bit0: 0server,1 client;*/
     unsigned char path[96];
-};
-typedef union _zce_sockaddr_t {
+} zce_sockaddr_pipe;
+
+typedef union zce_sockaddr_t {
     struct sockaddr sa;
     struct sockaddr_in sa_in;
     struct sockaddr_in6 sa_in6;
@@ -81,7 +71,7 @@ typedef union _zce_sockaddr_t {
     struct zce_sockaddr_pipe sa_pipe;
 } zce_sockaddr_t;
 
-typedef struct _zce_addr_t {
+typedef struct zce_addr_t {
     zce_byte translayer;
     zce_byte ipclass;
     zce_sockaddr_t addr;
@@ -93,26 +83,30 @@ typedef struct _zce_addr_t {
 #    include <vector>
 #    include <string_view>
 #    include <memory>
-#    include <zce/zce_matrix.h>
 #    include <optional>
-#    ifdef _UNICODE
-typedef std::u16string zce_tstring;
-typedef char16_t zce_tchar;
-#    else   //_UNICODE
-typedef std::string zce_tstring;
-typedef char zce_tchar;
-#    endif  //_UNICODE
+#    if __has_include(<zce/zce_matrix.h>)
+#        include <zce/zce_matrix.h>
+#    endif
 
-typedef char16_t zce_char16;
-typedef std::u16string zce_ustr;
-typedef std::u16string_view zce_ustrview;
-typedef std::string zce_string;
-typedef std::string zce_astring;
-typedef std::vector<zce_byte> zce_bytevec;
-typedef std::vector<zce_ustr> zce_ustrvec;
-typedef std::vector<zce_string> zce_strvec;
-typedef std::vector<zce_astring> zce_astrvec;
-typedef std::vector<zce_tstring> zce_tstrvec;
+#    ifdef _UNICODE
+using zce_tstring = std::u16string;
+using zce_tchar = char16_t;
+#    else
+using zce_tstring = std::string;
+using zce_tchar = char;
+#    endif
+
+using zce_char16 = char16_t;
+using zce_ustr = std::u16string;
+using zce_ustrview = std::u16string_view;
+using zce_string = std::string;
+using zce_astring = std::string;
+
+using zce_bytevec = std::vector<zce_byte>;
+using zce_ustrvec = std::vector<zce_ustr>;
+using zce_strvec = std::vector<zce_string>;
+using zce_astrvec = std::vector<zce_astring>;
+using zce_tstrvec = std::vector<zce_tstring>;
 
 namespace zce {
 class Allocator;
@@ -127,8 +121,7 @@ class Tss;
 
 namespace zdp {
 struct zds_context_t;
-}  // namespace zdp
-
+}
 }  // namespace zce
 
-#endif  //__cplusplus
+#endif  // __cplusplus

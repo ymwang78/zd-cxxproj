@@ -166,7 +166,7 @@ DECLARE_PACK_BUILTIN_ARRAY(zce_byte)
 DECLARE_PACK_BUILTIN_ARRAY(zce_uint16)
 DECLARE_PACK_BUILTIN_ARRAY(zce_uint32)
 DECLARE_PACK_BUILTIN_ARRAY(zce_uint64)
-DECLARE_PACK_BUILTIN_ARRAY(zce_int8)
+DECLARE_PACK_BUILTIN_ARRAY(zce_char)
 DECLARE_PACK_BUILTIN_ARRAY(zce_int16)
 DECLARE_PACK_BUILTIN_ARRAY(zce_int32)
 DECLARE_PACK_BUILTIN_ARRAY(zce_int64)
@@ -252,7 +252,7 @@ int ZCE_API zds_unpack_builtin(std::vector<zce_uint32>& val, const zce_byte* buf
 int ZCE_API zds_unpack_builtin(std::vector<zce_uint64>& val, const zce_byte* buf, zce_int32 size,
                                zds_context_t* ctx);
 
-int ZCE_API zds_unpack_builtin(std::vector<zce_int8>& val, const zce_byte* buf, zce_int32 size,
+int ZCE_API zds_unpack_builtin(std::vector<zce_char>& val, const zce_byte* buf, zce_int32 size,
                                zds_context_t* ctx);
 
 int ZCE_API zds_unpack_builtin(std::vector<zce_int16>& val, const zce_byte* buf, zce_int32 size,
