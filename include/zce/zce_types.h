@@ -63,7 +63,7 @@ typedef struct zce_sockaddr_pipe {
     unsigned char path[96];
 } zce_sockaddr_pipe;
 
-typedef union zce_sockaddr_t {
+typedef union _zce_sockaddr_t {
     struct sockaddr sa;
     struct sockaddr_in sa_in;
     struct sockaddr_in6 sa_in6;
