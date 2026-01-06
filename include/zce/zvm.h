@@ -243,7 +243,7 @@ class VirtualMachineProxy : public zce::Object {
             result.errcode = errcode;
             if (errcode < 0) {
                 result.errdesc = "callTwoWay failed";
-                ZCE_DEBUG((ZLOG_DEBUG, "rpc call %s ret: 0x%x, desc: %s", func, errcode,
+                ZCE_ERROR((ZLOG_ERROR, "call %s ret: 0x%x, desc: %s", func, errcode,
                            result.errdesc.c_str()));
                 async_cb(std::move(result));
                 return;
