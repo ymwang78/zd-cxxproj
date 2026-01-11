@@ -202,7 +202,7 @@ class SmartPtr {
         Y* handler = rhs.__lock_addref();
 
         if (!handler) {
-            std::cerr << "dynamic_cast: rhs is null";
+            //std::cerr << "dynamic_cast: rhs is null";
             return SmartPtr<IMPL_CLASS, ZCE_LOCK>();
         }
 
@@ -214,8 +214,8 @@ class SmartPtr {
         IMPL_CLASS* p = dynamic_cast<IMPL_CLASS*>(handler);
 
         if (!p) {
-            std::cerr << "dynamic_cast failed: from [" << typeid(*handler).name()
-                      << "] to [" << typeid(IMPL_CLASS).name() << "], ptr=" << handler;
+            //std::cerr << "dynamic_cast failed: from [" << typeid(*handler).name()
+            //          << "] to [" << typeid(IMPL_CLASS).name() << "], ptr=" << handler;
             handler->__decref();
             return SmartPtr<IMPL_CLASS, ZCE_LOCK>();
         }
