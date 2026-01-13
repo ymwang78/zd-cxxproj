@@ -14,11 +14,15 @@
 #include <zce/zce_mbpool.h>
 #include <zce/zce_singleton.h>
 #include <zce/zds_schema.h>
+#include <zce/zce_task_queue.h>
 
 extern "C" {
 typedef struct lua_State lua_State;
 typedef void (*lpfn_lual_openlibs)(lua_State* L);
 }
+class zdl_module;
+class zdl_struct;
+class zvm_channel;
 
 namespace zce {
 
@@ -49,6 +53,9 @@ class VirtualMachineStub : public zce::Object {
     VirtualMachineStub();
 
     ~VirtualMachineStub();
+
+    const zce::SmartPtr<VirtualMachineStubPimpl>& pimpl_ptr() const noexcept {
+        return pimpl_ptr_; }
 
     int initStub(const zce::SmartPtr<zce::Scheduler>&, const zce::SmartPtr<zce::Reactor>&);
 
@@ -119,6 +126,54 @@ class VirtualMachineStub : public zce::Object {
 };
 
 typedef zce::Singleton<VirtualMachineStub> VirtualMachineStubSigt;
+
+class RpcServant;
+class RpcStream;
+class VirtualMachineStubPimpl;
+
+class Machine : public zce::TaskQueue {
+
+  protected:
+    std::string vm_name_;
+    zce::SmartPtr<VirtualMachineStub> stub_ptr_;
+    std::map<std::string, zce::SmartPtr<zdl_module>> modules_;
+
+  public:
+    Machine(const std::string& vm_name, const zce::SmartPtr<VirtualMachineStub>& stub_ptr);
+
+    virtual ~Machine();
+
+    const std::string& vm_name() const noexcept { return vm_name_; }
+
+    const zce::SmartPtr<VirtualMachineStub>& stub_ptr() const noexcept { return stub_ptr_; }
+
+    zce::SmartPtr<Machine> get_vm(const std::string& sname) const;
+
+    const zce::SmartPtr<zce::Reactor> reactor_ptr() const noexcept;
+
+    zce::SmartPtr<::zce::zvm::RpcServant> rpc_serve(const char* host, unsigned short port, bool ssl,
+                                                    const char* cert, const char* key,
+                                                    const char* method_prefix = "");
+
+    virtual int start() = 0;
+
+    virtual void stop() = 0;
+
+    virtual int call_dblock(zce_int64 objid, const std::string& method, ::zce::RefBlock& dblock,
+                            int mstimeout, const VirtualMachineStub::response_cb& response) = 0;
+
+    virtual int call_dblock_from_remote(zce_int64 objid, const std::string& method,
+                                        ::zce::RefBlock& dblock,
+                                        const ::zce::SmartPtr<RpcStream>& stream_ptr,
+                                        const VirtualMachineStub::response_cb& response);
+
+    int registe_meta(const char* filepath);
+
+    zce::SmartPtr<zdl_module> get_module_by_name(const std::string& name) const;
+
+    zce::SmartPtr<zdl_struct> get_struct(const std::string& module, const std::string& name) const;
+};
+
 
 namespace detail {
 

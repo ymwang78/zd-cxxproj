@@ -13,6 +13,7 @@
 #include <zce/zce_handler.h>
 #include <zce/zdp_stream.h>
 #include <zce/zdp_base_proto.h>
+#include <zce/zvm.h>
 #include <map>
 #include <functional>
 
@@ -52,7 +53,7 @@ class ZCE_API Process : public zce::zdp::zdp_stream {
 
   public:
     struct ZCE_API ProcessInfo : public zdp_base::zvm_t {
-        std::string pipeid;     // pipe id, guid, 全局唯一
+        std::string pipeid;  // pipe id, guid, 全局唯一
         std::string exepath;
         unsigned int delayed;  // 延迟启动时间，单位秒
         unsigned int pid;
@@ -64,7 +65,7 @@ class ZCE_API Process : public zce::zdp::zdp_stream {
 
     using ExitCallback = std::function<void(int)>;
 
-    Process(SubProcessHost* host, ProcessInfo info, bool debug = false,
+    Process(SubProcessHost* host, zdp_base::zvm_t info, bool debug = false,
             ExitCallback exit_cb = nullptr);
 
     ~Process();
@@ -98,10 +99,11 @@ class ZCE_API Process : public zce::zdp::zdp_stream {
     void on_close() override;
 };
 
-class ZCE_API SubProcessHost : public Object {
+class ZCE_API SubProcessHost : public ::zce::zvm::Machine {
     friend class Process;
     struct Impl;
     Impl* pimpl_;
+
   public:
     using ConnectCallback = std::function<void(const zce::SmartPtr<Process>&)>;
     using DisconnectCallback = std::function<void(const zce::SmartPtr<Process>&)>;
@@ -119,7 +121,9 @@ class ZCE_API SubProcessHost : public Object {
         DataCallback data_cb = nullptr;
     };
 
-    SubProcessHost(const zce::SmartPtr<zce::Reactor>& reactor_ptr, HostContext context);
+    SubProcessHost(const std::string& vm_name,
+                   const zce::SmartPtr<zce::zvm::VirtualMachineStub>& stub_ptr,
+                   const zce::SmartPtr<zce::Reactor>& reactor_ptr, HostContext context);
 
     ~SubProcessHost() override;
 
@@ -127,11 +131,9 @@ class ZCE_API SubProcessHost : public Object {
 
     const HostContext& context() const;
 
-    void stopAllSubProcess();
-
     void checkDelayedStart();
 
-    zce::SmartPtr<Process> createSubProcess(const Process::ProcessInfo& process_info, bool debug_mode);
+    zce::SmartPtr<Process> createSubProcess(zdp_base::zvm_t process_info, bool debug_mode);
 
     int invoke(const zce::SmartPtr<Process>& subprocess_ptr);
 
@@ -140,6 +142,14 @@ class ZCE_API SubProcessHost : public Object {
     int querySubProcess(const std::string& name, zce::SmartPtr<Process>& subprocess_ptr);
 
     const std::map<std::string, zce::SmartPtr<Process>>& queryAllSubProcess() const;
+
+    virtual int start() override;
+
+    virtual void stop() override;
+
+    virtual int call_dblock(zce_int64 objid, const std::string& method, zce::RefBlock& dblock,
+                    int mstimetout,
+                    const zce::zvm::VirtualMachineStub::response_cb& response) override;
 };
 
 class SubProcess : virtual public Object {
