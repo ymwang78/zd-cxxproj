@@ -12,6 +12,7 @@
 #include <zce/zce_object.h>
 #include <zce/zce_handler.h>
 #include <zce/zdp_stream.h>
+#include <zce/zdp_base_proto.h>
 #include <map>
 #include <functional>
 
@@ -50,15 +51,10 @@ class ZCE_API Process : public zce::zdp::zdp_stream {
     Impl* pimpl_;
 
   public:
-    struct ZCE_API ProcessInfo {
-        std::string name;       // name在本进程内唯一
+    struct ZCE_API ProcessInfo : public zdp_base::zvm_t {
         std::string pipeid;     // pipe id, guid, 全局唯一
-        std::string workdir;
         std::string exepath;
-        std::vector<std::string> args;
-        std::map<std::string, std::string> env;
         unsigned int delayed;  // 延迟启动时间，单位秒
-
         unsigned int pid;
         zce_timestamp starttime;
         zce_timestamp endtime;
