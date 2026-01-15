@@ -12,6 +12,7 @@
 #include <zce/zce_config.h>
 #include <zce/zce_reactor.h>
 #include <zce/zce_handler.h>
+#include <zce/zce_process.h>
 #include <vector>
 #include <string>
 
@@ -31,11 +32,11 @@ struct ZCE_API AppOptions {
     std::string logsuffix;   // --logsuffix <suffix>
     std::string configpath;  // --configpath <path>
 
+    std::string vmtype;                  // --vmtype <vm type>
     std::string vmname;                  // --vmname <vm name>
     std::string vmpath;                  // --vmpath <vm path>
     std::string vmaddr;                  // --vmaddr <vm listen address>
     zce_uint16 vmport = (zce_uint16)~0;  // --vmport <vm listen port>
-    zce_uint16 stormport = (zce_uint16)~0;  // --stormport <storm listen port>
     std::vector<std::string> extras;     // 存放未定义参数
 
     std::string help_target;
@@ -66,11 +67,12 @@ class ZCE_API Service : public Reactor {
     SmartPtr<Signal> signal_int_;
     SmartPtr<Signal> signal_term_;
     SmartPtr<Timer> timer_;
+    zce::SubProcessHost::HostContext host_context_;
     zce::SmartPtr<zce::SubProcessHost> process_host_;
     zce::SmartPtr<zce::SubProcess> sub_process_;
 
 #ifdef _WIN32
-    SERVICE_STATUS_HANDLE win_service_handle_;
+    SERVICE_STATUS_HANDLE win_service_handle_ = nullptr;
     SERVICE_STATUS win_service_status_{};
 #endif
 
@@ -86,7 +88,7 @@ class ZCE_API Service : public Reactor {
 
     virtual void onDaemonStop();
 
-    virtual bool onWorkerStart() = 0;
+    virtual bool onWorkerStart();
 
     virtual bool onWorkerStop() = 0;
 
@@ -117,6 +119,7 @@ class ZCE_API Service : public Reactor {
     static void WINAPI _cbWindowsServiceCtrlHandler(DWORD);
 
     int startWindowsService();
+
     void onWindowsServiceMain(DWORD, LPSTR*);
 
     bool waitForServiceState(SC_HANDLE, DWORD, SERVICE_STATUS&);

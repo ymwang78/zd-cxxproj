@@ -53,7 +53,7 @@ class ZCE_API Process : public zce::zdp::zdp_stream {
 
   public:
     struct ZCE_API ProcessInfo : public zdp_base::zvm_t {
-        std::string pipeid;  // pipe id, guid, 全局唯一
+        std::string guid;  // pipe id, guid, 全局唯一
         std::string exepath;
         unsigned int delayed;  // 延迟启动时间，单位秒
         unsigned int pid;
@@ -66,6 +66,9 @@ class ZCE_API Process : public zce::zdp::zdp_stream {
     using ExitCallback = std::function<void(int)>;
 
     Process(SubProcessHost* host, zdp_base::zvm_t info, bool debug = false,
+            ExitCallback exit_cb = nullptr);
+
+    Process(SubProcessHost* host, ProcessInfo info, bool debug = false,
             ExitCallback exit_cb = nullptr);
 
     ~Process();
@@ -112,8 +115,8 @@ class ZCE_API SubProcessHost : public ::zce::zvm::Machine {
     using ProcessPreCheckCallback = std::function<int(const zce::SmartPtr<zce::Process>&)>;
 
     struct HostContext {
-        std::string config_path = "subprocess.db";
-        std::string table_name = "subprocess";
+        std::string config_path = "subvm.db";
+        std::string table_name = "subvm";
         bool debug_mode = false;
         ProcessPreCheckCallback precheck_cb = nullptr;
         ConnectCallback connect_cb = nullptr;
@@ -125,11 +128,11 @@ class ZCE_API SubProcessHost : public ::zce::zvm::Machine {
                    const zce::SmartPtr<zce::zvm::VirtualMachineStub>& stub_ptr,
                    const zce::SmartPtr<zce::Reactor>& reactor_ptr, HostContext context);
 
-    ~SubProcessHost() override;
+    ~SubProcessHost() noexcept override;
 
-    const zce::SmartPtr<zce::Reactor>& reactor_ptr() const;
+    const zce::SmartPtr<zce::Reactor>& reactor_ptr() const noexcept;
 
-    const HostContext& context() const;
+    const HostContext& context() const noexcept;
 
     void checkDelayedStart();
 
@@ -148,8 +151,8 @@ class ZCE_API SubProcessHost : public ::zce::zvm::Machine {
     virtual void stop() override;
 
     virtual int call_dblock(zce_int64 objid, const std::string& method, zce::RefBlock& dblock,
-                    int mstimetout,
-                    const zce::zvm::VirtualMachineStub::response_cb& response) override;
+                            int mstimetout,
+                            const zce::zvm::VirtualMachineStub::response_cb& response) override;
 };
 
 class SubProcess : virtual public Object {
