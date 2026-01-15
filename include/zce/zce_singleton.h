@@ -20,6 +20,8 @@ namespace zce {
 template <typename T, typename L = zce::Mutex>
 class ZCE_API Singleton {
   public:
+    static inline void setInstance(T* v) { instance_ = v; }
+
     static inline T* instance() {
         if (instance_ == 0) {
             zce::Guard<L> g(lock_);

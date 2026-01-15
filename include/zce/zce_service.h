@@ -25,6 +25,10 @@ class Tty;
 class SubProcessHost;
 class SubProcess;
 
+namespace zdp {
+class Storm;
+}
+
 struct ZCE_API AppOptions {
     std::string mode;        // daemon, work, service
     std::string guid;        // --guid <guid>
@@ -67,6 +71,7 @@ class ZCE_API Service : public Reactor {
     SmartPtr<Signal> signal_int_;
     SmartPtr<Signal> signal_term_;
     SmartPtr<Timer> timer_;
+    zce::SmartPtr<zce::zdp::Storm> storm_server_;
     zce::SubProcessHost::HostContext host_context_;
     zce::SmartPtr<zce::SubProcessHost> process_host_;
     zce::SmartPtr<zce::SubProcess> sub_process_;

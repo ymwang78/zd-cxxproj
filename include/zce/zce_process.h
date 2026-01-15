@@ -122,10 +122,14 @@ class ZCE_API SubProcessHost : public ::zce::zvm::Machine {
         ConnectCallback connect_cb = nullptr;
         DisconnectCallback disconnect_cb = nullptr;
         DataCallback data_cb = nullptr;
+        std::string vmname = "VMHost";
+        std::string vmaddr = "0.0.0.0";
+        unsigned short vmport = (unsigned short)~0;
+        unsigned short stormport = (unsigned short)~0;
+        unsigned short host_uniqueid = 0;
     };
 
-    SubProcessHost(const std::string& vm_name,
-                   const zce::SmartPtr<zce::zvm::VirtualMachineStub>& stub_ptr,
+    SubProcessHost(const zce::SmartPtr<zce::zvm::VirtualMachineStub>& stub_ptr,
                    const zce::SmartPtr<zce::Reactor>& reactor_ptr, HostContext context);
 
     ~SubProcessHost() noexcept override;
