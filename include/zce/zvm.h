@@ -66,8 +66,7 @@ class VirtualMachineStub : public zce::Object {
 
     int listen(const char* host, unsigned short port);
 
-    zce::SmartPtr<zce::Object> boot(const std::string& svc_name, const zdp_base::zvm_t& vm,
-                                    zce::RefBlock args);
+    zce::SmartPtr<zce::Object> boot(const zdp_base::zvm_t& vm, zce::RefBlock args);
 
     zce::SmartPtr<zce::Object> boot(const std::string& svc_name, const std::string& host,
                                     unsigned short port, bool ssl, int default_timeout,

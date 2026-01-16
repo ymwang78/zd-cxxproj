@@ -12,6 +12,7 @@
 
 #include <zce/zce_object.h>
 #include <zce/zdp_schema.h>
+#include <zce/zds_schema.h>
 #include <zce/zce_api.h>
 #include <zce/zce_handler.h>
 
@@ -110,6 +111,25 @@ class ZCE_API StormClient : public ::zce::Object {
     template <typename T>
     int set(zce_int64 topic, const zce_string& name, zce_int64 oldseq, zce_int64 uid,
             zce_int64 flag, const T& msg);
+
+    template <typename... Args>
+    int publishMessage(zce_int64 topic, Args&&... args) {
+        int ret = 0;
+        ZTRACE("ZmpcStormClient::publish", hex_t<zce_uint64>(topic), sizeof...(args));
+        zce::RefBlock dblock;
+        {
+            ret = zce::zdp::zds_pack_multi(0, 0, nullptr, true, std::forward<Args>(args)...);
+            if (ret < 0) return ret;
+            ZCE_MBACQUIRE(dblock, ret);
+            if ((int)dblock.space() < ret) return ZCE_ERROR_MALLOC;
+            ret = zce::zdp::zds_pack_multi(dblock.wr_ptr_cow(), (int)dblock.space(), nullptr, true,
+                                           std::forward<Args>(args)...);
+            if (ret < 0) return ret;
+            dblock.wr_ptr(ret);
+        }
+
+        return publish(topic, dblock.rd_ptr(), dblock.length(), 0);
+    }
 };
 
 template <typename T, typename TTOPIC>

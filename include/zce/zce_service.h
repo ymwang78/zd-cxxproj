@@ -27,6 +27,7 @@ class SubProcess;
 
 namespace zdp {
 class Storm;
+class StormClient;
 }
 
 struct ZCE_API AppOptions : zdp_base::zvm_t {
@@ -66,6 +67,7 @@ class ZCE_API Service : public Reactor {
     SmartPtr<Signal> signal_term_;
     SmartPtr<Timer> timer_;
     zce::SmartPtr<zce::zdp::Storm> storm_server_;
+    zce::SmartPtr<zce::zdp::StormClient> storm_client_;
     zce::SubProcessHost::HostContext host_context_;
     zce::SmartPtr<zce::SubProcessHost> process_host_;
 

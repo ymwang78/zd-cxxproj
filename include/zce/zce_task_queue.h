@@ -46,6 +46,8 @@ class ZCE_API TaskQueue : public Task, public TaskDelegator {
     TaskQueue(const zce::SmartPtr<Scheduler>& scheduler_ptr, unsigned contproc = 10,
               const char* name = 0);
 
+    const zce::SmartPtr<Scheduler>& scheduler_ptr() const noexcept { return scheduler_ptr_; }
+
     int try_queue_length();  // if locked return -1
 
     void pause();
