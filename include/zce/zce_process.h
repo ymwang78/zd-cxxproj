@@ -34,15 +34,17 @@ struct zdp_head;
 namespace zce {
 
 enum PRECESS_MSGID {
-    PRECESS_MSGID_S2MSTART_REQ = 0,
-    PRECESS_MSGID_S2MSTART_RES = 2,
-    PRECESS_MSGID_M2SHBEAT_REQ = 4,
-    PRECESS_MSGID_M2SHBEAT_RES = 6,
-    PRECESS_MSGID_S2MQUIT_REQ = 8,
-    PRECESS_MSGID_S2MQUIT_RES = 10,
+    PROCESS_S2MQUEFYVM_REQ = 0x0000,
+    PROCESS_S2MQUEFYVM_RES = 0x0001,
+    PROCESS_S2MUPDATEVM_REQ = 0x0002,
+    PROCESS_S2MUPDATEVM_RES = 0x0003,
+    PROCESS_S2MHBEAT_REQ = 0x0008,
+    PROCESS_S2MHBEAT_RES = 0x0009,
 
-    PRECESS_MSGID_M2SQUIT_REQ = 0x100,
-    PRECESS_MSGID_M2SQUIT_RES,
+    PROCESS_M2SQUIT_REQ = 0x100,
+    PROCESS_M2SQUIT_RES = 0x101,
+    PROCESS_M2SHBEAT_REQ = 0x102,
+    PROCESS_M2SHBEAT_RES = 0x103,
 };
 
 class SubProcessHost;
@@ -53,19 +55,18 @@ class ZCE_API Process : public zce::zdp::zdp_stream {
 
   public:
     struct ZCE_API ProcessInfo : public zdp_base::zvm_t {
-        std::string guid;  // pipe id, guid, 全局唯一
         std::string exepath;
         unsigned int delayed;  // 延迟启动时间，单位秒
         unsigned int pid;
         zce_timestamp starttime;
         zce_timestamp endtime;
-
-        std::string extra;  // 扩展字段
+        zce::RefBlock dblock;
+        std::string extra;
     };
 
     using ExitCallback = std::function<void(int)>;
 
-    Process(SubProcessHost* host, zdp_base::zvm_t info, bool debug = false,
+    Process(SubProcessHost* host, zdp_base::zvm_t info, bool debug, zce::RefBlock content, 
             ExitCallback exit_cb = nullptr);
 
     Process(SubProcessHost* host, ProcessInfo info, bool debug = false,
@@ -115,7 +116,7 @@ class ZCE_API SubProcessHost : public ::zce::zvm::Machine {
     using ProcessPreCheckCallback = std::function<int(const zce::SmartPtr<zce::Process>&)>;
 
     struct HostContext {
-        std::string config_path = "subvm.db";
+        std::string metadb_path = "subvm.db";
         std::string table_name = "subvm";
         bool debug_mode = false;
         ProcessPreCheckCallback precheck_cb = nullptr;
@@ -126,7 +127,8 @@ class ZCE_API SubProcessHost : public ::zce::zvm::Machine {
         std::string vmaddr = "0.0.0.0";
         unsigned short vmport = (unsigned short)~0;
         unsigned short stormport = (unsigned short)~0;
-        unsigned short host_uniqueid = 0;
+        zce_uint64 hosttopic = ((zce_uint64)rand() * zce_thread_id());
+        std::string host_dir = ".";
     };
 
     SubProcessHost(const zce::SmartPtr<zce::zvm::VirtualMachineStub>& stub_ptr,
@@ -140,7 +142,8 @@ class ZCE_API SubProcessHost : public ::zce::zvm::Machine {
 
     void checkDelayedStart();
 
-    zce::SmartPtr<Process> createSubProcess(zdp_base::zvm_t process_info, bool debug_mode);
+    zce::SmartPtr<Process> createSubProcess(zdp_base::zvm_t process_info, bool debug_mode,
+                                            zce::RefBlock content);
 
     int invoke(const zce::SmartPtr<Process>& subprocess_ptr);
 

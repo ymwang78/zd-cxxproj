@@ -29,20 +29,12 @@ namespace zdp {
 class Storm;
 }
 
-struct ZCE_API AppOptions {
+struct ZCE_API AppOptions : zdp_base::zvm_t {
     std::string mode;        // daemon, work, service
-    std::string guid;        // --guid <guid>
     std::string pidfile;     // --pidfile <path>
     std::string logsuffix;   // --logsuffix <suffix>
     std::string configpath;  // --configpath <path>
-
-    std::string vmtype;                  // --vmtype <vm type>
-    std::string vmname;                  // --vmname <vm name>
-    std::string vmpath;                  // --vmpath <vm path>
-    std::string vmaddr;                  // --vmaddr <vm listen address>
-    zce_uint16 vmport = (zce_uint16)~0;  // --vmport <vm listen port>
-    std::vector<std::string> extras;     // 存放未定义参数
-
+    //std::string projectdir;
     std::string help_target;
 #ifdef _WIN32
     std::string service_action;     // install, remove, start, stop, restart, status
@@ -53,6 +45,8 @@ struct ZCE_API AppOptions {
 };
 
 class ZCE_API Service : public Reactor {
+    class SubProcessStream;
+
     struct ServiceStdInput : public IStream {
         Service* service_;
         ServiceStdInput(Service* service) : service_(service) {}
@@ -74,7 +68,9 @@ class ZCE_API Service : public Reactor {
     zce::SmartPtr<zce::zdp::Storm> storm_server_;
     zce::SubProcessHost::HostContext host_context_;
     zce::SmartPtr<zce::SubProcessHost> process_host_;
+
     zce::SmartPtr<zce::SubProcess> sub_process_;
+    zce::ObjectPtr sub_vm_;
 
 #ifdef _WIN32
     SERVICE_STATUS_HANDLE win_service_handle_ = nullptr;
@@ -118,6 +114,10 @@ class ZCE_API Service : public Reactor {
 
     bool isWorkProcess() const;
 
+    AppOptions& options() { return options_; }
+
+    void updateVMStatus(const zdp_base::zvm_t& zvm);
+
   protected:
 #ifdef _WIN32
     static void WINAPI _cbWindowsServiceMain(DWORD argc, LPSTR* argv);
@@ -144,6 +144,10 @@ class ZCE_API Service : public Reactor {
 #else
     int runPosixDaemon(int, const char*[]);
 #endif  // _WIN32
+
+    int connectToFatherProcess(bool is_fist);
+
+    int startVMFromFather(zdp_base::zvm_t zvm, zce::RefBlock content);
 };
 
 }  // namespace zce

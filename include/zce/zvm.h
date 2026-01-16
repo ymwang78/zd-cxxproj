@@ -10,6 +10,7 @@
 // ***************************************************************
 #pragma once
 #include <functional>
+#include <zce/zdp_base_proto.h>
 #include <zce/zce_dblock.h>
 #include <zce/zce_mbpool.h>
 #include <zce/zce_singleton.h>
@@ -54,14 +55,18 @@ class VirtualMachineStub : public zce::Object {
 
     ~VirtualMachineStub();
 
-    const zce::SmartPtr<VirtualMachineStubPimpl>& pimpl_ptr() const noexcept {
-        return pimpl_ptr_; }
+    const std::string& hostDir() const noexcept;
 
-    int initStub(const zce::SmartPtr<zce::Scheduler>&, const zce::SmartPtr<zce::Reactor>&);
+    std::string vmHomeDir(const zdp_base::zvm_t& vm) const noexcept;
+
+    const zce::SmartPtr<VirtualMachineStubPimpl>& pimpl_ptr() const noexcept { return pimpl_ptr_; }
+
+    int initStub(const zce::SmartPtr<zce::Scheduler>&, const zce::SmartPtr<zce::Reactor>&,
+                 const std::string& u8_host_dir);
 
     int listen(const char* host, unsigned short port);
 
-    zce::SmartPtr<zce::Object> boot(const std::string& svc_name, const std::string& path,
+    zce::SmartPtr<zce::Object> boot(const std::string& svc_name, const zdp_base::zvm_t& vm,
                                     zce::RefBlock args);
 
     zce::SmartPtr<zce::Object> boot(const std::string& svc_name, const std::string& host,
@@ -132,7 +137,6 @@ class RpcStream;
 class VirtualMachineStubPimpl;
 
 class Machine : public zce::TaskQueue {
-
   protected:
     std::string vm_name_;
     zce::SmartPtr<VirtualMachineStub> stub_ptr_;
@@ -173,7 +177,6 @@ class Machine : public zce::TaskQueue {
 
     zce::SmartPtr<zdl_struct> get_struct(const std::string& module, const std::string& name) const;
 };
-
 
 namespace detail {
 

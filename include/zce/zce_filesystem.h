@@ -69,6 +69,8 @@ const char* ZCE_API getFileName(const char* str);
 
 zce_int64 ZCE_API getFileSize(const char* path);
 
+bool ZCE_API writeFile(const char* u8path, const void* buf, size_t len);
+
 class ZCE_API File : public zce::Object {
     handle_t handle_;
 

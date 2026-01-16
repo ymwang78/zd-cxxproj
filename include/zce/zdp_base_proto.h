@@ -28,10 +28,11 @@ namespace zdp_base
     enum ERV_ZDP_PAYLOAD: int
     {
         ZDP_PAYLOAD_UNKNOW = (int)0x00000000,
-        ZDP_PAYLOAD_STRING = (int)0x00000001,
-        ZDP_PAYLOAD_JSON = (int)0x00000002,
-        ZDP_PAYLOAD_BSON = (int)0x00000003,
-        ZDP_PAYLOAD_PROTOBUF = (int)0x00000004,
+        ZDP_PAYLOAD_ZDS = (int)0x00000001,
+        ZDP_PAYLOAD_STRING = (int)0x00000002,
+        ZDP_PAYLOAD_JSON = (int)0x00000003,
+        ZDP_PAYLOAD_BSON = (int)0x00000004,
+        ZDP_PAYLOAD_PROTOBUF = (int)0x00000005,
     };
 
     enum MSG_E: int
@@ -42,9 +43,6 @@ namespace zdp_base
         E_MSG_CONTAINER_RES = (int)0x00000007,
         E_MSG_RPCCALL_REQ = (int)0x00000008,
         E_MSG_RPCCALL_RES = (int)0x00000009,
-        E_MSG_VMQUIT_REQ = (int)0x0000000a,
-        E_MSG_VMUPDATE_REQ = (int)0x0000000c,
-        E_MSG_VMUPDATE_RES = (int)0x0000000d,
     };
 
     struct err_t
@@ -163,11 +161,10 @@ namespace zdp_base
         zce_byte    keepalive;
         zce_byte    dummy;
     };
-    enum ZVM_FLAG_E: int
+    enum ZVM_STATUS_E: int
     {
-        ZVM_FLAG_NONE = (int)0x00000000,
-        ZVM_FLAG_AUTORESTART = (int)0x00000001,
-        ZVM_FLAG_RUNNING = (int)0x00000002,
+        ZVM_STATUS_NONE = (int)0x00000000,
+        ZVM_STATUS_RUNNING = (int)0x00000001,
     };
 
     struct zvm_t
@@ -180,9 +177,13 @@ namespace zdp_base
             if (vmname != _t.vmname) return false;
             if (vmpath != _t.vmpath) return false;
             if (workdir != _t.workdir) return false;
+            if (vmguid != _t.vmguid) return false;
             if (vmaddr != _t.vmaddr) return false;
+            if (vmstatus != _t.vmstatus) return false;
             if (vmport != _t.vmport) return false;
-            if (vmflags != _t.vmflags) return false;
+            if (stormport != _t.stormport) return false;
+            if (stormtopic != _t.stormtopic) return false;
+            if (stormaddr != _t.stormaddr) return false;
             if (args != _t.args) return false;
             if (!(env == _t.env)) return false;
             return true;
@@ -192,11 +193,29 @@ namespace zdp_base
         zce_astring    vmname/*vm 可读名称, 进程内唯一 */;
         zce_astring    vmpath/*vm 启动文件路径 */;
         zce_astring    workdir/*vm 工作路径 */;
+        zce_astring    vmguid/*vm guid*/;
         zce_astring    vmaddr/*vm RPC监听地址*/;
+        zce_uint32    vmstatus/*vm 标志位 ZVM_STATUS_E*/;
         zce_uint16    vmport/*vm RPC监听端口*/;
-        zce_uint16    vmflags/*vm 标志位 ZVM_FLAG_E*/;
+        zce_uint16    stormport/*storm端口*/;
+        zce_uint64    stormtopic/*storm 主题*/;
+        zce_astring    stormaddr/*storm 地址*/;
         std::vector<zce_astring> args;
         std::vector<zdp_base::nspair_t> env;
+    };
+    struct zvm_host_t
+    {
+        static zvm_host_t _empty;
+
+        bool operator==(const zvm_host_t& _t) const noexcept
+        {
+            if (hosttopic != _t.hosttopic) return false;
+            if (stormport != _t.stormport) return false;
+            return true;
+        }
+
+        zce_uint64    hosttopic/*storm topic*/;
+        zce_uint16    stormport/*host storm端口*/;
     };
     struct MSG_NONE_REQ : public ::zce::Object
     {

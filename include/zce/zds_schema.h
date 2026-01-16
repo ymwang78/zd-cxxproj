@@ -448,7 +448,7 @@ int zds_unpack_multi(const zce_byte* buf, zce_int32 size, zds_context_t* ctx, bo
     } else if constexpr (zce::zdp::is_vector<T>()) {
         len = zce::zdp::zds_unpack_array(val, buf, size, nullptr);
     } else {
-        len = zce::zdp::zds_unpack(val, buf, size, nullptr, true);
+        len = zce::zdp::zds_unpack(val, buf, size, nullptr, has_prefix);
     }
     if (len < 0) return len;
     ret += len;
