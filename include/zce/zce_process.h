@@ -65,12 +65,10 @@ class ZCE_API Process : public zce::zdp::zdp_stream {
         zce_timestamp endtime;
         zce::RefBlock dblock;
         std::string extra;
+        unsigned int autoadd;  // 是否自动添加到数据库,例如从xml配置文件启动的子进程
     };
 
     using ExitCallback = std::function<void(int)>;
-
-    Process(SubProcessHost* host, zdp_base::zvm_t info, bool debug, zce::RefBlock content, 
-            ExitCallback exit_cb = nullptr);
 
     Process(SubProcessHost* host, ProcessInfo info, bool debug = false,
             ExitCallback exit_cb = nullptr);
@@ -138,6 +136,8 @@ class ZCE_API SubProcessHost : public ::zce::zvm::Machine {
                    const zce::SmartPtr<zce::Reactor>& reactor_ptr, HostContext context);
 
     ~SubProcessHost() noexcept override;
+
+    int addAutoCreateProcess(const zdp_base::zvm_t& process_info);
 
     const zce::SmartPtr<zce::Reactor>& reactor_ptr() const noexcept;
 
