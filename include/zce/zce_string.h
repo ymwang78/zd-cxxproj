@@ -121,20 +121,20 @@ inline std::string to_upper(const std::string& str) {
 inline std::string to_formula(const std::string& str) {
     std::string result = str;
     bool is_first_in_word = true;
-    std::locale loc;
 
     std::transform(result.begin(), result.end(), result.begin(),
-                   [&is_first_in_word, &loc](unsigned char c) -> char {
-                       if (c == '-' || std::isspace(c, loc)) {
+                   [&is_first_in_word](unsigned char uc) -> char {
+                       // 仅按 C locale / ASCII 判断空白
+                       if (uc == '-' || std::isspace(static_cast<unsigned char>(uc))) {
                            is_first_in_word = true;
-                           return c;
+                           return static_cast<char>(uc);
                        }
 
                        if (is_first_in_word) {
                            is_first_in_word = false;
-                           return std::toupper(c, loc);
+                           return static_cast<char>(std::toupper(static_cast<unsigned char>(uc)));
                        } else {
-                           return std::tolower(c, loc);
+                           return static_cast<char>(std::tolower(static_cast<unsigned char>(uc)));
                        }
                    });
 

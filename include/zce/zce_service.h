@@ -35,7 +35,6 @@ struct ZCE_API AppOptions : zdp_base::zvm_t {
     std::string pidfile;     // --pidfile <path>
     std::string logsuffix;   // --logsuffix <suffix>
     std::string configpath;  // --configpath <path>
-    //std::string projectdir;
     std::string help_target;
 #ifdef _WIN32
     std::string service_action;     // install, remove, start, stop, restart, status
