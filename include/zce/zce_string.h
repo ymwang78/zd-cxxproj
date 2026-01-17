@@ -17,6 +17,7 @@
 #include <string.h>
 #include <zce/zce_inc.h>
 #include <locale>
+#include <cctype>
 
 #if __cplusplus >= 201703L || (defined(_MSC_VER) && _MSVC_LANG >= 201703L)
 #    include <string_view>
@@ -125,7 +126,7 @@ inline std::string to_formula(const std::string& str) {
     std::transform(result.begin(), result.end(), result.begin(),
                    [&is_first_in_word](unsigned char uc) -> char {
                        // 仅按 C locale / ASCII 判断空白
-                       if (uc == '-' || std::isspace(static_cast<unsigned char>(uc))) {
+                       if (uc == '-' || ::isspace(static_cast<unsigned char>(uc))) {
                            is_first_in_word = true;
                            return static_cast<char>(uc);
                        }
