@@ -164,7 +164,8 @@ namespace zdp_base
     enum ZVM_STATUS_E: int
     {
         ZVM_STATUS_NONE = (int)0x00000000,
-        ZVM_STATUS_RUNNING = (int)0x00000001,
+        ZVM_STATUS_RUNONCE = (int)0x00000001,
+        ZVM_STATUS_RUNNING = (int)0x00000002,
     };
 
     struct zvm_t

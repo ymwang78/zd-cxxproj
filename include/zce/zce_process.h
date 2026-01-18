@@ -65,6 +65,7 @@ class ZCE_API Process : public zce::zdp::zdp_stream {
         zce_timestamp endtime;
         zce::RefBlock dblock;
         std::string extra;
+        int exitcode;
         unsigned int autoadd;  // 是否自动添加到数据库,例如从xml配置文件启动的子进程
     };
 
