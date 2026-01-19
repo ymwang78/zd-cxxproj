@@ -119,7 +119,7 @@ class ZCE_API SubProcessHost : public ::zce::zvm::Machine {
 
     struct HostContext {
         std::string metadb_path = "subvm.db";
-        std::string table_name = "subvm";
+        std::string table_name = "subvm0";
         bool debug_mode = false;
         ProcessPreCheckCallback precheck_cb = nullptr;
         ConnectCallback connect_cb = nullptr;
