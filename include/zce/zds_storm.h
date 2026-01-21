@@ -40,8 +40,8 @@ class Storm : public zce::Reactor {
 
       public:
         Storm_task(const zce::SmartPtr<Storm>& stormptr,
-                       const zce::SmartPtr<StormRequester>& requester, zce_int64 topic,
-                       const zce::RefBlock& dblockptr, int timeoutms, void* ctx);
+                   const zce::SmartPtr<StormRequester>& requester, zce_int64 topic,
+                   const zce::RefBlock& dblockptr, int timeoutms, void* ctx);
 
         ~Storm_task();
 
@@ -70,8 +70,11 @@ class Storm : public zce::Reactor {
     int set(zce_int64 topic, const zce_string& name, zce_int64 oldseq, zce_int64 uid,
             zce_int64 flag, const zce_byte* data, zce_uint32 len);
 
-    void substorm(const char* addr, unsigned short port, std::string_view platform,
-                  std::string_view siteid, std::string_view service_class, unsigned service_id);
+    void substorm(
+        const char* addr, unsigned short port, std::string_view platform, std::string_view siteid,
+        std::string_view service_class, unsigned service_id,
+        std::function<void(bool passive, const zce_sockaddr_t& remote)> connected_cb,
+        std::function<void()> disconnect_cb);
 
     virtual zce_int64 streamtopic_from_msgmid(zce_uint16 msgmid) { return 0; };
 
@@ -118,13 +121,13 @@ class Storm : public zce::Reactor {
                                                                 const zdp::zdp_storm_peer& peer);
 
     template <typename T>
-    int request_async(const zce::SmartPtr<StormRequester>& cbdeque, zce_int64 topic,
-                      const T& msg, int timeoutms, void* ctx);
+    int request_async(const zce::SmartPtr<StormRequester>& cbdeque, zce_int64 topic, const T& msg,
+                      int timeoutms, void* ctx);
 };
 
 template <typename T>
 int Storm::zdp_publish(zce_int64 topic, const T& msg, const zdp::zdp_storm_peer& peer, int seq,
-                           zce_int64 trace) {
+                       zce_int64 trace) {
     zce::SmartPtr<zdp::zdp_storm_client> storm_ptr = storm_ptr_;
     if (storm_ptr == 0) return -1;
     return storm_ptr_->publish(topic, msg, peer, seq, trace);
@@ -132,7 +135,7 @@ int Storm::zdp_publish(zce_int64 topic, const T& msg, const zdp::zdp_storm_peer&
 
 template <typename T>
 int Storm::zdp_publish(const std::vector<zce_int64>& topics, const T& msg,
-                           const zdp::zdp_storm_peer& peer, int seq) {
+                       const zdp::zdp_storm_peer& peer, int seq) {
     zce::SmartPtr<zdp::zdp_storm_client> storm_ptr = storm_ptr_;
     if (storm_ptr == 0) return -1;
     return storm_ptr_->publish(topics, msg, peer, seq);
@@ -140,7 +143,7 @@ int Storm::zdp_publish(const std::vector<zce_int64>& topics, const T& msg,
 
 template <typename T>
 int Storm::request_async(const zce::SmartPtr<StormRequester>& requestptr, zce_int64 topic,
-                             const T& msg, int timeoutms, void* ctx) {
+                         const T& msg, int timeoutms, void* ctx) {
     zce::RefBlock dblock_ptr;
     int ret = zdp::zdp_serialize(dblock_ptr, 0, msg, 0, ZCE_COMPRESS_NONE, 32);
     ZCE_ASSERT(ret >= 0);
@@ -197,5 +200,5 @@ class StormRequester_impl : public StormRequester {
     }
 };
 
-}  // namespace zdp
+}  // namespace zds
 }  // namespace zce
