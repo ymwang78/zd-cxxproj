@@ -212,11 +212,17 @@ namespace zdp_base
         {
             if (hosttopic != _t.hosttopic) return false;
             if (stormport != _t.stormport) return false;
+            if (reserved != _t.reserved) return false;
+            if (version != _t.version) return false;
+            if (compiletime != _t.compiletime) return false;
             return true;
         }
 
         zce_uint64    hosttopic/*storm topic*/;
         zce_uint16    stormport/*host storm端口*/;
+        zce_uint16    reserved;
+        zce_uint32    version;
+        zce_uint32    compiletime;
     };
     struct MSG_NONE_REQ : public ::zce::Object
     {
