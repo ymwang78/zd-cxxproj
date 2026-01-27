@@ -26,6 +26,39 @@ Based on Google C++ Style Guide with modifications:
 - **Variable names**: snake_case - `my_variable`
 - **Class member variables**: snake_case with trailing underscore - `member_variable_`
 
+## Testing Standards
+
+All test code must follow these rules:
+
+### GTest Framework
+- **Mandatory**: All tests MUST use Google Test (GTest) framework
+- **Test file naming**: `test_*.cpp` (e.g., `test_per_tag_tracking.cpp`)
+- **Test structure**: Use `TEST_F()` for fixture-based tests or `TEST()` for simple tests
+
+### Main Function Rule
+- **Critical**: ALL test files MUST wrap the main function with `#ifndef USE_GTEST_MAIN` macro
+- **Purpose**: Allows flexible test compilation with custom or default GTest main
+- **Standard template**:
+```cpp
+#ifndef USE_GTEST_MAIN
+int main(int argc, char** argv) {
+    ::testing::InitGoogleTest(&argc, argv);
+    return RUN_ALL_TESTS();
+}
+#endif
+```
+
+### Test Organization
+- Place all tests in the `tests/` directory
+- Each test file should focus on a single component or feature
+- Use descriptive test names: `ComponentName_BehaviorUnderTest_ExpectedOutcome`
+- Example: `PerTagTrackingTest_BasicWriteSmallBuffer`
+
+### CMake Integration
+- Add test executables to CMakeLists.txt with conditional compilation
+- Link against GTest libraries: `GTest::gtest` and `GTest::gtest_main`
+- Register tests with `add_test(NAME TestName COMMAND test_executable)`
+
 ## Common Commands
 
 ### Build
