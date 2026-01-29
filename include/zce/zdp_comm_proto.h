@@ -283,7 +283,6 @@ namespace zdp_comm
     struct simpinfo_t
     {
         static simpinfo_t _empty;
-
         bool operator==(const simpinfo_t& _t) const noexcept
         {
             if (iid != _t.iid) return false;
@@ -315,7 +314,6 @@ namespace zdp_comm
     struct userextra_t
     {
         static userextra_t _empty;
-
         bool operator==(const userextra_t& _t) const noexcept
         {
             if (str0 != _t.str0) return false;
@@ -337,7 +335,6 @@ namespace zdp_comm
     struct user_t
     {
         static user_t _empty;
-
         bool operator==(const user_t& _t) const noexcept
         {
             if (!(basic == _t.basic)) return false;
@@ -351,7 +348,6 @@ namespace zdp_comm
     struct prop_t
     {
         static prop_t _empty;
-
         bool operator==(const prop_t& _t) const noexcept
         {
             if (propid != _t.propid) return false;
@@ -373,7 +369,6 @@ namespace zdp_comm
     struct nameval_t
     {
         static nameval_t _empty;
-
         bool operator==(const nameval_t& _t) const noexcept
         {
             if (name != _t.name) return false;
@@ -387,7 +382,6 @@ namespace zdp_comm
     struct ua_basic_t
     {
         static ua_basic_t _empty;
-
         bool operator==(const ua_basic_t& _t) const noexcept
         {
             if (iid != _t.iid) return false;
@@ -441,7 +435,6 @@ namespace zdp_comm
     struct notify_t
     {
         static notify_t _empty;
-
         bool operator==(const notify_t& _t) const noexcept
         {
             if (cmd != _t.cmd) return false;

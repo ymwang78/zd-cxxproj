@@ -132,8 +132,23 @@ class Array {  // skew heap
 
     size_t getUsedCount() const { return used_count_; }
 
+    int resetMagic(H handle, int new_magic) {
+        int index, magic;
+        mix_magic_t::seperate(handle, magic, index);
+        ZCE_ASSERT_RETURN(index >= 0 && index < cur_top_ && slots_[index].isInUse() &&
+                              magic == slots_[index].data_.magic,
+                          -1);
+        slots_[index].data_.magic = new_magic;
+        return 0;
+    }
+
     template <typename U>
     H insertItem(U&& val) {
+        return insertItem(std::forward<U>(val), mix_magic_t::nextMagic());
+    }
+
+    template <typename U>
+    H insertItem(U&& val, int magic) {
         int index;
         if (free_head_ != -1) {
             // 从堆中弹出最小元素
@@ -158,7 +173,7 @@ class Array {  // skew heap
 
         new (&slots_[index].data_.item) T(std::forward<U>(val));
         slots_[index].data_.inuse = 1;
-        slots_[index].data_.magic = mix_magic_t::nextMagic();
+        slots_[index].data_.magic = magic;
         ++used_count_;
         return mix_magic_t::mix(slots_[index].data_.magic, index);
     }
@@ -333,7 +348,7 @@ class Array {  // skew heap
                 slots_[parent].heap_node_.right = new_top;
             }
             if (new_top != -1) {
-                slots_[new_top].heap_node_.parent = parent;            
+                slots_[new_top].heap_node_.parent = parent;
             }
         } else {
             ZCE_ASSERT(free_head_ == nodeid);
@@ -387,6 +402,12 @@ class Array {  // skew heap
             return array_ == other.array_ && index_ == other.index_;
         }
         bool operator!=(const iterator& other) const { return !(*this == other); }
+        H getHandle() const {
+            if (index_ < 0 || index_ >= array_->cur_top_) {
+                return -1;
+            }
+            return mix_magic_t::mix(array_->slots_[index_].data_.magic, index_);
+        }
         // 允许 const_iterator 从非const迭代器构造
         friend class const_iterator;
     };
@@ -434,6 +455,13 @@ class Array {  // skew heap
             return array_ == other.array_ && index_ == other.index_;
         }
         bool operator!=(const const_iterator& other) const { return !(*this == other); }
+
+        H getHandle() const {
+            if (index_ < 0 || index_ >= array_->cur_top_) {
+                return -1;
+            }
+            return mix_magic_t::mix(array_->slots_[index_].data_.magic, index_);
+        }
     };
 
     // 提供 begin/end 接口
@@ -444,8 +472,6 @@ class Array {  // skew heap
     const_iterator cbegin() const { return begin(); }
     const_iterator cend() const { return end(); }
 };
-
-
 
 template <typename T, typename KeyType, typename GetKeyFunc>
 class ArrayWithIndex {
@@ -521,7 +547,7 @@ class ArrayWithIndex {
 
     const std::vector<T>& toVector() const { return data_; }
 
-  // 迭代器支持
+    // 迭代器支持
     using iterator = typename std::vector<T>::iterator;
     using const_iterator = typename std::vector<T>::const_iterator;
     using reverse_iterator = typename std::vector<T>::reverse_iterator;
@@ -542,7 +568,7 @@ class ArrayWithIndex {
     reverse_iterator rend() { return data_.rend(); }
     const_reverse_iterator rend() const { return data_.rend(); }
     const_reverse_iterator crend() const { return data_.crend(); }
-    
+
   private:
     std::vector<T> data_;
     std::unordered_map<KeyType, size_t> name_to_index_;

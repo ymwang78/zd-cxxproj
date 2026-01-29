@@ -129,8 +129,8 @@ class ZCE_API SubProcessHost : public ::zce::zvm::Machine {
         std::string vmaddr = "0.0.0.0";
         unsigned short vmport = (unsigned short)~0;
         unsigned short stormport = (unsigned short)~0;
-        zce_uint64 hosttopic = ((zce_uint64)rand() * zce_thread_id());
         std::string host_dir = ".";
+        std::string host_topic;
     };
 
     SubProcessHost(const zce::SmartPtr<zce::zvm::VirtualMachineStub>& stub_ptr,

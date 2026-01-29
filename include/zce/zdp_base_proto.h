@@ -48,7 +48,6 @@ namespace zdp_base
     struct err_t
     {
         static err_t _empty;
-
         bool operator==(const err_t& _t) const noexcept
         {
             if (errcode != _t.errcode) return false;
@@ -62,7 +61,6 @@ namespace zdp_base
     struct zdp_addr_t
     {
         static zdp_addr_t _empty;
-
         bool operator==(const zdp_addr_t& _t) const noexcept
         {
             if (translayer != _t.translayer) return false;
@@ -80,7 +78,6 @@ namespace zdp_base
     struct zdp_container_t
     {
         static zdp_container_t _empty;
-
         bool operator==(const zdp_container_t& _t) const noexcept
         {
             if (subcmd != _t.subcmd) return false;
@@ -98,7 +95,6 @@ namespace zdp_base
     struct nspair_t
     {
         static nspair_t _empty;
-
         bool operator==(const nspair_t& _t) const noexcept
         {
             if (name != _t.name) return false;
@@ -112,7 +108,6 @@ namespace zdp_base
     struct nipair_t
     {
         static nipair_t _empty;
-
         bool operator==(const nipair_t& _t) const noexcept
         {
             if (name != _t.name) return false;
@@ -126,7 +121,6 @@ namespace zdp_base
     struct nllpair_t
     {
         static nllpair_t _empty;
-
         bool operator==(const nllpair_t& _t) const noexcept
         {
             if (name != _t.name) return false;
@@ -140,7 +134,6 @@ namespace zdp_base
     struct zobject_proxy_t
     {
         static zobject_proxy_t _empty;
-
         bool operator==(const zobject_proxy_t& _t) const noexcept
         {
             if (objtype != _t.objtype) return false;
@@ -171,7 +164,6 @@ namespace zdp_base
     struct zvm_t
     {
         static zvm_t _empty;
-
         bool operator==(const zvm_t& _t) const noexcept
         {
             if (vmtype != _t.vmtype) return false;
@@ -199,7 +191,7 @@ namespace zdp_base
         zce_uint32    vmstatus/*vm 标志位 ZVM_STATUS_E*/;
         zce_uint16    vmport/*vm RPC监听端口*/;
         zce_uint16    stormport/*storm端口*/;
-        zce_uint64    stormtopic/*storm 主题*/;
+        zce_astring    stormtopic/*storm 主题*/;
         zce_astring    stormaddr/*storm 地址*/;
         std::vector<zce_astring> args;
         std::vector<zdp_base::nspair_t> env;
@@ -207,29 +199,27 @@ namespace zdp_base
     struct zvm_host_t
     {
         static zvm_host_t _empty;
-
         bool operator==(const zvm_host_t& _t) const noexcept
         {
-            if (hosttopic != _t.hosttopic) return false;
-            if (stormport != _t.stormport) return false;
+            if (host_topic != _t.host_topic) return false;
+            if (storm_port != _t.storm_port) return false;
             if (reserved != _t.reserved) return false;
             if (version != _t.version) return false;
-            if (compiletime != _t.compiletime) return false;
+            if (compile_time != _t.compile_time) return false;
             return true;
         }
 
-        zce_uint64    hosttopic/*storm topic*/;
-        zce_uint16    stormport/*host storm端口*/;
+        zce_astring    host_topic/*storm topic*/;
+        zce_uint16    storm_port/*host storm端口*/;
         zce_uint16    reserved;
         zce_uint32    version;
-        zce_uint32    compiletime;
+        zce_uint32    compile_time;
     };
     struct MSG_NONE_REQ : public ::zce::Object
     {
         const static unsigned short MSG_TYPE = E_MSG_NONE_REQ;
         static const char* type_name() { return ("MSG_NONE_REQ");}
         static MSG_NONE_REQ _empty;
-
         bool operator==(const MSG_NONE_REQ& _t) const noexcept
         {
             if (!(ie_ns == _t.ie_ns)) return false;
@@ -245,7 +235,6 @@ namespace zdp_base
         const static unsigned short MSG_TYPE = E_MSG_DISCONN_REQ;
         static const char* type_name() { return ("MSG_DISCONN_REQ");}
         static MSG_DISCONN_REQ _empty;
-
         bool operator==(const MSG_DISCONN_REQ& _t) const noexcept
         {
             return true;
@@ -259,7 +248,6 @@ namespace zdp_base
         const static unsigned short MSG_TYPE = E_MSG_CONTAINER_REQ;
         static const char* type_name() { return ("MSG_CONTAINER_REQ");}
         static MSG_CONTAINER_REQ _empty;
-
         bool operator==(const MSG_CONTAINER_REQ& _t) const noexcept
         {
             if (!(ie_req == _t.ie_req)) return false;
@@ -275,7 +263,6 @@ namespace zdp_base
         const static unsigned short MSG_TYPE = E_MSG_CONTAINER_RES;
         static const char* type_name() { return ("MSG_CONTAINER_RES");}
         static MSG_CONTAINER_RES _empty;
-
         bool operator==(const MSG_CONTAINER_RES& _t) const noexcept
         {
             if (ie_result != _t.ie_result) return false;
@@ -293,7 +280,6 @@ namespace zdp_base
         const static unsigned short MSG_TYPE = E_MSG_RPCCALL_REQ;
         static const char* type_name() { return ("MSG_RPCCALL_REQ");}
         static MSG_RPCCALL_REQ _empty;
-
         bool operator==(const MSG_RPCCALL_REQ& _t) const noexcept
         {
             if (!(target == _t.target)) return false;
@@ -315,7 +301,6 @@ namespace zdp_base
         const static unsigned short MSG_TYPE = E_MSG_RPCCALL_RES;
         static const char* type_name() { return ("MSG_RPCCALL_RES");}
         static MSG_RPCCALL_RES _empty;
-
         bool operator==(const MSG_RPCCALL_RES& _t) const noexcept
         {
             if (ie_result != _t.ie_result) return false;

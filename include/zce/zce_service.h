@@ -13,6 +13,7 @@
 #include <zce/zce_reactor.h>
 #include <zce/zce_handler.h>
 #include <zce/zce_process.h>
+#include <zce/zdp_storm.h>
 #include <vector>
 #include <string>
 
@@ -65,10 +66,10 @@ class ZCE_API Service : public Reactor {
     SmartPtr<Signal> signal_int_;
     SmartPtr<Signal> signal_term_;
     SmartPtr<Timer> timer_;
-    zce::SmartPtr<zce::zdp::Storm> storm_server_;
+    zce::SmartPtr<zce::SubProcessHost> process_host_;
+    zce::SmartPtr<zce::zdp::StormVM> storm_host_;
     zce::SmartPtr<zce::zdp::StormClient> storm_client_;
     zce::SubProcessHost::HostContext host_context_;
-    zce::SmartPtr<zce::SubProcessHost> process_host_;
 
     zce::SmartPtr<zce::SubProcess> sub_process_;
     zce::ObjectPtr sub_vm_;

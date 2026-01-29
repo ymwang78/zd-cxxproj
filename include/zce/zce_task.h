@@ -279,6 +279,8 @@ class ZCE_API Scheduler : public zce::Object {
     }
 };
 
+typedef zce::SmartPtr<Scheduler> SchedulerPtr;
+
 #include <zce/zce_singleton.h>
 
 typedef zce::Singleton<Scheduler> SchedulerSigt;

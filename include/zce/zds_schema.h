@@ -460,5 +460,26 @@ int zds_unpack_multi(const zce_byte* buf, zce_int32 size, zds_context_t* ctx, bo
     return ret;
 }
 
+template <typename T>
+int zds_unpack_oneitem(T& input, zce::RefBlock& dblock) {
+    if constexpr (zce::zdp::is_builtin_type<T>()) {
+        int ret =
+            zce::zdp::zds_unpack_builtin(input, dblock.rd_ptr(), (int)dblock.length(), nullptr);
+        if (ret < 0) return ret;
+        dblock.rd_ptr(ret);
+        return ret;
+    } else if constexpr (zce::zdp::is_vector<T>()) {
+        int ret = zce::zdp::zds_unpack_array(input, dblock.rd_ptr(), (int)dblock.length(), nullptr);
+        if (ret < 0) return ret;
+        dblock.rd_ptr(ret);
+        return ret;
+    } else {
+        int ret = zce::zdp::zds_unpack(input, dblock.rd_ptr(), (int)dblock.length(), nullptr, true);
+        if (ret < 0) return ret;
+        dblock.rd_ptr(ret);
+        return ret;
+    }
+}
+
 }  // namespace zdp
 }  // namespace zce

@@ -63,7 +63,7 @@ class Storm : public zce::Reactor {
 
     const zce::SmartPtr<zdp::StormClient>& storm_client() const { return storm_ptr_; }
 
-    void subscribe(zce_int64 topic);
+    void subscribe(const std::string& topic);
 
     void unsubscribe(zce_int64 topic);
 
@@ -81,9 +81,9 @@ class Storm : public zce::Reactor {
     virtual int on_topic_readzdp(zce_int64 topic, zce_int64 from, const zdp::zdp_storm_peer& peer,
                                  zce::RefBlock& plaindblock) = 0;
 
-    virtual int on_topic_read(zce_int64 topic, zce_int64 from, zce_byte* data, zce_uint32 len);
+    virtual int on_topic_read(zce_int64 topic, zce_int64 from, const zce_byte* data, zce_uint32 len);
 
-    virtual int on_multitopic_read(unsigned count, zce_int64* topics, zce_byte* data,
+    virtual int on_multitopic_read(unsigned count, const zce_int64* topics, const zce_byte* data,
                                    zce_uint32 len) {
         return 0;
     };
@@ -94,7 +94,7 @@ class Storm : public zce::Reactor {
         return 0;
     };
 
-    int publish(zce_int64 topic, const zce_byte* data, size_t len, zce_int64 trace) {
+    int publish(zce_int64 topic, const zce_byte* data, size_t len, zce_int32 trace) {
         if (storm_ptr_ == 0) return -1;
         return storm_ptr_->publish(topic, data, len, trace);
     }

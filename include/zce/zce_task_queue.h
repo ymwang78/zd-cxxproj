@@ -26,7 +26,7 @@ class ZCE_API TaskQueue : public Task, public TaskDelegator {
     ZCE_OBJECT_DECLARE;
 
   protected:
-    zce::SmartPtr<Scheduler> scheduler_ptr_;
+    zce::SmartPtr<zce::Scheduler> scheduler_ptr_;
 
     zce::AtomicLong inque_;
 
@@ -64,27 +64,27 @@ class ZCE_API TaskQueue : public Task, public TaskDelegator {
     virtual void call();
 };
 
-template <typename QueueSubType, typename Params, typename Results>
+using TaskQueuePtr = zce::SmartPtr<TaskQueue>;
+
+template <typename QueueSubType>
 class TaskMapReduce : public zce::Object {
     zce::SmartPtr<QueueSubType>* queue_vec_;
     size_t queue_size_;
     zce::AtomicLong remain_tasks_;
-    std::vector<int> queue_idx_vec_;
-    Params params_;
-    Results result_;
+    std::vector<int> queue_idx_vec_;  // task assign queue idx
 
   public:
-    template <typename QueueIdxVecType, typename ParamsType, typename ResultsType>
+    using ProcFunc = std::function<void(int, const std::vector<int>&)>;
+
+    using FinalFunc = std::function<void(size_t)>;
+
     TaskMapReduce(zce::SmartPtr<QueueSubType>* queue_vec, size_t queue_size,
-                  QueueIdxVecType&& queue_idx_vec, ParamsType&& params, ResultsType&& result)
+                  std::vector<int>&& queue_idx_vec)
         : queue_vec_(queue_vec),
           queue_size_(queue_size),
-          queue_idx_vec_(std::forward<QueueIdxVecType>(queue_idx_vec)),
-          params_(std::forward<ParamsType>(params)),
-          result_(std::forward<ResultsType>(result)) {}
+          queue_idx_vec_(std::forward<std::vector<int>>(queue_idx_vec)) {}
 
-    template <typename ProcFunc, typename FinalFunc>
-    int map_reduce(ProcFunc process_task, FinalFunc final_callback) {
+    int mapReduce(ProcFunc process_task, FinalFunc final_callback) {
         if (queue_vec_ == 0 || queue_size_ == 0 || queue_idx_vec_.empty()) {
             return ZCE_ERROR_INVALID;
         }
@@ -106,10 +106,9 @@ class TaskMapReduce : public zce::Object {
         for (size_t i = 0; i < queue_size_; ++i) {
             if (!if_work_queue[i]) continue;
             queue_vec_[i]->delegate(false, __FUNCTION__, [=]() {
-                process_task((int)i, this_ptr->queue_idx_vec_, this_ptr->params_,
-                             this_ptr->result_);
+                process_task((int)i, this_ptr->queue_idx_vec_);
                 if (--this_ptr->remain_tasks_ == 0) {
-                    final_callback(this_ptr->params_, this_ptr->result_);
+                    final_callback(work_queue_count);
                 }
             });
         }

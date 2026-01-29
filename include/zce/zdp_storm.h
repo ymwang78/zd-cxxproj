@@ -1,4 +1,4 @@
-﻿// ***************************************************************
+// ***************************************************************
 //  Storm   version:  1.0   -  date: 2015/01/01
 //  -------------------------------------------------------------
 //  Yongming Wang(wangym@gmail.com)
@@ -15,6 +15,7 @@
 #include <zce/zds_schema.h>
 #include <zce/zce_api.h>
 #include <zce/zce_handler.h>
+#include <zce/zvm.h>
 
 namespace zce {
 
@@ -26,8 +27,8 @@ class Reactor;
 namespace zdp {
 
 extern "C" {
-typedef int (*publish_callback)(const ::zce::Any& ctx, int cnt, zce_int64* topics, zce_int64 from,
-                                zce_byte* data, zce_uint32 len);
+typedef int (*publish_callback)(const ::zce::Any& ctx, int cnt, const zce_int64* topics,
+                                zce_int64 from, const zce_byte* data, zce_uint32 len);
 
 typedef int (*set_callback)(const ::zce::Any& ctx, zce_int64 topic, const zce_string& name,
                             zce_int64 seq, zce_int64 tick, zce_int64 uid, zce_int64 flag,
@@ -59,8 +60,8 @@ class ZCE_API Storm : public ::zce::Object {
 
   public:
     Storm(const ::zce::SmartPtr<::zce::Reactor>&, const ::zce::SmartPtr<::zce::Scheduler>&,
-          zce_uint16 uniqueid, const zce_string& token, const ::zce::Any& ctx,
-          publish_callback child_cb, set_callback set_cb);
+          zce_uint16 shard_id, const ::zce::Any& ctx, publish_callback child_cb,
+          set_callback set_cb);
 
     ~Storm();
 
@@ -77,12 +78,17 @@ class ZCE_API StormClient : public ::zce::Object {
     ::zce::SmartPtr<Pimpl> pimpl_ptr_;
 
   public:
-    StormClient(const ::zce::SmartPtr<::zce::Reactor>&, zce_int64 uniqueid, const zce_string& token,
-                const ::zce::Any& ctx, publish_callback father_cb, set_callback set_cb,
+    StormClient(const ::zce::SmartPtr<::zce::Reactor>&, const std::string& client_ident,
+                const std::string& token, const ::zce::Any& ctx, publish_callback father_cb,
+                set_callback set_cb,
                 std::function<void(bool passive, const zce_sockaddr_t& remote)> connected_cb,
                 std::function<void()> disconnect_cb);
 
     ~StormClient();
+
+    const std::string getClientIdent() const noexcept;
+
+    zce_int64 getClientId() const noexcept;
 
     int stop();
 
@@ -92,16 +98,18 @@ class ZCE_API StormClient : public ::zce::Object {
 
     int connect(const char* fatherip, zce_uint16 fatherport);
 
-    // subscribe topic
-    int subscribe(zce_int64 topic);
+    // subscribe by topic name (e.g. "server.topic"); server returns unique id for publish/set
+    int subscribe(const std::string& topic);
 
-    int unsubscribe(zce_int64 topic);
+    zce_int64 getTopicId(const std::string& topic) const;
 
-    int publish(zce_int64 topic, const zce_byte* data, size_t len, zce_int64 trace);
+    int unsubscribe(zce_int64 topic_id);
+
+    int publish(zce_int64 topic, const zce_byte* data, size_t len, zce_int32 trace);
 
     int publish(const std::vector<zce_int64>& topics, const zce_byte* data, size_t len);
 
-    int set(zce_int64 topic, const zce_string& name, zce_int64 oldseq, zce_int64 uid,
+    int set(zce_int64 topic, const std::string& name, zce_int64 oldseq, zce_int64 uid,
             zce_int64 flag, const zce_byte* data, zce_uint32 len);
 
     template <typename T, typename TTOPIC>
@@ -114,8 +122,11 @@ class ZCE_API StormClient : public ::zce::Object {
 
     template <typename... Args>
     int publishMessage(zce_int64 topic, Args&&... args) {
-        int ret = 0;
         ZTRACE("ZmpcStormClient::publish", hex_t<zce_uint64>(topic), sizeof...(args));
+        if (topic == 0) {
+            return -1;
+        }
+        int ret = 0;
         zce::RefBlock dblock;
         {
             ret = zce::zdp::zds_pack_multi(0, 0, nullptr, true, std::forward<Args>(args)...);
@@ -176,6 +187,32 @@ class ZCE_API StormStreamAdapter : public ::zce::IStream {
 
     int write(::zce::RefBlock& dblock, ERV_ISTREAM_WRITEOPT) override;
 };
+
+//////////////////////////////////////////////////////////////////////////
+
+
+class ZCE_API StormVM : public ::zce::zvm::Machine {
+    struct Impl;
+    std::unique_ptr<Impl> pimpl_;
+
+  public:
+
+    StormVM(const std::string& vm_name, const zce::SmartPtr<zce::zvm::VirtualMachineStub>& stub_ptr,
+            const zce::SmartPtr<zce::Reactor>& reactor_ptr,
+            const zce::SmartPtr<zce::Scheduler>& scheduler_ptr, zce_uint16 shard_id,
+            const std::string& listen_ip, unsigned short listen_port);
+
+    virtual ~StormVM() noexcept;
+
+    virtual int start() override;
+
+    virtual void stop() override;
+
+    virtual int call_dblock(zce_int64 objid, const std::string& method, ::zce::RefBlock& dblock,
+                            int mstimeout,
+                            const zce::zvm::VirtualMachineStub::response_cb& response) override;
+};
+
 
 }  // namespace zdp
 
