@@ -135,9 +135,13 @@ class RpcServant;
 class RpcStream;
 class VirtualMachineStubPimpl;
 
+
 class Machine : public zce::TaskQueue {
+    ZCE_OBJECT_DECLARE;
+
   protected:
     std::string vm_name_;
+    std::string full_name_;
     zce::SmartPtr<VirtualMachineStub> stub_ptr_;
     std::map<std::string, zce::SmartPtr<zdl_module>> modules_;
 
@@ -146,7 +150,13 @@ class Machine : public zce::TaskQueue {
 
     virtual ~Machine();
 
+    void set_fullname(const std::string& v) { full_name_ = v; }
+
     const std::string& vm_name() const noexcept { return vm_name_; }
+
+    const std::string& full_name() const noexcept {
+        return full_name_.empty() ? vm_name_ : full_name_;
+    }
 
     const zce::SmartPtr<VirtualMachineStub>& stub_ptr() const noexcept { return stub_ptr_; }
 
