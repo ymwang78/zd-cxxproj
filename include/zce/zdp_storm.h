@@ -81,7 +81,7 @@ class ZCE_API StormClient : public ::zce::Object {
     StormClient(const ::zce::SmartPtr<::zce::Reactor>&, const std::string& client_ident,
                 const std::string& token, const ::zce::Any& ctx, publish_callback father_cb,
                 set_callback set_cb,
-                std::function<void(bool passive, const zce_sockaddr_t& remote)> connected_cb,
+                std::function<void()> connected_cb,
                 std::function<void()> disconnect_cb);
 
     ~StormClient();

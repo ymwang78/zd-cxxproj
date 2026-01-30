@@ -73,7 +73,7 @@ class Storm : public zce::Reactor {
     void substorm(
         const char* addr, unsigned short port, std::string_view platform, std::string_view siteid,
         std::string_view service_class, unsigned service_id,
-        std::function<void(bool passive, const zce_sockaddr_t& remote)> connected_cb,
+        std::function<void()> connected_cb,
         std::function<void()> disconnect_cb);
 
     virtual zce_int64 streamtopic_from_msgmid(zce_uint16 msgmid) { return 0; };
