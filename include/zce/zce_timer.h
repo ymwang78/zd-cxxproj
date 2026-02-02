@@ -45,6 +45,8 @@ public:
     void cancel();
 };
 
+using TimerPtr = zce::SmartPtr<Timer>;
+
 class ZCE_API TimerDoozer : public zce::Object
 {
     friend struct Timer::pimpl;
@@ -59,5 +61,7 @@ public:
     virtual bool will_trigger();
     virtual void handle_timeout() = 0;
 };
+
+using TimerDoozerPtr = zce::SmartPtr<TimerDoozer>;
 
 }  // namespace zce

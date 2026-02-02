@@ -64,6 +64,10 @@ class VirtualMachineStub : public zce::Object {
     int initStub(const zce::SmartPtr<zce::Scheduler>&, const zce::SmartPtr<zce::Reactor>&,
                  const std::string& u8_host_dir);
 
+    const zce::SmartPtr<zce::Reactor>& getReactorPtr() const noexcept;
+
+    const zce::SmartPtr<zce::Scheduler>& getSchedulerPtr() const noexcept;
+
     int listen(const char* host, unsigned short port);
 
     zce::SmartPtr<zce::Object> boot(const zdp_base::zvm_t& vm, zce::RefBlock args);
@@ -135,7 +139,6 @@ class RpcServant;
 class RpcStream;
 class VirtualMachineStubPimpl;
 
-
 class Machine : public zce::TaskQueue {
     ZCE_OBJECT_DECLARE;
 
@@ -185,6 +188,28 @@ class Machine : public zce::TaskQueue {
     zce::SmartPtr<zdl_module> get_module_by_name(const std::string& name) const;
 
     zce::SmartPtr<zdl_struct> get_struct(const std::string& module, const std::string& name) const;
+
+    template <typename... Args>
+    int sendResponse(const zce::zvm::VirtualMachineStub::response_cb& response,
+                     Args&&... args) const {
+        int ret = 0;
+        zce::RefBlock dblock;
+        do {
+            ret = zce::zdp::zds_pack_multi(0, 0, nullptr, true, std::forward<Args>(args)...);
+            if (ret < 0) return ret;
+            ZCE_MBACQUIRE(dblock, ret);
+            if ((int)dblock.space() < ret) {
+                ret = ZCE_ERROR_MALLOC;
+                break;
+            }
+            ret = zce::zdp::zds_pack_multi(dblock.wr_ptr_cow(), (int)dblock.space(), nullptr, true,
+                                           std::forward<Args>(args)...);
+            if (ret < 0) break;
+            dblock.wr_ptr(ret);
+        } while (0);
+        response(ret, std::move(dblock));
+        return 0;
+    }
 };
 
 namespace detail {

@@ -198,8 +198,6 @@ class ZCE_API Scheduler : public zce::Object {
     struct pimpl;
     struct pimpl* pimpl_;
 
-    void doWork(WorkerContext& ctx);
-
   public:
     Scheduler();
 
@@ -213,7 +211,9 @@ class ZCE_API Scheduler : public zce::Object {
 
     int perform(const TaskPtr& req);
 
-    int printCurrentTask();
+    int perform(int idx, const TaskPtr& req); // bind to thread(idx)
+
+    int printCurrentTasks();
 
     template <typename F>
     int perform(F f) {
