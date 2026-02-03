@@ -133,7 +133,8 @@ class VirtualMachineStub : public zce::Object {
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 };
 
-typedef zce::Singleton<VirtualMachineStub> VirtualMachineStubSigt;
+using VirtualMachineStubPtr = zce::SmartPtr<VirtualMachineStub>;
+using VirtualMachineStubSigt = zce::Singleton<VirtualMachineStub>;
 
 class RpcServant;
 class RpcStream;

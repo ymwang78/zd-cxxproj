@@ -131,6 +131,23 @@ namespace zdp_base
         zce_astring    name/*名*/;
         zce_int64    value/*值*/;
     };
+    struct logtext_t
+    {
+        static logtext_t _empty;
+        bool operator==(const logtext_t& _t) const noexcept
+        {
+            if (timestamp != _t.timestamp) return false;
+            if (level != _t.level) return false;
+            if (desc != _t.desc) return false;
+            if (mod != _t.mod) return false;
+            return true;
+        }
+
+        zce_int64    timestamp/*日志时间, zce_timestamp*/;
+        zce_byte    level/*日志级别*/;
+        zce_astring    desc/*日志内容*/;
+        zce_astring    mod/*日志模块*/;
+    };
     struct zobject_proxy_t
     {
         static zobject_proxy_t _empty;

@@ -205,27 +205,27 @@ class ZCE_API Scheduler : public zce::Object {
 
     bool isActive() const;
 
+    int getWorkerCount() const;
+
     int active(int work_thread_cnt);
 
     void stop();
 
-    int perform(const TaskPtr& req);
-
-    int perform(int idx, const TaskPtr& req); // bind to thread(idx)
+    int perform(const TaskPtr& req, int idx = -1); // bind to thread(idx)
 
     int printCurrentTasks();
 
     template <typename F>
-    int perform(F f) {
+    int performFunc(F&& f, int idx = -1) {
         class FuncTask : public Task {
-            F f_;
-
+            using Fn = std::decay_t<F>;
+            Fn f_;
           public:
-            FuncTask(F f) : zce::Task("FuncTask"), f_(f) {}
+            FuncTask(F&& f) : zce::Task("performFunc"), f_(std::forward<F>(f)) {}
             virtual void call() { f_(); }
         };
-        zce::SmartPtr<zce::Task> task_ptr(new FuncTask(f));
-        return perform(task_ptr);
+        zce::SmartPtr<zce::Task> task_ptr(new FuncTask(std::forward<F>(f)));
+        return perform(task_ptr, idx);
     };
 
     template <typename F, typename... Args>

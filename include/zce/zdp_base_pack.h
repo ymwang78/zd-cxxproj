@@ -31,6 +31,8 @@ namespace zce
         int zds_unpack(zdp_base::nipair_t& _t, const zce_byte* buf, int size, zds_context_t* ctx, bool has_prefix);
         int zds_pack(zce_byte* buf, int size, const zdp_base::nllpair_t& _t, zds_context_t* ctx, bool has_prefix);
         int zds_unpack(zdp_base::nllpair_t& _t, const zce_byte* buf, int size, zds_context_t* ctx, bool has_prefix);
+        int zds_pack(zce_byte* buf, int size, const zdp_base::logtext_t& _t, zds_context_t* ctx, bool has_prefix);
+        int zds_unpack(zdp_base::logtext_t& _t, const zce_byte* buf, int size, zds_context_t* ctx, bool has_prefix);
         int zds_pack(zce_byte* buf, int size, const zdp_base::zobject_proxy_t& _t, zds_context_t* ctx, bool has_prefix);
         int zds_unpack(zdp_base::zobject_proxy_t& _t, const zce_byte* buf, int size, zds_context_t* ctx, bool has_prefix);
         int zds_pack(zce_byte* buf, int size, const zdp_base::zvm_t& _t, zds_context_t* ctx, bool has_prefix);
