@@ -128,7 +128,8 @@ int ZCE_API zce_list_ip(std::vector<std::string>& ip_list);
 
 void ZCE_API zce_str2addrvec(std::vector<zce_addr_t>& tsock_vec, const std::string& addrs);
 
-std::set<std::string> ZCE_API zce_get_mac();
+std::set<std::string> ZCE_API zce_get_mac(bool include_virtual = false,
+                                          bool include_tunnel = false);
 
 std::set<std::string> ZCE_API zce_get_hardrive();
 
@@ -285,6 +286,10 @@ std::wstring ZCE_API zce_to_utf16(const char* src, unsigned len);
 std::wstring ZCE_API zce_hresult_message(HRESULT hr);
 
 #endif
+
+namespace zce {
+
+}
 
 template<typename T>
 static inline T zce_counter(zce_uint32 spanid, zce_uint32& lastspanid, T& count)

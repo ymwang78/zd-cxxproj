@@ -212,6 +212,10 @@ class BsonDoc : public BsonRef {
 
     std::string to_json() const;
 
+    static BsonDoc from_json(const std::string& json);
+
+    static BsonDoc from_json(const char* json, size_t length);
+
     const zce_byte* get_data() const;
 
     uint32_t get_size() const;
