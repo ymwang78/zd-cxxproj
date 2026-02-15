@@ -34,6 +34,8 @@ class BsonRef {
 
     BsonRef& append(const std::string& key, const char* value);
 
+    BsonRef& append(const std::string& key, const zce::Any& value);
+
     template <typename T>
     BsonRef& append_array(const std::string& key, const std::vector<T>& items) {
         bson_t child_array;
