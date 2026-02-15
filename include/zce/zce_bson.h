@@ -14,6 +14,7 @@
 #include <functional>
 #include <stdexcept>
 #include <type_traits>
+#include <zce/zce_any.h>
 #include <zce/zce_types.h>
 
 namespace zce {
@@ -113,6 +114,8 @@ class BsonView {
 
     std::string as_string(const std::string& default_val = "") const;
 
+    zce::Any as_any(const zce::Any& default_val = zce::Any()) const;
+
     template<typename T>
     T as_type(const T& default_val = T()) const {
         if constexpr(std::is_same_v<T, int8_t> || std::is_same_v<T, uint8_t> ||
@@ -126,6 +129,8 @@ class BsonView {
             return as_bool(default_val);
         } else if constexpr (std::is_same_v<T, std::string>) {
             return as_string(default_val);
+        } else if constexpr (std::is_same_v<T, zce::Any>) {
+            return as_any(default_val);
         } else {
             throw std::runtime_error("Unsupported type in as_type");
         }
