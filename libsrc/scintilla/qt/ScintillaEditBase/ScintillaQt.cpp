@@ -11,6 +11,8 @@
 #include "ScintillaQt.h"
 #include "PlatQt.h"
 
+#include <cstring>
+
 #include <QApplication>
 #include <QDrag>
 #if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
@@ -18,7 +20,9 @@
 #endif
 #include <QMimeData>
 #include <QMenu>
-#include <QTextCodec>
+#include <QStringDecoder>
+#include <QStringEncoder>
+#include <QByteArrayView>
 #include <QScrollBar>
 #include <QTimer>
 
@@ -166,9 +170,12 @@ static QString StringFromSelectedText(const SelectionText &selectedText)
 	if (selectedText.codePage == SC_CP_UTF8) {
 		return QString::fromUtf8(selectedText.Data(), static_cast<int>(selectedText.Length()));
 	} else {
-		QTextCodec *codec = QTextCodec::codecForName(
-				CharacterSetID(selectedText.characterSet));
-		return codec->toUnicode(selectedText.Data(), static_cast<int>(selectedText.Length()));
+		const char *name = CharacterSetID(selectedText.characterSet);
+		QStringDecoder dec(name);
+		if (!dec.isValid())
+			dec = QStringDecoder("ISO-8859-1");
+		QString result = dec.decode(QByteArrayView(selectedText.Data(), selectedText.Length()));
+		return dec.hasError() ? QString::fromUtf8(selectedText.Data(), static_cast<int>(selectedText.Length())) : result;
 	}
 }
 
@@ -253,10 +260,12 @@ std::string ScintillaQt::UTF8FromEncoded(std::string_view encoded) const {
 	if (IsUnicodeMode()) {
 		return std::string(encoded);
 	} else {
-		QTextCodec *codec = QTextCodec::codecForName(
-				CharacterSetID(CharacterSetOfDocument()));
-		QString text = codec->toUnicode(encoded.data(), static_cast<int>(encoded.length()));
-		return text.toStdString();
+		const char *name = CharacterSetID(CharacterSetOfDocument());
+		QStringDecoder dec(name);
+		if (!dec.isValid())
+			dec = QStringDecoder("ISO-8859-1");
+		QString text = dec.decode(QByteArrayView(encoded.data(), encoded.size()));
+		return dec.hasError() ? std::string(encoded) : text.toUtf8().toStdString();
 	}
 }
 
@@ -265,10 +274,12 @@ std::string ScintillaQt::EncodedFromUTF8(std::string_view utf8) const {
 		return std::string(utf8);
 	} else {
 		QString text = QString::fromUtf8(utf8.data(), static_cast<int>(utf8.length()));
-		QTextCodec *codec = QTextCodec::codecForName(
-				CharacterSetID(CharacterSetOfDocument()));
-		QByteArray ba = codec->fromUnicode(text);
-		return std::string(ba.data(), ba.length());
+		const char *name = CharacterSetID(CharacterSetOfDocument());
+		QStringEncoder enc(name);
+		if (!enc.isValid())
+			enc = QStringEncoder("ISO-8859-1");
+		QByteArray ba = enc.encode(text);
+		return enc.hasError() ? std::string(utf8) : std::string(ba.data(), ba.length());
 	}
 }
 
@@ -534,9 +545,12 @@ QString ScintillaQt::StringFromDocument(const char *s) const
 	if (IsUnicodeMode()) {
 		return QString::fromUtf8(s);
 	} else {
-		QTextCodec *codec = QTextCodec::codecForName(
-				CharacterSetID(CharacterSetOfDocument()));
-		return codec->toUnicode(s);
+		const char *name = CharacterSetID(CharacterSetOfDocument());
+		QStringDecoder dec(name);
+		if (!dec.isValid())
+			dec = QStringDecoder("ISO-8859-1");
+		QString result = dec.decode(QByteArrayView(s, s ? std::strlen(s) : 0));
+		return dec.hasError() ? QString::fromUtf8(s) : result;
 	}
 }
 
@@ -545,32 +559,40 @@ QByteArray ScintillaQt::BytesForDocument(const QString &text) const
 	if (IsUnicodeMode()) {
 		return text.toUtf8();
 	} else {
-		QTextCodec *codec = QTextCodec::codecForName(
-				CharacterSetID(CharacterSetOfDocument()));
-		return codec->fromUnicode(text);
+		const char *name = CharacterSetID(CharacterSetOfDocument());
+		QStringEncoder enc(name);
+		if (!enc.isValid())
+			enc = QStringEncoder("ISO-8859-1");
+		QByteArray ba = enc.encode(text);
+		return enc.hasError() ? text.toUtf8() : ba;
 	}
 }
 
 namespace {
 
 class CaseFolderDBCS : public CaseFolderTable {
-	QTextCodec *codec;
+	std::string encodingName;
 public:
-	explicit CaseFolderDBCS(QTextCodec *codec_) : codec(codec_) {
+	explicit CaseFolderDBCS(const char *name) : encodingName(name ? name : "ISO-8859-1") {
 	}
 	size_t Fold(char *folded, size_t sizeFolded, const char *mixed, size_t lenMixed) override {
 		if ((lenMixed == 1) && (sizeFolded > 0)) {
 			folded[0] = mapping[static_cast<unsigned char>(mixed[0])];
 			return 1;
-		} else if (codec) {
-			QString su = codec->toUnicode(mixed, static_cast<int>(lenMixed));
-			QString suFolded = su.toCaseFolded();
-			QByteArray bytesFolded = codec->fromUnicode(suFolded);
+		}
+		QStringDecoder dec(encodingName.c_str());
+		if (!dec.isValid())
+			dec = QStringDecoder("ISO-8859-1");
+		QString su = dec.decode(QByteArrayView(mixed, lenMixed));
+		QString suFolded = su.toCaseFolded();
+		QStringEncoder enc(encodingName.c_str());
+		if (!enc.isValid())
+			enc = QStringEncoder("ISO-8859-1");
+		QByteArray bytesFolded = enc.encode(suFolded);
 
-			if (bytesFolded.length() < static_cast<int>(sizeFolded)) {
-				memcpy(folded, bytesFolded,  bytesFolded.length());
-				return bytesFolded.length();
-			}
+		if (!enc.hasError() && bytesFolded.length() < static_cast<int>(sizeFolded)) {
+			memcpy(folded, bytesFolded.data(), static_cast<size_t>(bytesFolded.length()));
+			return static_cast<size_t>(bytesFolded.length());
 		}
 		// Something failed so return a single NUL byte
 		folded[0] = '\0';
@@ -589,23 +611,26 @@ std::unique_ptr<CaseFolder> ScintillaQt::CaseFolderForEncoding()
 		if (charSetBuffer) {
 			if (pdoc->dbcsCodePage == 0) {
 				std::unique_ptr<CaseFolderTable> pcf = std::make_unique<CaseFolderTable>();
-				QTextCodec *codec = QTextCodec::codecForName(charSetBuffer);
+				QStringDecoder dec(charSetBuffer);
+				if (!dec.isValid())
+					dec = QStringDecoder("ISO-8859-1");
+				QStringEncoder enc(charSetBuffer);
+				if (!enc.isValid())
+					enc = QStringEncoder("ISO-8859-1");
 				// Only for single byte encodings
 				for (int i=0x80; i<0x100; i++) {
 					char sCharacter[2] = "A";
 					sCharacter[0] = static_cast<char>(i);
-					QString su = codec->toUnicode(sCharacter, 1);
+					QString su = dec.decode(QByteArrayView(sCharacter, 1));
 					QString suFolded = su.toCaseFolded();
-					if (codec->canEncode(suFolded)) {
-						QByteArray bytesFolded = codec->fromUnicode(suFolded);
-						if (bytesFolded.length() == 1) {
-							pcf->SetTranslation(sCharacter[0], bytesFolded[0]);
-						}
+					QByteArray bytesFolded = enc.encode(suFolded);
+					if (!enc.hasError() && bytesFolded.length() == 1) {
+						pcf->SetTranslation(sCharacter[0], bytesFolded[0]);
 					}
 				}
 				return pcf;
 			} else {
-				return std::make_unique<CaseFolderDBCS>(QTextCodec::codecForName(charSetBuffer));
+				return std::make_unique<CaseFolderDBCS>(charSetBuffer);
 			}
 		}
 		return nullptr;
@@ -625,8 +650,13 @@ std::string ScintillaQt::CaseMapString(const std::string &s, CaseMapping caseMap
 		return retMapped;
 	}
 
-	QTextCodec *codec = QTextCodec::codecForName(CharacterSetIDOfDocument());
-	QString text = codec->toUnicode(s.c_str(), static_cast<int>(s.length()));
+	const char *name = CharacterSetIDOfDocument();
+	QStringDecoder dec(name);
+	if (!dec.isValid())
+		dec = QStringDecoder("ISO-8859-1");
+	QString text = dec.decode(QByteArrayView(s.data(), s.size()));
+	if (dec.hasError())
+		return s;
 
 	if (caseMapping == CaseMapping::upper) {
 		text = text.toUpper();

@@ -30,11 +30,12 @@
 #include <QPaintDevice>
 #include <QPainter>
 #include <QHash>
-#include <QTextCodec>
 
 namespace Scintilla::Internal {
 
 const char *CharacterSetID(Scintilla::CharacterSet characterSet);
+
+QString UnicodeFromText(const char *codecName, std::string_view text);
 
 inline QColor QColorFromColourRGBA(ColourRGBA ca)
 {
@@ -78,7 +79,6 @@ private:
 	bool painterOwned = false;
 	SurfaceMode mode;
 	const char *codecName = nullptr;
-	QTextCodec *codec = nullptr;
 
 	void Clear();
 
