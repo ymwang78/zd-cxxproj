@@ -4,7 +4,7 @@ set -e
 
 source /opt/venv/bin/activate
 
-export CXXPROJ_PATH=/zdata/share/cxxproj
+export CXXPROJ_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd ${CXXPROJ_PATH}
 
 # -----------------------------------------
@@ -47,6 +47,7 @@ build_module() {
 # -----------------------------------------
 build_module libsrc/libzce
 build_module libsrc/libzdl
+build_module zGen
 build_module libsrc/libidh -DUSE_CUSTOM_STATIC_LIBS=OFF
 build_module libsrc/libcoin
 build_module libsrc/libmpc
