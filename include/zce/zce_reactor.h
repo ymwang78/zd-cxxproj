@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 // ***************************************************************
 //  zce::Reactor   version:  1.0     date: 2002/07/31
 //  -------------------------------------------------------------
@@ -44,7 +44,11 @@ class ZCE_API Reactor : public zce::TaskDelegator {
 
     int setThreadPriority(int priority);
 
+    // won't start loop if in_place is true, caller should call startLoop() to start loop
+
     int start(bool in_place = false);
+
+    int startLoop();
 
     void stop();
 
