@@ -14,6 +14,7 @@
 #include <zce/zce_task.h>
 #include <zce/zce_singleton.h>
 #include <deque>
+#include <functional>
 
 namespace zce {
 
@@ -21,6 +22,7 @@ class Allocator;
 class DnsResolve;
 class Task;
 class Thread;
+class Timer;
 
 class ZCE_API Reactor : public zce::TaskDelegator {
     struct pimpl;
@@ -53,6 +55,8 @@ class ZCE_API Reactor : public zce::TaskDelegator {
     void stop();
 
     int dns_resolve(const std::string& domain, const zce::SmartPtr<zce::DnsResolve>& resolve_ptr);
+
+    SmartPtr<Timer> scheduleTimer(int msec_span, bool repeat, std::function<void(Timer*)> timer_func);
 
     int delegateTask(const zce::SmartPtr<zce::Task>& task_ptr) override;
 

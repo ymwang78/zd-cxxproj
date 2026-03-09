@@ -1,4 +1,4 @@
-﻿// *s**************************************************************
+// *s**************************************************************
 //  zvm   version:  1.0   -  date: 2016/3/12
 //  -------------------------------------------------------------
 //  Yongming Wang(wangym@gmail.com)
@@ -229,13 +229,13 @@ inline std::pair<int, std::tuple<First, Rest...>> unpack_recursive_impl(const zc
     First current_value{};
     if constexpr (zce::zdp::is_builtin_type<First>()) {
         bytes_read = zce::zdp::zds_unpack_builtin(current_value, data.rd_ptr() + offset,
-                                                  data.length() - offset, nullptr);
+                                                  (int)(data.length() - offset), nullptr);
     } else if constexpr (zce::zdp::is_vector<First>()) {
         bytes_read = zce::zdp::zds_unpack_array(current_value, data.rd_ptr() + offset,
-                                                data.length() - offset, nullptr);
+                                                (int)(data.length() - offset), nullptr);
     } else {
         bytes_read = zce::zdp::zds_unpack(current_value, data.rd_ptr() + offset,
-                                          data.length() - offset, nullptr, true);
+                                          (int)(data.length() - offset), nullptr, true);
     }
 
     if (bytes_read < 0) {
@@ -258,7 +258,7 @@ inline std::pair<int, std::tuple<First, Rest...>> unpack_recursive_impl(const zc
 template <typename... Results>
 inline std::pair<int, std::tuple<Results...>> unpack_to_tuple(const zce::RefBlock& data,
                                                               const char* func) {
-    // 从偏移量 0 开始调用递归实现
+    // recursive call from offset 0
     return unpack_recursive_impl<Results...>(data, 0, func);
 }
 
@@ -351,7 +351,7 @@ class VirtualMachineProxy : public zce::Object {
                 result.errdesc = "unpack result failed";
             } else {
                 result.errdesc = "success";
-                result.data = std::move(data_tuple);  // ✨ 移动解包后的元组
+                result.data = std::move(data_tuple); 
             }
             async_cb(std::move(result));
         });
