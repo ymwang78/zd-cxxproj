@@ -223,6 +223,7 @@ namespace zdp_base
             if (reserved != _t.reserved) return false;
             if (version != _t.version) return false;
             if (compile_time != _t.compile_time) return false;
+            if (!(extra_vec == _t.extra_vec)) return false;
             return true;
         }
 
@@ -231,6 +232,7 @@ namespace zdp_base
         zce_uint16    reserved;
         zce_uint32    version;
         zce_uint32    compile_time;
+        std::vector<zdp_base::zdp_container_t> extra_vec;
     };
     struct MSG_NONE_REQ : public ::zce::Object
     {

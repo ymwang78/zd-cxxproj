@@ -52,6 +52,9 @@ class xOptModelComp : public xOptModelBase {
 
     int prepareSolvingDone();
 
+    std::unordered_map<std::string, xOptModelFixableVariables> getRealFixedVars(
+        bool ignore_linked_vars);
+
     int printX() const;
 
     //================= 模型初始化 ==================

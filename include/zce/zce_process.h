@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 // ***************************************************************
 //  zce_process   version:  1.0   -  date:  2025/10/15
 //  -------------------------------------------------------------
@@ -43,6 +43,10 @@ enum PRECESS_MSGID {
     PROCESS_S2MUPDATEVM_RES = 0x0043,
     PROCESS_S2MHBEAT_REQ = 0x0044,
     PROCESS_S2MHBEAT_RES = 0x0045,
+    PROCESS_S2MREGISTER_REQ = 0x0046,
+    PROCESS_S2MREGISTER_RES = 0x0047,
+    PROCESS_S2MUNREGISTER_REQ = 0x0048,
+    PROCESS_S2MUNREGISTER_RES = 0x0049,
 
     PROCESS_M2SQUIT_REQ = 0x0080,
     PROCESS_M2SQUIT_RES = 0x0081,
