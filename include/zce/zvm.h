@@ -70,6 +70,18 @@ class VirtualMachineStub : public zce::Object {
 
     int listen(const char* host, unsigned short port);
 
+    int listenPipe(const char* pipe_name);
+
+    /// Listen on a URI-style address.
+    /// Supported schemes:
+    ///   tcp://ip:port   — TCP listener on the given IP and port
+    ///   pipe://name     — named pipe; on Linux resolves to /tmp/name,
+    ///                     on Windows uses the name as-is
+    int listenSchema(const char* schema);
+
+    /// Stop all active RPC listeners (TCP and pipe) registered on this stub.
+    void stopAllServants();
+
     zce::SmartPtr<zce::Object> boot(const zdp_base::zvm_t& vm, zce::RefBlock args);
 
     zce::SmartPtr<zce::Object> boot(const std::string& svc_name, const std::string& host,
