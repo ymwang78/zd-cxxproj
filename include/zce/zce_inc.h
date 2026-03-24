@@ -5,6 +5,9 @@
 #    ifndef ZCE_ZDB_PGSQL
 #        define ZCE_ZDB_PGSQL 1
 #    endif
+#    ifndef ZCE_ZDB_SQLITE
+#        define ZCE_ZDB_SQLITE 1
+#    endif
 #    ifndef ZCE_ZDB_REDIS
 #        define ZCE_ZDB_REDIS 1
 #    endif

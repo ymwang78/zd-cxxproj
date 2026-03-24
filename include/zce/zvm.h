@@ -159,8 +159,9 @@ class Machine : public zce::TaskQueue {
     std::string vm_name_;
     std::string full_name_;
     zce::SmartPtr<VirtualMachineStub> stub_ptr_;
+#if ZCE_SUPPORT_LUAVM || ZCE_SUPPORT_PYVM || ZCE_SUPPORT_CCVM
     std::map<std::string, zce::SmartPtr<zdl_module>> modules_;
-
+#endif
   public:
     Machine(const std::string& vm_name, const zce::SmartPtr<VirtualMachineStub>& stub_ptr);
 
@@ -196,11 +197,13 @@ class Machine : public zce::TaskQueue {
                                         const ::zce::SmartPtr<RpcStream>& stream_ptr,
                                         const VirtualMachineStub::response_cb& response);
 
+#if ZCE_SUPPORT_LUAVM || ZCE_SUPPORT_PYVM || ZCE_SUPPORT_CCVM
     int registe_meta(const char* filepath);
 
     zce::SmartPtr<zdl_module> get_module_by_name(const std::string& name) const;
 
     zce::SmartPtr<zdl_struct> get_struct(const std::string& module, const std::string& name) const;
+#endif
 
     template <typename... Args>
     int sendResponse(const zce::zvm::VirtualMachineStub::response_cb& response,
