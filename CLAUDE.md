@@ -83,3 +83,28 @@ git submodule update --init --recursive
 - Each project directory typically has its own git repository
 - Common dependencies are shared through the `include/`, `lib/`, and `libsrc/` directories
 - Use the centralized build script for consistent compilation across projects
+## libzce Library Usage
+
+**IMPORTANT**: Before implementing networking, logging, threading, or common utilities, check if libzce already provides the functionality.
+
+### Key Rule
+**Always prefer libzce over custom implementations** for:
+- Network services (Reactor, Acceptor, HttpStream)
+- Logging (ZLOG macros)
+- Thread management (zce::Thread, zce::Task)
+- Timers (zce::Timer, not sleep loops)
+- Data structures (zce::Array, zce::Hash, zce::SafeMap)
+- Serialization (BSON, ZDS)
+
+### Documentation
+See `LIBZCE.md` for complete API reference and usage examples.
+
+### CMake Integration
+```cmake
+target_include_directories(your_target PUBLIC
+    ${CMAKE_SOURCE_DIR}/../include
+)
+target_link_libraries(your_target PUBLIC
+    /zdata/cxxproj/libsrc/libzce/build/libzce.a
+)
+```
