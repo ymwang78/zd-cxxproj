@@ -18,6 +18,10 @@ This directory contains all C++ projects with a shared structure for common depe
 - `libsrc/`: Common library source code
 - Individual project directories (each with their own git repository)
 
+## File Encoding
+
+**Mandatory**: All C/C++ header files (`.h`, `.hpp`) and source files (`.c`, `.cpp`) MUST be saved in **UTF-8 with BOM** encoding.
+
 ## Coding Standards
 
 Based on Google C++ Style Guide with modifications:
