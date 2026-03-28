@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 // ***************************************************************
 //  zce::Reactor   version:  1.0     date: 2002/07/31
 //  -------------------------------------------------------------
@@ -56,7 +56,8 @@ class ZCE_API Reactor : public zce::TaskDelegator {
 
     int dns_resolve(const std::string& domain, const zce::SmartPtr<zce::DnsResolve>& resolve_ptr);
 
-    SmartPtr<Timer> scheduleTimer(int msec_span, bool repeat, std::function<void(Timer*)> timer_func);
+    SmartPtr<Timer> scheduleTimer(zce::SmartPtr<TaskQueue> task_queue, int msec_span, bool repeat,
+                                  std::function<void(Timer*)> timer_func);
 
     int delegateTask(const zce::SmartPtr<zce::Task>& task_ptr) override;
 
