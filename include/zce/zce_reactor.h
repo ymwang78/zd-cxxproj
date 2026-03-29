@@ -30,11 +30,16 @@ class ZCE_API Reactor : public zce::TaskDelegator {
 
     friend class ReactorThread;
     friend class ReactorInPlaceThread;
+    friend class Singleton<Reactor, MutexNull>;
+    friend class Singleton<Reactor, Mutex>;
+
+  protected:
+
+    ~Reactor();  // reactor should only managed by SmartPtr, so destructor is protected
 
   public:
     Reactor(const char* name = nullptr);
 
-    ~Reactor();
 
     const std::string& name() const;
 

@@ -9,6 +9,7 @@
 // ***************************************************************
 //
 // ***************************************************************
+#include <pybind11/numpy.h>
 #include <pybind11/pybind11.h>
 #include <zce/zce_object.h>
 #include <zce/zce_any.h>
@@ -127,4 +128,62 @@ struct type_caster<zce::Any> {
 
 namespace zce {
 extern pybind11::object any_to_pyobject(const zce::Any& v);
+
+inline pybind11::array_t<double> toNumpyArray(zce_dblmat& mat,
+                                              pybind11::handle owner = pybind11::none()) {
+    return pybind11::array_t<double>(
+        {static_cast<pybind11::ssize_t>(mat.rows()), static_cast<pybind11::ssize_t>(mat.cols())},
+        {static_cast<pybind11::ssize_t>(sizeof(double) * mat.cols()),
+         static_cast<pybind11::ssize_t>(sizeof(double))},
+        mat.data(), owner);
+}
+
+inline pybind11::array_t<double> toNumpyArrayCopy(const zce_dblmat& mat) {
+    pybind11::array_t<double> arr(
+        {static_cast<pybind11::ssize_t>(mat.rows()), static_cast<pybind11::ssize_t>(mat.cols())});
+
+    if (mat.rows() > 0 && mat.cols() > 0) {
+        std::memcpy(arr.mutable_data(), mat.data(), mat.rows() * mat.cols() * sizeof(double));
+    }
+
+    return arr;
+}
+
+inline zce_dblmat fromNumpyArray(pybind11::array_t<double, pybind11::array::forcecast> arr) {
+    pybind11::buffer_info info = arr.request();
+
+    // 1️ 必须是二维
+    if (info.ndim != 2) {
+        throw std::runtime_error("Input must be a 2D numpy.ndarray");
+    }
+
+    size_t rows = static_cast<size_t>(info.shape[0]);
+    size_t cols = static_cast<size_t>(info.shape[1]);
+
+    zce_dblmat mat(rows, cols);
+
+    // 2 判断是否连续内存（C-style）
+    bool is_c_contiguous =
+        info.strides[1] == sizeof(double) && info.strides[0] == sizeof(double) * cols;
+
+    double* src = static_cast<double*>(info.ptr);
+
+    if (is_c_contiguous) {
+        // 快速路径：直接 memcpy
+        std::memcpy(mat.data(), src, rows * cols * sizeof(double));
+    } else {
+        // 慢路径：按 stride 访问
+        for (size_t i = 0; i < rows; ++i) {
+            for (size_t j = 0; j < cols; ++j) {
+                char* ptr =
+                    static_cast<char*>(info.ptr) + i * info.strides[0] + j * info.strides[1];
+
+                mat(i, j) = *reinterpret_cast<double*>(ptr);
+            }
+        }
+    }
+
+    return mat;
+}
+
 }  // namespace zce

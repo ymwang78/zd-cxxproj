@@ -12,6 +12,7 @@
 
 #include "detail/common.h"
 #include "cast.h"
+#include "trampoline_self_life_support.h"
 
 #include <functional>
 
@@ -192,6 +193,7 @@ struct argument_record {
 
 /// Internal data structure which holds metadata about a bound function (signature, overloads,
 /// etc.)
+#define PYBIND11_DETAIL_FUNCTION_RECORD_ABI_ID "v1" // PLEASE UPDATE if the struct is changed.
 struct function_record {
     function_record()
         : is_constructor(false), is_new_style_constructor(false), is_stateless(false),
@@ -271,6 +273,12 @@ struct function_record {
     /// Pointer to next overload
     function_record *next = nullptr;
 };
+// The main purpose of this macro is to make it easy to pin-point the critically related code
+// sections.
+#define PYBIND11_ENSURE_PRECONDITION_FOR_FUNCTIONAL_H_PERFORMANCE_OPTIMIZATIONS(...)              \
+    static_assert(                                                                                \
+        __VA_ARGS__,                                                                              \
+        "Violation of precondition for pybind11/functional.h performance optimizations!")
 
 /// Special data structure which (temporarily) holds metadata about a bound class
 struct type_record {
@@ -304,6 +312,12 @@ struct type_record {
 
     /// Function pointer to class_<..>::dealloc
     void (*dealloc)(detail::value_and_holder &) = nullptr;
+
+    /// Function pointer for casting alias class (aka trampoline) pointer to
+    /// trampoline_self_life_support pointer. Sidesteps cross-DSO RTTI issues
+    /// on platforms like macOS (see PR #5728 for details).
+    get_trampoline_self_life_support_fn get_trampoline_self_life_support
+        = [](void *) -> trampoline_self_life_support * { return nullptr; };
 
     /// List of base classes of the newly created type
     list bases;
@@ -359,7 +373,7 @@ struct type_record {
                           + (base_has_unique_ptr_holder ? "does not" : "does"));
         }
 
-        bases.append((PyObject *) base_info->type);
+        bases.append(reinterpret_cast<PyObject *>(base_info->type));
 
 #ifdef PYBIND11_BACKWARD_COMPATIBILITY_TP_DICTOFFSET
         dynamic_attr |= base_info->type->tp_dictoffset != 0;
@@ -689,6 +703,12 @@ struct process_attributes {
 };
 
 template <typename T>
+struct is_keep_alive : std::false_type {};
+
+template <size_t Nurse, size_t Patient>
+struct is_keep_alive<keep_alive<Nurse, Patient>> : std::true_type {};
+
+template <typename T>
 using is_call_guard = is_instantiation<call_guard, T>;
 
 /// Extract the ``type`` from the first `call_guard` in `Extras...` (or `void_type` if none found)
@@ -701,7 +721,9 @@ template <typename... Extra,
           size_t self = constexpr_sum(std::is_same<is_method, Extra>::value...)>
 constexpr bool expected_num_args(size_t nargs, bool has_args, bool has_kwargs) {
     PYBIND11_WORKAROUND_INCORRECT_MSVC_C4100(nargs, has_args, has_kwargs);
-    return named == 0 || (self + named + size_t(has_args) + size_t(has_kwargs)) == nargs;
+    return named == 0
+           || (self + named + static_cast<size_t>(has_args) + static_cast<size_t>(has_kwargs))
+                  == nargs;
 }
 
 PYBIND11_NAMESPACE_END(detail)
