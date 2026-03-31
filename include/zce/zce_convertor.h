@@ -53,6 +53,8 @@ class ZCE_API CharacterConvertor {
     static std::wstring fromUtf8(const std::string_view& str);
 
     static std::string toUtf8(const std::wstring_view& wstr);
+
+    static std::string localToUtf8(const std::string_view& str);
 };
 
 class ZCE_API GBKToUtf8 {
