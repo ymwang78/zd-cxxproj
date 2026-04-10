@@ -325,7 +325,7 @@ class VirtualMachineProxy : public zce::Object {
     template <typename... Results, typename... Args, typename F>
     int callTwoWayAsync(const char* func, int mstimeout, F&& async_cb, Args&&... args) {
         int ret = 0;
-        ZTRACE(func);
+        ZTRACE(func, "timeout", mstimeout);
 
         zce::RefBlock dblock;
         if constexpr (sizeof...(Args) > 0) {
@@ -347,15 +347,17 @@ class VirtualMachineProxy : public zce::Object {
             if (tick_end_call - tick_begin_call > 1000) {
                 ZTRACE("Slow RPC", func, tick_end_call - tick_begin_call, "size", retdata.length());
             }
+
             RpcResult<Results...> result;
             result.errcode = errcode;
             if (errcode < 0) {
-                result.errdesc = "callTwoWay failed";
-                ZCE_ERROR((ZLOG_ERROR, "call %s ret: 0x%x, desc: %s", func, errcode,
-                           result.errdesc.c_str()));
+                async_cb(std::move(result));
+                return;
+            } else if (retdata.empty()) {
                 async_cb(std::move(result));
                 return;
             }
+
             auto [unpack_code, data_tuple] = detail::unpack_to_tuple<Results...>(retdata, func);
             int tick_parsed = zce_tick();
             if (tick_parsed - tick_end_call > 300) {

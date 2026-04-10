@@ -22,7 +22,7 @@ enum MIXTURE_CONDITION { MIXCOND_T, MIXCOND_P, MIXCOND_MAX };
 
 enum FLASH_CONDITION { FLASHCOND_T, FLASHCOND_P, FLASHCOND_VF, FLASHCOND_H, FLASHCOND_MAX };
 
-static const int XOPT_MAX_COMPONENTS = 64;
+static const int XOPT_MAX_COMPONENTS = 128;
 
 struct xOptSlate {
     const char* name;           // e.g. "StreamPort"
@@ -152,7 +152,7 @@ XOPTIF_API int xOptModel_getReportData(xOptModelHandle model, double data[], int
 // 热力学接口
 XOPTIF_API int xOptModel_getNumberOfSlate(xOptModelHandle model);
 
-XOPTIF_API int xOptModel_setSlates(xOptModelHandle model, int count, const xOptSlate* slate[]);
+XOPTIF_API int xOptModel_setSlate(xOptModelHandle model, int slate_index, const xOptSlate* slate);
 
 XOPTIF_API int xOptModel_getNumberOfThermoBlock(xOptModelHandle model);
 

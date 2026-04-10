@@ -47,6 +47,8 @@ class xOptStreamSlate {
 
     const std::string& getName() const;
 
+    const std::string& getThermoMethod() const;
+
     int addComponent(const std::string& comp_name, const std::string& var_name,
                      const std::string& description = "");
 
@@ -213,9 +215,15 @@ class xOptModelBase : public zce::Object {
 
     // ***************************************热力学************************************************
 
-    virtual int getNumberOfSlate() { return 0; };
+    // 获取本模块支持的slate类型数量
+    virtual int getNumberOfSlate() { return -1; };
 
-    virtual int setSlates(int count, const xOptSlate* slate[]) { return 0; };
+    // slate_index是模块支持的slate类型索引，slate是具体的slate数据结构，返回值参考XOPTF_ERRCODE
+    virtual int setSlate(int slate_index, const xOptSlate* slate) { return -1; };
+
+    // 获取每个端口使用的slate id
+    virtual int getSlateIdOfPort(bool is_input_port, int port_index) { return -1; };
+
 
     virtual int getNumberOfThermoBlock() { return 0; };
 

@@ -112,3 +112,64 @@ target_link_libraries(your_target PUBLIC
     /zdata/cxxproj/libsrc/libzce/build/libzce.a
 )
 ```
+
+## Database Naming Conventions
+
+### Table Names
+- Use **plural + snake_case**: `users`, `order_items`, `sensor_readings`
+- Avoid abbreviations unless widely accepted (e.g., `configs`, not `cfg`)
+- Junction/association tables: combine both entity names — `user_roles`, `product_categories`
+
+### Column Names
+- Use **snake_case** with clear, self-documenting semantics
+- Include **units** in the name when applicable:
+  - `temperature_celsius`, `pressure_kpa`, `duration_seconds`, `file_size_bytes`
+- Booleans: use `is_` or `has_` prefix — `is_active`, `has_children`
+- Avoid generic names like `value`, `data`, `info`; prefer `retry_count`, `response_body`
+
+### Foreign Keys
+- Format: **`<referenced_table_singular>_id`**
+- Examples: `user_id`, `order_id`, `sensor_id`, `parent_node_id`
+- Always reference the primary key of the parent table
+
+### Timestamps
+- Creation time: `created_at` (preferred) or `create_time`
+- Last update time: `updated_at` (preferred) or `update_time`
+- Specific event times: `<event>_time` — `deleted_time`, `published_time`, `expired_time`
+- All timestamps stored in **UTC**; use `TIMESTAMP` or `DATETIME` type
+
+### Indexes
+- Format: **`idx_<table>_<column(s)>`**
+- Examples:
+  - `idx_users_email`
+  - `idx_order_items_order_id`
+  - `idx_sensor_readings_sensor_id_created_at` (composite)
+- Primary key index name: `pk_<table>` — `pk_users`
+
+### Constraints
+- **Unique constraints**: `uk_<table>_<column(s)>` — `uk_users_email`, `uk_products_sku`
+- **Foreign key constraints**: `fk_<table>_<referenced_table>` — `fk_orders_users`, `fk_order_items_orders`
+- **Check constraints**: `chk_<table>_<column>` — `chk_products_price_positive`
+- **Not-null/default**: enforced at the column definition level, no special naming required
+
+### Examples
+
+```sql
+CREATE TABLE order_items (
+    id              BIGINT       PRIMARY KEY,           -- pk_order_items
+    order_id        BIGINT       NOT NULL,              -- fk_order_items_orders
+    product_id      BIGINT       NOT NULL,              -- fk_order_items_products
+    quantity        INT          NOT NULL,
+    unit_price_cny  DECIMAL(12,2) NOT NULL,
+    is_gift         BOOLEAN      NOT NULL DEFAULT FALSE,
+    created_at      TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at      TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_order_items_orders   FOREIGN KEY (order_id)   REFERENCES orders(id),
+    CONSTRAINT fk_order_items_products FOREIGN KEY (product_id) REFERENCES products(id),
+    CONSTRAINT chk_order_items_qty     CHECK (quantity > 0)
+);
+
+CREATE INDEX idx_order_items_order_id   ON order_items (order_id);
+CREATE INDEX idx_order_items_product_id ON order_items (product_id);
+```

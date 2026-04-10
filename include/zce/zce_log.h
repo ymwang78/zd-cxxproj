@@ -80,7 +80,7 @@ void ZCE_API zlog_cleanup(int keep_days);
 #ifdef _WIN32
 #    define ZLOG(lv, fn, ...)                                                         \
         do {                                                                          \
-            if (zlog_getlevel() <= (lv))                                              \
+            if (zlog_getlevel() <= (unsigned)(lv))                                              \
                 zlog_logv((lv), __FUNCTION__, __FILE__, __LINE__, (fn), __VA_ARGS__); \
         } while (0)
 #    define ZLOG_SYSCALL(lv, s) ZLOG((lv), "%s: os error: %d", (s), GetLastError())
