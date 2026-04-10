@@ -227,4 +227,11 @@ class xOptModelBase : public zce::Object {
     virtual int getNumberOfThermoBlock() { return 0; };
 
     virtual int getThermoBlocks(int count, xOptThermoBlock blocks[]) { return 0; };
+
+    // ***************************************语言/国际化*******************************************
+
+    /// 设置模型当前使用的语言（如 "zh"、"en"）。
+    /// 模型可据此切换参数名称、报告标题等多语言文本的输出语言。
+    /// 默认不操作，子类按需重写。
+    virtual int setLanguage(const std::string& lang) { return 0; };
 };

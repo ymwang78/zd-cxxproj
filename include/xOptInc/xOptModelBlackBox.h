@@ -59,4 +59,7 @@ class xOptModelBlackBox : public xOptModelBase {
 
     // slate_index是模块支持的slate类型索引，slate是具体的slate数据结构，返回值参考XOPTF_ERRCODE
     virtual int setSlate(int slate_index, const xOptSlate* slate) override;
+
+    // ****************************************设置语言************************************************
+    virtual int setLanguage(const std::string& language_code) override;
 };

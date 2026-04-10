@@ -65,4 +65,9 @@ class xOptModelPython : public xOptModelBase {
     /// 将 slate 的名称、热力学方法、组分列表传给 Python 的 setSlate()；
     /// 若方法不存在则回退到 setComponents()。
     int setSlate(int slate_index, const xOptSlate* slate) override;
+
+    //================= 语言/国际化接口 ==================
+
+    /// 将语言代码传给 Python 对象的 setLanguage()；若方法不存在则忽略。
+    int setLanguage(const std::string& lang) override;
 };
