@@ -152,6 +152,8 @@ XOPTIF_API int xOptModel_getReportData(xOptModelHandle model, double data[], int
 // 热力学接口
 XOPTIF_API int xOptModel_getNumberOfSlate(xOptModelHandle model);
 
+XOPTIF_API int xOptModel_getSlateIdOfPort(xOptModelHandle model, bool is_input_port, int port_index);
+
 XOPTIF_API int xOptModel_setSlate(xOptModelHandle model, int slate_index, const xOptSlate* slate);
 
 XOPTIF_API int xOptModel_getNumberOfThermoBlock(xOptModelHandle model);

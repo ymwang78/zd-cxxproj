@@ -62,6 +62,17 @@ class xOptModelFixVars : public xOptModelBase {
     xOptVarCompMap getVarCompMap(bool is_input_port, int index) const override;
 
     std::vector<ReportMetaInfo> getReportMetas() const override;
-    
+
     ReportData getReportByMetaName(const std::string& name) const override;
+
+    //================= Slate / 组分体系接口 ==================
+
+    /// 本模型仅使用 1 个 Slate（对应唯一输出端口）。
+    int getNumberOfSlate() const override;
+
+    /// 输出端口 0 使用 Slate 0；输入端口返回 -1（本模型无输入端口）。
+    int getSlateIdOfPort(bool is_input_port, int port_index) const override;
+
+    /// slate_index 只接受 0；将 slate 中的组分列表传入 setComponents()。
+    int setSlate(int slate_index, const xOptSlate* slate) override;
 };

@@ -54,4 +54,15 @@ class xOptModelPython : public xOptModelBase {
 
     ReportData getReportByMetaName(const std::string& name) const override;
 
+    //================= Slate / 组分体系接口 ==================
+
+    /// 委托 Python 对象的 getNumberOfSlate()；若方法不存在则返回 -1。
+    int getNumberOfSlate() const override;
+
+    /// 委托 Python 对象的 getSlateIdOfPort()；若方法不存在则返回 -1。
+    int getSlateIdOfPort(bool is_input_port, int port_index) const override;
+
+    /// 将 slate 的名称、热力学方法、组分列表传给 Python 的 setSlate()；
+    /// 若方法不存在则回退到 setComponents()。
+    int setSlate(int slate_index, const xOptSlate* slate) override;
 };

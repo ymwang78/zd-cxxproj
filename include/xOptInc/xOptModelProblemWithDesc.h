@@ -63,4 +63,15 @@ class xOptModelProblemWithDesc : public xOptModelBase {
     std::vector<ReportMetaInfo> getReportMetas() const override;
 
     ReportData getReportByMetaName(const std::string& name) const override;
+
+    //================= Slate / 组分体系接口 ==================
+
+    /// 若模型有端口则使用 1 个 Slate，否则返回 -1。
+    int getNumberOfSlate() const override;
+
+    /// 所有端口均使用 Slate 0；无端口时返回 -1。
+    int getSlateIdOfPort(bool is_input_port, int port_index) const override;
+
+    /// slate_index 只接受 0；将组分列表转交 setComponents()。
+    int setSlate(int slate_index, const xOptSlate* slate) override;
 };
