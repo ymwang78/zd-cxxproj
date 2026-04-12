@@ -206,7 +206,8 @@ int ZCE_API zds_pack_struct_array_header(zce_byte* buf, int size, zce_uint64 arr
 int ZCE_API zds_pack_any_array_header(zce_byte* buf, int size, zce_uint64 array_size,
                                       zds_context_t* ctx, bool has_prefix = true);
 
-template <typename T, typename... Args>
+template <typename T, typename... Args,
+          typename = typename std::enable_if<(sizeof...(Args) > 0)>::type>
 int zds_pack_builtin(zce_byte* buf, int size, const T& v, zds_context_t* ctx, Args... args) {
     int ret = 0;
     int len = zds_pack_builtin(buf, size, v, 0, true);
