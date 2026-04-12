@@ -12,6 +12,7 @@
 #include <zce/zce_config.h>
 #include <zce/zce_types.h>
 #include <vector>
+#include <sys/stat.h>
 #include <stdarg.h>
 #include <sstream>
 
@@ -21,6 +22,12 @@
 #    define ZCE_OPEN_WRFLAG (O_WRONLY)
 #    define ZCE_OPEN_RDWRFLAG (O_RDWR)
 #    define ZCE_OPEN_CRWFLAG (O_RDWR | O_CREAT)
+#elif defined(__APPLE__)
+#    define ZCE_OPEN_RDFLAG (O_RDONLY)
+#    define ZCE_OPEN_WRFLAG (O_WRONLY)
+#    define ZCE_OPEN_RDWRFLAG (O_RDWR)
+#    define ZCE_OPEN_CRWFLAG (O_RDWR | O_CREAT)
+typedef void* LPSECURITY_ATTRIBUTES;
 #else
 #    include <linux/fs.h>
 #    define ZCE_OPEN_RDFLAG \
@@ -49,7 +56,7 @@ int ZCE_API zce_close(handle_t handle);
 
 namespace zce {
 
-int ZCE_API statFile(const char* filename_utf8, struct stat* stat_buf);
+int ZCE_API statFile(const char* filename_utf8, struct ::stat* stat_buf);
 
 std::string ZCE_API getModulePath();
 
