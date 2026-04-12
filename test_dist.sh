@@ -4,7 +4,7 @@ set -e
 
 source /opt/venv/bin/activate
 
-export CXXPROJ_PATH=/zdata/share/cxxproj
+export CXXPROJ_PATH=/zdata/cxxproj
 cd ${CXXPROJ_PATH}
 
 # 自动检测架构，如果提供了参数则使用参数

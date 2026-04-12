@@ -87,6 +87,24 @@ git submodule update --init --recursive
 - Each project directory typically has its own git repository
 - Common dependencies are shared through the `include/`, `lib/`, and `libsrc/` directories
 - Use the centralized build script for consistent compilation across projects
+## RPC Protocol Definition (ZDL / zGen)
+
+**IMPORTANT**: When defining remote communication protocols (messages, requests, responses, data structures for network transmission), use the **ZDL (Zce Definition Language)** with the **zGen** code generator.
+
+### Key Rule
+**Always use ZDL `.ptl` files** to define protocol data structures instead of writing C++ structs by hand. The `zgen` tool generates the C++ types and ZDS serialization code automatically.
+
+### Documentation
+See `ZDL_PROTOCOL.md` for the complete syntax reference, type mappings, code generation commands, and naming conventions.
+
+### Quick Reference
+- Protocol files: `*.ptl` (UTF-8 with BOM encoding)
+- Code generator: `/zdata/cxxproj/bin/linux_x86_64/zgen`
+- Generated outputs: `*_proto.h` (types) + `*_pack.h`/`*_pack.cpp` (serialization)
+- Serialization API: `zce::zdp::zds_pack()` / `zce::zdp::zds_unpack()`
+- Variable-length arrays: `type field[~];` → `std::vector<T>`
+- Optional fields: `[o] type field;`
+
 ## libzce Library Usage
 
 **IMPORTANT**: Before implementing networking, logging, threading, or common utilities, check if libzce already provides the functionality.
