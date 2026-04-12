@@ -101,5 +101,6 @@
         "xutility": "cpp",
         "pointers": "cpp",
         "util": "cpp"
-    }
+    },
+    "workbench.colorTheme": "Visual Studio Dark"
 }
