@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include <vector>
 #include <new>
@@ -70,7 +70,7 @@ class Array {  // skew heap
 
         struct slot_t_node {
             int inuse : 1;
-            int parent : 31;  // 为了方便删除，记录父节点
+            int parent : 31;  // FOR FREE NODES
             int left;
             int right;
         };
@@ -85,7 +85,6 @@ class Array {  // skew heap
 
         inline bool isInUse() const { return data_.inuse; }
 
-        // 显式定义拷贝构造函数
         slot_t(const slot_t& other) {
             if (other.isInUse()) {
                 data_.inuse = 1;
@@ -96,7 +95,6 @@ class Array {  // skew heap
             }
         }
 
-        // 显式定义赋值运算符
         slot_t& operator=(const slot_t& other) {
             if (this != &other) {
                 if (isInUse()) {
@@ -117,7 +115,7 @@ class Array {  // skew heap
     };
 
     std::vector<slot_t> slots_;
-    int free_head_;  // 堆的根节点索引，-1表示空
+    int free_head_;  //HEAD OF FREE SKEW HEAP, -1 MEANS EMPTY  
     int cur_top_;
     size_t used_count_;
     size_t capacity_limit_;
@@ -151,7 +149,7 @@ class Array {  // skew heap
     H insertItem(U&& val, int magic) {
         int index;
         if (free_head_ != -1) {
-            // 从堆中弹出最小元素
+            // pop the smallest index from free heap
             index = free_head_;
             int left = slots_[index].heap_node_.left;
             int right = slots_[index].heap_node_.right;
@@ -159,13 +157,13 @@ class Array {  // skew heap
             if (free_head_ != -1) slots_[free_head_].heap_node_.parent = -1;
         } else {
             if (cur_top_ >= mix_magic_t::LIMIT) {
-                return -1;  // 没有空间了
+                return -1;  // no space
             }
             if (cur_top_ >= (int)slots_.size()) {
                 if (is_auto_expand && slots_.size() * 2 <= capacity_limit_) {
                     slots_.resize(slots_.size() * 2);
                 } else {
-                    return -1;  // 没有空间了
+                    return -1;  // no space
                 }
             }
             index = cur_top_++;
@@ -194,7 +192,7 @@ class Array {  // skew heap
         ZCE_ASSERT_RETURN(index >= 0 && index < cur_top_ && slots_[index].isInUse() &&
                               magic == slots_[index].data_.magic, );
 
-        // 析构对象
+        // destroy the object
 
         slots_[index].data_.item.~T();
         slots_[index].data_.inuse = 0;
@@ -202,13 +200,13 @@ class Array {  // skew heap
         --used_count_;
 
         if (index == cur_top_ - 1) {
-            // 若释放的是最高索引的元素，可直接回退cur_top_
+            // if the released item is the top one, we can just move back cur_top_
             --cur_top_;
 
             if (is_auto_shrink) {
-                // 检查是否有连续的空闲元素
+                // check if there are continuous free nodes
                 while (cur_top_ > 0 && !slots_[cur_top_ - 1].isInUse()) {
-                    // 释放连续的空闲元素, 从skew heap中弹出
+                    // release continuous free nodes, pop from skew heap
                     int cur_free = cur_top_ - 1;
                     removeFreeNode(cur_free);
                     --cur_top_;
@@ -217,7 +215,7 @@ class Array {  // skew heap
             return;
         }
 
-        // 将该节点作为单独的小堆插入主堆
+        // insert this node as a single-node heap into the main free heap
         slots_[index].heap_node_.inuse = 0;
         slots_[index].heap_node_.parent = -1;
         slots_[index].heap_node_.left = -1;
@@ -225,7 +223,8 @@ class Array {  // skew heap
         free_head_ = mergeSkewHeap(free_head_, index);
     }
 
-    // 强制设置一个空节点为当前值
+    // force set an empty node to the value, if the node is in use, return -1, otherwise set and
+    // return 0
     template <typename U>
     int set(H handle, U&& val) {
         int index, magic;
@@ -242,7 +241,7 @@ class Array {  // skew heap
             cur_top_ = index + 1;
         } else {
             if (index > (int)capacity_limit_) {
-                return -1;  // 位置超限
+                return -1;  // position out of limit
             }
             if (index >= (int)slots_.size()) {
                 slots_.resize(
@@ -301,40 +300,37 @@ class Array {  // skew heap
     }
 
   private:
-    // Skew Heap合并函数
-    // 将堆root1和root2合并成一个并返回新根节点
-    int mergeSkewHeap(int root1, int root2) {
+
+      int mergeSkewHeap(int root1, int root2) {
         if (root1 == -1) return root2;
         if (root2 == -1) return root1;
 
-        // 比较索引大小保证堆根是最小索引
+        // make sure the smaller index is the root to maintain a consistent structure
         if (root2 < root1) {
-            // 交换root1和root2确保root1是较小的索引
+            // make sure root1 is the small one
             int temp = root1;
             root1 = root2;
             root2 = temp;
         }
 
-        // root1作为根
-        // Skew Heap的merge:
-        // 合并root1的右子树和root2
+        // root1 as root, merge root1's right child with root2
         int r = slots_[root1].heap_node_.right;
         slots_[root1].heap_node_.right = mergeSkewHeap(r, root2);
 
-        // Skew Heap特性：交换左右子树
+        // Skew Heap property: swap left and right child of root1
         int l = slots_[root1].heap_node_.left;
         int new_r = slots_[root1].heap_node_.right;
         if (new_r != -1) {
             slots_[new_r].heap_node_.parent = root1;
         }
-        // 交换左右子树
+        
         slots_[root1].heap_node_.left = new_r;
         slots_[root1].heap_node_.right = l;
 
         return root1;
     }
 
-    // 删除当前节点，返回新的子节点的根
+    // delete node, return new root of the subtree
     int removeFreeNode(int nodeid) {
         int parent = slots_[nodeid].heap_node_.parent;
         int left = slots_[nodeid].heap_node_.left;
@@ -361,7 +357,7 @@ class Array {  // skew heap
     }
 
   public:
-    // 非const迭代器
+
     class iterator {
       public:
         using iterator_category = std::forward_iterator_tag;
@@ -373,7 +369,7 @@ class Array {  // skew heap
       private:
         Array* array_;
         int index_;
-        // 跳过未使用的槽
+
         void advance_to_valid() {
             while (index_ < array_->cur_top_ && !array_->slots_[index_].isInUse()) {
                 ++index_;
@@ -408,11 +404,11 @@ class Array {  // skew heap
             }
             return mix_magic_t::mix(array_->slots_[index_].data_.magic, index_);
         }
-        // 允许 const_iterator 从非const迭代器构造
+
         friend class const_iterator;
     };
 
-    // const 迭代器
+
     class const_iterator {
       public:
         using iterator_category = std::forward_iterator_tag;
@@ -436,7 +432,7 @@ class Array {  // skew heap
                 advance_to_valid();
             }
         }
-        // 允许从非const迭代器转换
+
         const_iterator(const iterator& it) : array_(it.array_), index_(it.index_) {}
 
         const_iterator& operator++() {
@@ -464,7 +460,7 @@ class Array {  // skew heap
         }
     };
 
-    // 提供 begin/end 接口
+
     iterator begin() { return iterator(this, 0); }
     iterator end() { return iterator(this, cur_top_); }
     const_iterator begin() const { return const_iterator(this, 0); }
@@ -547,7 +543,6 @@ class ArrayWithIndex {
 
     const std::vector<T>& toVector() const { return data_; }
 
-    // 迭代器支持
     using iterator = typename std::vector<T>::iterator;
     using const_iterator = typename std::vector<T>::const_iterator;
     using reverse_iterator = typename std::vector<T>::reverse_iterator;
