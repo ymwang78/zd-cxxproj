@@ -10,6 +10,9 @@
 //
 // ***************************************************************
 #include <zce/zce_inc.h>
+#include <atomic>
+#include <optional>
+#include <utility>
 
 namespace zce {
 
@@ -208,6 +211,70 @@ class Lock {
     };
 
     struct TempUnLock tempUnlock() { return TempUnLock(*this); };
+};
+
+// execution permit
+
+class ExecPermit {
+  public:
+    class ExecPermitGuard {
+      public:
+        ExecPermitGuard() noexcept : state_(nullptr) {}
+
+        explicit ExecPermitGuard(std::atomic<int>* state) noexcept : state_(state) {}
+
+        ~ExecPermitGuard() noexcept { release(); }
+
+        ExecPermitGuard(const ExecPermitGuard&) = delete;
+        ExecPermitGuard& operator=(const ExecPermitGuard&) = delete;
+
+        ExecPermitGuard(ExecPermitGuard&& other) noexcept : state_(other.state_) {
+            other.state_ = nullptr;
+        }
+
+        ExecPermitGuard& operator=(ExecPermitGuard&& other) noexcept {
+            if (this != &other) {
+                release();
+                state_ = other.state_;
+                other.state_ = nullptr;
+            }
+            return *this;
+        }
+
+        bool valid() const noexcept { return state_ != nullptr; }
+
+        explicit operator bool() const noexcept { return valid(); }
+
+        void release() noexcept {
+            if (state_ != nullptr) {
+                state_->store(0, std::memory_order_release);
+                state_ = nullptr;
+            }
+        }
+
+      private:
+        std::atomic<int>* state_;
+    };
+
+    ExecPermit() noexcept : state_(0) {}
+
+    ExecPermit(const ExecPermit&) = delete;
+    ExecPermit& operator=(const ExecPermit&) = delete;
+
+    std::optional<ExecPermitGuard> tryAcquire() noexcept {
+        int expected = 0;
+        bool ok = state_.compare_exchange_strong(expected, 1, std::memory_order_acquire,
+                                                 std::memory_order_relaxed);
+        if (!ok) {
+            return std::nullopt;
+        }
+        return ExecPermitGuard(&state_);
+    }
+
+    bool isBusy() const noexcept { return state_.load(std::memory_order_relaxed) != 0; }
+
+  private:
+    std::atomic<int> state_;
 };
 
 }  // namespace zce
