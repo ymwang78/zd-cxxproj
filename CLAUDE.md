@@ -87,6 +87,28 @@ git submodule update --init --recursive
 - Each project directory typically has its own git repository
 - Common dependencies are shared through the `include/`, `lib/`, and `libsrc/` directories
 - Use the centralized build script for consistent compilation across projects
+## CTL CLI Framework (Two-Layer CLI Design)
+
+**IMPORTANT**: All `*ctl` command-line tools follow a unified two-layer CLI design.
+
+### Key Rule
+When building a CTL tool for any library (`libxxx` → `xxxctrl`), follow the conventions in `CTL_CLI_GUIDE.md` exactly. Do **not** invent ad-hoc argument structures.
+
+### Documentation
+See `CTL_CLI_GUIDE.md` for the complete guide (bilingual EN/ZH), including:
+- Layer 1 (`hostvmctl`): host-level VM enumeration and lifecycle management
+- Layer 2 (`xxxctrl`): instance-level service control, noun/verb command matrix
+- `mpcctrl` full command reference and RPC method mapping
+- Implementation skeleton for new CTL tools
+
+### Quick Reference
+- Host address: `HOSTVM=ip:port` env var (default port 22500) or `--host ip:port`
+- Command structure: `<toolname> <instance> <noun> <verb> [args...] [--flags]`
+- Common verbs: `list`, `get`, `add`, `set`, `del`, `swap`, `clear`, `start`, `stop`, `status`, `exec`
+- Tool binary naming: `<libname>ctl` (drop "lib" prefix) — e.g. `mpcctrl`, `pbcctrl`
+- Exit codes: 0=ok, 1=usage, 2=conn-failed, 3=rpc-error, 4=timeout
+- Output flags: `--json` for machine-readable, `-q` quiet, `-v` verbose
+
 ## RPC Protocol Definition (ZDL / zGen)
 
 **IMPORTANT**: When defining remote communication protocols (messages, requests, responses, data structures for network transmission), use the **ZDL (Zce Definition Language)** with the **zGen** code generator.
