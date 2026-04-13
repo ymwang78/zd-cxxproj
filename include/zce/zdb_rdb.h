@@ -97,7 +97,7 @@ class Statement : public zce::Object {
     virtual Statement& operator<<(const struct timespec& v) = 0;
     virtual Statement& operator<<(const none&) = 0;
     virtual Statement& operator<<(const none_ignoreidx&) = 0;
-#ifndef WIN32
+#if !defined(WIN32) && !defined(__APPLE__)
     virtual Statement& operator<<(long long v) { return operator<<((zce_int64)v); }
 #endif
 
@@ -110,7 +110,7 @@ class Statement : public zce::Object {
     virtual Statement& operator>>(struct timespec& v) = 0;
     virtual Statement& operator>>(none&) = 0;
     virtual Statement& operator>>(none_ignoreidx&) = 0;
-#ifndef WIN32
+#if !defined(WIN32) && !defined(__APPLE__)
     virtual Statement& operator>>(long long& v) { return operator>>((zce_int64&)v); }
 #endif
 
