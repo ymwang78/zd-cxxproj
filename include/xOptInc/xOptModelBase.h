@@ -171,9 +171,6 @@ class xOptModelBase : public zce::Object {
 
     virtual xOptModelFixableVariables getFixableVariables() const = 0;
 
-    virtual int fixVariables(const xOptModelFixableVariables& varnames,
-                             bool try_fixed_in_model_first) = 0;
-
     virtual int validateModel() const = 0;
 
     // 以上是模型初始化准备，以下是运行时准备
@@ -196,10 +193,6 @@ class xOptModelBase : public zce::Object {
 
     virtual int setVariableBounds(const std::string& varname, int hint_index, double lower,
                                   double upper);
-    // 这里是返回需要流程固定的变量的索引, 单元模块自己能固定的索引不需要返回
-    virtual std::vector<int> getFixedVariableIndexes() const;
-
-    virtual const xOptModelFixableVariables& getFixedVariables() const;
 
     virtual std::vector<int> getStreamVariableIndexes(const xOptStreamSlate& stream,
                                                       bool is_input_port, int index) const;

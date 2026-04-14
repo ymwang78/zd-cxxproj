@@ -44,18 +44,11 @@ class xOptModelFixVars : public xOptModelBase {
 
     xOptModelFixableVariables getFixableVariables() const override;
 
-    int fixVariables(const xOptModelFixableVariables& varnames,
-                     bool try_fixed_in_model_first) override;
-
     int validateModel() const override;
 
     //================= 模型运行时 ==================
 
     int prepareRuntime(const xOptParsedVariableArr& arr) override;
-
-    std::vector<int> getFixedVariableIndexes() const override;
-
-    const xOptModelFixableVariables& getFixedVariables() const override;
 
     int getPortNum(bool is_input_port) const override;
 

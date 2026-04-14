@@ -41,9 +41,6 @@ class xOptModelProblemWithDesc : public xOptModelBase {
 
     xOptModelFixableVariables getFixableVariables() const override;
 
-    int fixVariables(const xOptModelFixableVariables& varnames,
-                     bool try_fixed_in_model_first) override;
-
     int validateModel() const override;
 
     int prepareRuntime(const xOptParsedVariableArr& arr) override;
