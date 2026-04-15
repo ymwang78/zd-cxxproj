@@ -3,6 +3,8 @@
 # 允许根目录下的所有文件（不包括文件夹）
 !/*.*
 .vscode/*
+.claude/*
+/*.md
 !.vscode/settings.json
 !.vscode/launch.json
 !.vscode/tasks.json
