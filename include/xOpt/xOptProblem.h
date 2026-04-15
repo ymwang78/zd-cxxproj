@@ -11,6 +11,8 @@
 // ***************************************************************
 #include "xOptInterface.h"
 
+#ifdef __cplusplus
+
 class XOPTIF_API xOptProblem {
   public:
     enum OPTIONS {
@@ -40,6 +42,8 @@ class XOPTIF_API xOptProblem {
     virtual int numConstraints() const = 0;
 
     virtual int getVariableNames(const char* names[], int names_size) const = 0;
+
+    virtual int getVariableDescriptions(const char* descriptions[], int descriptions_size) const = 0;
 
     virtual int getConstraintNames(const char* names[], int names_size) const = 0;
 
@@ -97,7 +101,6 @@ class XOPTIF_API xOptProblem {
     // Evaluate constraint Jacobian values (x_size == numVariables(), values_size == iRow_jCol_size)
     virtual int evaluateConstraintsJacobianValues(double* values, int values_size) const = 0;
 };
-
 extern "C" typedef xOptProblem* (*createProblemFunc)();
-
 extern "C" typedef void (*destroyProblemFunc)(xOptProblem*);
+#endif

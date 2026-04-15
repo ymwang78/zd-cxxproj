@@ -30,8 +30,6 @@ class xOptModelSym : public xOptModelBase {
 
     int setProblemType(XOPTF_PROBLEM_TYPE) override;
 
-    int setComponents(const std::vector<std::string>& components) override;
-
     xOptModelParameters getParameters() const override;
 
     int setParameters(const xOptModelParameters& parameters) override;

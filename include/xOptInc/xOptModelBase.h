@@ -111,7 +111,7 @@ struct ReportData {
 
 struct xOptPort {
     enum PortType : unsigned char { InputPort, OutputPort };
-    xOptModel* m_parent;
+    //xOptModel* m_parent;
     std::string m_name;
     PortType m_port_type;
     xOptStream* m_stream;
@@ -148,8 +148,6 @@ class xOptModelBase : public zce::Object {
     virtual int initializeModel() = 0;
 
     virtual int setProblemType(XOPTF_PROBLEM_TYPE) = 0;
-
-    virtual int setComponents(const std::vector<std::string>& components) = 0;
 
     virtual xOptModelParameters getParameters() const = 0;
 

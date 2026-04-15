@@ -1,0 +1,49 @@
+﻿  Generate moc_predefs.h
+C:\Program Files\Microsoft Visual Studio\2022\Enterprise\MSBuild\Microsoft\VC\v170\Microsoft.CppCommon.targets(254,5): warning MSB8064: Custom build for item "release\moc_predefs.h.cbt" succeeded, but specified dependency "d:\github\cxxproj\libsrc\scintilla\qt\scintillaedit\release\moc_predefs.h.cbt" does not exist. This may cause incremental build to work incorrectly.
+   Qt/MSBuild: 3.4.1.0
+  Reading Qt configuration (D:/WinApp/DevTools/QT6.8/6.8.1/msvc2022_64/bin/qmake)
+   Qt: 6.8.1
+  AutoComplete.cxx
+  CallTip.cxx
+  CaseConvert.cxx
+  CaseFolder.cxx
+  CellBuffer.cxx
+  ChangeHistory.cxx
+  CharClassify.cxx
+  CharacterCategoryMap.cxx
+  CharacterType.cxx
+  ContractionState.cxx
+  DBCS.cxx
+  Decoration.cxx
+  Document.cxx
+  EditModel.cxx
+  EditView.cxx
+  Editor.cxx
+  Geometry.cxx
+  Indicator.cxx
+  KeyMap.cxx
+  LineMarker.cxx
+  MarginView.cxx
+  PerLine.cxx
+  PlatQt.cpp
+  PositionCache.cxx
+  RESearch.cxx
+  RunStyles.cxx
+  ScintillaBase.cxx
+  ScintillaDocument.cpp
+  ScintillaEdit.cpp
+  ScintillaEditBase.cpp
+  ScintillaQt.cpp
+  Selection.cxx
+  Style.cxx
+  UndoHistory.cxx
+  UniConversion.cxx
+  UniqueString.cxx
+D:\Github\cxxproj\libsrc\scintilla\qt\ScintillaEdit\ScintillaEdit.h(10,10): error C1083: Cannot open include file: 'ScintillaEditBase.h': No such file or directory
+  (compiling source file 'ScintillaEdit.cpp')
+  
+  ViewStyle.cxx
+  XPM.cxx
+D:\Github\cxxproj\libsrc\scintilla\qt\ScintillaEditBase\PlatQt.cpp(1336,3): warning C4996: 'strcpy': This function or variable may be unsafe. Consider using strcpy_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\Github\cxxproj\libsrc\scintilla\qt\ScintillaEditBase\PlatQt.cpp(1381,3): warning C4996: 'strcat': This function or variable may be unsafe. Consider using strcat_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+D:\Github\cxxproj\libsrc\scintilla\qt\ScintillaEditBase\PlatQt.cpp(1377,17): warning C4996: 'QMessageBox::QMessageBox': Use the overload taking StandardButtons instead.

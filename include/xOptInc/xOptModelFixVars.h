@@ -34,8 +34,6 @@ class xOptModelFixVars : public xOptModelBase {
 
     int initializeModel() override;
 
-    int setComponents(const std::vector<std::string>& components) override;
-
     int setProblemType(XOPTF_PROBLEM_TYPE) override;
 
     xOptModelParameters getParameters() const override;
@@ -66,6 +64,6 @@ class xOptModelFixVars : public xOptModelBase {
     /// 输出端口 0 使用 Slate 0；输入端口返回 -1（本模型无输入端口）。
     int getSlateIdOfPort(bool is_input_port, int port_index) const override;
 
-    /// slate_index 只接受 0；将 slate 中的组分列表传入 setComponents()。
+    /// slate_index 只接受 0；将 slate 中的组分列表传入
     int setSlate(int slate_index, const xOptSlate* slate) override;
 };

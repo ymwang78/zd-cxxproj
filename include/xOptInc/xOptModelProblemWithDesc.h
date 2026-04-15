@@ -33,8 +33,6 @@ class xOptModelProblemWithDesc : public xOptModelBase {
 
     int setProblemType(XOPTF_PROBLEM_TYPE) override;
 
-    int setComponents(const std::vector<std::string>& components) override;
-
     xOptModelParameters getParameters() const override;
 
     int setParameters(const xOptModelParameters& parameters) override;
@@ -69,6 +67,5 @@ class xOptModelProblemWithDesc : public xOptModelBase {
     /// 所有端口均使用 Slate 0；无端口时返回 -1。
     int getSlateIdOfPort(bool is_input_port, int port_index) const override;
 
-    /// slate_index 只接受 0；将组分列表转交 setComponents()。
     int setSlate(int slate_index, const xOptSlate* slate) override;
 };

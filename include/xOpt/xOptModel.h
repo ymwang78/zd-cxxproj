@@ -43,9 +43,9 @@ struct xOptThermoBlock {
 
 // ***************************************************************
 
-struct xOptThermo;
-
-typedef struct xOptThermo* xOptThermoHandle;
+typedef struct _xOptThermo {
+    int dummy;
+}*xOptThermoHandle;
 
 typedef int (*xOptThermo_calcMixtureProperties)(
     xOptThermoHandle handle, double properties[8], double fugacity[XOPT_MAX_COMPONENTS],
@@ -62,103 +62,213 @@ typedef int (*xOptThermo_calcFlash)(xOptThermoHandle handle, double& vapor_fract
                                     const xOptSlate* slate, double conditions[FLASHCOND_MAX],
                                     double components[XOPT_MAX_COMPONENTS]);
 
+typedef struct xOptThermoT {
+    size_t size;
+    xOptThermoHandle handle;
+    xOptThermo_calcMixtureProperties calcMixtureProperties;
+    xOptThermo_calcFlash calcFlash;
+} xOptThermoT;
+
+// ***************************************************************
+typedef struct _xOptPlatform {
+    int dummy;
+}* xOptPlatformHandle;
+
+typedef xOptThermoT* (*xOptPlatform_createThermo)(xOptPlatformHandle handle, const char* args);
+
+typedef void (*xOptThermo_freeThermo)(xOptThermoT* thermo);
+
+typedef struct xOptPlatformT {
+    size_t size;
+    xOptPlatformHandle handle;
+    xOptPlatform_createThermo createThermo;
+    xOptThermo_freeThermo freeThermo;
+} xOptPlatformT;
+
 // ***************************************************************
 
-struct xOptPlatform;
+typedef struct _xOptProblem {
+    int dummy;
+}* xOptProblemHandle;
 
-typedef struct xOptPlatform* xOptPlatformHandle;
+typedef int* (*xOptProblem_destroyProblem)(xOptProblemHandle handle);
+/* configurations */
 
-typedef xOptThermoHandle (*xOptPlatform_getThermo)(xOptPlatformHandle handle);
+typedef int (*xOptProblem_numVariables)(xOptProblemHandle handle);
+
+typedef int (*xOptProblem_numConstraints)(xOptProblemHandle handle);
+
+typedef int (*xOptProblem_getVariableNames)(xOptProblemHandle handle, const char* names[],
+                                            int names_size);
+
+typedef int (*xOptProblem_getVariableDescriptions)(xOptProblemHandle handle,
+                                                   const char* descriptions[],
+                                                   int descriptions_size);
+
+typedef int (*xOptProblem_getConstraintNames)(xOptProblemHandle handle, const char* names[],
+                                              int names_size);
+
+typedef int (*xOptProblem_getOptions)(xOptProblemHandle handle, double* options, int options_size);
+
+typedef int (*xOptProblem_getVariableBounds)(xOptProblemHandle handle, double* xlow, double* xupp,
+                                             int x_size);
+
+typedef int (*xOptProblem_getConstraintBounds)(xOptProblemHandle handle, double* clow, double* cupp,
+                                               int c_size);
+
+typedef int (*xOptProblem_getInitialX)(xOptProblemHandle handle, double* x0, int x0_size);
+
+typedef int (*xOptProblem_getLinearConstraints)(xOptProblemHandle handle, int* lcons_rowidx,
+                                                int* lcons_colidx, double* values, int* lcons_size);
+
+typedef int (*xOptProblem_getObjectiveGradientStructure)(xOptProblemHandle handle, int* obj_colidx,
+                                                         int* obj_colidx_size);
+
+typedef int (*xOptProblem_getConstraintJacobianStructure)(xOptProblemHandle handle,
+                                                          int* cons_rowidx, int* cons_colidx,
+                                                          int* nnz);
+
+/* iterator */
+
+typedef int (*xOptProblem_setX)(xOptProblemHandle handle, const double* x, int x_size);
+
+typedef int (*xOptProblem_runTimeCheck)(xOptProblemHandle handle);
+
+typedef int (*xOptProblem_evaluateObjective)(xOptProblemHandle handle, double* obj);
+
+typedef int (*xOptProblem_evaluateConstraints)(xOptProblemHandle handle, double* cons,
+                                               int cons_size);
+
+typedef int (*xOptProblem_evaluateObjectiveGradient)(xOptProblemHandle handle, double* grad,
+                                                     int grad_size);
+
+typedef int (*xOptProblem_evaluateConstraintsJacobianValues)(xOptProblemHandle handle,
+                                                             double* values, int values_size);
+
+typedef struct xOptProblemT {
+    size_t size; 
+    xOptProblemHandle handle;
+    xOptProblem_destroyProblem destroyProblem;
+    xOptProblem_numVariables numVariables;
+    xOptProblem_numConstraints numConstraints;
+    xOptProblem_getVariableNames getVariableNames;
+    xOptProblem_getVariableDescriptions getVariableDescriptions;
+    xOptProblem_getConstraintNames getConstraintNames;
+    xOptProblem_getOptions getOptions;
+    xOptProblem_getVariableBounds getVariableBounds;
+    xOptProblem_getConstraintBounds getConstraintBounds;
+    xOptProblem_getInitialX getInitialX;
+    xOptProblem_getLinearConstraints getLinearConstraints;
+    xOptProblem_getObjectiveGradientStructure getObjectiveGradientStructure;
+    xOptProblem_getConstraintJacobianStructure getConstraintJacobianStructure;
+    xOptProblem_setX setX;
+    xOptProblem_runTimeCheck runTimeCheck;
+    xOptProblem_evaluateObjective evaluateObjective;
+    xOptProblem_evaluateConstraints evaluateConstraints;
+    xOptProblem_evaluateObjectiveGradient evaluateObjectiveGradient;
+    xOptProblem_evaluateConstraintsJacobianValues evaluateConstraintsJacobianValues;
+} xOptProblemT;
 
 // ***************************************************************
+typedef struct _xOptModel {
+    int dummy;
+}* xOptModelHandle;
 
-struct xOptModel;
+typedef void (*xOptModel_destroyModel)(xOptModelHandle model);
 
-typedef struct xOptModel* xOptModelHandle;
+typedef int (*xOptModel_setLanguage)(xOptModelHandle model, const char* language_code);
 
-XOPTIF_API xOptModelHandle xOptModel_createModel(xOptPlatformHandle platform, const char* name);
+// slates
+typedef int (*xOptModel_getNumberOfSlate)(xOptModelHandle model);
 
-XOPTIF_API void xOptModel_freeModel(xOptModelHandle model);
+typedef int (*xOptModel_getSlateIdOfPort)(xOptModelHandle model, bool is_input_port,
+                                          int port_index);
 
-// 设置组分列表：
-// 组分列表的名字约定为
-//["C1P", "C2P", "C3P", "C4P", "C5P", "C6P", "C7P", "C8P", "C9P", "C10P", "C6N", "C7N", "C8N",
-//"C9N", "C10N", "C6A", "C7A", "C8A", "C9A", "C10A", "H2"]
-XOPTIF_API int xOptModel_setComponents(xOptModelHandle model, const char* names[], int size);
+typedef int (*xOptModel_setSlate)(xOptModelHandle model, int slate_index, const xOptSlate* slate);
 
 // parameter指不在模型方程组中作为变量出现的参数，可能会影响方程结构
 // 例如：板效率
-XOPTIF_API int xOptModel_getParameters(xOptModelHandle model, const char* names[],
+typedef int (*xOptModel_getParameters)(xOptModelHandle model, const char* names[],
                                        double defualt_values[], int& size);
 
-XOPTIF_API int xOptModel_setParameters(xOptModelHandle model, const char* name[], double value[],
+typedef int (*xOptModel_setParameters)(xOptModelHandle model, const char* name[], double value[],
                                        int size);
 
-XOPTIF_API int xOptModel_setProblemType(xOptModelHandle model, XOPTF_PROBLEM_TYPE);
+typedef int (*xOptModel_setProblemType)(xOptModelHandle model, XOPTF_PROBLEM_TYPE);
 
 // 获取可以被fix的变量以及初值，如：回流比、板效率
 // 根据用户界面配置是否被fix
-XOPTIF_API int xOptModel_getFixableVariables(xOptModelHandle model, const char* names[],
+typedef int (*xOptModel_getFixableVariables)(xOptModelHandle model, const char* names[],
                                              double initial_values[], int& size);
 
-// 固定变量, 返回值参考XOPTF_ERRCODE
-XOPTIF_API int xOptModel_fixVariables(xOptModelHandle model, const char* names[],
-                                      const double values[], int size);
-
 // 获取进料流股的个数，不考虑能量流股
-XOPTIF_API int xOptModel_getInPortNum(xOptModelHandle model);
+typedef int (*xOptModel_getInPortNum)(xOptModelHandle model);
 
 // 获取出料流股的个数，不考虑能量流股
-XOPTIF_API int xOptModel_getOutPortNum(xOptModelHandle model);
+typedef int (*xOptModel_getOutPortNum)(xOptModelHandle model);
 
 // 获取进料流股对应的变量映射表
 // streamNames可能为：T,P,fi_C1P,fi_C2P等等
 // variableNames为对应变量在模型内部的名称
 // 如果上游没有提供进料所对应的某个变量，例如P，则模型中该变量被固定在初始值
-XOPTIF_API int xOptModel_getInPortVariableMap(xOptModelHandle model, int iPortIndex,
+typedef int (*xOptModel_getInPortVariableMap)(xOptModelHandle model, int iPortIndex,
                                               const char* streamNames[],
                                               const char* variableNames[], int& size);
 
 // 获取出料流股对应的变量映射表
-XOPTIF_API int xOptModel_getOutPortVariableMap(xOptModelHandle model, int iPortIndex,
+typedef int (*xOptModel_getOutPortVariableMap)(xOptModelHandle model, int iPortIndex,
                                                const char* streamNames[],
                                                const char* variableNames[], int& size);
 
-XOPTIF_API int xOptModel_validateModel(xOptModelHandle model);
+typedef int (*xOptModel_validateModel)(xOptModelHandle model);
 
 // 构造对应的xOptProblem
-XOPTIF_API xOptProblem* xOptModel_buildProblem(xOptModelHandle model);
+typedef int (*xOptModel_buildProblem)(xOptModelHandle model, xOptProblemT* problem);
 
-XOPTIF_API void xOptModel_deleteProblem(xOptModelHandle model, xOptProblem* problem);
-
-XOPTIF_API int xOptModel_getReportMetaAbstracts(xOptModelHandle model, const char* names[],
+typedef int (*xOptModel_getReportMetaAbstracts)(xOptModelHandle model, const char* names[],
                                                 const char* titles[], const char* descriptions[],
                                                 const char* preferred_display_types[],
                                                 int dim_size[], int& size);
 
-XOPTIF_API int xOptModel_getReportMetaDims(xOptModelHandle model, const char* dim_names[],
+typedef int (*xOptModel_getReportMetaDims)(xOptModelHandle model, const char* dim_names[],
                                            const char* dim_units[], const char* name, int dim_size);
 
-XOPTIF_API int xOptModel_getReportData(xOptModelHandle model, double data[], int shape[],
+typedef int (*xOptModel_getReportData)(xOptModelHandle model, double data[], int shape[],
                                        const char* name, int& data_size, int& shape_size);
 
-// 查询测度/单位接口
-
 // 热力学接口
-XOPTIF_API int xOptModel_getNumberOfSlate(xOptModelHandle model);
+typedef int (*xOptModel_getNumberOfThermoBlock)(xOptModelHandle model);
 
-XOPTIF_API int xOptModel_getSlateIdOfPort(xOptModelHandle model, bool is_input_port,
-                                          int port_index);
-
-XOPTIF_API int xOptModel_setSlate(xOptModelHandle model, int slate_index, const xOptSlate* slate);
-
-XOPTIF_API int xOptModel_getNumberOfThermoBlock(xOptModelHandle model);
-
-XOPTIF_API int xOptModel_getThermoBlocks(xOptModelHandle model, int count,
+typedef int (*xOptModel_getThermoBlocks)(xOptModelHandle model, int count,
                                          xOptThermoBlock blocks[]);
 
-// 设置语言
-XOPTIF_API int xOptModel_setLanguage(xOptModelHandle model, const char* language_code);
+struct xOptModelT {
+    size_t size;
+    xOptModelHandle handle;
+    xOptModel_destroyModel destroyModel;
+    xOptModel_setLanguage setLanguage;
+    xOptModel_getNumberOfSlate getNumberOfSlate;
+    xOptModel_getSlateIdOfPort getSlateIdOfPort;
+    xOptModel_setSlate setSlate;
+    xOptModel_getParameters getParameters;
+    xOptModel_setParameters setParameters;
+    xOptModel_setProblemType setProblemType;
+    xOptModel_getFixableVariables getFixableVariables;
+    xOptModel_getInPortNum getInPortNum;
+    xOptModel_getOutPortNum getOutPortNum;
+    xOptModel_getInPortVariableMap getInPortVariableMap;
+    xOptModel_getOutPortVariableMap getOutPortVariableMap;
+    xOptModel_validateModel validateModel;
+    xOptModel_buildProblem buildProblem;
+    xOptModel_getReportMetaAbstracts getReportMetaAbstracts;
+    xOptModel_getReportMetaDims getReportMetaDims;
+    xOptModel_getReportData getReportData;
+    xOptModel_getNumberOfThermoBlock getNumberOfThermoBlock;
+    xOptModel_getThermoBlocks getThermoBlocks;
+};
+
+/* xOptModelT model= {sizeof(xOptModelT)} */
+XOPTIF_API int xOptModel_createModel(xOptModelT* model, xOptPlatformT* platform, const char* name);
 
 #ifdef __cplusplus
 }
