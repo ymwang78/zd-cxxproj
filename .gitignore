@@ -9,6 +9,9 @@
 !.vscode/launch.json
 !.vscode/tasks.json
 
+/local.*
+*.vcxproj.user
+
 # 取消忽略特定文件夹
 !bin/
 !include/
@@ -25,11 +28,6 @@ libsrc/*
 !libsrc/libpbc
 !libsrc/libzlib
 !libsrc/scintilla
-
-.vscode/*
-!.vscode/settings.json
-!.vscode/launch.json
-!.vscode/tasks.json
 
 
 
