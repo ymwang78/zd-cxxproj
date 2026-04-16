@@ -35,7 +35,8 @@ class xOptModelPython : public xOptModelBase {
 
     int prepareRuntime(const xOptParsedVariableArr& arr) override;
 
-    int generateEstimate(std::vector<double>& init_x) override;
+    int generateEstimate(std::vector<double>& init_x,
+                         const xOptModelFixableVariables& fixed_values) override;
 
     int setInPortVariableValues(const xOptModelFixableVariables& nvpairs) override;
 

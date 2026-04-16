@@ -225,6 +225,10 @@ typedef int (*xOptModel_validateModel)(xOptModelHandle model);
 // 构造对应的xOptProblem
 typedef int (*xOptModel_buildProblem)(xOptModelHandle model, xOptProblemT* problem);
 
+typedef int (*xOptModel_generateEstimate)(xOptModelHandle model, double initx[], int& size,
+                                          const char fixed_var_names[],
+                                          const double fixed_var_values[], int fixed_var_size);
+
 typedef int (*xOptModel_getReportMetaAbstracts)(xOptModelHandle model, const char* names[],
                                                 const char* titles[], const char* descriptions[],
                                                 const char* preferred_display_types[],
@@ -260,6 +264,7 @@ struct xOptModelT {
     xOptModel_getOutPortVariableMap getOutPortVariableMap;
     xOptModel_validateModel validateModel;
     xOptModel_buildProblem buildProblem;
+    xOptModel_generateEstimate generateEstimate;
     xOptModel_getReportMetaAbstracts getReportMetaAbstracts;
     xOptModel_getReportMetaDims getReportMetaDims;
     xOptModel_getReportData getReportData;

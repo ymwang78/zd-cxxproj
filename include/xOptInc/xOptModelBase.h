@@ -178,7 +178,7 @@ class xOptModelBase : public zce::Object {
     virtual const xOptParsedVariableArr& getVariables() const;
 
     // 生成估计，给出当前初值
-    virtual int generateEstimate(std::vector<double>& initx);
+    virtual int generateEstimate(std::vector<double>& initx, const xOptModelFixableVariables& fixed_values);
 
     // 以下API更新内置的变量当前值，供外部查看
     virtual int setVariableValues(const std::vector<double>& values);
