@@ -1,6 +1,3 @@
-[submodule "libzce"]
-	path = libsrc/libzce
-	url = https://github.com/ymwang78/zd-libzce.git
 [submodule "libsrc/libzdl"]
 	path = libsrc/libzdl
 	url = https://github.com/ymwang78/my-zdl.git
