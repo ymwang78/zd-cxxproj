@@ -10,7 +10,7 @@ vcpkg install CLI11:x64-windows-static-md
 vcpkg install coinutils:x64-windows-static-md
 vcpkg install expat:x64-windows-static-md
 vcpkg install gtest:x64-windows-static-md
-vcpkg install hiredis:x64-windows-static-md
+vcpkg install hiredis[core,ssl]:x64-windows-static-md
 vcpkg install libbson:x64-windows-static-md
 vcpkg install liblzma:x64-windows-static-md
 vcpkg install libuv:x64-windows-static-md
