@@ -241,6 +241,7 @@ int zdp_stream::requestArgs(int msgmid, int mstimeout, const zce::Any& ctx, ERV_
 template <typename T, typename... Args>
 int zdp_stream::responseArgs(int msgmid, unsigned seq, zce_byte rev, ERV_ZCE_COMPRESS cps,
                              const T& val, Args&&... args) {
+    (void)rev;
     const int preserv = 32;
     int bodylen = zds_pack_multi(0, 0, nullptr, true, val, std::forward<Args>(args)...);
     if (bodylen < 0) return bodylen;

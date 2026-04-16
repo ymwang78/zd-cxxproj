@@ -209,6 +209,11 @@ class ZCE_API Logger : public zce::Object {
 
     void log_args(std::ostream& ost, const wchar_t* t);
 
+    template <size_t N>
+    void log_args(std::ostream& ost, const wchar_t (&t)[N]) {
+        log_args(ost, static_cast<const wchar_t*>(t));
+    }
+
     void log_args(std::ostream& ost, const std::wstring& t);
 
     void log_args(std::ostream& ost, const zce_sockaddr_t& t);

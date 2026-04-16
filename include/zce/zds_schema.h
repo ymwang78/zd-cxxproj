@@ -140,6 +140,7 @@ template <typename T>
 inline typename std::enable_if<std::is_integral<T>::value, int>::type zds_pack_builtin(
     zce_byte* buf, zce_int32 size, T val, zds_context_t* ctx, bool has_prefix = true) {
     static_assert(std::is_integral<T>::value, "must be integral type");
+    (void)has_prefix;
     if (std::is_signed<T>::value) {
         zce_int64 tmp = (zce_int64)val;
         return zds_pack_builtin(buf, size, tmp, ctx);
@@ -212,6 +213,7 @@ int ZCE_API zds_pack_any_array_header(zce_byte* buf, int size, zce_uint64 array_
 template <typename T, typename... Args,
           typename = typename std::enable_if<(sizeof...(Args) > 0)>::type>
 int zds_pack_builtin(zce_byte* buf, int size, const T& v, zds_context_t* ctx, Args... args) {
+    (void)ctx;
     int ret = 0;
     int len = zds_pack_builtin(buf, size, v, 0, true);
     CHECKLEN_MOVEBUF_ADDRET_DECSIZE;

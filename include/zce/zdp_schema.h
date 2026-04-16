@@ -30,7 +30,10 @@ static inline int zdp_dynarr_length(size_t x) {
 
 static inline int zdp_dynarr_headlen(size_t x) { return (((x) < 255) ? 1 : 5); }
 
-static inline int zdp_headlen(int rev) { return ZDP_HEADLEN; }
+static inline int zdp_headlen(int rev) {
+    (void)rev;
+    return ZDP_HEADLEN;
+}
 
 struct ZCE_API zdp_head {
     zce_byte magic /*'Z':ZDP, 'S':ZDS, 'B': BSON, 'J': JSON, 'P': PROTOBUF*/;
@@ -460,6 +463,7 @@ zce_int32 array_total_length(const std::vector<T>& val, unsigned char version) {
 
 template <typename T>
 zce_int32 rawptr_pair_total_length(const std::pair<T*, T*>& val, unsigned char version) {
+    (void)version;
     if (val.second - val.first >= 255) return (val.second - val.first) + 5;
     return (val.second - val.first) + 1;
 }

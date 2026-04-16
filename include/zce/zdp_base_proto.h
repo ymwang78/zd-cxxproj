@@ -254,7 +254,7 @@ namespace zdp_base
         const static unsigned short MSG_TYPE = E_MSG_DISCONN_REQ;
         static const char* type_name() { return ("MSG_DISCONN_REQ");}
         static MSG_DISCONN_REQ _empty;
-        bool operator==(const MSG_DISCONN_REQ& _t) const noexcept
+        bool operator==(const MSG_DISCONN_REQ&) const noexcept
         {
             return true;
         }

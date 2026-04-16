@@ -29,7 +29,16 @@
 #    define ZCE_OPEN_CRWFLAG (O_RDWR | O_CREAT)
 typedef void* LPSECURITY_ATTRIBUTES;
 #else
-#    include <linux/fs.h>
+#    include <fcntl.h>
+#    if defined(__linux__)
+#        include <linux/fs.h>
+#    endif
+#    if !defined(O_NOATIME)
+#        define O_NOATIME 0
+#    endif
+#    if !defined(O_LARGEFILE)
+#        define O_LARGEFILE 0
+#    endif
 #    define ZCE_OPEN_RDFLAG \
         (O_NOATIME | O_RDONLY | O_LARGEFILE) /* only for mount, need not O_DIRECT */
 #    define ZCE_OPEN_WRFLAG \

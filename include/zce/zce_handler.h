@@ -490,6 +490,8 @@ class ZCE_API SyncStream : public IStream {
 
     virtual int do_match_queue(zce::SmartPtr<zce::TaskQueue>&, const zce::RefBlock& dblock,
                                const zce::Any& ctx) {
+        (void)dblock;
+        (void)ctx;
         return 0;
     };
 

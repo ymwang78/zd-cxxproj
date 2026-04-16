@@ -161,7 +161,9 @@ class ZCE_API HttpStream : public IStream {
     virtual void on_http_request(const SmartPtr<ZCE_HTTP_REQUEST>&,
                                  const RefBlock& dblock);
 
-    virtual void on_http_continue(RefBlock& dblock) {};
+    virtual void on_http_continue(RefBlock& dblock) {
+        (void)dblock;
+    };
 
     virtual void on_prepare_nextreq();
 
