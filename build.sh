@@ -60,7 +60,7 @@ build_module() {
 # 按顺序构建
 # -----------------------------------------
 build_module libsrc/libzce -DBUILD_TESTS=ON
-build_module libsrc/libzdl
+build_module libsrc/libzdl -DBUILD_TESTS=ON
 build_module libsrc/libidh -DUSE_CUSTOM_STATIC_LIBS=OFF -DBUILD_TESTS=ON
 build_module libsrc/libcoin
 build_module libsrc/libmpc -DBUILD_TESTS=ON -DENABLE_PYTHON_BINDING=ON
