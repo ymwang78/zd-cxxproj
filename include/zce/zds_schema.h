@@ -64,7 +64,7 @@ struct is_builtin_basic
     : std::integral_constant<
           bool, std::is_arithmetic<T>::value || std::is_same<T, std::string>::value ||
                     std::is_same<T, zce::RefBlock>::value || std::is_same<T, zce::Any>::value ||
-                    std::is_same<T, zce_dblmat>::value> {};
+                    std::is_same<T, zce_dblmat>::value || std::is_same<T, zce_fltmat>::value> {};
 
 template <typename T>
 struct is_builtin_vector : std::false_type {};
@@ -194,6 +194,9 @@ int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const std::vector<zc
 int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const zce_dblmat& val,
                              zds_context_t* ctx, bool has_prefix = true);
 
+int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const zce_fltmat& val,
+                             zds_context_t* ctx, bool has_prefix = true);
+
 // int ZCE_API zds_pack_builtin(zce_byte* buf, zce_int32 size, const std::map<zce_any, zce::Any>&
 // val, zds_context_t* ctx, bool has_prefix = true);
 
@@ -284,6 +287,9 @@ int ZCE_API zds_unpack_builtin(std::vector<std::string>& val, const zce_byte* bu
                                zds_context_t* ctx);
 
 int ZCE_API zds_unpack_builtin(zce_dblmat& val, const zce_byte* buf, zce_int32 size,
+                               zds_context_t* ctx);
+
+int ZCE_API zds_unpack_builtin(zce_fltmat& val, const zce_byte* buf, zce_int32 size,
                                zds_context_t* ctx);
 
 int ZCE_API zds_unpack_struct_header(zce_uint64& struct_prefix, const zce_byte* buf, int size,

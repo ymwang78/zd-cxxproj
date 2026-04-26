@@ -92,6 +92,8 @@ class Matrix {
         return _rows == m._rows && _cols == m._cols && _vec == m._vec;
     }
 
+    inline bool operator!=(const Matrix& m) const { return !(*this == m); }
+
     inline T& operator()(size_t r, size_t c) {
         // Add bounds checking for safety if desired
         // if (r >= _rows || c >= _cols) throw std::out_of_range("Matrix access out of bounds");
@@ -351,3 +353,4 @@ class Matrix {
 }  // namespace zce
 
 typedef zce::Matrix<double> zce_dblmat;
+typedef zce::Matrix<float> zce_fltmat;
