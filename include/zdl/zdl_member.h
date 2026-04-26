@@ -36,6 +36,10 @@ class zdl_member : public meta_base {
     zdl_member(zdl_struct* parent, int var_idx, const std::string& var, const std::string& minsize,
                const std::string& maxsize, zdl_type* type = 0);
 
+    bool has_field_tag() const noexcept { return field_tag_ >= 0; }
+    int field_tag() const noexcept { return field_tag_; }
+    void field_tag(int tag) noexcept { field_tag_ = tag; }
+
     bool is_array() const noexcept { return (member_type_e_ == array_e); }
 
     bool is_array_optional() const noexcept { return (calc_min_size() == 0 && is_array()); }
@@ -121,6 +125,7 @@ class zdl_member : public meta_base {
   private:
     zdl_struct* parent_;
     int var_idx_;
+    int field_tag_;
     std::string var_name_;
     std::string comment_;
 

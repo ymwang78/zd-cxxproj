@@ -64,6 +64,7 @@ class zdl_parser_context : public zce::Object {
     /// implemention
     // void add_member_start(const std::string& varname);
     /// array [minsize,maxsize], if unknow(pointer) maxsize == 0
+    void set_current_member_field_tag(int field_tag);
     void add_member_start(const std::string& varname, const std::string& minsize,
                           const std::string& maxsize);
     void add_member_end(const std::string& varname);
@@ -120,6 +121,7 @@ class zdl_parser_context : public zce::Object {
     std::vector<std::pair<std::string, std::string> > current_metas_;
     zdl_module_ptr module_ptr_;
     std::map<std::string, zdl_module_ptr>& modules_;
+    int current_member_field_tag_;
     int error_count_;
     std::vector<zdl_error> errors_;
     bool is_parsing_;
