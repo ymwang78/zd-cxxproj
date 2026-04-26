@@ -85,6 +85,13 @@ class zdl_parser_context : public zce::Object {
     void add_type_template_arg(const std::string& argname);
     void add_member_template_arg(const std::string& arg);
 
+    void begin_parse(const std::string& filename);
+    void end_parse();
+    void reset_transient_state();
+    bool has_transient_state() const noexcept;
+    bool is_parsing() const noexcept { return is_parsing_; }
+    const std::string& current_filename() const noexcept { return current_filename_; }
+
     void add_error();
     void add_error(const std::string& message);
     void add_error(const std::string& filename, int line, const std::string& message,
@@ -115,6 +122,8 @@ class zdl_parser_context : public zce::Object {
     std::map<std::string, zdl_module_ptr>& modules_;
     int error_count_;
     std::vector<zdl_error> errors_;
+    bool is_parsing_;
+    std::string current_filename_;
 };
 
 typedef zce::SmartPtr<zdl_parser_context> zdl_parser_context_ptr;
