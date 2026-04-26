@@ -32,7 +32,8 @@ enum yytokentype {
     ZDL_DOUBLE = 267,          /* ZDL_DOUBLE  */
     ZDL_ASTRING = 268,         /* ZDL_ASTRING  */
     ZDL_TSTRING = 269,         /* ZDL_TSTRING  */
-    ZDL_USTRING = 270,         /* ZDL_USTRING  */
+    ZDL_WSTRING = 270,         /* ZDL_WSTRING  */
+    ZDL_USTRING = ZDL_WSTRING, /* Backward-compatible alias. */
     ZDL_BYTEVEC = 271,         /* ZDL_BYTEVEC  */
     ZDL_DATETIME = 272,        /* ZDL_DATETIME  */
     ZDL_ANY = 273,             /* ZDL_ANY  */
@@ -49,6 +50,10 @@ enum yytokentype {
     ZDL_USER_START = 284       /* ZDL_USER_START  */
 };
 typedef enum yytokentype yytoken_kind_t;
+#endif
+
+#ifndef ZDL_USTRING
+#    define ZDL_USTRING ZDL_WSTRING
 #endif
 
 class meta_base : public zce::Object {

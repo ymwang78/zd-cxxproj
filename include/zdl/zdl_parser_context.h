@@ -68,6 +68,10 @@ class zdl_parser_context : public zce::Object {
     void add_type_template_arg(const std::string& argname);
     void add_member_template_arg(const std::string& arg);
 
+    void add_error();
+    int error_count() const noexcept { return error_count_; }
+    bool has_error() const noexcept { return error_count_ != 0; }
+
     const zdl_module_ptr& get_module_by_name(const std::string& ns);
 
     const zdl_module_ptr& module_ptr() { return module_ptr_; };
@@ -82,6 +86,7 @@ class zdl_parser_context : public zce::Object {
     std::vector<std::pair<std::string, std::string> > current_metas_;
     zdl_module_ptr module_ptr_;
     std::map<std::string, zdl_module_ptr>& modules_;
+    int error_count_;
 };
 
 typedef zce::SmartPtr<zdl_parser_context> zdl_parser_context_ptr;
