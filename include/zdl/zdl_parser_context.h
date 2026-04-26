@@ -29,6 +29,23 @@ class zdl_module;
 class zdl_parser;
 class zdl_type;
 
+struct zdl_error {
+    enum severity_e {
+        severity_warning,
+        severity_error,
+    };
+
+    zdl_error() : line(0), severity(severity_error) {}
+    zdl_error(const std::string& filename_, int line_, const std::string& message_,
+              severity_e severity_)
+        : filename(filename_), line(line_), message(message_), severity(severity_) {}
+
+    std::string filename;
+    int line;
+    std::string message;
+    severity_e severity;
+};
+
 class zdl_parser_context : public zce::Object {
     ZCE_OBJECT_DECLARE;
 
@@ -69,8 +86,14 @@ class zdl_parser_context : public zce::Object {
     void add_member_template_arg(const std::string& arg);
 
     void add_error();
+    void add_error(const std::string& message);
+    void add_error(const std::string& filename, int line, const std::string& message,
+                   zdl_error::severity_e severity = zdl_error::severity_error);
+    void add_warning(const std::string& filename, int line, const std::string& message);
+    void clear_errors();
     int error_count() const noexcept { return error_count_; }
     bool has_error() const noexcept { return error_count_ != 0; }
+    const std::vector<zdl_error>& errors() const noexcept { return errors_; }
 
     // Thread-safety contract: zdl_parser_context mutates parse state and the
     // referenced modules map. Do not share one context or modules map across
@@ -91,6 +114,7 @@ class zdl_parser_context : public zce::Object {
     zdl_module_ptr module_ptr_;
     std::map<std::string, zdl_module_ptr>& modules_;
     int error_count_;
+    std::vector<zdl_error> errors_;
 };
 
 typedef zce::SmartPtr<zdl_parser_context> zdl_parser_context_ptr;
