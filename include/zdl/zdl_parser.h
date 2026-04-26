@@ -29,6 +29,9 @@ public:
     void warning(const char* s);
     void info(const char* s);
     void read_cr();
+    // Thread-safety contract: zdl_parser stores filename, line, and context
+    // state during parse(). Do not call parse() concurrently on the same
+    // zdl_parser instance.
     int parse(const char* filename, const zdl_parser_context_ptr& parser_context);
     zdl_parser_context_ptr context_ptr() const { return parser_context_; };
 

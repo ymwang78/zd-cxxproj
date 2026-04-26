@@ -72,6 +72,10 @@ class zdl_parser_context : public zce::Object {
     int error_count() const noexcept { return error_count_; }
     bool has_error() const noexcept { return error_count_ != 0; }
 
+    // Thread-safety contract: zdl_parser_context mutates parse state and the
+    // referenced modules map. Do not share one context or modules map across
+    // concurrent parses unless the caller provides external synchronization.
+
     const zdl_module_ptr& get_module_by_name(const std::string& ns);
 
     const zdl_module_ptr& module_ptr() { return module_ptr_; };

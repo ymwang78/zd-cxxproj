@@ -107,6 +107,9 @@ class zdl_type : public meta_base {
 
     inline const std::string& full_name() const noexcept { return full_name_; }
 
+    inline bool is_placeholder() const noexcept { return is_placeholder_; }
+    inline void is_placeholder(bool val) noexcept { is_placeholder_ = val; }
+
     // type itself indicator is a vector
     inline bool is_vector() const noexcept {
         return ((id() >= ZDL_ASTRING && id() <= ZDL_BYTEVEC) || id() == ZDL_FLTMAT ||
@@ -130,6 +133,7 @@ class zdl_type : public meta_base {
     zdl_module* module_ptr_;
     std::string type_name_;
     std::string full_name_;
+    bool is_placeholder_;
 };
 
 typedef zce::SmartPtr<zdl_type> zdl_type_ptr;
