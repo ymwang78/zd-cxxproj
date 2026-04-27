@@ -122,6 +122,7 @@ class zdl_parser_context : public zce::Object {
     zdl_module_ptr module_ptr_;
     std::map<std::string, zdl_module_ptr>& modules_;
     int current_member_field_tag_;
+    int next_member_field_tag_;
     int error_count_;
     std::vector<zdl_error> errors_;
     bool is_parsing_;
