@@ -1,41 +1,43 @@
 #pragma once
-#    ifndef ZCE_ZDB_MYSQL
-#        define ZCE_ZDB_MYSQL 0
-#    endif
-#    ifndef ZCE_ZDB_PGSQL
-#        define ZCE_ZDB_PGSQL 1
-#    endif
-#    ifndef ZCE_ZDB_SQLITE
-#        define ZCE_ZDB_SQLITE 1
-#    endif
-#    ifndef ZCE_ZDB_REDIS
-#        define ZCE_ZDB_REDIS 1
-#    endif
-#    ifndef ZCE_SUPPORT_PYVM
-#        define ZCE_SUPPORT_PYVM 1
-#    endif
-#    ifndef ZCE_SUPPORT_LUAVM
-#        define ZCE_SUPPORT_LUAVM 1
-#    endif
-#    ifndef ZCE_SUPPORT_CCVM
-#        define ZCE_SUPPORT_CCVM 1
-#    endif
-#    ifndef ZCE_SUPPORT_SSL
-#        define ZCE_SUPPORT_SSL 1
-#    endif
+#ifndef ZCE_ZDB_MYSQL
+#    define ZCE_ZDB_MYSQL 0
+#endif
+#ifndef ZCE_ZDB_PGSQL
+#    define ZCE_ZDB_PGSQL 1
+#endif
+#ifndef ZCE_ZDB_SQLITE
+#    define ZCE_ZDB_SQLITE 1
+#endif
+#ifndef ZCE_ZDB_REDIS
+#    define ZCE_ZDB_REDIS 1
+#endif
+#ifndef ZCE_SUPPORT_PYVM
+#    define ZCE_SUPPORT_PYVM 1
+#endif
+#ifndef ZCE_SUPPORT_LUAVM
+#    define ZCE_SUPPORT_LUAVM 1
+#endif
+#ifndef ZCE_SUPPORT_CCVM
+#    define ZCE_SUPPORT_CCVM 1
+#endif
+#ifndef ZCE_SUPPORT_SSL
+#    define ZCE_SUPPORT_SSL 1
+#endif
 
 #ifdef _WIN32
-#   define NOMINMAX
-#   include <winsock2.h>
-#   include <ws2tcpip.h>
-#   include <stdio.h>
-#   include <stdlib.h>
-#   include <stdint.h>
-#   include <windows.h>
-#   include <direct.h>
-#   include <io.h>
-#   include <sys/stat.h>
-#   define ZDP_GEP
+#    ifndef NOMINMAX
+#        define NOMINMAX
+#    endif
+#    include <winsock2.h>
+#    include <ws2tcpip.h>
+#    include <stdio.h>
+#    include <stdlib.h>
+#    include <stdint.h>
+#    include <windows.h>
+#    include <direct.h>
+#    include <io.h>
+#    include <sys/stat.h>
+#    define ZDP_GEP
 #elif defined(__APPLE__)
 #    include <unistd.h>
 #    include <fcntl.h>
@@ -145,28 +147,28 @@ enum ERV_ZCE_ERROR {
 
     ZCE_ERROR_BASE = 0x81000000,  // keep for stdc error
 
-    ZCE_ERROR_COMMON = 0x81010000,      // ZCE ERROR
-    ZCE_ERROR_MALLOC = 0x81010001,      
-    ZCE_ERROR_UNSUPPORT = 0x81010002,   
-    ZCE_ERROR_SHRTLEN = 0x81010003,     
-    ZCE_ERROR_EXCDLEN = 0x81010004,     
-    ZCE_ERROR_CORRUPT = 0x81010005,     
-    ZCE_ERROR_SYNTAX = 0x81010006,      
-    ZCE_ERROR_ZIP = 0x81010007,         
-    ZCE_ERROR_TIMEOUT = 0x81010008,     
-    ZCE_ERROR_CONVERTOR = 0x81010009,   
-    ZCE_ERROR_CLOSED = 0x8101000a,      
-    ZCE_ERROR_TOCLOSE = 0x8101000b,     
-    ZCE_ERROR_PREVNULL = 0x8101000c,    
-    ZCE_ERROR_OVERFLOW = 0x8101000d,    
-    ZCE_ERROR_INVALID = 0x8101000e,     
-    ZCE_ERROR_DUPLICATED = 0x8101000f,  
-    ZCE_ERROR_UNINIT = 0x81010010,      
-    ZCE_ERROR_BADPRC = 0x81010011,      
-    ZCE_ERROR_NORESOURCE = 0x81010012,  
-    ZCE_ERROR_VERSION = 0x81010013,     
-    ZCE_ERROR_READ = 0x81010014,        
-    ZCE_ERROR_WRITE = 0x81010015,       
+    ZCE_ERROR_COMMON = 0x81010000,  // ZCE ERROR
+    ZCE_ERROR_MALLOC = 0x81010001,
+    ZCE_ERROR_UNSUPPORT = 0x81010002,
+    ZCE_ERROR_SHRTLEN = 0x81010003,
+    ZCE_ERROR_EXCDLEN = 0x81010004,
+    ZCE_ERROR_CORRUPT = 0x81010005,
+    ZCE_ERROR_SYNTAX = 0x81010006,
+    ZCE_ERROR_ZIP = 0x81010007,
+    ZCE_ERROR_TIMEOUT = 0x81010008,
+    ZCE_ERROR_CONVERTOR = 0x81010009,
+    ZCE_ERROR_CLOSED = 0x8101000a,
+    ZCE_ERROR_TOCLOSE = 0x8101000b,
+    ZCE_ERROR_PREVNULL = 0x8101000c,
+    ZCE_ERROR_OVERFLOW = 0x8101000d,
+    ZCE_ERROR_INVALID = 0x8101000e,
+    ZCE_ERROR_DUPLICATED = 0x8101000f,
+    ZCE_ERROR_UNINIT = 0x81010010,
+    ZCE_ERROR_BADPRC = 0x81010011,
+    ZCE_ERROR_NORESOURCE = 0x81010012,
+    ZCE_ERROR_VERSION = 0x81010013,
+    ZCE_ERROR_READ = 0x81010014,
+    ZCE_ERROR_WRITE = 0x81010015,
     ZCE_ERROR_NOT_FOUND = 0x81010016,
     ZCE_ERROR_EXLIMIT = 0x81010017,
 
@@ -179,7 +181,7 @@ enum ERV_ZCE_ERROR {
     ZDB_ERROR_BINDERROR,
     ZDB_ERROR_PARAMCNT,
     ZDB_ERROR_FOPEN,
-    ZDB_ERROR_FILEEXPAND,  
+    ZDB_ERROR_FILEEXPAND,
     ZDB_ERROR_TAGNOTEXISTS,
 
     ZDB_ERROR_SQLITE_COMMON = 0x82010000,  // SQLITE  ERROR CODE
@@ -192,11 +194,11 @@ enum ERV_ZCE_ERROR {
 
     ZVM_SUCCESS_BASE = 0x02100000,
     ZVM_ERROR_BASE = 0x82100000,  // ZVM ERROR
-    ZVM_ERROR_INVALID,            
-    ZVM_ERROR_INVALIDMETHOD,      
-    ZVM_ERROR_INVALIDPARAM,       
-    ZVM_ERROR_DISCONNECT,         
-    ZVM_ERROR_INCONNECT,          
+    ZVM_ERROR_INVALID,
+    ZVM_ERROR_INVALIDMETHOD,
+    ZVM_ERROR_INVALIDPARAM,
+    ZVM_ERROR_DISCONNECT,
+    ZVM_ERROR_INCONNECT,
 
     ZAP_ERROR_BASE = 0x83000000,  // ZAP ERROR
     ZAP_ERROR_COIN = 0x83010000,  // COIN ERROR
