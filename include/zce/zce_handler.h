@@ -357,6 +357,14 @@ class ZCE_API Acceptor : public zce::Object {
     void block_remote(const zce_sockaddr_t& remote, unsigned end_timet, const std::string& reason);
 
     void unblock_remote(const zce_sockaddr_t& remote);
+
+    // Purge all block_dict_ entries whose end_timet is <= the current time.
+    // Returns the number of entries removed. Safe to call at any time;
+    // typically scheduled from an application level timer (e.g. 60s).
+    unsigned purgeExpiredBlocks();
+
+    // Current number of active (and possibly-expired-but-not-yet-purged) blocks.
+    unsigned blockedCount() const { return (unsigned)block_count_.value(); }
 };
 
 class ZCE_API Pipe : public Socket {

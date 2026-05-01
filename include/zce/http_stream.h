@@ -191,7 +191,10 @@ class ZCE_API zce_http_client : public IStream {
 
     virtual void on_close();
 
-    virtual void on_prepare_nextres() {};  //@todo
+    // Reset response/body state so the same IStream can be reused for
+    // another HTTP/1.1 keep-alive response. Called right after the current
+    // response has been fully delivered to on_http_response().
+    virtual void on_prepare_nextres();
 
     int request(
         const std::string& url, ZCE_HTTP_REQUEST::METHOD_E m, zce_byte* buf,

@@ -419,11 +419,9 @@ struct DatabaseObject {
             if (ret < 0) return ret;
             *stmtptr << prop << Statement::endl;
             while (stmtptr->end_row() > 0) {
-                //@todo check
                 T m;
                 m.extract(stmtptr);
                 vec.push_back(std::move(m));
-                return 1;
             }
 
             return (int)vec.size();

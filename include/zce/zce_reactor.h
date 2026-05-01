@@ -61,6 +61,19 @@ class ZCE_API Reactor : public zce::TaskDelegator {
 
     int dns_resolve(const std::string& domain, const zce::SmartPtr<zce::DnsResolve>& resolve_ptr);
 
+    // Configure the DNS cache TTL (seconds). 0 disables cache entirely so
+    // every dns_resolve() triggers a fresh lookup. Default: 60.
+    // Thread-safe: safely callable from any thread; the change takes effect
+    // on the next cache lookup.
+    void setDnsCacheTTL(unsigned seconds);
+
+    // Current DNS cache TTL (seconds). 0 means caching is disabled.
+    unsigned getDnsCacheTTL() const;
+
+    // Drop every cached DNS entry. Useful after a network-config change
+    // (SIGHUP, VPN on/off, DDNS rotation, ...).
+    void clearDnsCache();
+
     SmartPtr<Timer> scheduleTimer(zce::SmartPtr<TaskQueue> task_queue, int msec_span, bool repeat,
                                   std::function<void(Timer*)> timer_func);
 

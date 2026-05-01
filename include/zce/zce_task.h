@@ -84,26 +84,43 @@ class ZCE_API TaskDelegator : virtual public zce::Object {
 
     virtual int delegateRelease(zce::Object* obj) = 0;
 
-    // unknow buggy
+    // Submit a callable and get a std::future<TaskResult<...>>.
+    //
+    // Semantics:
+    //   - Always sets exactly one value on the underlying promise:
+    //       * SubmitFailed if delegateTask returned non-zero (task not queued).
+    //       * Success / TaskException otherwise (set inside task's call()).
+    //   - If the delegator is destroyed before the task runs, the FutureTask
+    //     (and its promise) are also destroyed and the future observes
+    //     std::future_errc::broken_promise. Callers should handle that.
+    //
+    // IMPORTANT: do NOT wait() on the returned future while executing on
+    // the delegator's own thread -- that deadlocks. Use this only from
+    // threads different from the target executor.
     template <typename F, typename... Args>
-    auto _delegateFuture(const char* name, F&& f, Args&&... args)
-        -> std::shared_ptr<std::promise<TaskResult<decltype(f(args...))>>> {
+    auto delegateFuture(const char* name, F&& f, Args&&... args)
+        -> std::future<TaskResult<decltype(f(args...))>> {
         using ReturnType = decltype(f(args...));
         using ResultType = TaskResult<ReturnType>;
 
         auto promise_ptr = std::make_shared<std::promise<ResultType>>();
+        std::future<ResultType> result_future = promise_ptr->get_future();
 
         class FutureTask : public Task {
             std::shared_ptr<std::promise<ResultType>> promise_;
             std::function<ReturnType()> func_;
+            bool fulfilled_ = false;
 
           public:
-            FutureTask(const std::shared_ptr<std::promise<ResultType>>& p, F&& f, Args&&... args)
-                : Task("future_task_no_except"), promise_(p) {
+            FutureTask(const char* tname, std::shared_ptr<std::promise<ResultType>> p,
+                       F&& f, Args&&... args)
+                : Task(tname ? tname : "delegate_future"), promise_(std::move(p)) {
                 func_ = std::bind(std::forward<F>(f), std::forward<Args>(args)...);
             }
 
             virtual void call() override {
+                if (fulfilled_) return;  // defensive: never set twice
+                fulfilled_ = true;
                 try {
                     if constexpr (std::is_same_v<ReturnType, void>) {
                         func_();
@@ -121,8 +138,8 @@ class ZCE_API TaskDelegator : virtual public zce::Object {
             }
         };
 
-        auto task = zce::SmartPtr<Task>(
-            new FutureTask(promise_ptr, std::forward<F>(f), std::forward<Args>(args)...));
+        auto task = zce::SmartPtr<Task>(new FutureTask(
+            name, promise_ptr, std::forward<F>(f), std::forward<Args>(args)...));
 
         int ret = delegateTask(task);
 
@@ -131,7 +148,14 @@ class ZCE_API TaskDelegator : virtual public zce::Object {
                 ResultType::error(ResultType::Status::SubmitFailed, "Failed to schedule task."));
         }
 
-        return promise_ptr;
+        return result_future;
+    }
+
+    // Back-compat alias; prefer delegateFuture().
+    template <typename F, typename... Args>
+    auto _delegateFuture(const char* name, F&& f, Args&&... args)
+        -> std::future<TaskResult<decltype(f(args...))>> {
+        return delegateFuture(name, std::forward<F>(f), std::forward<Args>(args)...);
     }
 
     template <typename F>
@@ -165,28 +189,29 @@ class ZCE_API TaskDelegator : virtual public zce::Object {
         }
     };
 
+    // Queue a callable to the delegator.
+    //   bwait=false: fire-and-forget.
+    //   bwait=true:  synchronous; the caller blocks via a thread-local
+    //                semaphore until the task has finished.
+    // NOTE: calling delegate(bwait=true) from the delegator's own thread
+    // would deadlock. On Windows the Fr_task constructor asserts that
+    // the thread-local semaphore is in the 0 state as a defensive check.
     template <typename F>
     int delegate(bool bwait, const char* name, F&& f) {
-#if 0
-        auto promise_ptr = delegateFuture(name, std::forward<F>(f));
-        if (bwait) {
-            auto result_future = promise_ptr->get_future();
-            ZCE_ASSERT(result_future.valid());
-            result_future.wait();
-        }
-#else
         if (bwait) {
             zce::Tss::zce_global_semaphore global_semaphore;
             zce::SmartPtr<zce::Task> task_ptr(new Fr_task(name, this, global_semaphore.sem, f));
             int ret = delegateTask(task_ptr);
+            if (ret != 0) {
+                // Task not queued; avoid blocking forever on the semaphore.
+                return ret;
+            }
             global_semaphore.sem->acquire();
             return ret;
         } else {
             zce::SmartPtr<zce::Task> task_ptr(new Fr_task(name, this, 0, f));
             return delegateTask(task_ptr);
         }
-#endif
-        return 0;
     };
 };
 
