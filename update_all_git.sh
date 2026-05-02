@@ -12,9 +12,9 @@ fi
 #export HTTP_PROXY="http://192.168.200.8:32080"
 #export HTTPS_PROXY="http://192.168.200.8:32080"
 
-SOCKS_PROXY="${SOCKS_PROXY:-socks5h://192.168.200.13:32029}"
-export ALL_PROXY="$SOCKS_PROXY"
-export all_proxy="$SOCKS_PROXY"
+#SOCKS_PROXY="${SOCKS_PROXY:-socks5h://192.168.200.13:32029}"
+#export ALL_PROXY="$SOCKS_PROXY"
+#export all_proxy="$SOCKS_PROXY"
 export GIT_TERMINAL_PROMPT=0
 
 git_pull_with_retry() {
