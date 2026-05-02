@@ -17,6 +17,11 @@ source ~/.proxy
 DIRS=(
     "$PWD"
     "libsrc"
+    "apps"
+    "tools"
+    "modules"
+    "hosts"
+    "services"
 )
 
 echo "==============================================="
