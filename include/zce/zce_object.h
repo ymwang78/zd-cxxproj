@@ -176,6 +176,11 @@ class SmartPtr {
         if (this->handler_) this->handler_->__decref();
     }
 
+    void swap(SmartPtr& other) noexcept {
+        Guard<ZCE_LOCK> g(SmartPtrLock<ZCE_LOCK>().get());
+        std::swap(this->handler_, other.handler_);
+    }
+
     inline void __assign(IMPL_CLASS* right) { this->handler_ = right; }
 
     template <class Y, class P>
