@@ -169,9 +169,9 @@ class ZCE_API Logger : public zce::Object {
   private:
     _zlog_level level_;
     int line_;
-    const char* func_;
-    const char* fname_;
-    const char* splitter_;
+    std::string func_;
+    std::string fname_;
+    std::string splitter_;
     std::ostringstream oss_;
 
   public:
@@ -185,17 +185,17 @@ class ZCE_API Logger : public zce::Object {
     template <typename T>
     void log_args(std::ostream& ost, const T& t) {
         ost << t;
-        if (splitter_) ost << splitter_;
+        if (!splitter_.empty()) ost << splitter_;
     }
 
     void log_args(std::ostream& ost, float t) {
         ost << std::setprecision(8) << t;
-        if (splitter_) ost << splitter_;
+        if (!splitter_.empty()) ost << splitter_;
     }
 
     void log_args(std::ostream& ost, double t) {
         ost << std::setprecision(16) << t;
-        if (splitter_) ost << splitter_;
+        if (!splitter_.empty()) ost << splitter_;
     }
 
     void log_args(std::ostream& ost, const char* t) {
@@ -204,7 +204,7 @@ class ZCE_API Logger : public zce::Object {
         } else {
             ost << t;
         }
-        if (splitter_) ost << splitter_;
+        if (!splitter_.empty()) ost << splitter_;
     }
 
     void log_args(std::ostream& ost, const wchar_t* t);
