@@ -44,6 +44,8 @@ struct none_t {};
 
 inline void replace(std::string& strBase, const std::string& strSrc, const std::string& strDes,
                     bool bReplaceAll) {
+    if (strSrc.empty()) return;
+
     std::string::size_type pos = 0;
     std::string::size_type srcLen = strSrc.size();
     std::string::size_type desLen = strDes.size();

@@ -98,9 +98,8 @@ class ZCE_API TaskDelegator : virtual public zce::Object {
     // the delegator's own thread -- that deadlocks. Use this only from
     // threads different from the target executor.
     template <typename F, typename... Args>
-    auto _delegateFuture(const char* name, F&& f, Args&&... args)
-        -> std::shared_ptr<std::promise<TaskResult<decltype(f(args...))>>> {
-        (void)name;
+    auto delegateFuture(const char* name, F&& f, Args&&... args)
+        -> std::future<TaskResult<decltype(f(args...))>> {
         using ReturnType = decltype(f(args...));
         using ResultType = TaskResult<ReturnType>;
 
