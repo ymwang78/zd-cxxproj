@@ -21,7 +21,9 @@ vcpkg install nlohmann-json:x64-windows-static-md
 vcpkg install open62541:x64-windows-static-md
 vcpkg install openssl:x64-windows-static-md 
 vcpkg install sol2:x64-windows-static-md 
+vcpkg install sqlite:x64-windows-static-md 
 vcpkg install uriparser:x64-windows-static-md 
+vcpkg install zlib:x64-windows-static-md 
 
 vcpkg install nlohmann-json:x64-windows
 vcpkg install casadi:x64-windows
