@@ -47,6 +47,19 @@ build_module() {
     fi
 
     mkdir -p "$build_dir"
+
+    # If a source directory was moved, an existing CMakeCache.txt still points at
+    # the old absolute path and CMake will fail or reuse stale paths. Reconfigure
+    # from scratch automatically for relocated modules.
+    if [[ -f "$build_dir/CMakeCache.txt" ]] && grep -q '^CMAKE_HOME_DIRECTORY:' "$build_dir/CMakeCache.txt"; then
+        cached_src=$(grep '^CMAKE_HOME_DIRECTORY:' "$build_dir/CMakeCache.txt" | cut -d= -f2-)
+        if [[ "$cached_src" != "$module_dir" ]]; then
+            echo "WARN: $path/$build_dir cache points to $cached_src, removing stale build dir"
+            rm -rf "$build_dir"
+            mkdir -p "$build_dir"
+        fi
+    fi
+
     cd "$build_dir"
 
     cmake .. "$@"
@@ -62,11 +75,11 @@ build_module() {
 build_module libsrc/libzce -DBUILD_TESTS=ON
 build_module libsrc/libzdl -DBUILD_TESTS=ON
 build_module libsrc/libidh -DUSE_CUSTOM_STATIC_LIBS=OFF -DBUILD_TESTS=ON
-build_module libsrc/libident
-build_module libsrc/libcoin
-build_module libsrc/libmpc -DBUILD_TESTS=ON -DENABLE_PYTHON_BINDING=ON
-build_module zGen
-build_module HostVM
+build_module modules/ident
+build_module modules/coin
+build_module modules/mpc -DBUILD_TESTS=ON -DENABLE_PYTHON_BINDING=ON
+build_module tools/zGen
+build_module hosts/HostVM
 
-#cd HostVM/dist/debian
+#cd hosts/HostVM/dist/debian
 #./x_package.sh hostvm

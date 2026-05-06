@@ -45,7 +45,7 @@ else
     exit 1
 fi
 
-cp HostVM/dist/docker/*.xml /opt/hostvm/ || true   
-cp HostVM/dist/docker/*.ptl /opt/hostvm/ || true
-cp HostVM/dist/docker/*.lua /opt/hostvm/ || true
-cp HostVM/dist/docker/*.py  /opt/hostvm/ || true
+cp hosts/HostVM/dist/docker/*.xml /opt/hostvm/ || true   
+cp hosts/HostVM/dist/docker/*.ptl /opt/hostvm/ || true
+cp hosts/HostVM/dist/docker/*.lua /opt/hostvm/ || true
+cp hosts/HostVM/dist/docker/*.py  /opt/hostvm/ || true
