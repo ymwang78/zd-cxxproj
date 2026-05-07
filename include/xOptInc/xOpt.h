@@ -28,7 +28,7 @@
 #            define XOPT_API __declspec(dllimport)
 #        endif
 #    else
-#        define ZCE_API __attribute__((visibility("default")))
+#        define XOPT_API __attribute__((visibility("default")))
 #    endif
 #endif
 

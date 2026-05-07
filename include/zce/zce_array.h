@@ -405,6 +405,10 @@ class Array {  // skew heap
             return mix_magic_t::mix(array_->slots_[index_].data_.magic, index_);
         }
 
+        const Array* getArray() const { return array_; }
+
+        int getIndex() const { return index_; }
+
         friend class const_iterator;
     };
 
@@ -433,7 +437,7 @@ class Array {  // skew heap
             }
         }
 
-        const_iterator(const iterator& it) : array_(it.array_), index_(it.index_) {}
+        const_iterator(const iterator& it) : array_(it.getArray()), index_(it.getIndex()) {}
 
         const_iterator& operator++() {
             ++index_;

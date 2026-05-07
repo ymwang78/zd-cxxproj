@@ -25,6 +25,8 @@ class xOptModelPython : public xOptModelBase {
 
     int setProblemType(XOPTF_PROBLEM_TYPE) override;
 
+    std::string getVersion() const override;
+
     xOptModelParameters getParameters() const override;
 
     xOptNameStrValueMap getParameterDescs() const override;

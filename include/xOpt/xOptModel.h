@@ -176,6 +176,8 @@ typedef struct _xOptModel {
 
 typedef void (*xOptModel_destroyModel)(xOptModelHandle model);
 
+typedef const char* (*xOptModel_getVersion)(xOptModelHandle model);
+
 typedef int (*xOptModel_setLanguage)(xOptModelHandle model, const char* language_code);
 
 // slates
@@ -270,6 +272,8 @@ struct xOptModelT {
     xOptModel_getReportData getReportData;
     xOptModel_getNumberOfThermoBlock getNumberOfThermoBlock;
     xOptModel_getThermoBlocks getThermoBlocks;
+    // Optional. If null or empty, host code treats the model as version "v1.0.0".
+    xOptModel_getVersion getVersion;
 };
 
 /* xOptModelT model= {sizeof(xOptModelT)} */

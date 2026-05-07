@@ -142,6 +142,8 @@ class xOptModelBase : public zce::Object {
 
     void setName(const std::string& name) { name_ = name; };
 
+    virtual std::string getVersion() const { return "v1.0.0"; };
+
     int getVariableIndex(const std::string& varname, int hint_index = -1) const;
 
     // 初始化模型, 获取默认参数等，做好接受参数等准备
