@@ -29,11 +29,20 @@ class XOPTIF_API xOptSolver {
         RESULT_INVALID_PROBLEM      = -7,
         RESULT_USER_PAUSE           = -100,
     };
+    enum OPTION_TYPE : int {
+        OPTION_REAL   = 0,
+        OPTION_INT    = 1,
+        OPTION_STRING = 2,
+    };
     using boolean = unsigned char;
 
     virtual ~xOptSolver() = 0;
 
     virtual xOptProblem* getProblem() const = 0;
+
+    virtual int getTunableParamList(const char* p_name[], OPTION_TYPE p_type[], int& p_size) const = 0;
+
+    virtual int setTunableParamList(const char* p_name[], int p_size) = 0;
 
     virtual int getStringOptions(const char* option_names[], const char* option_values[],
                            int& options_size) const = 0;
