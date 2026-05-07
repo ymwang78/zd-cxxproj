@@ -28,6 +28,8 @@ class xOptModelBlackBox : public xOptModelBase {
 
     std::string getVersion() const override;
 
+    xOptModelFixableVariables getFixableVariables() const override;
+
     xOptModelParameters getParameters() const override;
 
     int setParameters(const xOptModelParameters& parameters) override;
