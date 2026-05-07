@@ -7,9 +7,15 @@
 #if defined(__cplusplus) && !defined(COMPAT53_LUA_CPP)
 extern "C" {
 #endif
-#include <lua.h>
-#include <lauxlib.h>
-#include <lualib.h>
+#if __has_include(<lua/lua.h>)
+  #include <lua/lua.h>
+  #include <lua/lauxlib.h>
+  #include <lua/lualib.h>
+#else
+  #include <lua.h>
+  #include <lauxlib.h>
+  #include <lualib.h>
+#endif
 #if defined(__cplusplus) && !defined(COMPAT53_LUA_CPP)
 }
 #endif
@@ -399,11 +405,11 @@ COMPAT53_API void luaL_requiref(lua_State *L, const char *modname,
 
 
 /* other Lua versions */
-#if !defined(LUA_VERSION_NUM) || LUA_VERSION_NUM < 501 || LUA_VERSION_NUM > 504
+#if !defined(LUA_VERSION_NUM) || LUA_VERSION_NUM < 501 || LUA_VERSION_NUM > 505
 
-#  error "unsupported Lua version (i.e. not Lua 5.1, 5.2, 5.3, or 5.4)"
+#  error "unsupported Lua version (i.e. not Lua 5.1, 5.2, 5.3, 5.4, or 5.5)"
 
-#endif /* other Lua versions except 5.1, 5.2, 5.3, and 5.4 */
+#endif /* other Lua versions except 5.1, 5.2, 5.3, 5.4, and 5.5 */
 
 
 
