@@ -36,7 +36,7 @@ class XOPTIF_API xOptSolver {
     };
     using boolean = unsigned char;
 
-    virtual ~xOptSolver() = 0;
+    virtual ~xOptSolver() = default;
 
     virtual xOptProblem* getProblem() const = 0;
 

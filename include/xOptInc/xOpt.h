@@ -132,6 +132,7 @@ struct xOptParsedVariable {
     std::string array_expr;  // 数组长度表达式
     int expand_index;        // 展开后的数组下标
     std::vector<double> initial;
+    std::string external_datasource;
 };
 
 using xOptParsedVariableMap = std::unordered_map<std::string, xOptParsedVariable>;

@@ -28,7 +28,7 @@ class XOPTIF_API xOptProblem {
         int max_iter;  // Maximum number of iterations
     };
 
-    virtual ~xOptProblem() = 0;
+    virtual ~xOptProblem() = default;
 
     virtual int initialize() = 0;
 
