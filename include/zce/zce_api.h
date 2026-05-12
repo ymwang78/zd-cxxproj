@@ -163,6 +163,9 @@ std::string ZCE_API zce_format_scientific(double value);
 
 std::string ZCE_API zce_error_msg(int errnum);
 
+// Human-readable text for ERV_ZCE_ERROR / ZCE family codes (zce_inc.h). See also zce_error_msg() for OS errno.
+std::string ZCE_API zce_error_desc(int errcode);
+
 template<typename T>
 inline T zce_min(T v1, T v2) 
 {
