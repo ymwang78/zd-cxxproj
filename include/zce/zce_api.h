@@ -33,6 +33,11 @@ extern "C"
 
     void ZCE_API zce_fini_pyenv();
 
+    // Redirect sys.stdout/sys.stderr to ZCE log. Lines with logging level tokens
+    // (INFO/INFOR, ERROR, ...) use the matching level; otherwise stdout->trace,
+    // stderr->error. Requires zce_init_pyenv() first. Returns 0 on success.
+    int ZCE_API zce_redirect_py_stdio();
+
     struct tm * ZCE_API zce_localtime_r(const time_t *t, struct tm *res);
 
     zce_uint64 ZCE_API zce_tick();
