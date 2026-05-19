@@ -131,6 +131,8 @@ void ZCE_API zlog_cleanup(int keep_days);
 #ifdef __cplusplus
 
 #    include <zce/zce_object.h>
+#    include <cstddef>
+#    include <cstdint>
 #    include <sstream>
 #    include <vector>
 #    include <functional>
@@ -270,5 +272,66 @@ class ZCE_API Logger : public zce::Object {
 #    define ZBIZDT(...)
 // #define ZBIZDT(...) do { if(zlog_getlevel() <= ZLOG_BIZDT) zce::Logger(ZLOG_BIZDT, __FUNCTION__,
 // __FILE__, __LINE__).write(__VA_ARGS__); } while(0)
+
+// LogCollector UDP 协议 v1：固定头 2 字节。
+// 本协议头故意不使用 ZDS（ZDS 帧开销会破坏“固定头仅 2 字节”
+// 的目标），采用手写 mask/shift 位域。
+namespace logcollector {
+
+constexpr uint8_t kProtocolVersion = 1;
+constexpr size_t kHeaderSize = 2;
+constexpr uint8_t kMaxAppLen = 15;  // app_len 占 4 bit
+constexpr uint8_t kLevelCount = 8;  // level 占 3 bit，对应 8 个 ZLOG_LEVEL
+
+constexpr uint8_t kVersionMask = 0xC0;
+constexpr uint8_t kLevelMask = 0x38;
+constexpr uint8_t kCompressMask = 0x06;
+constexpr uint8_t kTypeMask = 0x01;
+constexpr uint8_t kAppLenMask = 0xF0;
+
+constexpr uint8_t kCompressNone = 0;
+constexpr uint8_t kCompressZlib = 1;  // v1 预留，未实现
+constexpr uint8_t kCompressBz2 = 2;   // v1 预留，未实现
+
+constexpr uint8_t kTypeLog = 0;      // 普通日志内容
+constexpr uint8_t kTypeCommand = 1;  // 交互 Command，v1 暂不处理
+
+inline uint8_t getVersion(uint8_t flag) { return (flag >> 6) & 0x03; }
+inline uint8_t getLevel(uint8_t flag) { return (flag >> 3) & 0x07; }
+inline uint8_t getCompress(uint8_t flag) { return (flag >> 1) & 0x03; }
+inline uint8_t getType(uint8_t flag) { return flag & 0x01; }
+inline uint8_t getAppLen(uint8_t ext) { return (ext >> 4) & 0x0F; }
+
+inline uint8_t makeFlag(uint8_t version, uint8_t level, uint8_t compress, uint8_t type) {
+    return static_cast<uint8_t>(((version & 0x03) << 6) | ((level & 0x07) << 3) |
+                                ((compress & 0x03) << 1) | (type & 0x01));
+}
+
+inline uint8_t makeExt(uint8_t app_len) {
+    return static_cast<uint8_t>((app_len & 0x0F) << 4);
+}
+
+enum class ParseStatus {
+    Ok,
+    TooShort,
+    BadVersion,
+    BadCompress,
+    Command,
+};
+
+struct ParsedPacket {
+    uint8_t version = 0;
+    uint8_t level = 0;
+    uint8_t compress = 0;
+    uint8_t type = 0;
+    const char* app = nullptr;
+    uint8_t app_len = 0;
+    const char* content = nullptr;
+    uint32_t content_len = 0;
+};
+
+ParseStatus parseLogPacket(const uint8_t* buf, size_t len, ParsedPacket& out);
+
+}  // namespace logcollector
 
 #endif
