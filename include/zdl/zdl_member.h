@@ -114,6 +114,34 @@ class zdl_member : public meta_base {
         return -1;
     }
 
+    // String-family length constraint: string(min~max). Independent of the
+    // [..] multiplicity above — min_size_/max_size_ count elements, these
+    // bound the character length of each string element. Closed interval.
+    bool has_str_len() const noexcept { return has_str_len_; }
+
+    void str_len(const std::string& minlen, const std::string& maxlen) {
+        str_len_min_ = minlen;
+        str_len_max_ = maxlen;
+        has_str_len_ = true;
+    }
+
+    const std::string& str_len_min() const noexcept { return str_len_min_; }
+    const std::string& str_len_max() const noexcept { return str_len_max_; }
+
+    int calc_str_len_min() const {
+        char* endp = 0;
+        long val = strtol(str_len_min_.c_str(), &endp, 0);
+        if (endp != 0 && *endp == 0) return val;
+        return -1;
+    }
+
+    int calc_str_len_max() const {
+        char* endp = 0;
+        long val = strtol(str_len_max_.c_str(), &endp, 0);
+        if (endp != 0 && *endp == 0) return val;
+        return -1;
+    }
+
     void add_template_arg(const std::string& arg);
     int arg_size() const { return (int)args_.size(); }
 
@@ -133,6 +161,10 @@ class zdl_member : public meta_base {
     member_type_e member_type_e_;
     std::string min_size_;
     std::string max_size_;
+
+    bool has_str_len_ = false;
+    std::string str_len_min_;
+    std::string str_len_max_;
 
     std::vector<zdl_template_arg_ptr> args_;
 };

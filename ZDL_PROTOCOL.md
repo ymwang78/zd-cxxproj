@@ -140,9 +140,41 @@ int32*  items;
 
 #### Variable-length array with bounds
 ```
-int32   values[1~100];   // min 1, max 100
-string  tags[0~50];      // min 0 (optional), max 50
+int32   values[1~100];   // 1 to 100 elements (closed interval)
+string  tags[0~50];      // 0 to 50 strings (min 0 => optional)
 ```
+
+> **`[ ]` always means element multiplicity** — how *many* values the field holds —
+> for every type, including strings. Bounds are a **closed interval** `[min, max]`.
+> The string *content length* is a separate concern; see below.
+
+#### String length constraint — `string(min~max)`
+A length bound is attached to the **type**, written with parentheses, and is
+independent of the `[ ]` multiplicity. It applies to the string family
+(`astring`, `tstring`/`string`, `wstring`) and to `bytevec`. Closed interval.
+
+```
+string(2~32)  name;        // one string, length 2..32
+string(~64)   label;       // one string, length 0..64 (upper bound only)
+string(16)    code;        // one string, exact length 16
+string        free;        // one string, unbounded length
+```
+
+Because length and multiplicity are orthogonal, they compose — this is how you
+express an **array of length-bounded strings** (previously a separate `strvec`):
+
+```
+string(2~32)  tags[~];     // vector of strings, each 2..32 chars
+string(2~32)  fixed[8];    // 8 strings, each 2..32 chars
+```
+
+**Enforcement & metadata.** The generated C++ ZDS code enforces the length:
+`zds_pack` rejects out-of-range strings before serializing and `zds_unpack`
+re-validates after deserializing (returning `ZCE_ERROR_SYNTAX`), per element for
+vectors. A `0` bound means "unbounded on that side" (so `string(~64)` emits only
+an upper check). The bounds are also exposed as `_str_len_min` / `_str_len_max`
+member metadata, so other generators (SQL/ORM column sizing, docs, etc.) can read
+them via `fetch_meta`.
 
 #### Nested struct
 ```
@@ -413,7 +445,8 @@ target_link_libraries(my_target PUBLIC
 2. **File extension**: `.ptl` for protocol definitions
 3. **Every definition ends with `;`** (structs, enums, and each field)
 4. **Variable-length fields** use `[~]` suffix or `*` pointer notation → `std::vector<T>`
-5. **Optional fields** use `[o]` metadata or min_size=0 bounds
-6. **Never edit generated files** — always edit the `.ptl` and regenerate
-7. **Cross-namespace struct references** use `struct Ns::TypeName field;` syntax
-8. **Enum auto-increment**: values increment from the last explicit assignment
+5. **`[ ]` = multiplicity, `( )` = string length** — both closed intervals, independent and composable (`string(2~32) tags[~]`)
+6. **Optional fields** use `[o]` metadata or min_size=0 bounds
+7. **Never edit generated files** — always edit the `.ptl` and regenerate
+8. **Cross-namespace struct references** use `struct Ns::TypeName field;` syntax
+9. **Enum auto-increment**: values increment from the last explicit assignment

@@ -72,6 +72,8 @@ class zdl_parser_context : public zce::Object {
     void set_current_member_type(int tpid);
     void set_current_member_type(int tpid, const std::string& tparg, const std::string& tpname,
                                  const std::string& ns = "");
+    /// string(min~max) length constraint for the member about to be started
+    void set_current_str_len(const std::string& minlen, const std::string& maxlen);
     void add_current_member_metadata(const std::string& meta_key, const std::string& meta_val);
 
     void add_enumerator(unsigned long val, const std::string& emname, const std::string& comment);
@@ -117,6 +119,9 @@ class zdl_parser_context : public zce::Object {
     zdl_member_ptr current_member_;
     zdl_type_ptr current_member_type_;
     std::string current_member_arg_;
+    bool current_has_str_len_ = false;
+    std::string current_str_len_min_;
+    std::string current_str_len_max_;
     zdl_module_ptr current_module_;
     std::vector<std::pair<std::string, std::string> > current_metas_;
     zdl_module_ptr module_ptr_;
