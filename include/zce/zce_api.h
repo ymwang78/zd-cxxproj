@@ -33,6 +33,11 @@ extern "C"
 
     void ZCE_API zce_fini_pyenv();
 
+    // Wire Python logging (ZceLogHandler) into ZCE log; optionally redirect
+    // sys.stdout/stderr for print (stdout->trace, stderr->error).
+    // redirect_stdio: 0=logging only, nonzero=logging + stdio. Requires zce_init_pyenv().
+    int ZCE_API zce_setup_py_logging(int redirect_stdio);
+
     struct tm * ZCE_API zce_localtime_r(const time_t *t, struct tm *res);
 
     zce_uint64 ZCE_API zce_tick();
