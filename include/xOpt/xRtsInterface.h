@@ -81,6 +81,8 @@ class xRtsCallbackInterface {
     */
     virtual QString solve(QString flowSheetName, QString computeTaskName, QString sInfo) = 0;
 
+    virtual int saveRts(QString projectJson) = 0;
+
     // 打印日志
     virtual void appendLog(ZLOG_LEVEL level, QString message) = 0;
 };
