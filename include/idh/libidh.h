@@ -270,11 +270,20 @@ LIBIDH_API int idh_instance_discovery(idh_handle_t handle, idh_source_desc_t* so
                                       uint16_t port);
 /* data source */
 
+// sample_timespan_msec: 订阅周期(毫秒). >0 = 订阅模式(组读返回订阅缓存);
+//   ==0 = 不订阅(同步读模式), 组读时直接同步读OPC并按缓存窗口节流
 LIBIDH_API idh_source_t idh_source_create(idh_handle_t handle, IDH_RTSOURCE source_type,
                                           const char* source_schema, int sample_timespan_msec,
                                           unsigned int source_flag);
 
 LIBIDH_API int idh_source_valid(idh_source_t source_id);
+
+// 设置同步读模式(订阅时间为0)下的缓存有效窗口(毫秒), 默认100ms; 0 = 每次组读都同步读OPC.
+// 窗口内的快读直接返回缓存, 避免大量请求打到OPC服务器. 返回0成功, 负值为错误码.
+LIBIDH_API int idh_source_set_sync_cache_msec(idh_source_t source_id, int msec);
+
+// 获取当前同步读缓存窗口(毫秒). 返回 >=0 为当前窗口值, 负值为错误码.
+LIBIDH_API int idh_source_get_sync_cache_msec(idh_source_t source_id);
 
 LIBIDH_API void idh_source_destroy(idh_source_t source_id);
 

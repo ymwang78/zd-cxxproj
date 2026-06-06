@@ -1,4 +1,4 @@
-﻿// *s**************************************************************
+// *s**************************************************************
 //  zvm   version:  1.0   -  date: 2016/3/12
 //  -------------------------------------------------------------
 //  Yongming Wang(wangym@gmail.com)
@@ -11,6 +11,7 @@
 #pragma once
 #include <functional>
 #include <zce/zdp_base_proto.h>
+#include <zce/zdp_base_pack.h>
 #include <zce/zce_dblock.h>
 #include <zce/zce_mbpool.h>
 #include <zce/zce_singleton.h>
