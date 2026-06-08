@@ -39,11 +39,11 @@
 /// further ABI-incompatible changes may be made before the ABI is officially
 /// changed to the new version.
 #ifndef PYBIND11_INTERNALS_VERSION
-#    define PYBIND11_INTERNALS_VERSION 11
+#    define PYBIND11_INTERNALS_VERSION 12
 #endif
 
-#if PYBIND11_INTERNALS_VERSION < 11
-#    error "PYBIND11_INTERNALS_VERSION 11 is the minimum for all platforms for pybind11v3."
+#if PYBIND11_INTERNALS_VERSION < 12
+#    error "PYBIND11_INTERNALS_VERSION 12 is the minimum for all platforms for pybind11 v3.1.0"
 #endif
 
 PYBIND11_NAMESPACE_BEGIN(PYBIND11_NAMESPACE)
@@ -59,15 +59,13 @@ using ExceptionTranslator = void (*)(std::exception_ptr);
 #    define PYBIND11_TLS_KEY_INIT(var)                                                            \
         _Pragma("clang diagnostic push")                                         /**/             \
             _Pragma("clang diagnostic ignored \"-Wmissing-field-initializers\"") /**/             \
-            Py_tss_t var                                                                          \
-            = Py_tss_NEEDS_INIT;                                                                  \
+            Py_tss_t var = Py_tss_NEEDS_INIT;                                                     \
         _Pragma("clang diagnostic pop")
 #elif defined(__GNUC__) && !defined(__INTEL_COMPILER)
 #    define PYBIND11_TLS_KEY_INIT(var)                                                            \
         _Pragma("GCC diagnostic push")                                         /**/               \
             _Pragma("GCC diagnostic ignored \"-Wmissing-field-initializers\"") /**/               \
-            Py_tss_t var                                                                          \
-            = Py_tss_NEEDS_INIT;                                                                  \
+            Py_tss_t var = Py_tss_NEEDS_INIT;                                                     \
         _Pragma("GCC diagnostic pop")
 #else
 #    define PYBIND11_TLS_KEY_INIT(var) Py_tss_t var = Py_tss_NEEDS_INIT;
@@ -191,7 +189,7 @@ inline bool same_type(const std::type_info &lhs, const std::type_info &rhs) {
 }
 
 struct type_hash {
-    size_t operator()(const std::type_index &t) const {
+    size_t operator()(const std::type_index &t) const noexcept {
         size_t hash = 5381;
         const char *ptr = t.name();
         while (auto c = static_cast<unsigned char>(*ptr++)) {
@@ -202,7 +200,7 @@ struct type_hash {
 };
 
 struct type_equal_to {
-    bool operator()(const std::type_index &lhs, const std::type_index &rhs) const {
+    bool operator()(const std::type_index &lhs, const std::type_index &rhs) const noexcept {
         return lhs.name() == rhs.name() || std::strcmp(lhs.name(), rhs.name()) == 0;
     }
 };
@@ -218,7 +216,7 @@ template <typename value_type>
 using type_map = std::unordered_map<std::type_index, value_type, type_hash, type_equal_to>;
 
 struct override_hash {
-    size_t operator()(const std::pair<const PyObject *, const char *> &v) const {
+    size_t operator()(const std::pair<const PyObject *, const char *> &v) const noexcept {
         size_t value = std::hash<const void *>()(v.first);
         value ^= std::hash<const void *>()(v.second) + 0x9e3779b9 + (value << 6) + (value >> 2);
         return value;
@@ -864,7 +862,11 @@ inline internals_pp_manager<internals> &get_internals_pp_manager() {
 /// Return a reference to the current `internals` data
 PYBIND11_NOINLINE internals &get_internals() {
     auto &ppmgr = get_internals_pp_manager();
-    auto &internals_ptr = *ppmgr.get_pp();
+    auto *pp = ppmgr.get_pp();
+    if (!pp) {
+        pybind11_fail("get_internals: get_pp() returned nullptr");
+    }
+    auto &internals_ptr = *pp;
     if (!internals_ptr) {
         // Slow path, something needs fetched from the state dict or created
         gil_scoped_acquire_simple gil;
@@ -872,6 +874,9 @@ PYBIND11_NOINLINE internals &get_internals() {
 
         ppmgr.create_pp_content_once(&internals_ptr);
 
+        if (!internals_ptr) {
+            pybind11_fail("get_internals: create_pp_content_once() produced nullptr");
+        }
         if (!internals_ptr->instance_base) {
             // This calls get_internals, so cannot be called from within the internals constructor
             // called above because internals_ptr must be set before get_internals is called again

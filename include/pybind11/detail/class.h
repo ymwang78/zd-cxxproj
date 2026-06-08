@@ -503,6 +503,17 @@ extern "C" inline void pybind11_object_dealloc(PyObject *self) {
         PyObject_GC_UnTrack(self);
     }
 
+#if PY_VERSION_HEX >= 0x030D0000
+    // PyObject_ClearManagedDict() is available from Python 3.13+. It must be
+    // called before tp_free() because on Python 3.14+ tp_free no longer
+    // implicitly clears the managed dict, which would abandon the refcounts of
+    // objects stored in __dict__ of py::dynamic_attr() types, causing permanent
+    // memory leaks.
+    if (PyType_HasFeature(type, Py_TPFLAGS_MANAGED_DICT)) {
+        PyObject_ClearManagedDict(self);
+    }
+#endif
+
     clear_instance(self);
 
     type->tp_free(self);
@@ -567,7 +578,10 @@ inline PyObject *make_object_base_type(PyTypeObject *metaclass) {
 /// dynamic_attr: Allow the garbage collector to traverse the internal instance `__dict__`.
 extern "C" inline int pybind11_traverse(PyObject *self, visitproc visit, void *arg) {
 #if PY_VERSION_HEX >= 0x030D0000
-    PyObject_VisitManagedDict(self, visit, arg);
+    int ret = PyObject_VisitManagedDict(self, visit, arg);
+    if (ret) {
+        return ret;
+    }
 #else
     PyObject *&dict = *_PyObject_GetDictPtr(self);
     Py_VISIT(dict);
