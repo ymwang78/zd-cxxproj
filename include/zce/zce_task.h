@@ -236,7 +236,15 @@ class ZCE_API Scheduler : public zce::Object {
 
     void stop();
 
-    int perform(const TaskPtr& req, int idx = -1); // bind to thread(idx)
+    // idx only selects which worker is woken to pull from the SHARED queue; the task may
+    // still execute on any worker. Use performExclusive() when execution must be bound to a
+    // specific worker thread.
+    int perform(const TaskPtr& req, int idx = -1);
+
+    // Strictly enqueue req onto worker(idx)'s PRIVATE queue, guaranteeing it runs on that one
+    // worker thread (unlike perform(req, idx)). Required for tasks that must run on a specific
+    // OS thread, e.g. releasing a thread-affine resource on the thread that created it.
+    int performExclusive(const TaskPtr& req, int idx);
 
     int printCurrentTasks();
 
@@ -251,6 +259,19 @@ class ZCE_API Scheduler : public zce::Object {
         };
         zce::SmartPtr<zce::Task> task_ptr(new FuncTask(std::forward<F>(f)));
         return perform(task_ptr, idx);
+    };
+
+    template <typename F>
+    int performExclusiveFunc(F&& f, int idx) {
+        class FuncTask : public Task {
+            using Fn = std::decay_t<F>;
+            Fn f_;
+          public:
+            FuncTask(F&& f) : zce::Task("performExclusiveFunc"), f_(std::forward<F>(f)) {}
+            virtual void call() { f_(); }
+        };
+        zce::SmartPtr<zce::Task> task_ptr(new FuncTask(std::forward<F>(f)));
+        return performExclusive(task_ptr, idx);
     };
 
     template <typename F, typename... Args>
