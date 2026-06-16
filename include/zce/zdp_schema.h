@@ -327,7 +327,8 @@ static inline int unpack_builtin_fix_array(P& val, const zce_byte* buf, zce_int3
 
     if (alen == 0) return ret;
 
-    len = (alen * sizeof(T));
+    int err = zdp_detail::check_byte_count(alen, sizeof(T), len);
+    if (err < 0) return err;
     if (size < len) return ZCE_ERROR_SHRTLEN;
 
     if (sizeof(T) == 1) {
@@ -397,10 +398,11 @@ static inline int unpack_rawptr_pair(std::pair<T*, T*>& val, const zce_byte* buf
         return ret;
     }
 
+    int err = zdp_detail::check_byte_count(alen, sizeof(T), len);
+    if (err < 0) return err;
+    if (size < len) return ZCE_ERROR_SHRTLEN;
     val.first = (T*)buf;
     val.second = val.first + alen;
-    len = (alen * sizeof(T));
-    if (size < len) return ZCE_ERROR_SHRTLEN;
     ret += len;
     return ret;
 }
