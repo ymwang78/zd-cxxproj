@@ -457,7 +457,6 @@ int unpack_array(std::vector<T>& val, const zce_byte* buf, zce_int32 size, int f
         return ZCE_ERROR_SYNTAX;
     }
     if (alen < 0) return ZCE_ERROR_SYNTAX;
-    if (size < alen) return ZCE_ERROR_SHRTLEN;
     int err = zdp_detail::resize_vector(val, alen);
     if (err < 0) return err;
 
