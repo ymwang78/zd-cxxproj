@@ -13,6 +13,9 @@
 #include <zce/zce_matrix.h>
 #include <zce/zce_dblock.h>
 #include <zce/zce_mbpool.h>
+#include <limits>
+#include <new>
+#include <stdexcept>
 #ifndef CHECKLEN_MOVEBUF_ADDRET_DECSIZE
 #    define CHECKLEN_MOVEBUF_ADDRET_DECSIZE \
         do {                                \
@@ -29,6 +32,31 @@ typedef struct _object PyObject;
 namespace zce {
 
 namespace zdp {
+
+namespace zds_detail {
+
+inline bool to_size(zce_uint64 val, size_t& out) {
+    if (val > static_cast<zce_uint64>(std::numeric_limits<size_t>::max())) return false;
+    out = static_cast<size_t>(val);
+    return true;
+}
+
+template <typename T>
+inline int resize_vector(std::vector<T>& val, zce_uint64 count) {
+    size_t size = 0;
+    if (!to_size(count, size)) return ZCE_ERROR_MALLOC;
+
+    try {
+        val.resize(size);
+    } catch (const std::bad_alloc&) {
+        return ZCE_ERROR_MALLOC;
+    } catch (const std::length_error&) {
+        return ZCE_ERROR_MALLOC;
+    }
+    return 0;
+}
+
+}  // namespace zds_detail
 
 enum ERV_ZDS_PAYLOAD : zce_byte {
     ZDS_PAYLOAD_SIMPBINT,
@@ -322,11 +350,10 @@ int zds_unpack_array(std::vector<T>& val, const zce_byte* buf, zce_int32 size, z
     len = zds_unpack_struct_array_header(alen, buf, size, ctx);
     CHECKLEN_MOVEBUF_ADDRET_DECSIZE;
 
-    // fast size check, to avoid a very large array size
-    // at least every struct has 1 byte
-    if (size < (int)alen) return ZCE_ERROR_SHRTLEN;
+    if (size < 0 || alen > static_cast<zce_uint64>(size)) return ZCE_ERROR_SHRTLEN;
 
-    val.resize((size_t)alen);
+    int err = zds_detail::resize_vector(val, alen);
+    if (err < 0) return err;
 
     typename std::vector<T>::iterator iter;
     for (iter = val.begin(); iter != val.end(); ++iter) {
