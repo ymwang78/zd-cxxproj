@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 // ***************************************************************
 //  zdp_schema   version:  1.0   -  date: 2015/11/14
 //  -------------------------------------------------------------
@@ -22,7 +22,7 @@
 #include <utility>
 
 #ifndef ZCE_ZDP_MAX_UNPACK_ARRAY_COUNT
-#define ZCE_ZDP_MAX_UNPACK_ARRAY_COUNT (1024 * 1024)
+#    define ZCE_ZDP_MAX_UNPACK_ARRAY_COUNT (1024 * 1024 * 1024)
 #endif
 
 namespace zce {
