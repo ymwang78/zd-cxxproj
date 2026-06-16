@@ -350,6 +350,7 @@ int zds_unpack_array(std::vector<T>& val, const zce_byte* buf, zce_int32 size, z
     len = zds_unpack_struct_array_header(alen, buf, size, ctx);
     CHECKLEN_MOVEBUF_ADDRET_DECSIZE;
 
+    // Each ZDS struct array element carries at least its struct-prefix varuint.
     if (size < 0 || alen > static_cast<zce_uint64>(size)) return ZCE_ERROR_SHRTLEN;
 
     int err = zds_detail::resize_vector(val, alen);

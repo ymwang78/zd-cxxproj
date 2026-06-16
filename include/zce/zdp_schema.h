@@ -21,11 +21,17 @@
 #include <typeinfo>
 #include <utility>
 
+#ifndef ZCE_ZDP_MAX_UNPACK_ARRAY_COUNT
+#define ZCE_ZDP_MAX_UNPACK_ARRAY_COUNT (1024 * 1024)
+#endif
+
 namespace zce {
 
 namespace zdp {
 
 namespace zdp_detail {
+
+static const int MAX_UNPACK_ARRAY_COUNT = ZCE_ZDP_MAX_UNPACK_ARRAY_COUNT;
 
 template <typename T>
 inline int resize_vector(std::vector<T>& val, int count) {
@@ -38,6 +44,12 @@ inline int resize_vector(std::vector<T>& val, int count) {
     } catch (const std::length_error&) {
         return ZCE_ERROR_MALLOC;
     }
+    return 0;
+}
+
+inline int check_array_count(int count) {
+    if (count < 0) return ZCE_ERROR_SYNTAX;
+    if (count > MAX_UNPACK_ARRAY_COUNT) return ZCE_ERROR_EXCDLEN;
     return 0;
 }
 
@@ -456,8 +468,10 @@ int unpack_array(std::vector<T>& val, const zce_byte* buf, zce_int32 size, int f
         ZCE_DEBUG((ZLOG_DEBUG, "unpack_array fixed_len != alen\n"));
         return ZCE_ERROR_SYNTAX;
     }
-    if (alen < 0) return ZCE_ERROR_SYNTAX;
-    int err = zdp_detail::resize_vector(val, alen);
+    int err = zdp_detail::check_array_count(alen);
+    if (err < 0) return err;
+
+    err = zdp_detail::resize_vector(val, alen);
     if (err < 0) return err;
 
     typename std::vector<T>::iterator iter;
