@@ -60,7 +60,7 @@ inline int check_byte_count(int count, size_t item_size, int& len) {
         return 0;
     }
     if (static_cast<size_t>(count) >
-        static_cast<size_t>(std::numeric_limits<int>::max()) / item_size) {
+        static_cast<size_t>((std::numeric_limits<int>::max)()) / item_size) {
         return ZCE_ERROR_SHRTLEN;
     }
     len = static_cast<int>(static_cast<size_t>(count) * item_size);

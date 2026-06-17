@@ -36,7 +36,7 @@ namespace zdp {
 namespace zds_detail {
 
 inline bool to_size(zce_uint64 val, size_t& out) {
-    if (val > static_cast<zce_uint64>(std::numeric_limits<size_t>::max())) return false;
+    if (val > static_cast<zce_uint64>((std::numeric_limits<size_t>::max)())) return false;
     out = static_cast<size_t>(val);
     return true;
 }
