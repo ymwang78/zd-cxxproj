@@ -15,12 +15,59 @@
 #include <zce/zce_object.h>
 #include <zce/zce_dblock.h>
 #include <zce/zce_mbpool.h>
+#include <limits>
+#include <new>
+#include <stdexcept>
 #include <typeinfo>
 #include <utility>
+
+#ifndef ZCE_ZDP_MAX_UNPACK_ARRAY_COUNT
+#    define ZCE_ZDP_MAX_UNPACK_ARRAY_COUNT (1024 * 1024 * 1024)
+#endif
 
 namespace zce {
 
 namespace zdp {
+
+namespace zdp_detail {
+
+static const int MAX_UNPACK_ARRAY_COUNT = ZCE_ZDP_MAX_UNPACK_ARRAY_COUNT;
+
+template <typename T>
+inline int resize_vector(std::vector<T>& val, int count) {
+    if (count < 0) return ZCE_ERROR_SYNTAX;
+
+    try {
+        val.resize(static_cast<size_t>(count));
+    } catch (const std::bad_alloc&) {
+        return ZCE_ERROR_MALLOC;
+    } catch (const std::length_error&) {
+        return ZCE_ERROR_MALLOC;
+    }
+    return 0;
+}
+
+inline int check_array_count(int count) {
+    if (count < 0) return ZCE_ERROR_SYNTAX;
+    if (count > MAX_UNPACK_ARRAY_COUNT) return ZCE_ERROR_EXCDLEN;
+    return 0;
+}
+
+inline int check_byte_count(int count, size_t item_size, int& len) {
+    if (count < 0) return ZCE_ERROR_SYNTAX;
+    if (item_size == 0) {
+        len = 0;
+        return 0;
+    }
+    if (static_cast<size_t>(count) >
+        static_cast<size_t>(std::numeric_limits<int>::max()) / item_size) {
+        return ZCE_ERROR_SHRTLEN;
+    }
+    len = static_cast<int>(static_cast<size_t>(count) * item_size);
+    return 0;
+}
+
+}  // namespace zdp_detail
 
 static const int ZDP_HEADLEN = 10;
 
@@ -243,10 +290,12 @@ static inline int unpack_builtin_array(std::vector<T>& val, const zce_byte* buf,
 
     if (alen == 0) return ret;
 
-    val.resize(alen);
-
-    len = (alen * sizeof(T));
+    int err = zdp_detail::check_byte_count(alen, sizeof(T), len);
+    if (err < 0) return err;
     if (size < len) return ZCE_ERROR_SHRTLEN;
+
+    err = zdp_detail::resize_vector(val, alen);
+    if (err < 0) return err;
 
     if (sizeof(T) == 1) {
         memcpy(&val[0], buf, len);
@@ -290,7 +339,8 @@ static inline int unpack_builtin_fix_array(P& val, const zce_byte* buf, zce_int3
 
     if (alen == 0) return ret;
 
-    len = (alen * sizeof(T));
+    int err = zdp_detail::check_byte_count(alen, sizeof(T), len);
+    if (err < 0) return err;
     if (size < len) return ZCE_ERROR_SHRTLEN;
 
     if (sizeof(T) == 1) {
@@ -360,10 +410,11 @@ static inline int unpack_rawptr_pair(std::pair<T*, T*>& val, const zce_byte* buf
         return ret;
     }
 
+    int err = zdp_detail::check_byte_count(alen, sizeof(T), len);
+    if (err < 0) return err;
+    if (size < len) return ZCE_ERROR_SHRTLEN;
     val.first = (T*)buf;
     val.second = val.first + alen;
-    len = (alen * sizeof(T));
-    if (size < len) return ZCE_ERROR_SHRTLEN;
     ret += len;
     return ret;
 }
@@ -417,7 +468,11 @@ int unpack_array(std::vector<T>& val, const zce_byte* buf, zce_int32 size, int f
         ZCE_DEBUG((ZLOG_DEBUG, "unpack_array fixed_len != alen\n"));
         return ZCE_ERROR_SYNTAX;
     }
-    val.resize(alen);
+    int err = zdp_detail::check_array_count(alen);
+    if (err < 0) return err;
+
+    err = zdp_detail::resize_vector(val, alen);
+    if (err < 0) return err;
 
     typename std::vector<T>::iterator iter;
     for (iter = val.begin(); iter != val.end(); ++iter) {
@@ -512,4 +567,3 @@ int ZCE_API zdp_unzip(zce::RefBlock& out_ptr, const zce::RefBlock& in_ptr, const
             proc_##X(head, zce::SmartPtr<Y::X>(0), ctx);                       \
         }                                                                      \
     } break;
-
