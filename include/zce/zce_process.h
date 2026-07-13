@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 // ***************************************************************
 //  zce_process   version:  1.0   -  date:  2025/10/15
 //  -------------------------------------------------------------
@@ -135,6 +135,7 @@ class ZCE_API SubProcessHost : public ::zce::zvm::Machine {
         unsigned short stormport = (unsigned short)~0;
         std::string host_dir = ".";
         std::string host_topic;
+        zce_uint32 version = 0x00040000u;
     };
 
     SubProcessHost(const zce::SmartPtr<zce::zvm::VirtualMachineStub>& stub_ptr,
