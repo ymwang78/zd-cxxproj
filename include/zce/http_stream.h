@@ -153,6 +153,17 @@ class ZCE_API HttpStream : public IStream {
 
     void proc_dblock(RefBlock& dblock, const Any&);
 
+  protected:
+    /**
+     * @brief Cache the peer address for get_x_forward_for() and logging.
+     *
+     * Split out of on_open() so a derived stream that must delay the
+     * on_open() propagation (e.g. WebSocketStream, which only opens the
+     * application layer once the handshake response has been written) can
+     * still record the peer without notifying the next stream.
+     */
+    void record_remote(const zce_sockaddr_t& remote);
+
   public:
     void on_open(bool passive, const zce_sockaddr_t& remote) override;
 
@@ -212,6 +223,27 @@ class WebSocketStream : public HttpStream {
 
     int opcode_;
 
+    // RFC6455 4.2.2: the connection is only in the OPEN state once the 101
+    // response has been sent. on_open() is therefore held back until
+    // on_http_request() has written the handshake response, so the
+    // application never sees a connected stream it could write frames into
+    // ahead of the 101 status line. Mirrors zce_websocket_client, which
+    // likewise defers on_open() until the 101 has been validated.
+    zce_sockaddr_t open_remote_;
+
+    bool open_passive_;
+
+    bool opened_;
+
+    /**
+     * @brief Answer a request that is not a valid handshake and close.
+     *
+     * Writes a plain HTTP error response, unframed, followed by the stream
+     * stack's flush-then-close request so the response reaches the peer
+     * before the socket goes away.
+     */
+    void writeHandshakeError(unsigned code, const char* reason);
+
   public:
     enum { OPCODE_TEXT = 1, OPCODE_BIN = 2 };
 
@@ -223,6 +255,8 @@ class WebSocketStream : public HttpStream {
                          const RefBlock& dblock) override;
 
     void on_http_continue(RefBlock& dblock) override;
+
+    void on_close() override;
 
     int write(RefBlock& dblock, ERV_ISTREAM_WRITEOPT opt) override;
 
