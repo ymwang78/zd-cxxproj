@@ -38,6 +38,9 @@ class xOptModelBlackBox : public xOptModelBase {
 
     int prepareRuntime(const xOptParsedVariableArr& arr) override;  // 运行时准备
 
+    int generateEstimate(std::vector<double>& init_x,
+                         const xOptModelFixableVariables& fixed_values) override;
+
     int getPortNum(bool is_input_port) const override;
 
     xOptVarCompMap getVarCompMap(bool isInPort, int iIndex) const override;
