@@ -315,11 +315,18 @@ mpcctrl <instance> script exec <script-name> --dry-run
 # Run online identification (timeout 60 s)
 mpcctrl <instance> ident online --timeout 60000
 
+# Ask the Python identification algorithm to export files (ignored by older HostVM)
+mpcctrl <instance> ident online --export-file --timeout 60000
+
 # Estimate delays
 mpcctrl <instance> ident delay --timeout 30000
 
 # Design test
 mpcctrl <instance> ident design --timeout 120000
+
+# Cancel the running identification task (optionally only the given requestId)
+mpcctrl <instance> ident cancel
+mpcctrl <instance> ident cancel 42
 ```
 
 ---
@@ -760,11 +767,18 @@ mpcctrl <实例> script exec <脚本名> --dry-run
 # 在线辨识（超时 60 秒）
 mpcctrl <实例> ident online --timeout 60000
 
+# 让 Python 辨识算法导出文件（旧 HostVM 会忽略该尾参）
+mpcctrl <实例> ident online --export-file --timeout 60000
+
 # 估算延迟
 mpcctrl <实例> ident delay --timeout 30000
 
 # 设计测试
 mpcctrl <实例> ident design --timeout 120000
+
+# 取消在途的辨识任务（可只取消指定的 requestId）
+mpcctrl <实例> ident cancel
+mpcctrl <实例> ident cancel 42
 ```
 
 ---
@@ -869,6 +883,7 @@ CTL 命令到 ZVM RPC 方法的完整映射：
 | `script set` | `setScript` | `(string name, string content)` |
 | `script exec` | `executeScript` | `(bool=false, string name)` |
 | `script exec --dry-run` | `executeScript` | `(bool=true, string name)` |
-| `ident online` | `onlineIdent` | `(int timeout_ms)` |
+| `ident online` | `onlineIdent` | `(bool estimate_delay, bool use_expectation_matrix, int timeout_ms, [bool export_file])` |
 | `ident delay` | `estDelayon` | `(int timeout_ms)` |
 | `ident design` | `testDesign` | `(int timeout_ms)` |
+| `ident cancel` | `identCancel` | `(int64 request_id)` |
