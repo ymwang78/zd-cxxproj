@@ -327,6 +327,24 @@ mpcctrl <instance> ident design --timeout 120000
 # Cancel the running identification task (optionally only the given requestId)
 mpcctrl <instance> ident cancel
 mpcctrl <instance> ident cancel 42
+
+# Import identification data from CSV (header: DateTime,TAG1,TAG2,...).
+# Replaces the current testing-data round; rejected while a test is running.
+# --period is required when the CSV has no DateTime column.
+mpcctrl <instance> ident import --file data.csv --period 60
+
+# Append a further chunk to the round started by the import above
+mpcctrl <instance> ident import --file more.csv --append
+
+# Map CSV column names onto project tag names
+mpcctrl <instance> ident import --file data.csv --map "FI-101=FIC101" --map "TI-102=TI102"
+
+# Tune the per-request chunk size (default 20000 points); the first chunk overwrites,
+# the rest are appended
+mpcctrl <instance> ident import --file big.csv --chunk 50000
+
+# Export testing/identification data as CSV (optionally only the last N points)
+mpcctrl <instance> ident export --file dump.csv --max-points 10000
 ```
 
 ---
@@ -779,6 +797,23 @@ mpcctrl <实例> ident design --timeout 120000
 # 取消在途的辨识任务（可只取消指定的 requestId）
 mpcctrl <实例> ident cancel
 mpcctrl <实例> ident cancel 42
+
+# 从 CSV 导入辨识数据（表头 DateTime,位号1,位号2,...）。
+# 覆盖当前的试验数据轮次；辨识测试运行中会被拒绝。
+# CSV 没有 DateTime 列时必须给 --period。
+mpcctrl <实例> ident import --file data.csv --period 60
+
+# 向上面开始的那一轮追加后续数据块
+mpcctrl <实例> ident import --file more.csv --append
+
+# CSV 列名与工程位号不一致时手工映射
+mpcctrl <实例> ident import --file data.csv --map "FI-101=FIC101" --map "TI-102=TI102"
+
+# 调整单块上传的点数(默认 20000); 首块 overwrite, 其余转 append
+mpcctrl <实例> ident import --file big.csv --chunk 50000
+
+# 导出试验/辨识数据为 CSV（可只导出最后 N 个点）
+mpcctrl <实例> ident export --file dump.csv --max-points 10000
 ```
 
 ---
@@ -870,7 +905,7 @@ CTL 命令到 ZVM RPC 方法的完整映射：
 | `model upload` | `updateModels` | `(int flags, IDModelMatrix matrix)` |
 | `model autotune start` | `startAutoTuning` | `(bool=true)` |
 | `model autotune apply` | `useAutoTuningValue` | `(bool=true)` |
-| `project download` | `downloadProject` | `(int=0)` |
+| `project download` | `downloadProject` | `(unsigned mask)` — CLI passes Config\|Model\|SimulationModel\|Script\|Runtime |
 | `project upload` | `uploadProjectConfig` | `(ProjectFull cfg)` |
 | `project reload` | `reloadProjectConfig` | *(无参数)* |
 | `project set <real>` | `setProjectReal` | `(int enum_idx, double val)` |
@@ -883,7 +918,9 @@ CTL 命令到 ZVM RPC 方法的完整映射：
 | `script set` | `setScript` | `(string name, string content)` |
 | `script exec` | `executeScript` | `(bool=false, string name)` |
 | `script exec --dry-run` | `executeScript` | `(bool=true, string name)` |
-| `ident online` | `onlineIdent` | `(bool estimate_delay, bool use_expectation_matrix, int timeout_ms, [bool export_file])` |
+| `ident online` | `onlineIdent` | `(bool estimate_delay=false, bool use_expectation=true, int timeout_ms, bool export_file=false)` — the two leading bools exist only for wire compatibility with older HostVM; current HostVM reads `delayCalculationMethod` / `idTestingFlag` from the project. `--estimate-delay` / `--no-expectation` therefore only affect legacy servers |
 | `ident delay` | `estDelayon` | `(int timeout_ms)` |
 | `ident design` | `testDesign` | `(int timeout_ms)` |
-| `ident cancel` | `identCancel` | `(int64 request_id)` |
+| `ident cancel` | `identCancel` | `(int64 request_id=0)` — omit the argument to cancel whatever task is in flight (`request_id <= 0`) |
+| `ident import` | `importTestingHisData` | `(ImportTestingHisDataRequest req)` — CSV parsed client-side, uploaded in chunks |
+| `ident export` | `downloadProject` | `(unsigned mask)` — mask = Config\|TestingHisData; CSV written client-side |
