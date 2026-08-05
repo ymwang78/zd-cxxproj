@@ -77,6 +77,12 @@ std::string ZCE_API getAbsolutePath(const char* filename);
 
 int ZCE_API addToPath(const char* path);
 
+// Set an environment variable of the current process. Subprocesses started
+// afterwards through zce::SubProcessHost inherit it.
+// name and value are UTF-8. An empty value sets the variable to an empty
+// string instead of removing it.
+int ZCE_API setEnvVar(const char* name, const char* value);
+
 bool ZCE_API makeDir(const char* dir);
 
 bool ZCE_API isFilePathExists(const char* path);
