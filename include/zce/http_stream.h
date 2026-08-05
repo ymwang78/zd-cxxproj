@@ -129,6 +129,20 @@ struct ZCE_API ZCE_HTTP_RESPONSE : public ZCE_HTTP_HEADER {
 ///////////////////////////////////////////////////////////////////////////////
 
 class ZCE_API HttpStream : public IStream {
+  public:
+    /**
+     * @brief Largest request head (request line + headers) accepted.
+     *
+     * Until the head has been parsed there is no Content-Length, so this is
+     * the only point at which reading is genuinely unbounded and the only
+     * place a byte cap belongs. 8 KB is the same figure nginx and Apache use
+     * for a header block.
+     */
+    enum { MAX_HEAD_LENGTH = 8192 };
+
+    /// Default ceiling for a request BODY.
+    enum { DEFAULT_MAX_BODY_LENGTH = 8 * 1024 * 1024 };
+
   protected:
     HTTP_CGI_E cgi_;
     SmartPtr<ZCE_HTTP_REQUEST> org_request_;
@@ -142,6 +156,29 @@ class ZCE_API HttpStream : public IStream {
 
   public:
     HttpStream(HTTP_CGI_E cgi = HTTP_CGI_STANDARD);
+
+    /**
+     * @brief Raise or lower the accepted request body size, process-wide.
+     *
+     * Deliberately static rather than a per-stream member: adding a data
+     * member to HttpStream changes its size, and this class is exported from a
+     * shared library that several applications link against and do not all
+     * rebuild together. A caller compiled against the old layout would then
+     * allocate an object too small for the constructor to fill — which crashes
+     * where it is very hard to attribute. A static costs no layout change.
+     *
+     * The body is buffered whole before the request is dispatched, so this is
+     * also the per-connection memory a slow sender can pin. Raise it only for
+     * a process whose clients are trusted.
+     *
+     * `unsigned` rather than size_t on purpose: this bounds
+     * ZCE_HTTP_REQUEST::body_length(), which is itself unsigned, so a wider
+     * parameter would advertise a range the parser cannot represent. There is
+     * no 64-bit body length to compare against.
+     */
+    static void set_max_body_length(unsigned bytes);
+
+    static unsigned get_max_body_length();
 
     virtual ~HttpStream();
 
