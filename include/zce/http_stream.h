@@ -143,6 +143,31 @@ class ZCE_API HttpStream : public IStream {
     /// Default ceiling for a request BODY.
     enum { DEFAULT_MAX_BODY_LENGTH = 8 * 1024 * 1024 };
 
+    /**
+     * @brief Bounds of the lingering close applied to a refused request.
+     *
+     * A request is refused (400, 413) as soon as the head says so, which is
+     * usually while the peer is still uploading. Answering and closing at once
+     * makes the kernel reset the connection, and the RST discards whatever the
+     * peer has not read yet — including the response just written. The caller
+     * then sees a bare disconnect instead of the status explaining it, which
+     * is exactly the case where the reason matters most.
+     *
+     * So the close is deferred: the response is queued, then inbound data is
+     * read and discarded until the peer stops, giving the response time to be
+     * seen. Both bounds below exist so that refusing a large upload does not
+     * cost the very read the limit was meant to avoid — at most
+     * DEFAULT_LINGER_MAX_BYTES are discarded, for at most
+     * DEFAULT_LINGER_TIMEOUT_MS. Whichever is reached first ends the drain.
+     *
+     * The figures follow nginx's lingering_close, scaled down: it drains for
+     * up to 30 s with a 5 s idle timeout and no byte bound, which is generous
+     * for a server that has already decided to say no.
+     */
+    enum { DEFAULT_LINGER_TIMEOUT_MS = 5000 };
+
+    enum { DEFAULT_LINGER_MAX_BYTES = 1024 * 1024 };
+
   protected:
     HTTP_CGI_E cgi_;
     SmartPtr<ZCE_HTTP_REQUEST> org_request_;
@@ -180,6 +205,26 @@ class ZCE_API HttpStream : public IStream {
 
     static unsigned get_max_body_length();
 
+    /**
+     * @brief Tune the lingering close, process-wide.
+     *
+     * Static for the same reason as set_max_body_length(): HttpStream must not
+     * grow a data member.
+     *
+     * @param timeout_ms how long a single drain may run before the connection
+     *        is closed regardless. 0 leaves the drain bounded by bytes alone
+     *        (and by the transport's own idle timeout).
+     * @param max_bytes how much inbound data a refusal is willing to read and
+     *        throw away. 0 disables lingering entirely and restores the
+     *        immediate close, at the cost of the response being lost to the
+     *        reset whenever the peer is still uploading.
+     */
+    static void set_linger_close(unsigned timeout_ms, unsigned max_bytes);
+
+    static unsigned get_linger_timeout_ms();
+
+    static unsigned get_linger_max_bytes();
+
     virtual ~HttpStream();
 
     int header_length() const { return request_->header_length(); }
@@ -200,6 +245,26 @@ class ZCE_API HttpStream : public IStream {
      * still record the peer without notifying the next stream.
      */
     void record_remote(const zce_sockaddr_t& remote);
+
+    /**
+     * @brief Answer a request this stream will not process, and close.
+     *
+     * Writes a bodyless response, then hands the connection to a bounded
+     * lingering close so it survives the shutdown even though the peer is
+     * still uploading — see the DEFAULT_LINGER_* bounds. Non-virtual on
+     * purpose: HttpStream is exported and must not grow a vtable slot any more
+     * than a data member.
+     *
+     * @param code HTTP status to answer with, e.g. 400 or 413.
+     * @param reason the reason phrase, copied verbatim onto the status line
+     *        after `code`. Must be a non-null single-line phrase: it is not
+     *        escaped, so a CR or LF in it would split the status line and let
+     *        the caller inject a header.
+     * @param expect_more bytes of this request still outstanding, so a refusal
+     *        never drains longer than the request itself; pass -1 when the head
+     *        did not parse and there is no Content-Length to go by.
+     */
+    void refuseRequest(unsigned code, const char* reason, zce_int64 expect_more);
 
   public:
     void on_open(bool passive, const zce_sockaddr_t& remote) override;
