@@ -77,10 +77,13 @@ std::string ZCE_API getAbsolutePath(const char* filename);
 
 int ZCE_API addToPath(const char* path);
 
-// Set an environment variable of the current process. Subprocesses started
-// afterwards through zce::SubProcessHost inherit it.
-// name and value are UTF-8. An empty value sets the variable to an empty
-// string instead of removing it.
+// Set an environment variable of the current process. The new value is visible
+// to getenv() in this process and is inherited by subprocesses started
+// afterwards through zce::SubProcessHost.
+// name and value are UTF-8. An empty value sets the variable to an empty string
+// instead of removing it, except that on Windows the CRT cannot represent an
+// empty value: getenv() then reports the variable as unset, while subprocesses
+// still receive the empty string.
 int ZCE_API setEnvVar(const char* name, const char* value);
 
 bool ZCE_API makeDir(const char* dir);
