@@ -196,6 +196,21 @@ typedef int (*xOptModel_getParameters)(xOptModelHandle model, const char* names[
 typedef int (*xOptModel_setParameters)(xOptModelHandle model, const char* name[], double value[],
                                        int size);
 
+// 字符串参数通道。数值通道的取值只能是 double，无法表达取值本身是名字的参数——
+// 例如 RadFrac 的 SpecifyVariableName（["BottomFlowrate", "RefluxFlowrate", ...]），
+// 它与数值通道里的 SpecifyVariableValue 一一对应。
+// 一个名字对应一个字符串列表；values 为 NULL 时只回填 size，与数值通道的约定一致。
+// 返回的 const char* 由模型持有，在下一次 setSlate/setParameters/销毁之前有效。
+// 三者均为可选接口，未实现时为 NULL，宿主必须先判空再调用。
+typedef int (*xOptModel_getStringParameterNames)(xOptModelHandle model, const char* names[],
+                                                 int& size);
+
+typedef int (*xOptModel_getStringParameter)(xOptModelHandle model, const char* name,
+                                            const char* values[], int& size);
+
+typedef int (*xOptModel_setStringParameter)(xOptModelHandle model, const char* name,
+                                            const char* values[], int size);
+
 typedef int (*xOptModel_setProblemType)(xOptModelHandle model, XOPTF_PROBLEM_TYPE);
 
 // 获取可以被fix的变量以及初值，如：回流比、板效率
@@ -274,6 +289,15 @@ struct xOptModelT {
     xOptModel_getThermoBlocks getThermoBlocks;
     // Optional. If null or empty, host code treats the model as version "v1.0.0".
     xOptModel_getVersion getVersion;
+    // ---- 尾部扩展 ------------------------------------------------------
+    // 新接口只能追加在这里，且必须是可选的（允许为 NULL）。宿主分配本结构并在
+    // size 里填 sizeof(xOptModelT)；模型据此判断调用方的副本是否长到覆盖某个
+    // 字段，只有覆盖到了才写入，否则会越过调用方的分配写坏内存。相应地，模型
+    // 不应要求 size 恰好等于自己的 sizeof——那样一来任何用旧头文件编译的宿主
+    // 都会被新模型拒绝，而追加本可以是兼容的。
+    xOptModel_getStringParameterNames getStringParameterNames;
+    xOptModel_getStringParameter getStringParameter;
+    xOptModel_setStringParameter setStringParameter;
 };
 
 /* xOptModelT model= {sizeof(xOptModelT)} */
