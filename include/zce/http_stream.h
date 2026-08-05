@@ -209,12 +209,15 @@ class ZCE_API HttpStream : public IStream {
      * @brief Tune the lingering close, process-wide.
      *
      * Static for the same reason as set_max_body_length(): HttpStream must not
-     * grow a data member. `max_bytes == 0` disables lingering and restores the
-     * immediate close, which is the right setting only for a process that
-     * never refuses a request mid-upload.
+     * grow a data member.
      *
-     * @param timeout_ms  0 leaves the drain bounded by bytes alone (and by the
-     *                    transport's own idle timeout).
+     * @param timeout_ms how long a single drain may run before the connection
+     *        is closed regardless. 0 leaves the drain bounded by bytes alone
+     *        (and by the transport's own idle timeout).
+     * @param max_bytes how much inbound data a refusal is willing to read and
+     *        throw away. 0 disables lingering entirely and restores the
+     *        immediate close, at the cost of the response being lost to the
+     *        reset whenever the peer is still uploading.
      */
     static void set_linger_close(unsigned timeout_ms, unsigned max_bytes);
 
@@ -246,12 +249,17 @@ class ZCE_API HttpStream : public IStream {
     /**
      * @brief Answer a request this stream will not process, and close.
      *
-     * Writes a bodyless `code` response carrying Connection: close, then hands
-     * the connection to a bounded lingering close so the response survives the
-     * shutdown even though the peer is still uploading — see the
-     * DEFAULT_LINGER_* bounds. Non-virtual on purpose: HttpStream is exported
-     * and must not grow a vtable slot any more than a data member.
+     * Writes a bodyless response, then hands the connection to a bounded
+     * lingering close so it survives the shutdown even though the peer is
+     * still uploading — see the DEFAULT_LINGER_* bounds. Non-virtual on
+     * purpose: HttpStream is exported and must not grow a vtable slot any more
+     * than a data member.
      *
+     * @param code HTTP status to answer with, e.g. 400 or 413.
+     * @param reason the reason phrase, copied verbatim onto the status line
+     *        after `code`. Must be a non-null single-line phrase: it is not
+     *        escaped, so a CR or LF in it would split the status line and let
+     *        the caller inject a header.
      * @param expect_more bytes of this request still outstanding, so a refusal
      *        never drains longer than the request itself; pass -1 when the head
      *        did not parse and there is no Content-Length to go by.
