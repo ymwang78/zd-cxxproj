@@ -1,4 +1,4 @@
-﻿# CTL CLI Framework Guide — Two-Layer CLI Design
+# CTL CLI Framework Guide — Two-Layer CLI Design
 
 > **Language / 语言**: This document is bilingual. English section first, Chinese section follows.
 > See CLAUDE.md index for the entry point.
@@ -918,7 +918,7 @@ CTL 命令到 ZVM RPC 方法的完整映射：
 | `script set` | `setScript` | `(string name, string content)` |
 | `script exec` | `executeScript` | `(bool=false, string name)` |
 | `script exec --dry-run` | `executeScript` | `(bool=true, string name)` |
-| `ident online` | `onlineIdent` | `(bool estimate_delay=false, bool use_expectation=true, int timeout_ms, bool export_file)` — the two leading bools exist only for wire compatibility with older HostVM; current HostVM reads `delayCalculationMethod` / `idTestingFlag` from the project. `--estimate-delay` / `--no-expectation` therefore only affect legacy servers |
+| `ident online` | `onlineIdent` | `(bool estimate_delay=false, bool use_expectation=true, int timeout_ms, bool export_file=false)` — the two leading bools exist only for wire compatibility with older HostVM; current HostVM reads `delayCalculationMethod` / `idTestingFlag` from the project. `--estimate-delay` / `--no-expectation` therefore only affect legacy servers |
 | `ident delay` | `estDelayon` | `(int timeout_ms)` |
 | `ident design` | `testDesign` | `(int timeout_ms)` |
 | `ident cancel` | `identCancel` | `(int64 request_id=0)` — omit the argument to cancel whatever task is in flight (`request_id <= 0`) |
