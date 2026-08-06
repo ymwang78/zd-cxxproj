@@ -127,6 +127,16 @@ extern "C"
 }
 #endif
 
+// 解析嵌入式 Python home，返回存在的绝对路径；一个候选都不存在时返回空串。
+// 候选优先级：python_home 实参 > ZCE_VIRTUAL_VENV 环境变量 > 平台默认值
+// （Windows 为 ../WinPy<主><次>/python，Linux 为 /opt/venv）。
+// 即 python_home 传 nullptr 时，ZCE_VIRTUAL_VENV 就是优先级最高的覆盖手段。
+// 其中相对路径先按「可执行文件所在目录」解析，再按进程工作目录解析：服务与测试都可能
+// 从任意目录启动，只按工作目录解析会在目录不对时静默失败，随后取 GIL 直接访问违例。
+// zce_init_pyenv() 内部用的就是这个函数，python_home 传 nullptr 即表示只用默认候选。
+// 仅在 ZCE_SUPPORT_PYVM 编译时提供实现。
+std::string ZCE_API zce_resolve_pyenv_home(const char* python_home = nullptr);
+
 int ZCE_API zce_symbol_read(const char* buf, int size, std::string& val, char split = ' ');
 
 int ZCE_API zce_symbol_read_linefeed(const char* buf, int size, std::string& val);
