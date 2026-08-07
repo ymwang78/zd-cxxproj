@@ -222,20 +222,30 @@ typedef int (*xOptModel_getParameters)(xOptModelHandle model, const char* names[
 typedef int (*xOptModel_setParameters)(xOptModelHandle model, const char* name[], double value[],
                                        int size);
 
-// 字符串参数通道。数值通道的取值只能是 double，无法表达取值本身是名字的参数——
-// 例如 RadFrac 的 SpecifyVariableName（["BottomFlowrate", "RefluxFlowrate", ...]），
-// 它与数值通道里的 SpecifyVariableValue 一一对应。
-// 一个名字对应一个字符串列表；values 为 NULL 时只回填 size，与数值通道的约定一致。
-// 返回的 const char* 由模型持有，在下一次 setSlate/setParameters/销毁之前有效。
-// 三者均为可选接口，未实现时为 NULL，宿主必须先判空再调用。
-typedef int (*xOptModel_getStringParameterNames)(xOptModelHandle model, const char* names[],
-                                                 int& size);
+// JSON 参数通道。数值通道一个名字只能带一个 double，表达不了取值本身是名字的
+// 参数——例如 RadFrac 的 SpecifyVariableName
+// （["BottomFlowrate", "RefluxFlowrate", ...]）——也表达不了数组，例如两股进料
+// 的 Feed_Stage（[28, 40]）。
+//
+// 宿主侧的参数容器本来就是 zce::Any（xOptModelBase.h 的 xOptModelParameters），
+// 界面、Python 模型和持久化都按 Any 传递；JSON 只是 Any 跨过这条 C 边界时的
+// 表示，不是另一套类型系统。宿主用 Any::toJsonString() 送进来，模型解析；反向
+// 用 Any::fromJsonString() 还原。
+//
+// 传的是**整个参数集**而不是单个参数，理由有两个：其一，一组参数是否合法往往
+// 只能整体判断（RadFrac 的规格组合就是如此），整集调用才能原子地接受或拒绝；
+// 其二，有的参数决定另一些参数存不存在（进料股数决定有几个进料级），逐个调用
+// 会把结果变成调用顺序的函数。
+//
+// setParametersJson 收一个 JSON 对象，允许只给出参数集的一个子集，未提及的保持
+// 原值；整体校验不通过时应当整体拒绝，不留下改了一半的模型。
+// getParametersJson 返回的指针由模型持有，在下一次
+// setSlate/setParameters/setParametersJson/销毁之前有效；失败时返回 NULL。
+//
+// 两者均为可选接口，未实现时为 NULL，宿主必须先判空，并在缺失时退回数值通道。
+typedef int (*xOptModel_setParametersJson)(xOptModelHandle model, const char* json);
 
-typedef int (*xOptModel_getStringParameter)(xOptModelHandle model, const char* name,
-                                            const char* values[], int& size);
-
-typedef int (*xOptModel_setStringParameter)(xOptModelHandle model, const char* name,
-                                            const char* values[], int size);
+typedef const char* (*xOptModel_getParametersJson)(xOptModelHandle model);
 
 typedef int (*xOptModel_setProblemType)(xOptModelHandle model, XOPTF_PROBLEM_TYPE);
 
@@ -321,9 +331,8 @@ struct xOptModelT {
     // 字段，只有覆盖到了才写入，否则会越过调用方的分配写坏内存。相应地，模型
     // 不应要求 size 恰好等于自己的 sizeof——那样一来任何用旧头文件编译的宿主
     // 都会被新模型拒绝，而追加本可以是兼容的。
-    xOptModel_getStringParameterNames getStringParameterNames;
-    xOptModel_getStringParameter getStringParameter;
-    xOptModel_setStringParameter setStringParameter;
+    xOptModel_setParametersJson setParametersJson;
+    xOptModel_getParametersJson getParametersJson;
 };
 
 /* xOptModelT model= {sizeof(xOptModelT)} */
