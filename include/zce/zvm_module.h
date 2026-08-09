@@ -7,21 +7,31 @@
 //  This is a part of ZCE lib, which inherited from ubeda/utiny.
 //  Copyright (C) 2003 - All Rights Reserved
 // ***************************************************************
-// zvm 模块接入公开接口。
-//
-// 独立模块（libmpc / libident / libcoin 等）向 zvm 注册自己的 vmtype 和
-// Lua 扩展库时只需包含本头文件，不应再包含 libsrc/libzce 下的内部头
-// （zvm/zvm_pimpl.h、zvm/zvm_base.h）——那些头暴露的是 zvm 的内部实现，
-// 跟着它们走会把模块和 libzce 的内部布局焊死。
-// ***************************************************************
+
+/**
+ * @file zvm_module.h
+ * @brief Public integration surface for zvm modules.
+ *
+ * Standalone modules (libmpc / libident / libcoin ...) only need this header to
+ * register their own vmtype and Lua extension libraries. They must not include
+ * the internal headers under libsrc/libzce (zvm/zvm_pimpl.h, zvm/zvm_base.h):
+ * those expose zvm implementation details and welding a module to them ties it
+ * to libzce's internal layout.
+ */
+
 #include <zce/zvm.h>
 #include <functional>
 #include <string>
 
-// Lua 扩展库注册：模块在 zXXX_init() 里构造一个静态对象即可把自己的
-// openlibs 回调挂进 zua 虚拟机的初始化链。
+/**
+ * @brief Registers a Lua extension library with the zua virtual machine.
+ *
+ * A module declares a static instance inside its zXXX_init() so that its
+ * openlibs callback is appended to the zua initialisation chain.
+ */
 class ZCE_API zua_register {
   public:
+    /// @param openlibs Callback invoked on each new lua_State to register libraries.
     zua_register(lpfn_lual_openlibs openlibs);
 
     ~zua_register();
@@ -31,9 +41,13 @@ namespace zce {
 
 namespace zvm {
 
-// vmtype 注册：模块在 zXXX_init() 里构造一个静态对象，把 vmtype 字符串
-// 和创建 Machine 的工厂函数登记到 zvm。之后 hostvm 侧按 zvm_t::vmtype
-// boot 出对应的 Machine。
+/**
+ * @brief Registers a vmtype and its Machine factory with zvm.
+ *
+ * A module declares a static instance inside its zXXX_init(), binding a vmtype
+ * string to a factory. The host then boots the matching Machine according to
+ * zvm_t::vmtype.
+ */
 class ZCE_API VirtualMachineRegister {
   public:
     typedef std::function<zce::SmartPtr<::zce::zvm::Machine>(
@@ -41,22 +55,49 @@ class ZCE_API VirtualMachineRegister {
         zce::RefBlock& dblock)>
         lpfn_zvm_creator;
 
+    /**
+     * @param suffix  vmtype string to bind, e.g. "TaijiMPC".
+     * @param creator Factory producing the Machine for that vmtype.
+     */
     VirtualMachineRegister(const std::string& suffix, lpfn_zvm_creator creator);
 
     ~VirtualMachineRegister();
 };
 
-// ── 反向调用（服务端顺着来路回调发起方，如进度上报） ─────────────────────
+// ── Reverse calls (a server calling back into its caller, e.g. progress) ──────
 //
-// 这两个函数一律以 SmartPtr<Object> 作为不透明句柄进出，目的是让模块不必看见
-// RpcStream / Proxy 的定义：两者的 dynamic_cast 都需要完整类型，而完整类型只
-// 在 libzce 内部头里有。转换统一在 libzce 内部完成。
+// Both helpers below pass zce::SmartPtr<zce::Object> as an opaque handle on
+// purpose, so that modules never need the definitions of RpcStream / Proxy:
+// converting between them requires dynamic_cast on complete types, and those
+// types live only in libzce's internal headers. The conversions are therefore
+// kept inside libzce.
 
-// 把 call_dblock_from_remote 收到的来路流收成句柄存下来备用。
+/**
+ * @brief Wraps the originating stream of a remote call into an opaque handle.
+ *
+ * Typically called from Machine::call_dblock_from_remote() to remember the
+ * caller for a later reverse call.
+ *
+ * @param stream Stream the current request arrived on.
+ * @return Opaque handle, or null if @p stream is null.
+ */
 zce::SmartPtr<zce::Object> ZCE_API toObjectHandle(const zce::SmartPtr<RpcStream>& stream);
 
-// 顺着来路句柄取一个指向发起方 svc_name 服务的 vm，可直接作为
-// VirtualMachineStub::rpc_call_* 的目标。已存在则复用，否则新建；失败返回空。
+/**
+ * @brief Gets, or boots, a vm pointing back at @p svc_name on the caller side.
+ *
+ * The returned handle can be used directly as the target of
+ * VirtualMachineStub::rpc_call_*. An existing reusable vm is returned when one
+ * is present, otherwise a new one is booted. Safe under concurrent callers: if
+ * a racing caller wins the insert, the loser picks up the winner's vm rather
+ * than failing.
+ *
+ * @param stream_handle Handle previously obtained from toObjectHandle().
+ * @param svc_name Service name on the caller side to connect back to.
+ * @param default_timeout_ms Default RPC timeout for a newly booted vm.
+ * @return Handle to the vm, or null if @p stream_handle is null, is not a
+ *         stream handle, or the vm could not be booted.
+ */
 zce::SmartPtr<zce::Object> ZCE_API getOrBootReuseVM(
     const zce::SmartPtr<zce::Object>& stream_handle, const std::string& svc_name,
     int default_timeout_ms);
