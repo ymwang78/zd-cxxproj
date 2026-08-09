@@ -93,6 +93,7 @@ zce::SmartPtr<zce::Object> ZCE_API toObjectHandle(const zce::SmartPtr<RpcStream>
  * than failing.
  *
  * @param stream_handle Handle previously obtained from toObjectHandle().
+ * @param svc_name Service name on the caller side to connect back to.
  * @param default_timeout_ms Default RPC timeout for a newly booted vm.
  * @return Handle to the vm, or null if @p stream_handle is null, is not a
  *         stream handle, or the vm could not be booted.
