@@ -72,9 +72,11 @@ class ZCE_API Any {
         zce_uint16 len_or_port_;
         zce_uint16 subtype_indicate_;  // defined by app
         zce_uint32 reserved_ : 15;
-        // Payload lives in the RefBlock at u_.dblock_ rather than in u_.str_ /
-        // the in-place buffer. Set only when the length exceeds what padding_ +
-        // len_or_port_ can record; implies outplace_.
+        // Payload (string or array) lives in the RefBlock at u_.dblock_ rather
+        // than in u_.str_ / u_.bytearray_ / the in-place buffer. Set only when
+        // the length exceeds what padding_ + len_or_port_ can record; implies
+        // outplace_. The block always holds one byte more than the payload,
+        // zeroed, so str() stays safe to hand to C string APIs.
         zce_uint32 blockstore_ : 1;
         zce_uint32 padding_ : 6;
         zce_uint32 type_ : 5;
@@ -104,12 +106,19 @@ class ZCE_API Any {
         int shiftbits) noexcept;
 
     // Out of line so that this header keeps its forward declaration of RefBlock
-    // instead of pulling zce_dblock.h into every translation unit. Only strings
+    // instead of pulling zce_dblock.h into every translation unit. Only payloads
     // past the 22-bit length ceiling take this path, so the call never lands on
     // the common one.
-    const char* _blockstore_str() const noexcept;
+    const char* _blockstore_data() const noexcept;
 
-    int _blockstore_len() const noexcept;
+    // Payload size in bytes, excluding the trailing 0.
+    int _blockstore_bytes() const noexcept;
+
+    // Copies len bytes into a fresh RefBlock and sets blockstore_ + outplace_.
+    bool _blockstore_assign(const void* src, size_t len) noexcept;
+
+    // Start of an array payload whichever of the three storage modes holds it.
+    const zce_byte* _array_ptr() const noexcept;
 
   public:
     Any(const Any& rhs);
@@ -318,6 +327,7 @@ class ZCE_API Any {
     inline const T* array() const noexcept {
         ZCE_ASSERT_RETURN(data_.type_ == _to_type<T>() && sizeof(T) == (1ull << data_.shiftbits_),
                           0);
+        if (data_.blockstore_) return (const T*)_blockstore_data();
         if (data_.outplace_) return (T*)data_.u_.bytearray_;
         return (T*)data_.u_.bytearray_inplace_;
     }
@@ -325,6 +335,8 @@ class ZCE_API Any {
     inline int arraylen() const noexcept {
         ZCE_ASSERT_RETURN(is_array(), 0);
 
+        // The block records bytes; an array counts elements.
+        if (data_.blockstore_) return _blockstore_bytes() >> data_.shiftbits_;
         if (data_.outplace_) return (data_.padding_ << 16) | data_.len_or_port_;
         return data_.padding_;
     }
@@ -333,14 +345,14 @@ class ZCE_API Any {
 
     inline const char* str() const noexcept {
         ZCE_ASSERT_RETURN(data_.type_ == any_str, 0);
-        if (data_.blockstore_) return _blockstore_str();
+        if (data_.blockstore_) return _blockstore_data();
         if (data_.outplace_) return data_.u_.str_;
         return data_.u_.str_inplace_;
     }
 
     inline int strlen() const noexcept {
         ZCE_ASSERT_RETURN(data_.type_ == any_str, 0);
-        if (data_.blockstore_) return _blockstore_len();
+        if (data_.blockstore_) return _blockstore_bytes();
         if (data_.outplace_) return (data_.padding_ << 16) | data_.len_or_port_;
         return data_.padding_;
     }
