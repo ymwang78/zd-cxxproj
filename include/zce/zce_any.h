@@ -71,7 +71,11 @@ class ZCE_API Any {
         } u_;
         zce_uint16 len_or_port_;
         zce_uint16 subtype_indicate_;  // defined by app
-        zce_uint32 reserved_ : 16;
+        zce_uint32 reserved_ : 15;
+        // Payload lives in the RefBlock at u_.dblock_ rather than in u_.str_ /
+        // the in-place buffer. Set only when the length exceeds what padding_ +
+        // len_or_port_ can record; implies outplace_.
+        zce_uint32 blockstore_ : 1;
         zce_uint32 padding_ : 6;
         zce_uint32 type_ : 5;
         zce_uint32 shiftbits_ : 3;
@@ -98,6 +102,14 @@ class ZCE_API Any {
     // called by template constructor
     Any(const zce_byte* buf, size_t len, _any_types any_types, bool issigned,
         int shiftbits) noexcept;
+
+    // Out of line so that this header keeps its forward declaration of RefBlock
+    // instead of pulling zce_dblock.h into every translation unit. Only strings
+    // past the 22-bit length ceiling take this path, so the call never lands on
+    // the common one.
+    const char* _blockstore_str() const noexcept;
+
+    int _blockstore_len() const noexcept;
 
   public:
     Any(const Any& rhs);
@@ -321,12 +333,14 @@ class ZCE_API Any {
 
     inline const char* str() const noexcept {
         ZCE_ASSERT_RETURN(data_.type_ == any_str, 0);
+        if (data_.blockstore_) return _blockstore_str();
         if (data_.outplace_) return data_.u_.str_;
         return data_.u_.str_inplace_;
     }
 
     inline int strlen() const noexcept {
         ZCE_ASSERT_RETURN(data_.type_ == any_str, 0);
+        if (data_.blockstore_) return _blockstore_len();
         if (data_.outplace_) return (data_.padding_ << 16) | data_.len_or_port_;
         return data_.padding_;
     }
