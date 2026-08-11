@@ -345,7 +345,27 @@ mpcctrl <instance> ident import --file big.csv --chunk 50000
 
 # Export testing/identification data as CSV (optionally only the last N points)
 mpcctrl <instance> ident export --file dump.csv --max-points 10000
+
+# Permanently delete samples from the testing history to free capacity.
+# Without ranges: drop every slice that is currently deselected.
+mpcctrl <instance> ident compact --yes
+
+# With explicit zero-based half-open ranges (<start>:<length>), repeatable
+mpcctrl <instance> ident compact 0:500 12000:3000 --yes
 ```
+
+Compaction is irreversible, so `--yes` is mandatory; it is rejected while a test is
+running. Deleting a range in the middle leaves the data on either side no longer
+time-adjacent, so the server records a **segment boundary** there — it does not insert
+NaN or placeholder samples to represent the gap. The gap length is whatever the real
+timestamps on both sides say it is. Identification then treats the two sides as separate
+batches: the first sample of each later segment is excluded from the fit so that no
+regression row spans the seam. That sample is still stored and still displayed; it is a
+real sample, just not fed to the fit.
+
+The response carries `historyRevision`, which increments whenever existing sample indices
+shift (compaction, or replacing the round). Clients must discard any index-based cache and
+re-pull the whole round when it changes — incremental top-ups no longer line up.
 
 ---
 
@@ -814,7 +834,23 @@ mpcctrl <实例> ident import --file big.csv --chunk 50000
 
 # 导出试验/辨识数据为 CSV（可只导出最后 N 个点）
 mpcctrl <实例> ident export --file dump.csv --max-points 10000
+
+# 物理删除测试历史里的采样点，释放点数配额。
+# 不带区间：删掉当前生效的全部"取消选择"切片。
+mpcctrl <实例> ident compact --yes
+
+# 显式给区间（零基半开 <起点>:<长度>），可重复
+mpcctrl <实例> ident compact 0:500 12000:3000 --yes
 ```
+
+压缩不可逆，所以 `--yes` 是必填；辨识测试运行中会被拒绝。删掉中段之后，两侧数据不再时间
+相邻，服务端在接缝处记一条**段边界**（见 `TestingHisData.segmentStarts`），而**不是**插
+NaN 或占位点来表示间隔——隔了多久由两侧真实时间戳说了算。辨识随后把两侧当作互不相干的两批
+数据：每个后续段的首点被排除出拟合，保证没有任何一行回归跨过接缝。这个点照常存储、照常显示，
+它是真实采样点，只是不进拟合。
+
+应答里的 `historyRevision` 在既有采样点下标发生平移时（压缩、整轮换数据）递增。客户端一旦
+发现它变了，必须丢弃所有按下标缓存的历史并重拉整轮——增量补拉的下标已经对不上账。
 
 ---
 
