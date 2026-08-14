@@ -140,9 +140,19 @@ class ZCE_API StormClient : public ::zce::Object {
      * the topic dictionary, and the id the server just handed out is unsubscribed
      * right away.
      *
-     * @p done is invoked exactly once: 0 when the topic is known to be gone from the
-     * server, negative when that could not be confirmed (the caller should then treat
-     * the topic as still possibly subscribed).
+     * @p done is invoked exactly once: 0 when the caller is done with this topic —
+     * either the server confirmed the unsubscribe, or there is no connection to
+     * confirm it on, in which case nothing is being delivered right now and the
+     * server-side remnant is removed on the next registration. Negative means the
+     * removal could not be confirmed on a connection that was live at the time, and
+     * the caller should treat the topic as still possibly subscribed.
+     *
+     * @note A subscription is registered against a client id that survives a
+     *       reconnect, so unsubscribing while offline is not enough on its own; this
+     *       call also arranges for the remnant to be dropped once the connection is
+     *       back. That replay briefly re-subscribes the topic — the server only
+     *       accepts a connection-scoped id, and subscribing is the only way to learn
+     *       it — so a stray message for the topic is possible during the reconnect.
      */
     int unsubscribe(const std::string& topic, storm_ack_callback done = nullptr);
 
