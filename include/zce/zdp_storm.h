@@ -51,6 +51,19 @@ struct ZCE_API zdp_storm_peer {
     zdp_storm_peer() : to(0), from(0) {}
 };
 
+/**
+ * @brief Completion callback for the acknowledged subscribe/unsubscribe overloads.
+ *
+ * @param result >= 0 when the server confirmed the operation on the connection that
+ *        is live right now; < 0 when it could not be confirmed (the connection was
+ *        lost first, the request was superseded, or the server rejected it).
+ *
+ * The callback runs on the reactor thread, except when the operation fails before it
+ * can be queued at all — then it runs inline on the calling thread. It is invoked
+ * exactly once per call, whatever the return value of the call was.
+ */
+typedef std::function<void(int result)> storm_ack_callback;
+
 class ZCE_API Storm : public ::zce::Object {
   public:
     struct Pimpl;
@@ -101,9 +114,47 @@ class ZCE_API StormClient : public ::zce::Object {
     // subscribe by topic name (e.g. "server.topic"); server returns unique id for publish/set
     int subscribe(const std::string& topic);
 
+    /**
+     * @brief Subscribe and report when the server has confirmed it.
+     *
+     * Same effect as subscribe(topic); additionally @p done is invoked exactly once
+     * with 0 once the MSG_SUBSCRIB_RES for this topic has landed on the current
+     * connection, or with a negative value if the connection went away (or the topic
+     * was unsubscribed) before that. It never fires a second time for a later
+     * automatic re-subscribe — call subscribe() again if a fresh ack is wanted.
+     */
+    int subscribe(const std::string& topic, storm_ack_callback done);
+
+    // 0 while a subscribe is still unconfirmed, and while the connection is down
     zce_int64 getTopicId(const std::string& topic) const;
 
     int unsubscribe(zce_int64 topic_id);
+
+    /**
+     * @brief Unsubscribe by topic name, with an ack.
+     *
+     * Topic names are stable across reconnects, so the caller can always name what it
+     * wants dropped — unlike ids, which are connection-scoped and unknown while a
+     * subscribe is still in flight. Cancelling a subscribe whose response has not
+     * arrived yet is handled here: the late MSG_SUBSCRIB_RES is not written back into
+     * the topic dictionary, and the id the server just handed out is unsubscribed
+     * right away.
+     *
+     * @p done is invoked exactly once: 0 when the caller is done with this topic —
+     * either the server confirmed the unsubscribe, or there is no connection to
+     * confirm it on, in which case nothing is being delivered right now and the
+     * server-side remnant is removed on the next registration. Negative means the
+     * removal could not be confirmed on a connection that was live at the time, and
+     * the caller should treat the topic as still possibly subscribed.
+     *
+     * @note A subscription is registered against a client id that survives a
+     *       reconnect, so unsubscribing while offline is not enough on its own; this
+     *       call also arranges for the remnant to be dropped once the connection is
+     *       back. That replay briefly re-subscribes the topic — the server only
+     *       accepts a connection-scoped id, and subscribing is the only way to learn
+     *       it — so a stray message for the topic is possible during the reconnect.
+     */
+    int unsubscribe(const std::string& topic, storm_ack_callback done = nullptr);
 
     int publish(zce_int64 topic, const zce_byte* data, size_t len, zce_int32 trace);
 
