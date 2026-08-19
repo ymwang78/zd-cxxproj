@@ -78,6 +78,7 @@ build_module libsrc/libidh -DUSE_CUSTOM_STATIC_LIBS=OFF -DBUILD_TESTS=ON
 build_module modules/ident
 build_module modules/coin
 build_module modules/mpc -DBUILD_TESTS=ON -DENABLE_PYTHON_BINDING=ON
+build_module modules/fgw -DFGW_BUILD_TESTS=OFF
 build_module tools/zGen
 build_module hosts/HostVM
 
