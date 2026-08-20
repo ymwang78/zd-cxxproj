@@ -41,13 +41,21 @@ struct ConnectionParams {
  * the port at the last ':' of what remains; an IPv6 host must be bracketed, as in
  * "[::1]:5432". A password may therefore hold '@' and ':'.
  *
- * The syntax still cannot express every value, and what it cannot express is rejected
- * rather than silently split into the wrong fields:
- * - a user, password or host holding '/' -- reported, returns < 0;
+ * The syntax still cannot express every value. Where an input has two readings and
+ * neither is provably the intended one, it is rejected rather than silently split into
+ * the wrong fields:
+ * - a user, password or host holding '/', *when credentials are present* -- the leaked
+ *   '/' ends the authority early, so ':', '@' or '/' turns up in what is left as the
+ *   database name; reported, returns < 0. With no '@' anywhere there are no credentials
+ *   and nothing to confuse, so the database name is taken verbatim: "host/db:name" and
+ *   "host/db/name" parse as they always have;
  * - an unbracketed IPv6 host -- reported, returns < 0;
  * - a non-numeric port -- reported, returns < 0;
  * - a user holding ':' is indistinguishable from "user:password" and is therefore *not*
  *   detectable: the text before the first ':' always wins.
+ *
+ * Diagnostics never echo any part of @a connstr: on a malformed input a credential
+ * fragment can land in any field.
  *
  * Use ConnectionParams whenever a field may hold one of those characters.
  *
