@@ -50,12 +50,60 @@ extern "C"
 
     int ZCE_API zce_timespec_str(char* buf, int size, struct timespec*, bool msec);
 
+    /**
+     * @brief Format a timespec as UTC text with an explicit "+00" offset.
+     *
+     * Produces "YYYY-MM-DD HH:MM:SS.uuuuuu+00" (29 chars). Unlike zce_timespec_str(),
+     * which renders local wall clock with no offset, this shape is unambiguous no
+     * matter what time zone the reader is in -- which is what a PostgreSQL
+     * timestamptz literal needs, since PostgreSQL would otherwise apply the session
+     * TimeZone to an offset-less literal.
+     *
+     * @param buf  Output buffer.
+     * @param size Size of @p buf; 30 bytes hold the result plus its NUL.
+     * @param ts   Time to format; tv_nsec is clamped to [0, 1e9).
+     * @return Number of characters the full text needs (snprintf semantics), or -1
+     *         on a bad argument or an unrepresentable time.
+     */
+    int ZCE_API zce_timespec_utc_str(char* buf, int size, const struct timespec* ts);
+
     zce_timestamp ZCE_API zce_timestamp_now();
 
     zce_timestamp ZCE_API zce_to_timestamp(time_t t);
 
     time_t ZCE_API zce_to_timet(zce_timestamp ts);
 
+    /**
+     * @brief Sentinel returned by zce_timestamp_from_asc() when the input cannot be parsed.
+     *
+     * Deliberately not -1: -1 is a legal zce_timestamp (1us before 2000-01-01) and
+     * zce_to_timet(-1) yields a plausible-looking time_t, which used to hide parse
+     * failures behind a fixed "year 2000" reading.
+     */
+#define ZCE_TIMESTAMP_INVALID ((zce_timestamp)(-9223372036854775807LL - 1))
+
+    /**
+     * @brief Parse a textual timestamp into a zce_timestamp.
+     *
+     * Accepted grammar (the shapes PostgreSQL emits for timestamp/timestamptz):
+     *   YYYY-MM-DD[ T]HH:MM:SS[.frac][offset]
+     * where @c frac is 1..6+ digits (extra digits are truncated) and @c offset is
+     * @c Z, @c z or @c (+|-)HH[[:]MM[[:]SS]]. Both are optional.
+     *
+     * With an offset the wall clock is interpreted in that zone; without one it is
+     * interpreted in the local zone (mktime semantics).
+     *
+     * @param timestr Input string; leading/trailing blanks are tolerated.
+     * @param out     Receives the parsed value, or ZCE_TIMESTAMP_INVALID on failure.
+     *                May be NULL if only validation is wanted.
+     * @return 0 on success, -1 on failure.
+     */
+    int ZCE_API zce_timestamp_from_asc_ex(const char* timestr, zce_timestamp* out);
+
+    /**
+     * @brief Same parsing as zce_timestamp_from_asc_ex(), returning the value directly.
+     * @return The parsed timestamp, or ZCE_TIMESTAMP_INVALID if @p timestr is malformed.
+     */
     zce_timestamp ZCE_API zce_timestamp_from_asc(const char* timestr);
 
     char* ZCE_API zce_strptime(const char* buf, const char* fmt, struct tm* tm, int* tz_offset);
