@@ -93,6 +93,9 @@ extern "C"
      * With an offset the wall clock is interpreted in that zone; without one it is
      * interpreted in the local zone (mktime semantics).
      *
+     * Impossible calendar dates are a parse failure, not something to normalize:
+     * "2026-02-31" is rejected rather than silently read as 2026-03-03.
+     *
      * @param timestr Input string; leading/trailing blanks are tolerated.
      * @param out     Receives the parsed value, or ZCE_TIMESTAMP_INVALID on failure.
      *                May be NULL if only validation is wanted.
