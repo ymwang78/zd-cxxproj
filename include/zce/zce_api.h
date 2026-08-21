@@ -88,8 +88,18 @@ extern "C"
      *       results a whole time-zone offset away from zce_timestamp_now() (8 hours on
      *       UTC+8). zce_to_timet() added the same offset back, so round-trips always
      *       looked right and only cross-constructor comparisons and formatting were
-     *       wrong. Rebuild producers and consumers together: a value that crosses a
-     *       process or storage boundary shifts by the local offset.
+     *       wrong.
+     *
+     *       Upgrading shifts the numeric value by the local offset, so it is not enough to
+     *       rebuild in place:
+     *       - Values that only live inside one process, or that cross a process boundary,
+     *         need producers and consumers rebuilt and deployed together.
+     *       - Values already PERSISTED by the old implementation keep the old encoding on
+     *         disk. Rebuilding does not touch them, and a new reader will interpret them
+     *         as UTC and land a local offset away from the instant that was meant. Such
+     *         data must be migrated (add the offset that was in force when it was written)
+     *         or versioned so readers can tell the two encodings apart.
+     *       On a UTC host both encodings coincide and nothing has to be done.
      */
     zce_timestamp ZCE_API zce_to_timestamp(time_t t);
 
@@ -255,8 +265,16 @@ std::string ZCE_API zce_localtime_str(bool msec);
  *
  * The text carries no UTC offset, so it is ambiguous on its own -- read in another time
  * zone the same characters denote a different instant. It is the mirror of
- * zce_timestamp_from_asc(), which reads offset-less input as local time, so the pair
- * round-trips on one host. Good for logs and UI.
+ * zce_timestamp_from_asc(), which reads offset-less input as local time. Good for logs
+ * and UI.
+ *
+ * That mirroring is a round trip only within limits, so do not rely on it as a general
+ * one:
+ * - Only milliseconds are emitted. A zce_timestamp whose microsecond part is not a
+ *   multiple of 1000 loses the remainder, and parsing back yields the value truncated to
+ *   the millisecond.
+ * - Offset-less local text is ambiguous across a DST fall-back, where the same wall clock
+ *   occurs twice; parsing picks one of the two instants (mktime semantics).
  *
  * For PostgreSQL literals or anything crossing time zones use zce_timespec_utc_str(),
  * which emits UTC with an explicit "+00".
