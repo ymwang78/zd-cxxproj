@@ -90,15 +90,26 @@ extern "C"
      *       looked right and only cross-constructor comparisons and formatting were
      *       wrong.
      *
-     *       Upgrading shifts the numeric value by the local offset, so it is not enough to
+     *       Upgrading shifts the numeric value by that offset, so it is not enough to
      *       rebuild in place:
      *       - Values that only live inside one process, or that cross a process boundary,
      *         need producers and consumers rebuilt and deployed together.
      *       - Values already PERSISTED by the old implementation keep the old encoding on
      *         disk. Rebuilding does not touch them, and a new reader will interpret them
      *         as UTC and land a local offset away from the instant that was meant. Such
-     *         data must be migrated (add the offset that was in force when it was written)
-     *         or versioned so readers can tell the two encodings apart.
+     *         data must be migrated, or versioned so readers can tell the two encodings
+     *         apart. The old implementation computed
+     *             ts_old = (t - timezone) * 1000000 - epoch_2000_unix_us
+     *         so the migration is exactly
+     *             ts_new = ts_old + timezone * 1000000LL
+     *         where @c timezone is the POSIX global (@c _timezone on Windows): seconds
+     *         WEST of UTC, which is the NEGATION of the "UTC+08"-style wall-clock offset.
+     *         On UTC+8 timezone is -28800, so ts_new = ts_old - 28800000000LL: the stored
+     *         value moves BACK 8 hours. Reading the rule as "+08" and advancing it lands
+     *         16 hours out.
+     *         Note @c timezone is standard time, fixed per zone, and the old code applied
+     *         it unconditionally -- so one constant migrates every stored value, whatever
+     *         date it carries and whether or not DST was in force when it was written.
      *       On a UTC host both encodings coincide and nothing has to be done.
      */
     zce_timestamp ZCE_API zce_to_timestamp(time_t t);
@@ -125,9 +136,16 @@ extern "C"
      * @brief Parse a textual timestamp into a zce_timestamp.
      *
      * Accepted grammar (the shapes PostgreSQL emits for timestamp/timestamptz):
-     *   YYYY-MM-DD[ T]HH:MM:SS[.frac][offset]
+     *   YYYY-MM-DD<sep>HH:MM:SS[.frac][offset]
      * where @c frac is 1..6+ digits (extra digits are truncated) and @c offset is
      * @c Z, @c z or @c (+|-)HH[[:]MM[[:]SS]]. Both are optional.
+     *
+     * @c sep is a run of blanks and/or 'T' that may be EMPTY: the underlying
+     * zce_strptime() consumes "[[:space:]T]*" wherever its format holds one blank. So
+     * "2026-08-20 12:34:56", "2026-08-20T12:34:56", "2026-08-20TTT12:34:56" and even
+     * "2026-08-2012:34:56" all parse, to the same instant. A caller that needs the strict
+     * single-separator ISO shape must check that itself -- passing @p out as NULL
+     * validates against this looser grammar, not against ISO 8601.
      *
      * With an offset the wall clock is interpreted in that zone; without one it is
      * interpreted in the local zone (mktime semantics).
