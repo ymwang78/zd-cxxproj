@@ -50,12 +50,120 @@ extern "C"
 
     int ZCE_API zce_timespec_str(char* buf, int size, struct timespec*, bool msec);
 
+    /**
+     * @brief Format a timespec as UTC text with an explicit "+00" offset.
+     *
+     * Produces "YYYY-MM-DD HH:MM:SS.uuuuuu+00" (29 chars). Unlike zce_timespec_str(),
+     * which renders local wall clock with no offset, this shape is unambiguous no
+     * matter what time zone the reader is in -- which is what a PostgreSQL
+     * timestamptz literal needs, since PostgreSQL would otherwise apply the session
+     * TimeZone to an offset-less literal.
+     *
+     * @param buf  Output buffer.
+     * @param size Size of @p buf; 30 bytes hold the result plus its NUL.
+     * @param ts   Time to format; tv_nsec is clamped to [0, 1e9).
+     * @return Number of characters the full text needs (snprintf semantics), or -1
+     *         on a bad argument or an unrepresentable time.
+     */
+    int ZCE_API zce_timespec_utc_str(char* buf, int size, const struct timespec* ts);
+
+    /**
+     * @brief Microseconds since 2000-01-01 00:00:00 UTC -- the meaning of zce_timestamp.
+     *
+     * The epoch is UTC and the count is time-zone independent: the same instant has the
+     * same zce_timestamp everywhere. Every producer of the type must agree on this,
+     * which is what zce_to_timestamp() and zce_timestamp_from_asc() also do.
+     *
+     * Note this is NOT a Unix timestamp -- it is 946684800 seconds (10957 days) smaller.
+     * Handing one to code that expects Unix time reads 30 years early.
+     */
     zce_timestamp ZCE_API zce_timestamp_now();
 
+    /**
+     * @brief Convert Unix time (UTC seconds) to a zce_timestamp.
+     *
+     * Same scale as zce_timestamp_now(), so values from the two are directly comparable.
+     *
+     * @note Until 2026-08 this subtracted the local standard UTC offset, putting its
+     *       results a whole time-zone offset away from zce_timestamp_now() (8 hours on
+     *       UTC+8). zce_to_timet() added the same offset back, so round-trips always
+     *       looked right and only cross-constructor comparisons and formatting were
+     *       wrong.
+     *
+     *       Upgrading shifts the numeric value by that offset, so it is not enough to
+     *       rebuild in place:
+     *       - Values that only live inside one process, or that cross a process boundary,
+     *         need producers and consumers rebuilt and deployed together.
+     *       - Values already PERSISTED by the old implementation keep the old encoding on
+     *         disk. Rebuilding does not touch them, and a new reader will interpret them
+     *         as UTC and land a local offset away from the instant that was meant. Such
+     *         data must be migrated, or versioned so readers can tell the two encodings
+     *         apart. The old implementation computed
+     *             ts_old = (t - timezone) * 1000000 - epoch_2000_unix_us
+     *         so the migration is exactly
+     *             ts_new = ts_old + timezone * 1000000LL
+     *         where @c timezone is the POSIX global (@c _timezone on Windows): seconds
+     *         WEST of UTC, which is the NEGATION of the "UTC+08"-style wall-clock offset.
+     *         On UTC+8 timezone is -28800, so ts_new = ts_old - 28800000000LL: the stored
+     *         value moves BACK 8 hours. Reading the rule as "+08" and advancing it lands
+     *         16 hours out.
+     *         Note @c timezone is standard time, fixed per zone, and the old code applied
+     *         it unconditionally -- so one constant migrates every stored value, whatever
+     *         date it carries and whether or not DST was in force when it was written.
+     *       On a UTC host both encodings coincide and nothing has to be done.
+     */
     zce_timestamp ZCE_API zce_to_timestamp(time_t t);
 
+    /**
+     * @brief Inverse of zce_to_timestamp(): a zce_timestamp as Unix time (UTC seconds).
+     *
+     * Sub-second digits are truncated toward zero, so timestamps before 2000-01-01 round
+     * up to the next whole second. Strip the sub-second part with floor semantics first
+     * if that matters.
+     */
     time_t ZCE_API zce_to_timet(zce_timestamp ts);
 
+    /**
+     * @brief Sentinel returned by zce_timestamp_from_asc() when the input cannot be parsed.
+     *
+     * Deliberately not -1: -1 is a legal zce_timestamp (1us before 2000-01-01) and
+     * zce_to_timet(-1) yields a plausible-looking time_t, which used to hide parse
+     * failures behind a fixed "year 2000" reading.
+     */
+#define ZCE_TIMESTAMP_INVALID ((zce_timestamp)(-9223372036854775807LL - 1))
+
+    /**
+     * @brief Parse a textual timestamp into a zce_timestamp.
+     *
+     * Accepted grammar (the shapes PostgreSQL emits for timestamp/timestamptz):
+     *   YYYY-MM-DD<sep>HH:MM:SS[.frac][offset]
+     * where @c frac is 1..6+ digits (extra digits are truncated) and @c offset is
+     * @c Z, @c z or @c (+|-)HH[[:]MM[[:]SS]]. Both are optional.
+     *
+     * @c sep is a run of blanks and/or 'T' that may be EMPTY: the underlying
+     * zce_strptime() consumes "[[:space:]T]*" wherever its format holds one blank. So
+     * "2026-08-20 12:34:56", "2026-08-20T12:34:56", "2026-08-20TTT12:34:56" and even
+     * "2026-08-2012:34:56" all parse, to the same instant. A caller that needs the strict
+     * single-separator ISO shape must check that itself -- passing @p out as NULL
+     * validates against this looser grammar, not against ISO 8601.
+     *
+     * With an offset the wall clock is interpreted in that zone; without one it is
+     * interpreted in the local zone (mktime semantics).
+     *
+     * Impossible calendar dates are a parse failure, not something to normalize:
+     * "2026-02-31" is rejected rather than silently read as 2026-03-03.
+     *
+     * @param timestr Input string; leading/trailing blanks are tolerated.
+     * @param out     Receives the parsed value, or ZCE_TIMESTAMP_INVALID on failure.
+     *                May be NULL if only validation is wanted.
+     * @return 0 on success, -1 on failure.
+     */
+    int ZCE_API zce_timestamp_from_asc_ex(const char* timestr, zce_timestamp* out);
+
+    /**
+     * @brief Same parsing as zce_timestamp_from_asc_ex(), returning the value directly.
+     * @return The parsed timestamp, or ZCE_TIMESTAMP_INVALID if @p timestr is malformed.
+     */
     zce_timestamp ZCE_API zce_timestamp_from_asc(const char* timestr);
 
     char* ZCE_API zce_strptime(const char* buf, const char* fmt, struct tm* tm, int* tz_offset);
@@ -170,6 +278,25 @@ std::string ZCE_API zce_trim(const std::string& str, const std::string& whitespa
 
 std::string ZCE_API zce_localtime_str(bool msec);
 
+/**
+ * @brief Render a zce_timestamp as LOCAL wall clock: "YYYY-MM-DD HH:MM:SS.mmm".
+ *
+ * The text carries no UTC offset, so it is ambiguous on its own -- read in another time
+ * zone the same characters denote a different instant. It is the mirror of
+ * zce_timestamp_from_asc(), which reads offset-less input as local time. Good for logs
+ * and UI.
+ *
+ * That mirroring is a round trip only within limits, so do not rely on it as a general
+ * one:
+ * - Only milliseconds are emitted. A zce_timestamp whose microsecond part is not a
+ *   multiple of 1000 loses the remainder, and parsing back yields the value truncated to
+ *   the millisecond.
+ * - Offset-less local text is ambiguous across a DST fall-back, where the same wall clock
+ *   occurs twice; parsing picks one of the two instants (mktime semantics).
+ *
+ * For PostgreSQL literals or anything crossing time zones use zce_timespec_utc_str(),
+ * which emits UTC with an explicit "+00".
+ */
 std::string ZCE_API zce_timestamp_to_asc(zce_timestamp ts);
 
 std::string ZCE_API zce_get_hostname();

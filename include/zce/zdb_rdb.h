@@ -14,7 +14,64 @@
 
 namespace zce {
 namespace zdb {
-int ZCE_API zdb_connstr_parser(const std::string& filename, std::string& dbuser,
+
+/**
+ * @brief Connection parameters supplied field by field.
+ *
+ * Every field is taken verbatim, so no character is reserved: a password may contain
+ * ':', '@' or '/'. The "user:passwd@host:port/dbname" connection string reserves some
+ * of them -- a credential holding '/' is rejected, and a ':' in the user name is read
+ * as "user:password" with no way to tell -- so prefer this form whenever a field may
+ * hold one; zdb_connstr_parser() states the exact contract.
+ *
+ * For Database::ERV_DATABASE_SQLITE only @a dbname is used, as the database file path
+ * (its "path?threadsafe=..;dbkey=.." suffix is still honoured); the other fields are
+ * ignored.
+ */
+struct ConnectionParams {
+    std::string host;      ///< Host name or address; backend default is used when empty.
+    std::string port;      ///< Port; backend default is used when empty.
+    std::string dbname;    ///< Database name (SQLite: database file path).
+    std::string user;      ///< User name; backend default is used when empty.
+    std::string password;  ///< Password, taken verbatim.
+};
+
+/**
+ * @brief Parse a "[user[:passwd]@]host[:port][/dbname]" connection string.
+ *
+ * The authority ends at the first '/', the credentials at the *last* '@' before it, and
+ * the port at the last ':' of what remains; an IPv6 host must be bracketed, as in
+ * "[::1]:5432". A password may therefore hold '@' and ':'.
+ *
+ * The syntax still cannot express every value. Where an input has two readings and
+ * neither is provably the intended one, it is rejected rather than silently split into
+ * the wrong fields:
+ * - a user, password or host holding '/', *when credentials are present* -- the leaked
+ *   '/' ends the authority early, so ':', '@' or '/' turns up in what is left as the
+ *   database name; reported, returns < 0. With no '@' anywhere there are no credentials
+ *   and nothing to confuse, so the database name is taken verbatim: "host/db:name" and
+ *   "host/db/name" parse as they always have;
+ * - an unbracketed IPv6 host -- reported, returns < 0;
+ * - a non-numeric port -- reported, returns < 0;
+ * - a user holding ':' is indistinguishable from "user:password" and is therefore *not*
+ *   detectable: the text before the first ':' always wins.
+ *
+ * Diagnostics never echo any part of @a connstr: on a malformed input a credential
+ * fragment can land in any field.
+ *
+ * Use ConnectionParams whenever a field may hold one of those characters.
+ *
+ * @param[in]  connstr Connection string, with any "scheme://" prefix already stripped.
+ * @param[out] dbuser  User name, empty when the string carries no credentials.
+ * @param[out] dbpass  Password, empty when the string carries none.
+ * @param[out] dbhost  Host, empty when the string starts at the port.
+ * @param[out] dbport  Port, empty when the string carries none.
+ * @param[out] dbname  Database name, empty when the string carries none.
+ * @return 0 on success, < 0 when the string cannot be parsed unambiguously. All five
+ *         outputs are cleared on entry and left cleared on failure, so a caller that
+ *         skips the return code cannot pick up a half-parsed field.
+ */
+int ZCE_API zdb_connstr_parser(const std::string& connstr, std::string& dbuser,
                                std::string& dbpass, std::string& dbhost, std::string& dbport,
                                std::string& dbname);
 
@@ -269,7 +326,24 @@ class ZCE_API Database : public zce::Object {
         ERV_DATABASE_LIMIT,
     };
 
+    /**
+     * @brief Build from a "[user[:passwd]@]host[:port][/dbname]" connection string.
+     *
+     * Split by zdb_connstr_parser(), which defines exactly what the form can carry: a
+     * password may hold ':' and '@'; an IPv6 host must be bracketed, as in "[::1]:5432";
+     * a credential holding '/' is rejected; and a ':' in the user name is read as
+     * "user:password" with no way to tell. A string the parser rejects makes the
+     * connection fail to open rather than reach an unintended target. Reach for the
+     * ConnectionParams overload when a field may hold one of those characters. SQLite
+     * takes the whole string as its database file path.
+     */
     Database(ERV_DATABASE e, const zce_astring& connection_str);
+
+    /**
+     * @brief Build from parameters given field by field, bypassing connection-string
+     *        assembly and parsing entirely.
+     */
+    Database(ERV_DATABASE e, const ConnectionParams& params);
 
     virtual ~Database();
 
