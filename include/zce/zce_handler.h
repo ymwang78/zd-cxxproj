@@ -252,7 +252,26 @@ class ZCE_API Tcp : public Socket {
 
     virtual void on_read_data(zce_byte*, zce_uint32);
 
+    /// Stop delivering on_read_data() without closing the connection, so the
+    /// peer's TCP receive window closes and it stops sending.
+    ///
+    /// This is the only way to apply real backpressure to a source that
+    /// produces faster than the reader can forward. Without it a relay can
+    /// only buffer what it cannot yet pass on, and an unbounded buffer is not
+    /// a policy but a deferred out-of-memory; a bounded one just turns the
+    /// same overrun into a dropped connection.
+    ///
+    /// Both are idempotent and must be called on the reactor thread. Neither
+    /// touches the read refcount that start_read()/on_close() maintain, so a
+    /// paused handle keeps exactly the same lifetime as a reading one.
+    int  pause_read();
+    int  resume_read();
+    bool read_paused() const { return read_paused_; }
+
     virtual int get_local_addr(zce_sockaddr_t& addr) const;
+
+  protected:
+    bool read_paused_ = false;
 };
 
 class ZCE_API DnsResolve : virtual public zce::Object {
