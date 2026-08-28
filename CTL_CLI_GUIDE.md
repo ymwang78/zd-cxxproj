@@ -513,7 +513,8 @@ softsensor_paracmp vb.csv new.csv --ref-time "时间" --ref-value "预估值" \
 ```
 
 Besides the per-point tolerance it also enforces the whole-run criteria it can evaluate:
-`--max-bias` (systematic offset, defaults to **half the average per-point tolerance**)
+`--max-bias` (systematic offset, defaults to **half the average per-point tolerance of the
+compared samples**)
 and `--min-coverage` (alignment coverage, defaults to **0.95**) are on by default;
 `--min-points` is opt-in. All four are printed as passed / failed / **unchecked** — a
 silently disabled criterion must not look like a passing one. A constant bias can keep
@@ -1159,7 +1160,7 @@ softsensor_paracmp vb.csv new.csv --ref-time "时间" --ref-value "预估值" \
 ```
 
 除了逐点容差，它还会判**整体判据**里它能判的那几条：`--max-bias`（系统性偏置，默认取
-**平均每点容差的一半**）与 `--min-coverage`（对齐覆盖率，默认 **0.95**）**默认就开着**，
+**参与判据那些点的平均每点容差的一半**）与 `--min-coverage`（对齐覆盖率，默认 **0.95**）**默认就开着**，
 `--min-points` 要显式给。四条逐条印通过 / 未过 / **未判**——一条被静默关掉的判据不能
 看起来和通过一样。一个恒定的偏置可以让每一点都在容差内、却说明有一个常数项错了。
 
