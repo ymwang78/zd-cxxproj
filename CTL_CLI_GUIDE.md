@@ -508,11 +508,17 @@ Shipped alongside `softsensorctrl`, but **not** a CTL tool — it never connects
 HostVM. It compares two prediction series (VB6 legacy vs. the new system) offline:
 
 ```bash
-softsensor_paracmp vb.csv new.csv --ref-time "时间" --ref-value "预估值"                                   --tol 0.05 --align-tol 30 --warmup 25
+softsensor_paracmp vb.csv new.csv --ref-time "时间" --ref-value "预估值" \
+                                  --tol 0.05 --align-tol 30 --warmup 25
 ```
 
-Its exit codes are therefore **different** from the CTL set (§8): `0` within tolerance,
-`1` usage/file error, `2` points outside tolerance, `3` nothing comparable lined up.
+Besides the per-point tolerance it also enforces the whole-run criteria it can evaluate —
+`--max-bias` (systematic offset, **defaults to `tol/2`**), `--min-points` and
+`--min-coverage` — printing each one as passed/failed. A constant bias can keep every
+single point inside tolerance while still meaning a constant term is wrong.
+
+Its exit codes are therefore **different** from the CTL set (§8): `0` all criteria passed,
+`1` usage/file error, `2` a criterion failed, `3` nothing comparable lined up.
 Full usage in `modules/softsensor/manual/PARALLEL_RUN.md`.
 
 #### 5.10 Config Edits Are Rejected While Estimating
@@ -1146,11 +1152,16 @@ traceback 并以退出码 `3` 结束。
 两条预测序列（VB6 存量系统 vs 新系统）：
 
 ```bash
-softsensor_paracmp vb.csv new.csv --ref-time "时间" --ref-value "预估值"                                   --tol 0.05 --align-tol 30 --warmup 25
+softsensor_paracmp vb.csv new.csv --ref-time "时间" --ref-value "预估值" \
+                                  --tol 0.05 --align-tol 30 --warmup 25
 ```
 
-所以它的退出码与 CTL 那一套（§8）**刻意不同**：`0` 在容差内，`1` 用法/文件错误，
-`2` 有超容差点位，`3` 对齐不上（没有可比的点）。完整用法见
+除了逐点容差，它还会判**整体判据**里它能判的那几条：`--max-bias`（系统性偏置，
+**默认取 `tol/2`**）、`--min-points`、`--min-coverage`，逐条印通过/未过。一个恒定的
+偏置可以让每一点都在容差内、却说明有一个常数项错了。
+
+所以它的退出码与 CTL 那一套（§8）**刻意不同**：`0` 全部判据通过，`1` 用法/文件错误，
+`2` 有判据没过，`3` 对齐不上（没有可比的点）。完整用法见
 `modules/softsensor/manual/PARALLEL_RUN.md`。
 
 #### 5.10 估计运行中，组态类命令一律被拒
