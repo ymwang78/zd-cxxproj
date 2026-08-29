@@ -252,6 +252,19 @@ class ZCE_API Tcp : public Socket {
 
     virtual void on_read_data(zce_byte*, zce_uint32);
 
+    /// Stamp the receive clock that handle_timeout() measures the idle window
+    /// against.
+    ///
+    /// Called from the libuv read callback BEFORE it dispatches to
+    /// on_read_data(), because on_read_data() is virtual and every override in
+    /// this tree replaces it outright rather than chaining to the base. The
+    /// clock belongs to the socket, not to whatever a subclass does with the
+    /// bytes, so an override must not be able to lose it: while it could, a
+    /// connection carrying traffic every few milliseconds still looked idle and
+    /// was closed on the 300s timer — every five minutes, for as long as it
+    /// stayed up.
+    void touch_recv_clock();
+
     /// Stop delivering on_read_data() without closing the connection, so the
     /// peer's TCP receive window closes and it stops sending.
     ///
