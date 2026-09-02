@@ -17,14 +17,19 @@ class xOptModelBlackBox : public xOptModelBase {
 
   public:
     // dll_path   动态库路径
-    // create_arg 原样转发给 DLL 的 xOptModel_createModel 的 name 形参。
-    //            空串时仍传历史值 "BlackBoxModel"，所以既有调用方不受影响。
+    // create_arg 按单元的配置串，由调用方给定，本类只负责原样转发给 DLL 的
+    //            xOptModel_createModel 的 name 形参——内容不作解释，含义由
+    //            那个 DLL 自己定。空串时仍传历史值 "BlackBoxModel"，所以既有
+    //            调用方不受影响。以上是本构造函数的全部契约。
     //
     //            为什么需要它：黑箱 DLL 能从宿主拿到的只有自己的路径，
-    //            UnitModel.json 里其余字段一个都到不了。有些 DLL 需要一个
-    //            按单元的配置串——例如 xRtoCapeOpen.dll 要知道连哪个
-    //            CAPE-OPEN 组件。xOpt::createModel 用 ProblemPath 填这个位置：
-    //            该字段在 ModelType="BlackBox" 下本来就没有用途。
+    //            部署配置里其余字段一个都到不了。有些 DLL 需要按单元区分
+    //            ——例如 xRtoCapeOpen.dll 要知道连哪个 CAPE-OPEN 组件。
+    //
+    //            这个值从哪来是**调用方的约定，不是这里的规定**：xOpt 的
+    //            createModel 目前拿 ProblemPath 来填（该字段在
+    //            ModelType="BlackBox" 下本来就闲置），别的集成点大可以另有
+    //            来源。写在这里只为让读者找得到现成的例子。
     xOptModelBlackBox(const std::string& dll_path, const std::string& create_arg = std::string());
 
     // 析构函数
