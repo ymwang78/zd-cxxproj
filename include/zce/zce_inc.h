@@ -3,22 +3,22 @@
 #    define ZCE_ZDB_MYSQL 0
 #endif
 #ifndef ZCE_ZDB_PGSQL
-#    define ZCE_ZDB_PGSQL 1
+#    define ZCE_ZDB_PGSQL 0
 #endif
 #ifndef ZCE_ZDB_SQLITE
 #    define ZCE_ZDB_SQLITE 1
 #endif
 #ifndef ZCE_ZDB_REDIS
-#    define ZCE_ZDB_REDIS 1
+#    define ZCE_ZDB_REDIS 0
 #endif
 #ifndef ZCE_SUPPORT_PYVM
 #    define ZCE_SUPPORT_PYVM 1
 #endif
 #ifndef ZCE_SUPPORT_LUAVM
-#    define ZCE_SUPPORT_LUAVM 1
+#    define ZCE_SUPPORT_LUAVM 0
 #endif
 #ifndef ZCE_SUPPORT_CCVM
-#    define ZCE_SUPPORT_CCVM 1
+#    define ZCE_SUPPORT_CCVM 0
 #endif
 #ifndef ZCE_SUPPORT_SSL
 #    define ZCE_SUPPORT_SSL 1
