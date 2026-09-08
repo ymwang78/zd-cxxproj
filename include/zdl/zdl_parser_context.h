@@ -74,6 +74,9 @@ class zdl_parser_context : public zce::Object {
                                  const std::string& ns = "");
     /// string(min~max) length constraint for the member about to be started
     void set_current_str_len(const std::string& minlen, const std::string& maxlen);
+    /// Drop a constraint no member is going to consume, so that it cannot
+    /// attach itself to whichever member is parsed next.
+    void clear_current_str_len();
     void add_current_member_metadata(const std::string& meta_key, const std::string& meta_val);
 
     void add_enumerator(unsigned long val, const std::string& emname, const std::string& comment);
