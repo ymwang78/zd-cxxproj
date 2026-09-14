@@ -160,8 +160,11 @@ class Array {  // skew heap
                 return -1;  // no space
             }
             if (cur_top_ >= (int)slots_.size()) {
-                if (is_auto_expand && slots_.size() * 2 <= capacity_limit_) {
-                    slots_.resize(slots_.size() * 2);
+                // double up to capacity_limit_ (not just the last doubling below it); an empty
+                // array grows to one slot, since doubling zero leaves slots_[cur_top_] out of range
+                if (is_auto_expand && slots_.size() < capacity_limit_) {
+                    slots_.resize(
+                        std::min(capacity_limit_, std::max<size_t>(1, slots_.size() * 2)));
                 } else {
                     return -1;  // no space
                 }
@@ -224,7 +227,7 @@ class Array {  // skew heap
     }
 
     // force set an empty node to the value, if the node is in use, return -1, otherwise set and
-    // return 0
+    // return 0. An index at or past capacity_limit_ (or mix_magic_t::LIMIT) returns -1.
     template <typename U>
     int set(H handle, U&& val) {
         int index, magic;
@@ -237,13 +240,15 @@ class Array {  // skew heap
         }
         if (index < cur_top_) {
             removeFreeNode(index);
-        } else if (index == cur_top_) {
-            cur_top_ = index + 1;
         } else {
-            if (index > (int)capacity_limit_) {
+            // the resize below stops at capacity_limit_ slots, so the index must be below it.
+            // Compare as size_t: the default limit 0xffffffff is -1 as an int. LIMIT keeps
+            // cur_top_ = index + 1 inside int, as in insertItem.
+            if ((size_t)index >= capacity_limit_ || index >= mix_magic_t::LIMIT) {
                 return -1;  // position out of limit
             }
-            if (index >= (int)slots_.size()) {
+            // index == cur_top_ grows too: it may equal slots_.size()
+            if ((size_t)index >= slots_.size()) {
                 slots_.resize(
                     std::min(capacity_limit_, std::max((size_t)index + 1, slots_.size() * 2)));
             }
