@@ -1,4 +1,4 @@
-// ***************************************************************
+﻿// ***************************************************************
 //  Storm   version:  1.0   -  date: 2015/01/01
 //  -------------------------------------------------------------
 //  Yongming Wang(wangym@gmail.com)
@@ -80,6 +80,21 @@ class ZCE_API Storm : public ::zce::Object {
 
     int listen(const char* localip, zce_uint16 localport);
 
+    /**
+     * @brief Stop listening, drop every client connection and release the topics.
+     *
+     * Safe to call from any thread; closing the acceptors and dropping the clients happens on
+     * the reactor. From any thread other than a zce::Scheduler worker the call waits for that.
+     * On a Scheduler worker (a publish or set callback, or any other task) it only hands the
+     * work to the reactor and returns, because a registration holds the reactor until a
+     * Scheduler worker has run a task, and waiting there could deadlock.
+     *
+     * Releasing the topics is asynchronous in every case: each topic queue gets a cleanup task
+     * behind whatever it already holds, which may finish after stop() has returned.
+     *
+     * @return 0; -1 after a best-effort cleanup behind a reactor that had already stopped while
+     *         acceptors or clients were still open; or the error from delegating to the reactor.
+     */
     int stop();
 };
 
@@ -97,12 +112,33 @@ class ZCE_API StormClient : public ::zce::Object {
                 std::function<void()> connected_cb,
                 std::function<void()> disconnect_cb);
 
+    /// Calls stop(); see there for what that means on a zce::Scheduler worker thread.
     ~StormClient();
 
     const std::string getClientIdent() const noexcept;
 
     zce_int64 getClientId() const noexcept;
 
+    /**
+     * @brief Drop the connection, stop reconnecting and fail the acks still pending.
+     *
+     * Safe to call from any thread; the teardown runs on the reactor. From any thread other than
+     * a zce::Scheduler worker the call waits for it, so once it returns no callback runs any
+     * more and whatever the callbacks use can be released.
+     *
+     * On a Scheduler worker it only hands the teardown to the reactor and returns: a Storm
+     * server on the same reactor may be holding the reactor until a Scheduler worker has run a
+     * task, so waiting there could deadlock. Called that way - including through
+     * ~StormClient() - the publish and set callbacks, connected_cb and disconnect_cb can still
+     * run until the reactor gets to the teardown, and the pending acks are failed only then
+     * (still exactly once each). So do not free anything those callbacks use right after such a
+     * call: stop the client from another thread first, or keep that state owned by the objects
+     * the callbacks hold (the ctx object, the captures of the std::function callbacks).
+     *
+     * @return 0; -1 after a best-effort cleanup behind a reactor that had already stopped while
+     *         the connection or the reconnect timer was still open; or the error from delegating
+     *         to the reactor.
+     */
     int stop();
 
     ERV_ZCE_COMPRESS default_cps() const;
