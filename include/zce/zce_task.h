@@ -226,24 +226,64 @@ class ZCE_API Scheduler : public zce::Object {
   public:
     Scheduler();
 
+    /// Calls stop(); see there for why that must not happen on one of this scheduler's workers.
     ~Scheduler();
 
+    /// Whether the workers are running and accepting tasks: false before active(), and from the
+    /// moment stop() begins.
     bool isActive() const;
 
+    /// The number of workers accepting tasks: 0 before active(), and from the moment stop()
+    /// begins.
     int getWorkerCount() const;
 
+    /**
+     * @brief Start work_thread_cnt worker threads.
+     *
+     * One pool at a time: a scheduler that is running, or whose stop() is still waiting for its
+     * workers, refuses and keeps what it has. Of several concurrent calls, one starts the pool.
+     * Once stop() has returned, active() may be called again.
+     *
+     * @return 0; -1 if the scheduler is running or still stopping.
+     */
     int active(int work_thread_cnt);
 
+    /**
+     * @brief Stop the workers and wait for them to exit.
+     *
+     * Every task performed before stop() still runs before the workers exit. From the moment
+     * stop() begins, perform() and performExclusive() refuse new tasks and isActive() is false.
+     * A stop() that finds another one under way returns at once, without waiting for it.
+     *
+     * Must not be called from a task running on this scheduler: stop() waits for every worker,
+     * including the one it would be running on. The destructor calls stop(), so the same holds
+     * for releasing the last reference to a running scheduler.
+     */
     void stop();
 
-    // idx only selects which worker is woken to pull from the SHARED queue; the task may
-    // still execute on any worker. Use performExclusive() when execution must be bound to a
-    // specific worker thread.
+    /**
+     * @brief Queue req for whichever worker gets to it first.
+     *
+     * idx is only a hint for which worker to wake: worker idx if it is idle, otherwise another
+     * idle one; with none idle, the first worker to free up takes the task. Either way the task
+     * may run on any worker. Use performExclusive() when it must run on a specific one.
+     *
+     * @return 0 once queued; -1 if req is null, idx is neither -1 nor a worker index, or the
+     *         scheduler is not running (never started, or stop() has begun). performFuture()
+     *         reports that as TaskResultBase::Status::SubmitFailed.
+     */
     int perform(const TaskPtr& req, int idx = -1);
 
-    // Strictly enqueue req onto worker(idx)'s PRIVATE queue, guaranteeing it runs on that one
-    // worker thread (unlike perform(req, idx)). Required for tasks that must run on a specific
-    // OS thread, e.g. releasing a thread-affine resource on the thread that created it.
+    /**
+     * @brief Queue req on worker idx's private queue, so that it runs on that worker's thread.
+     *
+     * Unlike perform(req, idx), this binds the task: it waits for worker idx even while others
+     * are idle. Required for tasks that must run on a specific OS thread, e.g. releasing a
+     * thread-affine resource on the thread that created it.
+     *
+     * @return 0 once queued; -1 if req is null, idx is not a worker index, or the scheduler is
+     *         not running (never started, or stop() has begun).
+     */
     int performExclusive(const TaskPtr& req, int idx);
 
     int printCurrentTasks();

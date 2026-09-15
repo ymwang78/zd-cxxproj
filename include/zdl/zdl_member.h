@@ -12,6 +12,9 @@
  * ***************************************************************/
 
 #include <string>
+#include <cerrno>
+#include <climits>
+#include <cstdlib>
 #include <zce/zce_object.h>
 #include <zce/zce_object_counter.h>
 #include "zdl/zdl_visitor.h"
@@ -128,18 +131,36 @@ class zdl_member : public meta_base {
     const std::string& str_len_min() const noexcept { return str_len_min_; }
     const std::string& str_len_max() const noexcept { return str_len_max_; }
 
-    int calc_str_len_min() const {
+    /// Convert one bound token, or fail. The lexer hands over anything shaped
+    /// like an integer literal, so every rejection has to happen here:
+    ///
+    ///  - a partially consumed token. With base 0 a leading '0' selects octal,
+    ///    so strtol("-08") stops at the '8' and reports 0 without complaining.
+    ///  - a value strtol saturated to LONG_MIN/LONG_MAX (ERANGE). Where long is
+    ///    32 bits, "2147483649" and "2147483648" both come back as LONG_MAX and
+    ///    would compare equal, letting a reversed interval through.
+    ///  - anything outside what this accessor can return, so the validation in
+    ///    zdl_parser_context and the value read back here can never disagree.
+    static bool parse_str_len_bound(const std::string& text, int& out) {
+        if (text.empty()) return false;
         char* endp = 0;
-        long val = strtol(str_len_min_.c_str(), &endp, 0);
-        if (endp != 0 && *endp == 0) return val;
-        return -1;
+        errno = 0;
+        long val = strtol(text.c_str(), &endp, 0);
+        if (endp == 0 || endp == text.c_str() || *endp != 0) return false;
+        if (errno == ERANGE) return false;
+        if (val < 0 || val > (long)INT_MAX) return false;
+        out = (int)val;
+        return true;
+    }
+
+    int calc_str_len_min() const {
+        int val = 0;
+        return parse_str_len_bound(str_len_min_, val) ? val : -1;
     }
 
     int calc_str_len_max() const {
-        char* endp = 0;
-        long val = strtol(str_len_max_.c_str(), &endp, 0);
-        if (endp != 0 && *endp == 0) return val;
-        return -1;
+        int val = 0;
+        return parse_str_len_bound(str_len_max_, val) ? val : -1;
     }
 
     void add_template_arg(const std::string& arg);
