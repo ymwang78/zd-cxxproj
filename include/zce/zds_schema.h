@@ -168,13 +168,12 @@ template <typename T>
 inline typename std::enable_if<std::is_integral<T>::value, int>::type zds_pack_builtin(
     zce_byte* buf, zce_int32 size, T val, zds_context_t* ctx, bool has_prefix = true) {
     static_assert(std::is_integral<T>::value, "must be integral type");
-    (void)has_prefix;
     if (std::is_signed<T>::value) {
         zce_int64 tmp = (zce_int64)val;
-        return zds_pack_builtin(buf, size, tmp, ctx);
+        return zds_pack_builtin(buf, size, tmp, ctx, has_prefix);
     } else {
         zce_uint64 tmp = (zce_uint64)val;
-        return zds_pack_builtin(buf, size, tmp, ctx);
+        return zds_pack_builtin(buf, size, tmp, ctx, has_prefix);
     }
 }
 
