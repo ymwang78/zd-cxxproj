@@ -414,18 +414,25 @@ int zds_pack_builtin(zce_byte* buf, zce_int32 size, const std::map<TKEY, TVAL>& 
     static_assert(std::is_same<TKEY, zce::Any>::value || is_builtin_type<TKEY>(),
                   "key must be builtin type");
 
+    // zds/README.md 4.4: the header carries one payload for all keys and one for
+    // all values, and an item carries its own prefix only when its payload is
+    // ANY. So the key's prefix follows TKEY and the value's follows TVAL; the
+    // decoders read each value by the header's value payload, whatever the key.
+    constexpr bool key_has_prefix = std::is_same<TKEY, zce::Any>::value;
+    constexpr bool val_has_prefix = std::is_same<TVAL, zce::Any>::value;
+
     int len = 0, ret = 0;
     len = zds_pack_dict_header(buf, size, _get_payload<TKEY>(), _get_payload<TVAL>(),
                                (unsigned)val.size(), ctx, has_prefix);
     CHECKLEN_MOVEBUF_ADDRET_DECSIZE;
 
     for (auto it = val.begin(); it != val.end(); ++it) {
-        len = zds_pack_builtin(buf, size, it->first, ctx, std::is_same<TKEY, zce::Any>::value);
+        len = zds_pack_builtin(buf, size, it->first, ctx, key_has_prefix);
         CHECKLEN_MOVEBUF_ADDRET_DECSIZE;
         if constexpr (is_builtin_type<TVAL>()) {
-            len = zds_pack_builtin(buf, size, it->second, ctx, std::is_same<TKEY, zce::Any>::value);
+            len = zds_pack_builtin(buf, size, it->second, ctx, val_has_prefix);
         } else {
-            len = zds_pack(buf, size, it->second, ctx, std::is_same<TKEY, zce::Any>::value);
+            len = zds_pack(buf, size, it->second, ctx, val_has_prefix);
         }
         CHECKLEN_MOVEBUF_ADDRET_DECSIZE;
     }
