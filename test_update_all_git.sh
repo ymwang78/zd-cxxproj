@@ -181,6 +181,89 @@ assert_ok "clone fast-forwarded to the remote HEAD" \
 assert_ok "manifest file exists" [ -f "$t3_manifest" ]
 assert_ok "manifest records path, branch and HEAD" \
     grep -q $'libsrc/okrepo\tmain\t'"$t3_head" "$t3_manifest"
+assert_ok "manifest starts with a header row" \
+    [ "$(head -n1 "$t3_manifest")" = $'# path\tbranch\thead' ]
+
+# --- 4) --manifest parent directory missing must fail the script ---
+echo
+echo "[4] missing manifest parent directory exits non-zero"
+t4=$(mktemp -d)
+KEEP_LOGS+=("$t4")
+mkdir -p "$t4/scan"
+
+t4_log="$t4/run.log"
+set +e
+run_update "$t4/scan" --manifest "$t4/no_such_dir/manifest.tsv" >"$t4_log" 2>&1
+t4_rc=$?
+set -e
+
+assert_ok "exit code is non-zero (got $t4_rc)" [ "$t4_rc" -ne 0 ]
+assert_ok "error names the missing parent directory" \
+    grep -q "parent directory does not exist" "$t4_log"
+assert_ok "success banner is not printed" \
+    log_lacks "$t4_log" "All Git repositories updated successfully!"
+assert_ok "manifest file was not created" \
+    [ ! -e "$t4/no_such_dir/manifest.tsv" ]
+
+# --- 5) top-level DIRS entry is updated and recorded only once ---
+echo
+echo "[5] libsrc as both Self and Subdir is deduplicated"
+t5=$(mktemp -d)
+KEEP_LOGS+=("$t5")
+# libsrc itself is the git repo, so $PWD/libsrc (Subdir) and D=libsrc (Self)
+# would both hit it without dedupe.
+git init -b main --bare "$t5/remote.git"
+git init -b main "$t5/src"
+make_commit "$t5/src" "initial libsrc"
+git -C "$t5/src" remote add origin "$t5/remote.git"
+git -C "$t5/src" push -u origin main
+mkdir -p "$t5/scan"
+git clone -b main "$t5/remote.git" "$t5/scan/libsrc"
+
+t5_manifest="$t5/source-manifest.tsv"
+t5_log="$t5/run.log"
+set +e
+run_update "$t5/scan" --manifest "$t5_manifest" >"$t5_log" 2>&1
+t5_rc=$?
+set -e
+
+t5_head=$(git -C "$t5/scan/libsrc" rev-parse HEAD)
+t5_libsrc_rows=$(grep -c $'^libsrc\t' "$t5_manifest" || true)
+t5_updates=$(grep -c 'Updating repo:.*libsrc' "$t5_log" || true)
+
+assert_ok "exit code is 0 (got $t5_rc)" [ "$t5_rc" -eq 0 ]
+assert_ok "manifest has exactly one libsrc row (got $t5_libsrc_rows)" \
+    [ "$t5_libsrc_rows" -eq 1 ]
+assert_ok "manifest records the single libsrc HEAD" \
+    grep -q $'libsrc\tmain\t'"$t5_head" "$t5_manifest"
+assert_ok "libsrc is pulled only once (Updating count=$t5_updates)" \
+    [ "$t5_updates" -eq 1 ]
+assert_ok "second visit is skipped" \
+    grep -q "Already updated: libsrc" "$t5_log"
+
+# --- 6) empty tree + --manifest still writes a header ---
+echo
+echo "[6] empty tree writes a header-only manifest"
+t6=$(mktemp -d)
+KEEP_LOGS+=("$t6")
+mkdir -p "$t6/scan"
+
+t6_manifest="$t6/source-manifest.tsv"
+t6_log="$t6/run.log"
+set +e
+run_update "$t6/scan" --manifest "$t6_manifest" >"$t6_log" 2>&1
+t6_rc=$?
+set -e
+
+t6_lines=$(wc -l < "$t6_manifest" | tr -d ' ')
+
+assert_ok "exit code is 0 (got $t6_rc)" [ "$t6_rc" -eq 0 ]
+assert_ok "success banner is printed" \
+    grep -q "All Git repositories updated successfully!" "$t6_log"
+assert_ok "manifest exists" [ -f "$t6_manifest" ]
+assert_ok "manifest is header-only (lines=$t6_lines)" [ "$t6_lines" -eq 1 ]
+assert_ok "manifest header is present" \
+    [ "$(cat "$t6_manifest")" = $'# path\tbranch\thead' ]
 
 echo
 echo "==============================================="
@@ -197,4 +280,10 @@ echo "---- deleted-branch log ----"
 sed -n '1,160p' "$t2_log" || true
 echo "---- success log ----"
 sed -n '1,160p' "$t3_log" || true
+echo "---- missing-parent log ----"
+sed -n '1,80p' "$t4_log" || true
+echo "---- dedupe log ----"
+sed -n '1,160p' "$t5_log" || true
+echo "---- empty-tree log ----"
+sed -n '1,80p' "$t6_log" || true
 exit 1

@@ -21,8 +21,11 @@ GIT_PULL_ATTEMPTS="${GIT_PULL_ATTEMPTS:-3}"
 GIT_PULL_RETRY_SLEEP="${GIT_PULL_RETRY_SLEEP:-2}"
 
 MANIFEST_FILE=""
+MANIFEST_ROWS=()
+MANIFEST_WRITE_FAILED=0
 FAILED_REPOS=()
 FAILED_ERRORS=()
+declare -A SEEN_REPOS=()
 
 usage() {
     cat <<'EOF'
@@ -33,7 +36,8 @@ Every discovered repository is required: any failed update exits non-zero
 and prints a summary with the repository path and original Git error.
 
   --manifest FILE   Write a TSV of path, branch, HEAD (sorted by path)
-                    so release builders can compare source provenance
+                    so release builders can compare source provenance.
+                    The script exits non-zero if FILE cannot be written.
   -h, --help        Show this help
 EOF
 }
@@ -97,7 +101,62 @@ record_manifest() {
     path=$(normalize_repo_path "$repo")
     branch=$(git -C "$repo" rev-parse --abbrev-ref HEAD 2>/dev/null || echo "?")
     head=$(git -C "$repo" rev-parse HEAD 2>/dev/null || echo "?")
-    printf '%s\t%s\t%s\n' "$path" "$branch" "$head" >> "$MANIFEST_FILE"
+    MANIFEST_ROWS+=("$path"$'\t'"$branch"$'\t'"$head")
+}
+
+# Fail early if --manifest cannot be created (missing parent, not writable).
+prepare_manifest() {
+    [ -n "$MANIFEST_FILE" ] || return 0
+
+    local manifest_dir
+    manifest_dir=$(dirname "$MANIFEST_FILE")
+    if [ -d "$MANIFEST_FILE" ]; then
+        echo "error: cannot write manifest: path is a directory: $MANIFEST_FILE" >&2
+        return 1
+    fi
+    if [ ! -d "$manifest_dir" ]; then
+        echo "error: cannot write manifest: parent directory does not exist: $manifest_dir" >&2
+        return 1
+    fi
+    if [ -e "$MANIFEST_FILE" ] && [ ! -w "$MANIFEST_FILE" ]; then
+        echo "error: cannot write manifest: file is not writable: $MANIFEST_FILE" >&2
+        return 1
+    fi
+    if [ ! -e "$MANIFEST_FILE" ] && [ ! -w "$manifest_dir" ]; then
+        echo "error: cannot write manifest: directory is not writable: $manifest_dir" >&2
+        return 1
+    fi
+    return 0
+}
+
+# Write header even when no repositories were found, so builders can diff
+# an empty provenance file instead of a 0-byte leftover.
+write_manifest() {
+    [ -n "$MANIFEST_FILE" ] || return 0
+
+    local tmp rc
+    tmp="${MANIFEST_FILE}.tmp.$$"
+    set -o pipefail
+    {
+        printf '# path\tbranch\thead\n'
+        if [ "${#MANIFEST_ROWS[@]}" -gt 0 ]; then
+            printf '%s\n' "${MANIFEST_ROWS[@]}" | sort -t $'\t' -k1,1
+        fi
+    } > "$tmp"
+    rc=$?
+    set +o pipefail
+    if [ "$rc" -ne 0 ]; then
+        rm -f "$tmp"
+        echo "error: failed to write manifest: $MANIFEST_FILE" >&2
+        return 1
+    fi
+    if ! mv "$tmp" "$MANIFEST_FILE"; then
+        rm -f "$tmp"
+        echo "error: failed to write manifest: $MANIFEST_FILE" >&2
+        return 1
+    fi
+    echo "Source manifest written to: $MANIFEST_FILE"
+    return 0
 }
 
 # Return 0 if there is no upstream or it still exists on the remote.
@@ -208,6 +267,25 @@ update_repo() {
     return 1
 }
 
+# Update and record each repository at most once. Top-level DIRS entries
+# (libsrc, apps, ...) can also appear as a first-level child of $PWD.
+visit_repo() {
+    local tag="$1"
+    local repo="$2"
+    local key
+    key=$(cd "$repo" && pwd) || {
+        record_failure "$repo" "cannot access repository"
+        return 1
+    }
+    if [ -n "${SEEN_REPOS[$key]:-}" ]; then
+        echo "[Skip] Already updated: $repo"
+        return 0
+    fi
+    SEEN_REPOS[$key]=1
+    echo "[$tag] Updating repo: $repo"
+    update_repo "$repo"
+}
+
 # ================================
 # 指定要扫描的目录列表
 # 可自行修改
@@ -232,8 +310,8 @@ done
 echo "SOCKS proxy: ${SOCKS_PROXY:-}"
 echo
 
-if [ -n "$MANIFEST_FILE" ]; then
-    : > "$MANIFEST_FILE"
+if ! prepare_manifest; then
+    exit 1
 fi
 
 # ================================
@@ -247,8 +325,7 @@ for D in "${DIRS[@]}"; do
 
     # ---- 更新目录自身 ----
     if [ -d "$D/.git" ]; then
-        echo "[Self] Updating repo: $D"
-        update_repo "$D"
+        visit_repo "Self" "$D"
     else
         echo "[Self] Not a git repo: $D"
     fi
@@ -258,20 +335,13 @@ for D in "${DIRS[@]}"; do
         [ -d "$S" ] || continue
         if [ -d "$S/.git" ]; then
             echo
-            echo "[Subdir] Updating repo: $S"
-            update_repo "$S"
+            visit_repo "Subdir" "$S"
         fi
     done
 done
 
-if [ -n "$MANIFEST_FILE" ] && [ -s "$MANIFEST_FILE" ]; then
-    {
-        echo -e "# path\tbranch\thead"
-        sort -t $'\t' -k1,1 "$MANIFEST_FILE"
-    } > "${MANIFEST_FILE}.sorted"
-    mv "${MANIFEST_FILE}.sorted" "$MANIFEST_FILE"
-    echo
-    echo "Source manifest written to: $MANIFEST_FILE"
+if ! write_manifest; then
+    MANIFEST_WRITE_FAILED=1
 fi
 
 if [ "${#FAILED_REPOS[@]}" -gt 0 ]; then
@@ -286,6 +356,15 @@ if [ "${#FAILED_REPOS[@]}" -gt 0 ]; then
             echo "    $line"
         done <<< "${FAILED_ERRORS[$i]}"
     done
+    echo
+    exit 1
+fi
+
+if [ "$MANIFEST_WRITE_FAILED" -ne 0 ]; then
+    echo
+    echo "==============================================="
+    echo "FAILED: could not write source manifest"
+    echo "==============================================="
     echo
     exit 1
 fi
