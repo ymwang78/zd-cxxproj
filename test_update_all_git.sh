@@ -265,6 +265,43 @@ assert_ok "manifest is header-only (lines=$t6_lines)" [ "$t6_lines" -eq 1 ]
 assert_ok "manifest header is present" \
     [ "$(cat "$t6_manifest")" = $'# path\tbranch\thead' ]
 
+# --- 7) header printf failure must fail write_manifest ---
+echo
+echo "[7] header write failure exits non-zero and suppresses the success banner"
+t7=$(mktemp -d)
+KEEP_LOGS+=("$t7")
+mkdir -p "$t7/scan"
+
+# Non-interactive bash sources BASH_ENV before the script. Override the
+# builtin so only the manifest header printf fails (the reviewer's repro).
+# A PATH wrapper would not work: the script uses builtin printf.
+cat > "$t7/fail_header_printf.sh" <<'EOF'
+printf() {
+    case "$1" in
+        '# path\tbranch\thead\n') return 1 ;;
+    esac
+    command printf "$@"
+}
+EOF
+
+t7_manifest="$t7/source-manifest.tsv"
+t7_log="$t7/run.log"
+set +e
+(
+    cd "$t7/scan"
+    BASH_ENV="$t7/fail_header_printf.sh" bash "$UPDATE_SH" --manifest "$t7_manifest"
+) >"$t7_log" 2>&1
+t7_rc=$?
+set -e
+
+assert_ok "exit code is non-zero (got $t7_rc)" [ "$t7_rc" -ne 0 ]
+assert_ok "error reports the manifest write failure" \
+    grep -q "failed to write manifest" "$t7_log"
+assert_ok "success banner is not printed" \
+    log_lacks "$t7_log" "All Git repositories updated successfully!"
+assert_ok "destination manifest was not published" \
+    [ ! -e "$t7_manifest" ]
+
 echo
 echo "==============================================="
 if [ "$failed" -eq 0 ]; then
@@ -286,4 +323,6 @@ echo "---- dedupe log ----"
 sed -n '1,160p' "$t5_log" || true
 echo "---- empty-tree log ----"
 sed -n '1,80p' "$t6_log" || true
+echo "---- header-write-failure log ----"
+sed -n '1,80p' "$t7_log" || true
 exit 1

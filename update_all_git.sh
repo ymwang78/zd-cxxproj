@@ -131,25 +131,31 @@ prepare_manifest() {
 
 # Write header even when no repositories were found, so builders can diff
 # an empty provenance file instead of a 0-byte leftover.
+# Each write is checked on its own: a later `if` must not mask a failed
+# header printf (empty tree used to leave rc=0 and still mv + succeed).
 write_manifest() {
     [ -n "$MANIFEST_FILE" ] || return 0
 
-    local tmp rc
+    local tmp
     tmp="${MANIFEST_FILE}.tmp.$$"
-    set -o pipefail
-    {
-        printf '# path\tbranch\thead\n'
-        if [ "${#MANIFEST_ROWS[@]}" -gt 0 ]; then
-            printf '%s\n' "${MANIFEST_ROWS[@]}" | sort -t $'\t' -k1,1
-        fi
-    } > "$tmp"
-    rc=$?
-    set +o pipefail
-    if [ "$rc" -ne 0 ]; then
+
+    if ! printf '# path\tbranch\thead\n' >"$tmp"; then
         rm -f "$tmp"
         echo "error: failed to write manifest: $MANIFEST_FILE" >&2
         return 1
     fi
+
+    if [ "${#MANIFEST_ROWS[@]}" -gt 0 ]; then
+        set -o pipefail
+        if ! printf '%s\n' "${MANIFEST_ROWS[@]}" | sort -t $'\t' -k1,1 >>"$tmp"; then
+            set +o pipefail
+            rm -f "$tmp"
+            echo "error: failed to write manifest: $MANIFEST_FILE" >&2
+            return 1
+        fi
+        set +o pipefail
+    fi
+
     if ! mv "$tmp" "$MANIFEST_FILE"; then
         rm -f "$tmp"
         echo "error: failed to write manifest: $MANIFEST_FILE" >&2
