@@ -99,6 +99,7 @@ typedef enum _IDH_QUALITY {
     IDH_HIGH_BAD = 0x80,        // 10xxxxxx
     IDH_HIGH_GOOD = 0xC0,       // 11xxxxxx
     IDH_HIGH_MASK = 0xC0,
+    IDH_LOW_MASK = 0x3F,
 
     /* ---------------- INVALID / BAD Base States (0x01–0x0F) ---------------- */
     IDH_LOW_INVALID_NODATA = 0x01,       // BadNoData
@@ -224,6 +225,10 @@ static inline uint8_t idh_get_quality(uint64_t tq) {
 
 static inline uint8_t idh_get_quality_high(uint64_t tq) {
     return (IDH_HIGH_MASK & (uint8_t)(tq >> IDH_TQ_QUALITY_SHIFT));
+}
+
+static inline uint8_t idh_get_quality_low(uint64_t tq) {
+    return (IDH_LOW_MASK & (uint8_t)(tq >> IDH_TQ_QUALITY_SHIFT));
 }
 
 static inline uint64_t idh_get_timestamp(uint64_t tq) { return tq & IDH_TQ_TIME_MASK; }
