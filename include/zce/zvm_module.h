@@ -102,6 +102,23 @@ zce::SmartPtr<zce::Object> ZCE_API getOrBootReuseVM(
     const zce::SmartPtr<zce::Object>& stream_handle, const std::string& svc_name,
     int default_timeout_ms);
 
+// ── Caller identity ───────────────────────────────────────────────────────────
+
+/**
+ * @brief Gets the peer IP address of the connection a remote call arrived on.
+ *
+ * Typically called from Machine::call_dblock_from_remote(), so that a module
+ * can check who is calling, e.g. against a per-caller IP binding. An IPv4 peer
+ * comes back in dotted form ("127.0.0.1"), also when the socket reports it as
+ * an IPv4-mapped IPv6 address; an IPv6 peer comes back in its textual form. The
+ * port is never included.
+ *
+ * @param stream Stream the current request arrived on.
+ * @return The peer address, or an empty string if @p stream is null or the
+ *         call did not arrive over IP (e.g. a named pipe).
+ */
+std::string ZCE_API getRemoteIp(const zce::SmartPtr<RpcStream>& stream);
+
 }  // namespace zvm
 
 }  // namespace zce
