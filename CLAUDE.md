@@ -1,6 +1,6 @@
 # C++ Projects Structure
 
-This directory contains all C++ projects with a shared structure for common dependencies and individual project directories.
+This directory contains all C++ projects with a shared structure for common dependencies and individual project directories. The canonical workspace policy entry is [docs/.ai/cxx-docs-index.md](docs/.ai/cxx-docs-index.md); more specific project `AGENTS.md` guidance controls project conventions.
 
 ## Project Structure
 
@@ -32,17 +32,13 @@ Based on Google C++ Style Guide with modifications:
 
 ## Testing Standards
 
-All test code must follow these rules:
+The canonical rules live in [docs/.ai/cxx-testing-policy.md](docs/.ai/cxx-testing-policy.md); a project `AGENTS.md` may override them for that project. The summary below is what day-to-day work needs. If it ever disagrees with the policy, the policy wins: update the policy first, then this summary.
 
-### GTest Framework
-- **Mandatory**: All tests MUST use Google Test (GTest) framework
-- **Test file naming**: `test_*.cpp` (e.g., `test_per_tag_tracking.cpp`)
-- **Test structure**: Use `TEST_F()` for fixture-based tests or `TEST()` for simple tests
-
-### Main Function Rule
-- **Critical**: ALL test files MUST wrap the main function with `#ifndef USE_GTEST_MAIN` macro
-- **Purpose**: Allows flexible test compilation with custom or default GTest main
-- **Standard template**:
+- **Framework**: C++ tests use Google Test by default. Where a project `AGENTS.md` names another framework (e.g. xOptCon uses Qt Test), use that one; the GTest rules below then do not apply.
+- **Location**: `tests/` or `gtest/` (libzce uses `gtest/`). Put new tests in the directory the project already uses.
+- **Files**: `test_*.cpp`, one component or feature per file.
+- **Cases**: `TEST_F()` for fixture-based tests, `TEST()` for simple ones. Name the suite after the component and the case after the behavior and expected outcome, PascalCase without underscores: `TEST_F(HttpRequestLimitsFixture, ContentLengthOverCeilingIsRefusedWith413)`.
+- **Custom `main()`**: a test file that defines `main()` must guard it, so the same file also builds against `gtest_main`:
 ```cpp
 #ifndef USE_GTEST_MAIN
 int main(int argc, char** argv) {
@@ -51,17 +47,8 @@ int main(int argc, char** argv) {
 }
 #endif
 ```
-
-### Test Organization
-- Place all tests in the `tests/` directory
-- Each test file should focus on a single component or feature
-- Use descriptive test names: `ComponentName_BehaviorUnderTest_ExpectedOutcome`
-- Example: `PerTagTrackingTest_BasicWriteSmallBuffer`
-
-### CMake Integration
-- Add test executables to CMakeLists.txt with conditional compilation
-- Link against GTest libraries: `GTest::gtest` and `GTest::gtest_main`
-- Register tests with `add_test(NAME TestName COMMAND test_executable)`
+- **CMake**: link `GTest::gtest` / `GTest::gtest_main` when available and register each executable with `add_test()`.
+- Add or update tests whenever behavior changes.
 
 ## Common Commands
 
