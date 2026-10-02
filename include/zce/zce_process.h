@@ -58,6 +58,8 @@ enum PRECESS_MSGID {
 class SubProcessHost;
 
 class ZCE_API Process : public zce::zdp::zdp_stream {
+    // Closes the worker pipe of a Process it lets go of: stopSubProcess(), ~SubProcessHost().
+    friend class SubProcessHost;
     struct Impl;
     Impl* pimpl_;
 
