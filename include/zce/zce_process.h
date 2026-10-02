@@ -15,6 +15,7 @@
 #include <zce/zdp_base_proto.h>
 #include <zce/zvm.h>
 #include <map>
+#include <vector>
 #include <functional>
 
 namespace zce {
@@ -136,6 +137,12 @@ class ZCE_API SubProcessHost : public ::zce::zvm::Machine {
         std::string host_dir = ".";
         std::string host_topic;
         zce_uint32 version = 0x00040000u;
+        // The processes start() creates and keeps running, saved as autoadd rows in the
+        // instance table; a later entry replaces an earlier one with the same vmname. A host
+        // booted through VirtualMachineStub::boot() runs start() on a Scheduler worker straight
+        // away, so a list known up front belongs here rather than in addAutoCreateProcess()
+        // calls made after the boot.
+        std::vector<zdp_base::zvm_t> auto_create_processes;
     };
 
     SubProcessHost(const zce::SmartPtr<zce::zvm::VirtualMachineStub>& stub_ptr,
@@ -143,6 +150,9 @@ class ZCE_API SubProcessHost : public ::zce::zvm::Machine {
 
     ~SubProcessHost() noexcept override;
 
+    // Adds to HostContext::auto_create_processes. Only an entry added before start() runs
+    // counts; start() then drops the autoadd rows of every vmname not on the list. Afterwards
+    // the list is final and this returns ZCE_ERROR_INVALID.
     int addAutoCreateProcess(const zdp_base::zvm_t& process_info);
 
     const zce::SmartPtr<zce::Reactor>& reactor_ptr() const noexcept;
