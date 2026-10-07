@@ -170,7 +170,11 @@ class ZCE_API Any {
         zce_uint16 subtype) noexcept
         : data_{} {
         data_.type_ = any_idh;
-        data_.u_.idh_real_.time_quality = ((zce_uint64)quality << 48) | (timestamp_microsec / 1000);
+        // Packs exactly like idh_make_time_quality(): the time keeps only its low 48 bits,
+        // so a negative or >= 2^48 ms time cannot spill into the quality byte.
+        data_.u_.idh_real_.time_quality =
+            ((zce_uint64)quality << 48) |
+            ((zce_uint64)(timestamp_microsec / 1000) & 0x0000FFFFFFFFFFFFULL);
         data_.u_.idh_real_.value = value;
         data_.subtype_indicate_ = subtype;
     }
