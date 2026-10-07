@@ -4,7 +4,9 @@
  *  This library is used to provide a common interface for accessing data from different data
  * sources The data sources can be OPC UA, OPC DA, SQL, etc.
  * Note:
- * 1. Don't support abs(int64/uint64) >= 2^52, because of the precision of double.
+ * 1. Values are passed as double, which holds every integer up to 2^53 exactly. An Int64/UInt64
+ *    value whose magnitude exceeds 2^53 is read as the nearest double; if the server reported it
+ *    as good, its quality becomes IDH_HIGH_UNCERTAIN | IDH_LOW_UNCERTAIN_ESTIMATED.
  * 2. Minimal support OPC DA 2.0.
  * 3. DA Schema: opc.da://{hostname}/{ProgID}?ds_device=1 opc.da://{hostname}/{CLSID}?ds_device=0
  */
