@@ -15,6 +15,7 @@
 #include <zce/zce_dblock.h>
 #include <zce/zce_mbpool.h>
 #include <zce/zce_singleton.h>
+#include <zce/zce_ssl.h>
 #include <zce/zds_schema.h>
 #include <zce/zce_task_queue.h>
 
@@ -113,9 +114,30 @@ class VirtualMachineStub : public zce::Object {
 
     zce::SmartPtr<zce::Object> boot(const zdp_base::zvm_t& vm, zce::RefBlock args);
 
+    /// Boots a proxy for the vm svc_name of the stub at host:port. The proxy connects when it is
+    /// booted, and again whenever a call finds it disconnected. With ssl, the connection uses TLS
+    /// but accepts any certificate the server presents (TlsClientOptions::VERIFY_NONE); the
+    /// overload below checks it.
     zce::SmartPtr<zce::Object> boot(const std::string& svc_name, const std::string& host,
                                     unsigned short port, bool ssl, int default_timeout,
                                     std::function<void()> open_cb, std::function<void()> close_cb);
+
+    /// As boot(svc_name, host, port, true, ...), but every TLS connection the proxy makes checks
+    /// the server as tls says. tls.server_name defaults to host. Under VERIFY_REQUIRED a server
+    /// that fails the checks is disconnected during the handshake: no call is sent to it, and the
+    /// calls waiting for that connection fail with ZVM_ERROR_DISCONNECT. With VERIFY_NONE this is
+    /// boot(svc_name, host, port, true, ...).
+    ///
+    /// @return the proxy, or null with Tss::getGlobal()->last_errcode_ set to
+    ///         ZCE_ERROR_UNINIT if called before initStub(),
+    ///         ZCE_ERROR_INVALID if host is a pipe:// address, which carries no TLS, and
+    ///         tls.verify is not VERIFY_NONE,
+    ///         ZCE_ERROR_UNSUPPORT if built without ZCE_SUPPORT_SSL and tls.verify is not
+    ///         VERIFY_NONE.
+    zce::SmartPtr<zce::Object> boot(const std::string& svc_name, const std::string& host,
+                                    unsigned short port, const zce::TlsClientOptions& tls,
+                                    int default_timeout, std::function<void()> open_cb,
+                                    std::function<void()> close_cb);
 
     zce::SmartPtr<zce::Object> get_vm(const std::string& svc_name) const;
 
