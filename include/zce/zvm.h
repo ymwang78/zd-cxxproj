@@ -83,6 +83,34 @@ class VirtualMachineStub : public zce::Object {
     /// Stop all active RPC listeners (TCP and pipe) registered on this stub.
     void stopAllServants();
 
+    /// Serves files under u8_root_dir to RPC peers as the built-in "fs" service. Its "head"
+    /// method lists a directory or returns a file's [size, mtime]. Its "get" method lists a
+    /// directory or returns a file's bytes, optionally only the [begin, end) range of them.
+    ///
+    /// The service is off until this is called. A relative u8_root_dir is resolved against the
+    /// current directory once, here. Paths a peer sends are relative to the root, whatever
+    /// separators they start with: "" and "/" name the root itself. A path that leads outside the
+    /// root, whether through "..", a drive letter or a symlink, gets the same answer as a missing
+    /// file. Only directories and regular files are served.
+    ///
+    /// With outbound_only (the default), only peers this stub has connected to itself, with
+    /// boot(svc_name, host, port, ...), can call "fs", and only over a connection the stub opened.
+    /// Peers that connect to one of the stub's listeners (listen(), listenPipe(), listenSchema(),
+    /// Machine::rpc_serve()) get the same answer as from a stub that does not serve "fs".
+    /// In-process calls through rpc_call_dblock() are not restricted.
+    ///
+    /// Calling this again replaces the root and the outbound_only setting.
+    ///
+    /// @return 0 on success.
+    ///         ZCE_ERROR_INVALID if u8_root_dir is not an existing directory.
+    ///         ZCE_ERROR_DUPLICATED if a vm named "fs" is already booted.
+    ///         ZCE_ERROR_UNSUPPORT if built without ZCE_SUPPORT_CCVM.
+    ///         ZCE_ERROR_UNINIT if called before initStub().
+    int enableFileService(const std::string& u8_root_dir, bool outbound_only = true);
+
+    /// Stops serving "fs". Calls already under way still finish.
+    void disableFileService();
+
     zce::SmartPtr<zce::Object> boot(const zdp_base::zvm_t& vm, zce::RefBlock args);
 
     zce::SmartPtr<zce::Object> boot(const std::string& svc_name, const std::string& host,
