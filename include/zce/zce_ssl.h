@@ -52,6 +52,13 @@ struct TlsClientOptions {
 
 }  // namespace zce
 
+/// TLS over the stream below it, normally a zce::Tcp.
+///
+/// An SSL object must not be used by two threads at once, and the reactor thread uses this one
+/// whenever data arrives. So every OpenSSL call on it runs on the reactor's thread: write() and
+/// close() called from another thread, e.g. by a vm answering a call on its own task queue, are
+/// handed to the reactor, which runs them in the order they were handed over. Such a write()
+/// returns once it is queued, as Socket::write() does, with -1 only if the reactor is not running.
 class zce_ssl : public zce::IStream
 {
     enum _tls_state {
@@ -76,6 +83,12 @@ class zce_ssl : public zce::IStream
     /* SSL writes to, we read from. */
     //zce_dblock write_dblock_;
     BIO *write_bio_;
+
+    // the reactor of the socket below; every OpenSSL call on ssl_ runs on its thread
+    zce::SmartPtr<zce::Reactor> reactor_;
+
+    // close() has run; only the reactor thread reads or sets it
+    bool closed_ = false;
 
     // zce::TlsClientOptions::Verify; VERIFY_NONE for a server and for the legacy constructor
     int verify_;
@@ -107,17 +120,21 @@ class zce_ssl : public zce::IStream
 
 public:
 
-    zce_ssl(bool isserver, const char* n, const char* verifycrt, const char* cert, const char* key);
+    /// @param reactor the reactor of the socket this stream goes on; its thread does all TLS work
+    zce_ssl(const zce::SmartPtr<zce::Reactor>& reactor, bool isserver, const char* n,
+            const char* verifycrt, const char* cert, const char* key);
 
     /// A TLS client that checks the server as opts says.
     ///
+    /// @param reactor the reactor of the socket this stream goes on; its thread does all TLS work
     /// @param dialed_host the host the client connects to; the server name to check when
     ///        opts.server_name is empty.
     ///
     /// Under VERIFY_REQUIRED, trust anchors that cannot be loaded, or an empty server name, fail
     /// the connection as soon as it opens. Under VERIFY_AUDIT they are logged, and the connection
     /// goes ahead unchecked, still sending a DNS server name as SNI.
-    zce_ssl(const zce::TlsClientOptions& opts, const char* dialed_host);
+    zce_ssl(const zce::SmartPtr<zce::Reactor>& reactor, const zce::TlsClientOptions& opts,
+            const char* dialed_host);
 
     ~zce_ssl();
 
