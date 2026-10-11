@@ -95,9 +95,32 @@ class ZCE_API Process : public zce::zdp::zdp_stream {
 
     const zce::SmartPtr<zce::Object>& getContextPtr() const;
 
+    /**
+     * @brief The ProcessInfo itself, without synchronization.
+     *
+     * Meant for setting up a Process the host does not have yet: between
+     * SubProcessHost::createSubProcess() (SubProcessHost::HostContext::precheck_cb
+     * included) and SubProcessHost::invoke(). Once the host has the Process, its
+     * reactor thread and its task queue change these fields (pid, vmstatus and the
+     * start and end times among them) under the host's state lock, which a caller
+     * cannot take, so reading or writing through this reference races them. Read
+     * with infoSnapshot() instead.
+     */
     const ProcessInfo& processInfo() const;
 
+    /** @copydoc processInfo() const */
     ProcessInfo& processInfo();
+
+    /**
+     * @brief A copy of the ProcessInfo, taken under the host's state lock.
+     *
+     * Safe from any thread, the reactor thread and the host's callbacks included.
+     * All fields are read at the same moment. The copy shares the content buffer
+     * (dblock) rather than copying it.
+     *
+     * @return The fields as they were while the lock was held.
+     */
+    ProcessInfo infoSnapshot() const;
 
     bool isRunning() const;
 
@@ -172,6 +195,24 @@ class ZCE_API SubProcessHost : public ::zce::zvm::Machine {
 
     int querySubProcess(const std::string& name, zce::SmartPtr<Process>& subprocess_ptr);
 
+    /**
+     * @brief The host's processes, copied under its state lock.
+     *
+     * Safe from any thread. Each entry holds its Process, so it stays valid while the
+     * caller goes through the list even if the host drops it meanwhile (an external
+     * process that unregisters, or stopSubProcess()). Read each one's fields with
+     * Process::infoSnapshot().
+     *
+     * @return One Process per instance, ordered by vmname.
+     */
+    std::vector<zce::SmartPtr<Process>> allSubProcesses() const;
+
+    /**
+     * @deprecated Use allSubProcesses(). This returns the host's own map, which its
+     * reactor thread and its task queue insert into and erase from while the caller
+     * goes through it.
+     */
+    [[deprecated("races the host's reactor thread and task queue; use allSubProcesses()")]]
     const std::map<std::string, zce::SmartPtr<Process>>& queryAllSubProcess() const;
 
     virtual int start() override;
