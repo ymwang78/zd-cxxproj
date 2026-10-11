@@ -7,6 +7,8 @@ export LC_ALL=en_US.UTF-8
 # 设置代理（可选）
 # ================================
 if [ -f ~/.proxy ]; then
+    # Optional operator file; path is user-specific.
+    # shellcheck disable=SC1090
     source ~/.proxy
 fi
 #export HTTP_PROXY="http://192.168.200.8:32080"
@@ -25,7 +27,11 @@ MANIFEST_ROWS=()
 MANIFEST_WRITE_FAILED=0
 FAILED_REPOS=()
 FAILED_ERRORS=()
-declare -A SEEN_REPOS=()
+# Indexed array of absolute paths. Avoid bash-4 associative arrays so
+# this stays runnable on macOS /usr/bin/bash 3.2 as well as Linux bash 4+.
+# Compare whole strings: a newline-separated blob would treat
+# "foo" and "foo<newline>bar" as overlapping keys.
+SEEN_REPOS=()
 
 usage() {
     cat <<'EOF'
@@ -37,6 +43,8 @@ and prints a summary with the repository path and original Git error.
 
   --manifest FILE   Write a TSV of path, branch, HEAD (sorted by path)
                     so release builders can compare source provenance.
+                    Also accepted as UPDATE_ALL_GIT_MANIFEST=FILE.
+                    The flag wins if both are set.
                     The script exits non-zero if FILE cannot be written.
   -h, --help        Show this help
 EOF
@@ -63,6 +71,10 @@ while [ $# -gt 0 ]; do
             ;;
     esac
 done
+
+if [ -z "$MANIFEST_FILE" ] && [ -n "${UPDATE_ALL_GIT_MANIFEST:-}" ]; then
+    MANIFEST_FILE="$UPDATE_ALL_GIT_MANIFEST"
+fi
 
 git_in_repo() {
     local repo="$1"
@@ -273,6 +285,24 @@ update_repo() {
     return 1
 }
 
+# Exact-string membership in SEEN_REPOS (bash 3.2 indexed array).
+# Do not join paths with newlines or feed them to grep: a key that
+# itself contains a newline would be split into multiple patterns.
+repo_already_seen() {
+    local key="$1"
+    local seen
+    for seen in "${SEEN_REPOS[@]}"; do
+        if [ "$seen" = "$key" ]; then
+            return 0
+        fi
+    done
+    return 1
+}
+
+mark_repo_seen() {
+    SEEN_REPOS+=("$1")
+}
+
 # Update and record each repository at most once. Top-level DIRS entries
 # (libsrc, apps, ...) can also appear as a first-level child of $PWD.
 visit_repo() {
@@ -283,11 +313,11 @@ visit_repo() {
         record_failure "$repo" "cannot access repository"
         return 1
     }
-    if [ -n "${SEEN_REPOS[$key]:-}" ]; then
+    if repo_already_seen "$key"; then
         echo "[Skip] Already updated: $repo"
         return 0
     fi
-    SEEN_REPOS[$key]=1
+    mark_repo_seen "$key"
     echo "[$tag] Updating repo: $repo"
     update_repo "$repo"
 }

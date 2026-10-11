@@ -302,6 +302,102 @@ assert_ok "success banner is not printed" \
 assert_ok "destination manifest was not published" \
     [ ! -e "$t7_manifest" ]
 
+# --- 8) UPDATE_ALL_GIT_MANIFEST env var is an opt-in alias for --manifest ---
+echo
+echo "[8] UPDATE_ALL_GIT_MANIFEST writes the same TSV as --manifest"
+t8=$(mktemp -d)
+KEEP_LOGS+=("$t8")
+setup_remote_and_clone "$t8" "envrepo"
+
+t8_manifest="$t8/source-manifest.tsv"
+t8_ignored="$t8/ignored.tsv"
+t8_log="$t8/run.log"
+set +e
+(
+    cd "$t8/scan"
+    UPDATE_ALL_GIT_MANIFEST="$t8_manifest" bash "$UPDATE_SH"
+) >"$t8_log" 2>&1
+t8_rc=$?
+set -e
+
+t8_head=$(git -C "$t8/scan/libsrc/envrepo" rev-parse HEAD)
+
+assert_ok "env-var exit code is 0 (got $t8_rc)" [ "$t8_rc" -eq 0 ]
+assert_ok "env-var success banner is printed" \
+    grep -q "All Git repositories updated successfully!" "$t8_log"
+assert_ok "env-var manifest records path, branch and HEAD" \
+    grep -q $'libsrc/envrepo\tmain\t'"$t8_head" "$t8_manifest"
+
+# Flag wins when both are set.
+t8b_log="$t8/flag-wins.log"
+set +e
+(
+    cd "$t8/scan"
+    UPDATE_ALL_GIT_MANIFEST="$t8_ignored" bash "$UPDATE_SH" --manifest "$t8_manifest"
+) >"$t8b_log" 2>&1
+t8b_rc=$?
+set -e
+
+assert_ok "flag-wins exit code is 0 (got $t8b_rc)" [ "$t8b_rc" -eq 0 ]
+assert_ok "flag path is rewritten" [ -f "$t8_manifest" ]
+assert_ok "env-var path is not created when the flag is set" \
+    [ ! -e "$t8_ignored" ]
+
+# --- 9) stay portable to macOS bash 3.2 (no bash-4-only features) ---
+echo
+echo "[9] update_all_git.sh avoids bash 4-only syntax"
+assert_ok "no declare -A (associative arrays)" \
+    log_lacks "$UPDATE_SH" 'declare -A'
+assert_ok "no mapfile" \
+    log_lacks "$UPDATE_SH" 'mapfile'
+assert_ok "no readarray" \
+    log_lacks "$UPDATE_SH" 'readarray'
+assert_ok "bash -n accepts the script" \
+    bash -n "$UPDATE_SH"
+
+# --- 10) a path with an embedded newline is not treated as a prefix match ---
+echo
+echo "[10] sibling repos whose names differ by an embedded newline are both updated"
+t10=$(mktemp -d)
+KEEP_LOGS+=("$t10")
+
+git init -b main --bare "$t10/remote.git"
+git init -b main "$t10/src"
+make_commit "$t10/src" "initial newline-repos"
+git -C "$t10/src" remote add origin "$t10/remote.git"
+git -C "$t10/src" push -u origin main
+
+mkdir -p "$t10/scan/libsrc"
+git clone -b main "$t10/remote.git" "$t10/scan/libsrc/foo"
+git clone -b main "$t10/remote.git" "$t10/scan/libsrc/foo"$'\n'"bar"
+
+make_commit "$t10/src" "remote advance"
+git -C "$t10/src" push origin main
+
+t10_log="$t10/run.log"
+set +e
+run_update "$t10/scan" >"$t10_log" 2>&1
+t10_rc=$?
+set -e
+
+t10_remote_head=$(git -C "$t10/src" rev-parse HEAD)
+t10_foo_head=$(git -C "$t10/scan/libsrc/foo" rev-parse HEAD)
+t10_weird_head=$(git -C "$t10/scan/libsrc/foo"$'\n'"bar" rev-parse HEAD)
+t10_updates=$(grep -c 'Updating repo:' "$t10_log" || true)
+
+assert_ok "exit code is 0 (got $t10_rc)" [ "$t10_rc" -eq 0 ]
+assert_ok "success banner is printed" \
+    grep -q "All Git repositories updated successfully!" "$t10_log"
+# The old newline-joined + grep -Fxq membership treated "…/foo<newline>bar"
+# as already seen after visiting "…/foo", so only one pull ran and the
+# second clone stayed stale.
+assert_ok "both sibling repos are pulled (Updating count=$t10_updates)" \
+    [ "$t10_updates" -eq 2 ]
+assert_ok "foo fast-forwarded to the remote HEAD" \
+    [ "$t10_foo_head" = "$t10_remote_head" ]
+assert_ok "foo<newline>bar fast-forwarded to the remote HEAD" \
+    [ "$t10_weird_head" = "$t10_remote_head" ]
+
 echo
 echo "==============================================="
 if [ "$failed" -eq 0 ]; then
@@ -325,4 +421,8 @@ echo "---- empty-tree log ----"
 sed -n '1,80p' "$t6_log" || true
 echo "---- header-write-failure log ----"
 sed -n '1,80p' "$t7_log" || true
+echo "---- env-manifest log ----"
+sed -n '1,80p' "$t8_log" || true
+echo "---- newline-path log ----"
+sed -n '1,160p' "$t10_log" || true
 exit 1
