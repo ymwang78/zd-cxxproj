@@ -27,9 +27,11 @@ MANIFEST_ROWS=()
 MANIFEST_WRITE_FAILED=0
 FAILED_REPOS=()
 FAILED_ERRORS=()
-# Newline-separated absolute paths. Avoid bash-4 associative arrays so
+# Indexed array of absolute paths. Avoid bash-4 associative arrays so
 # this stays runnable on macOS /usr/bin/bash 3.2 as well as Linux bash 4+.
-SEEN_REPOS=""
+# Compare whole strings: a newline-separated blob would treat
+# "foo" and "foo<newline>bar" as overlapping keys.
+SEEN_REPOS=()
 
 usage() {
     cat <<'EOF'
@@ -283,20 +285,22 @@ update_repo() {
     return 1
 }
 
-# Exact-line membership in SEEN_REPOS (bash 3.2, no associative arrays).
+# Exact-string membership in SEEN_REPOS (bash 3.2 indexed array).
+# Do not join paths with newlines or feed them to grep: a key that
+# itself contains a newline would be split into multiple patterns.
 repo_already_seen() {
     local key="$1"
-    [ -n "$SEEN_REPOS" ] || return 1
-    printf '%s\n' "$SEEN_REPOS" | grep -Fxq -- "$key"
+    local seen
+    for seen in "${SEEN_REPOS[@]}"; do
+        if [ "$seen" = "$key" ]; then
+            return 0
+        fi
+    done
+    return 1
 }
 
 mark_repo_seen() {
-    local key="$1"
-    if [ -z "$SEEN_REPOS" ]; then
-        SEEN_REPOS="$key"
-    else
-        SEEN_REPOS="$SEEN_REPOS"$'\n'"$key"
-    fi
+    SEEN_REPOS+=("$1")
 }
 
 # Update and record each repository at most once. Top-level DIRS entries

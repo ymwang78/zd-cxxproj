@@ -355,6 +355,49 @@ assert_ok "no readarray" \
 assert_ok "bash -n accepts the script" \
     bash -n "$UPDATE_SH"
 
+# --- 10) a path with an embedded newline is not treated as a prefix match ---
+echo
+echo "[10] sibling repos whose names differ by an embedded newline are both updated"
+t10=$(mktemp -d)
+KEEP_LOGS+=("$t10")
+
+git init -b main --bare "$t10/remote.git"
+git init -b main "$t10/src"
+make_commit "$t10/src" "initial newline-repos"
+git -C "$t10/src" remote add origin "$t10/remote.git"
+git -C "$t10/src" push -u origin main
+
+mkdir -p "$t10/scan/libsrc"
+git clone -b main "$t10/remote.git" "$t10/scan/libsrc/foo"
+git clone -b main "$t10/remote.git" "$t10/scan/libsrc/foo"$'\n'"bar"
+
+make_commit "$t10/src" "remote advance"
+git -C "$t10/src" push origin main
+
+t10_log="$t10/run.log"
+set +e
+run_update "$t10/scan" >"$t10_log" 2>&1
+t10_rc=$?
+set -e
+
+t10_remote_head=$(git -C "$t10/src" rev-parse HEAD)
+t10_foo_head=$(git -C "$t10/scan/libsrc/foo" rev-parse HEAD)
+t10_weird_head=$(git -C "$t10/scan/libsrc/foo"$'\n'"bar" rev-parse HEAD)
+t10_updates=$(grep -c 'Updating repo:' "$t10_log" || true)
+
+assert_ok "exit code is 0 (got $t10_rc)" [ "$t10_rc" -eq 0 ]
+assert_ok "success banner is printed" \
+    grep -q "All Git repositories updated successfully!" "$t10_log"
+# The old newline-joined + grep -Fxq membership treated "…/foo<newline>bar"
+# as already seen after visiting "…/foo", so only one pull ran and the
+# second clone stayed stale.
+assert_ok "both sibling repos are pulled (Updating count=$t10_updates)" \
+    [ "$t10_updates" -eq 2 ]
+assert_ok "foo fast-forwarded to the remote HEAD" \
+    [ "$t10_foo_head" = "$t10_remote_head" ]
+assert_ok "foo<newline>bar fast-forwarded to the remote HEAD" \
+    [ "$t10_weird_head" = "$t10_remote_head" ]
+
 echo
 echo "==============================================="
 if [ "$failed" -eq 0 ]; then
@@ -380,4 +423,6 @@ echo "---- header-write-failure log ----"
 sed -n '1,80p' "$t7_log" || true
 echo "---- env-manifest log ----"
 sed -n '1,80p' "$t8_log" || true
+echo "---- newline-path log ----"
+sed -n '1,160p' "$t10_log" || true
 exit 1
