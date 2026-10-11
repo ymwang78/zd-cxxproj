@@ -58,7 +58,10 @@ struct TlsClientOptions {
 /// whenever data arrives. So every OpenSSL call on it runs on the reactor's thread: write() and
 /// close() called from another thread, e.g. by a vm answering a call on its own task queue, are
 /// handed to the reactor, which runs them in the order they were handed over. Such a write()
-/// returns once it is queued, as Socket::write() does, with -1 only if the reactor is not running.
+/// returns 0 once it is queued, as Socket::write() does, or -1 if the reactor refuses it: it is
+/// not running, or its queue is full. A queued write the session can no longer take, after close()
+/// or a zero-length write, is dropped on the reactor. close() on a reactor that no longer runs
+/// finishes on the calling thread, so that the chain of streams is still cut.
 class zce_ssl : public zce::IStream
 {
     enum _tls_state {
