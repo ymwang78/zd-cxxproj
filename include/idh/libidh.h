@@ -41,7 +41,15 @@ typedef enum _zlog_level {
 #    define ZCE_DEFINED_LOGLEVEL
 #endif
 
+/* Error codes use signed int values, matching the C API: compare results as int.
+ * The 32-bit error bit patterns are preserved; conversion to long long sign-extends
+ * negative errors, including entries in group handle/result arrays.
+ */
+#if defined(__cplusplus)
+typedef enum _IDH_ERRCODE : int {
+#else
 typedef enum _IDH_ERRCODE {
+#endif
     IDH_ERRCODE_SUCCESS = 0,
 
     IDH_SUCCEED_IDHBASE = 0x1110000,
@@ -49,7 +57,7 @@ typedef enum _IDH_ERRCODE {
 
     IDH_ERRCODE_FAILED = -1,
 
-    IDH_ERROR_COMMON = 0x81010000,  // IDH COMM ERROR
+    IDH_ERROR_COMMON = (int)0x81010000,  // IDH COMM ERROR
     IDH_ERROR_MALLOC,
     IDH_ERROR_UNSUPPORT,
     IDH_ERROR_SHRTLEN,
@@ -70,7 +78,7 @@ typedef enum _IDH_ERRCODE {
     IDH_ERROR_NORESOURCE,
     IDH_ERROR_VERSION,
 
-    IDH_ERRCODE_IDHBASE = 0x81110000,
+    IDH_ERRCODE_IDHBASE = (int)0x81110000,
     IDH_ERRCODE_INVALIDTAG,
     IDH_ERRCODE_INVALIDHANDLE,
     IDH_ERRCODE_INVALIDSERVER,
