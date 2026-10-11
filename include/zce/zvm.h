@@ -81,7 +81,9 @@ class VirtualMachineStub : public zce::Object {
     ///                     on Windows uses the name as-is
     int listenSchema(const char* schema);
 
-    /// Stop all active RPC listeners (TCP and pipe) registered on this stub.
+    /// Stop all active RPC listeners (TCP and pipe) registered on this stub, and close the
+    /// connections they accepted that are still open: their peers see the connection close, and
+    /// replies still queued for them are dropped.
     void stopAllServants();
 
     /// Serves files under u8_root_dir to RPC peers as the built-in "fs" service. Its "head"
