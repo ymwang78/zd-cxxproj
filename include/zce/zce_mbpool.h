@@ -30,10 +30,6 @@ class ZCE_API BlockPool
 
     zce::SmartPtr<zce::Allocator> dbblock_allocator_;
 
-    // 已不再使用：仅为还没合入原子计数修复的 libzce 分支保留，让它们仍能编译。
-    // libzce 合入该修复后删除。
-    zce::AllocStat outpool_alloc_;
-
     // 池外分配/释放计数。BlockPool 是进程级单例，各线程都会走到这里，
     // 所以不能用 AllocStat 的普通 unsigned；getStat() 时再拼成一个 AllocStat。
     std::atomic<unsigned> outpool_alloc_times_;
