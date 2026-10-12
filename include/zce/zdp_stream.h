@@ -89,10 +89,20 @@ class ZCE_API zdp_stream : public zce::IStream {
 
     void on_read(zce::RefBlock& dblock_ptr, const zce::Any&) override;
 
+    /// Writes the block to the stream below, prev().
+    ///
+    /// prev() belongs to the reactor thread: close() cuts this stream off it there. On the reactor
+    /// thread the block is written at once, and the result is what the stream below returns, or
+    /// ZCE_ERROR_PREVNULL once close() has cut this stream off it. On any other thread - a
+    /// response given on a TaskQueue - the write is queued on the reactor, behind every write and
+    /// close() already queued there, and the result is 0, or the error Reactor::delegate() returns
+    /// when the reactor no longer runs. A queued write that finds this stream closed is dropped.
     int write(zce::RefBlock& dblock_ptr,
               zce::IStream::ERV_ISTREAM_WRITEOPT opt = zce::IStream::ERV_ISTREAM_DEFAULT) override;
 
-    // void close() override;
+    /// Cuts this stream off the stream below and closes that, on the reactor thread. On any other
+    /// thread it is queued there, behind the writes already queued, and returns at once.
+    void close() override;
 
     void on_close() override;
 
