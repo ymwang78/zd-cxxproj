@@ -18,7 +18,7 @@
 #    define ZCE_SUPPORT_LUAVM 1
 #endif
 #ifndef ZCE_SUPPORT_CCVM
-#    define ZCE_SUPPORT_CCVM 1
+#    define ZCE_SUPPORT_CCVM 0
 #endif
 #ifndef ZCE_SUPPORT_SSL
 #    define ZCE_SUPPORT_SSL 1
