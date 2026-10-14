@@ -14,6 +14,7 @@
 #include <zce/zce_types.h>
 #include <zce/zce_dblock.h>
 #include <zce/zce_any.h>
+#include <zce/zce_timer.h>
 #include <string>
 #include <deque>
 #include <map>
@@ -259,8 +260,8 @@ class ZCE_API Tcp : public Socket {
     /// abandoned the way a refused one is: the stream is closed and the layers
     /// above get on_close() without on_open(). It only bounds this socket's own
     /// connection; a handshake run over it afterwards is not covered. A TLS
-    /// client (zce_ssl) gives its handshake DEFAULT_CONNECT_TIMEOUT_SEC of its
-    /// own; a SOCKS handshake has none of its own.
+    /// client (zce_ssl) and a SOCKS5 client (SocksStream) each give their
+    /// handshake DEFAULT_CONNECT_TIMEOUT_SEC of its own.
     ///
     /// 0 leaves the wait to the operating system, which for a peer that never
     /// answers is about two minutes on Linux.
@@ -558,6 +559,16 @@ class ZCE_API SyncStream : public IStream {
     virtual void close();
 };
 
+/// The client side of a SOCKS5 handshake (RFC 1928, with RFC 1929 username/password), between a
+/// connection to the proxy below and the stream above. The stream above gets on_open() once the
+/// proxy has connected to realip:realport, and only then.
+///
+/// The proxy gets zce::Tcp::DEFAULT_CONNECT_TIMEOUT_SEC from on_open() to finish the whole
+/// handshake, as long as Tcp::connect() gives the connection itself. A proxy that accepts the
+/// connection but stops answering (a wrong service on the port, a stuck proxy, a CONNECT the
+/// proxy never completes) is then hung up on as for a refused handshake: the stream above gets
+/// on_close() and never on_open(). The deadline runs on the reactor of the socket below; with no
+/// socket below there is none.
 class SocksStream : public IStream {
     std::string user_;
 
@@ -570,6 +581,21 @@ class SocksStream : public IStream {
     zce_uint16 remote_port_ = 0;
 
     enum { STATE_BEGIN, STATE_AUTH, STATE_CONNECT } state_ = STATE_BEGIN;
+
+    // The deadline for the handshake, from on_open() until the stream above is opened or the
+    // connection ends. Only the reactor thread starts or stops it.
+    zce::SmartPtr<zce::Timer> handshake_timer_;
+
+    void on_handshake_timeout();
+
+    // Inline, as is on_close(): a libzce built before the deadline existed still links against
+    // this header.
+    void stop_handshake_timer() {
+        if (handshake_timer_) {
+            handshake_timer_->cancel();
+            handshake_timer_ = 0;
+        }
+    }
 
     void proc_begin_ack(zce::RefBlock& dblock, const zce::Any& ctx);
 
@@ -584,6 +610,12 @@ class SocksStream : public IStream {
     virtual void on_open(bool passive, const zce_sockaddr_t& remote);
 
     virtual void on_read(zce::RefBlock& dblock, const zce::Any&);
+
+    /// The connection below has ended; a handshake deadline still running goes with it.
+    void on_close() override {
+        stop_handshake_timer();
+        IStream::on_close();
+    }
 };
 
 }  // namespace zce

@@ -31,7 +31,9 @@ libzce 是一个基于 libuv 的 C++ 网络和系统工具库，提供异步 I/O
 
 **zce::Tcp** - TCP 套接字封装
 - `connect(addr, port)` - 出站连接，建连超时默认 `DEFAULT_CONNECT_TIMEOUT_SEC`（10 s，含域名解析）；
-  超时与连接被拒一样，上层只收到 `on_close()`
+  超时与连接被拒一样，上层只收到 `on_close()`。建连之后的握手不算在内：TLS 客户端（`zce_ssl`）与
+  SOCKS5 客户端（`zce::SocksStream`）各自再给握手 `DEFAULT_CONNECT_TIMEOUT_SEC`，对端接了连接却不应答时
+  同样只向上层报 `on_close()`
 - `connect(addr, port, timeout_sec)` - 指定建连超时，0 表示交给操作系统（Linux 上对端不应答约 127 s）
 
 **zce::Connector** - 出站连接处理器（`timeoutsec` 默认 0，即不设建连超时）
