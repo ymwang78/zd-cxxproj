@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include <zce/zce_handler.h>
+#include <zce/zce_timer.h>
 #include <string>
 
 typedef struct bio_st BIO;
@@ -62,6 +63,13 @@ struct TlsClientOptions {
 /// not running, or its queue is full. A queued write the session can no longer take, after close()
 /// or a zero-length write, is dropped on the reactor. close() on a reactor that no longer runs
 /// finishes on the calling thread, so that the chain of streams is still cut.
+///
+/// A client gives the server zce::Tcp::DEFAULT_CONNECT_TIMEOUT_SEC from on_open() to finish the
+/// handshake, as long as Tcp::connect() gives the connection itself. A server that accepts the
+/// connection but never answers the client's hello (a wrong service on the port, a stuck server,
+/// a middlebox holding the connection) is then hung up on as for a failed handshake: the stream
+/// above gets on_close() and never on_open(). A server has no such deadline for its client's
+/// hello; only Tcp's receive timeout ends that wait.
 class zce_ssl : public zce::IStream
 {
     enum _tls_state {
@@ -103,6 +111,21 @@ class zce_ssl : public zce::IStream
     std::string verify_errors_;
 
     std::string peer_certificate_;
+
+    // A client's deadline for the handshake, from on_open() until the handshake is done or the
+    // connection ends. Only the reactor thread starts or stops it.
+    zce::SmartPtr<zce::Timer> handshake_timer_;
+
+    void on_handshake_timeout();
+
+    // Inline, as is on_close(): a libzce built before the deadline existed still links against
+    // this header.
+    void stop_handshake_timer() {
+        if (handshake_timer_) {
+            handshake_timer_->cancel();
+            handshake_timer_ = 0;
+        }
+    }
 
     static int verify_peer(int ok, X509_STORE_CTX* store_ctx);
 
@@ -146,6 +169,12 @@ public:
     void on_open(bool passive, const zce_sockaddr_t& remote) override;
 
     void on_read(zce::RefBlock& dblock, const zce::Any&) override;
+
+    /// The connection below has ended; a handshake deadline still running goes with it.
+    void on_close() override {
+        stop_handshake_timer();
+        zce::IStream::on_close();
+    }
 
     void close() override;
 

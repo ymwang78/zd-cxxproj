@@ -258,8 +258,9 @@ class ZCE_API Tcp : public Socket {
     /// addr when it is a host name. A connection not established by then is
     /// abandoned the way a refused one is: the stream is closed and the layers
     /// above get on_close() without on_open(). It only bounds this socket's own
-    /// connection; a handshake run over it afterwards (TLS, SOCKS) is not
-    /// covered.
+    /// connection; a handshake run over it afterwards is not covered. A TLS
+    /// client (zce_ssl) gives its handshake DEFAULT_CONNECT_TIMEOUT_SEC of its
+    /// own; a SOCKS handshake has none of its own.
     ///
     /// 0 leaves the wait to the operating system, which for a peer that never
     /// answers is about two minutes on Linux.
