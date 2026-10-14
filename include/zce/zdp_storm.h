@@ -78,6 +78,20 @@ class ZCE_API Storm : public ::zce::Object {
 
     ~Storm();
 
+    /**
+     * @brief Listen for clients on localip:localport (all addresses when localip is null or
+     *        empty).
+     *
+     * Safe to call from any thread; the acceptor is built and bound on the reactor, inline when
+     * called there. From any thread other than a zce::Scheduler worker the call waits for that.
+     * On a Scheduler worker it only hands the listen to the reactor and returns, for the reason
+     * given at stop().
+     *
+     * @return 0, or the bind/listen error, when the listen ran inline or was waited for; 0 when
+     *         it was handed over from a Scheduler worker (a failure is then only logged);
+     *         ZCE_ERROR_CLOSED after stop(); the error from delegating when the reactor is not
+     *         running.
+     */
     int listen(const char* localip, zce_uint16 localport);
 
     /**
@@ -145,6 +159,21 @@ class ZCE_API StormClient : public ::zce::Object {
 
     void default_cps(ERV_ZCE_COMPRESS v);
 
+    /**
+     * @brief Connect to the Storm server at fatherip:fatherport, and reconnect whenever the
+     *        connection drops, until stop().
+     *
+     * Safe to call from any thread; the connection is made on the reactor, inline when called
+     * there. From any thread other than a zce::Scheduler worker the call waits for that. On a
+     * Scheduler worker it only hands the connect to the reactor and returns, for the reason given
+     * at stop(). Whether the server is reached is reported through connected_cb and
+     * disconnect_cb, not through the return value.
+     *
+     * @return -1 for an empty client ident, a null or empty fatherip or a 0 fatherport; when the
+     *         connect ran inline or was waited for, -1 if a connection is already up or under way
+     *         and 0 otherwise; 0 when it was handed over from a Scheduler worker; the error from
+     *         delegating when the reactor is not running.
+     */
     int connect(const char* fatherip, zce_uint16 fatherport);
 
     // subscribe by topic name (e.g. "server.topic"); server returns unique id for publish/set
