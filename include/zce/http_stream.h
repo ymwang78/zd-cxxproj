@@ -280,6 +280,40 @@ class ZCE_API HttpStream : public IStream {
 
     virtual void on_prepare_nextreq();
 
+    /**
+     * @brief Answer the request with a complete response.
+     *
+     * Writes the status line, the headers in `paramdict`, a Content-Length
+     * (`length`, unless `paramdict` names one) and the body. Call it from
+     * within on_http_request(), or later once on_http_request() has returned;
+     * either way it answers the request most recently dispatched.
+     *
+     * The connection ends with this response (RFC 9112 §9.3, §9.6) when the
+     * request carries the "close" connection option, when it is HTTP/1.0
+     * without "keep-alive", or when `paramdict` itself sets
+     * "Connection: close". The response then says "Connection: close",
+     * whatever `paramdict` put there, no further request on the connection is
+     * parsed, and the connection is closed as soon as the response has been
+     * sent. An interim 1xx response leaves the connection as it is. An
+     * HTTP/1.0 request that asked for "keep-alive" is answered with
+     * "Connection: keep-alive" unless `paramdict` sets the header.
+     *
+     * A caller that declares a Content-Length beyond `length`, or
+     * "Transfer-Encoding: chunked", and writes the rest of the body itself
+     * must also close the connection itself when the connection ends: this
+     * call cannot tell when that body is complete.
+     *
+     * @param code HTTP status code.
+     * @param buf the body, `length` bytes; may be null when `length` is 0.
+     * @param length body length in bytes.
+     * @param paramdict response headers. A body over 1 KB is gzip-encoded
+     *        when the request accepts gzip and that makes it smaller, unless
+     *        `paramdict` has a "Force-Raw" entry; "Content-Encoding: gzip" is
+     *        then added here.
+     * @return what the stream's write() returned for the response: >= 0 once
+     *         it is on its way, < 0 if it could not be written, including when
+     *         status line and headers exceed 1 KB.
+     */
     int write_ack(unsigned code, const zce_byte* buf, size_t length,
                   std::map<std::string, std::string>& paramdict);
 
