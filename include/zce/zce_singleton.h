@@ -14,36 +14,55 @@
 #    include <windows.h>
 #endif
 #include <zce/zce_sync.h>
+#include <atomic>
+#include <type_traits>
 
 namespace zce {
 
+/**
+ * @brief A process-wide instance of T, created on first use.
+ *
+ * instance() may be called from any thread: the pointer is published with release semantics and
+ * read with acquire semantics, so a thread that sees it also sees the object fully constructed.
+ * L serialises the creation; with L = MutexNull two threads that both make the first call may
+ * each create one, so such a singleton must be first used from a single thread.
+ */
 template <typename T, typename L = zce::Mutex>
 class ZCE_API Singleton {
   public:
-    static inline void setInstance(T* v) { instance_ = v; }
+    /** @brief Makes v the instance, without taking a reference to it. */
+    static inline void setInstance(T* v) { instance_.store(v, std::memory_order_release); }
 
+    /** @brief The instance, created by the first call if setInstance() has not set one. */
     static inline T* instance() {
-        if (instance_ == 0) {
+        T* ptr = instance_.load(std::memory_order_acquire);
+        if (ptr == nullptr) {
             zce::Guard<L> g(lock_);
-            if (instance_ == 0) {
-                instance_ = new T;
+            ptr = instance_.load(std::memory_order_acquire);
+            if (ptr == nullptr) {
+                ptr = new T;
+                // The singleton's own reference is counted before any other thread can see the
+                // object: one that took and dropped the first SmartPtr to it would delete it.
                 if constexpr (std::is_base_of<zce::Object, T>::value) {
-                    instance_->__addref();
+                    ptr->__addref();
                 }
+                instance_.store(ptr, std::memory_order_release);
             }
         }
-        return instance_;
+        return ptr;
     }
 
+    /** @brief Drops the instance; the next instance() creates a new one. */
     static inline void release() {
         zce::Guard<L> g(lock_);
-        if (instance_ != 0) {
+        T* ptr = instance_.load(std::memory_order_acquire);
+        if (ptr != nullptr) {
             if constexpr (std::is_base_of<zce::Object, T>::value) {
-                instance_->__decref();
+                ptr->__decref();
             } else {
-                delete instance_;
+                delete ptr;
             }
-            instance_ = 0;
+            instance_.store(nullptr, std::memory_order_release);
         }
     }
 
@@ -52,9 +71,10 @@ class ZCE_API Singleton {
 
     virtual ~Singleton() {
         zce::Guard<L> g(lock_);
-        if (instance_ != 0) {
-            delete instance_;
-            instance_ = 0;
+        T* ptr = instance_.load(std::memory_order_acquire);
+        if (ptr != nullptr) {
+            delete ptr;
+            instance_.store(nullptr, std::memory_order_release);
         }
     }
 
@@ -63,12 +83,12 @@ class ZCE_API Singleton {
     Singleton& operator=(const Singleton&) {}
 
   private:
-    static T* instance_;
+    static std::atomic<T*> instance_;
     static L lock_;
 };
 
 template <typename T, typename L>
-T* Singleton<T, L>::instance_ = NULL;
+std::atomic<T*> Singleton<T, L>::instance_{nullptr};
 
 template <typename T, typename L>
 L Singleton<T, L>::lock_;
