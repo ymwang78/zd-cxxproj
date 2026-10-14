@@ -117,9 +117,11 @@ class VirtualMachineStub : public zce::Object {
     zce::SmartPtr<zce::Object> boot(const zdp_base::zvm_t& vm, zce::RefBlock args);
 
     /// Boots a proxy for the vm svc_name of the stub at host:port. The proxy connects when it is
-    /// booted, and again whenever a call finds it disconnected. With ssl, the connection uses TLS
-    /// but accepts any certificate the server presents (TlsClientOptions::VERIFY_NONE); the
-    /// overload below checks it.
+    /// booted, and again whenever a call finds it disconnected. A connection attempt the peer
+    /// does not answer within Tcp::DEFAULT_CONNECT_TIMEOUT_SEC (name resolution included) is
+    /// given up, and the calls waiting for it fail with ZVM_ERROR_DISCONNECT. With ssl, the
+    /// connection uses TLS but accepts any certificate the server presents
+    /// (TlsClientOptions::VERIFY_NONE); the overload below checks it.
     zce::SmartPtr<zce::Object> boot(const std::string& svc_name, const std::string& host,
                                     unsigned short port, bool ssl, int default_timeout,
                                     std::function<void()> open_cb, std::function<void()> close_cb);
