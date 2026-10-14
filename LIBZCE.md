@@ -131,7 +131,7 @@ doc.append("key", value);  // 支持 int32, int64, double, bool, string
 
 - 基于模式的二进制序列化
 - 稀疏编码（零/默认字段省略）
-- xTdb 使用 ZDS 进行高效数据打包
+- KeelTdb 使用 ZDS 进行高效数据打包
 
 ## 7. 字符串处理
 
