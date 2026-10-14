@@ -246,7 +246,24 @@ class ZCE_API Tcp : public Socket {
 
     //////////////////////////////////////////////////////////////////////////
 
+    /// How long connect(addr, port) waits for the connection to be established.
+    static const unsigned short DEFAULT_CONNECT_TIMEOUT_SEC = 10;
+
+    /// Connect to addr:port, giving up after DEFAULT_CONNECT_TIMEOUT_SEC.
     int connect(const char* addr, unsigned short port);
+
+    /// Connect to addr:port, giving up after timeout_sec seconds.
+    ///
+    /// The time counts from the start of the attempt and covers resolving
+    /// addr when it is a host name. A connection not established by then is
+    /// abandoned the way a refused one is: the stream is closed and the layers
+    /// above get on_close() without on_open(). It only bounds this socket's own
+    /// connection; a handshake run over it afterwards (TLS, SOCKS) is not
+    /// covered.
+    ///
+    /// 0 leaves the wait to the operating system, which for a peer that never
+    /// answers is about two minutes on Linux.
+    int connect(const char* addr, unsigned short port, unsigned short timeout_sec);
 
     virtual void on_written(void* req, int status);
 
@@ -323,6 +340,8 @@ class ZCE_API Connector : public zce::Object {
     int _do_connect(zce_sockaddr_t& addr_in);
 
   public:
+    /// timeoutsec bounds the connection attempt as Tcp::connect() describes;
+    /// 0 sets no bound of its own.
     Connector(const zce::SmartPtr<zce::Tcp>& tcp_ptr, const std::string& ip, unsigned short port,
               unsigned short timeoutsec = 0);
 
