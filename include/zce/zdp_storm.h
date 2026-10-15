@@ -169,10 +169,13 @@ class ZCE_API StormClient : public ::zce::Object {
      * at stop(). Whether the server is reached is reported through connected_cb and
      * disconnect_cb, not through the return value.
      *
+     * A client is not restarted: after stop() it makes no connection, also when a connect()
+     * handed over from a worker reaches the reactor only after stop().
+     *
      * @return -1 for an empty client ident, a null or empty fatherip or a 0 fatherport; when the
-     *         connect ran inline or was waited for, -1 if a connection is already up or under way
-     *         and 0 otherwise; 0 when it was handed over from a Scheduler worker; the error from
-     *         delegating when the reactor is not running.
+     *         connect ran inline or was waited for, ZCE_ERROR_CLOSED after stop(), -1 if a
+     *         connection is already up or under way, and 0 otherwise; 0 when it was handed over
+     *         from a Scheduler worker; the error from delegating when the reactor is not running.
      */
     int connect(const char* fatherip, zce_uint16 fatherport);
 
