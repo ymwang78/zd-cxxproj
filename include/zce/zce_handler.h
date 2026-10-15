@@ -85,6 +85,22 @@ class ZCE_API IStream : virtual public zce::Object {
     const zce_sockaddr_t& get_remote_addr() const;
 };
 
+/// Why a socket was closed, as reported to the layer above in on_close().
+///
+/// A bare libuv error code cannot carry all of these: CONNECT_TIMEOUT and
+/// IDLE_TIMEOUT come from zce timers and have no code of their own, and
+/// UV_ETIMEDOUT also arrives on the read path from a failed keepalive probe, so
+/// it cannot stand in for a receive idle timeout.
+enum class CloseCause : int {
+    NONE = 0,         ///< not closed
+    LOCAL,            ///< close() was called on this side
+    PEER_EOF,         ///< the peer closed the connection
+    IO_ERROR,         ///< a read or write failed; see close_error()
+    CONNECT_FAILED,   ///< connect failed (refused, unreachable, DNS, bad address); see close_error()
+    CONNECT_TIMEOUT,  ///< the Connector gave up waiting
+    IDLE_TIMEOUT,     ///< the receive idle timer expired
+};
+
 class ZCE_API Socket : public IStream {
     ZCE_OBJECT_DECLARE;
 
@@ -108,6 +124,13 @@ class ZCE_API Socket : public IStream {
     zce::AtomicLong onclose_refcnt_;
 
     zce::AtomicLong close_refcnt_;
+
+    /// Set before on_close() is dispatched and never changed afterwards; the
+    /// first cause recorded is the one reported.
+    CloseCause close_cause_ = CloseCause::NONE;
+
+    /// The libuv error behind close_cause_, 0 when there is none.
+    int close_error_ = 0;
 
     zce::AtomicLong read_refcnt_;
 
@@ -137,6 +160,21 @@ class ZCE_API Socket : public IStream {
     virtual void on_open(bool passive, const zce_sockaddr_t& remote);
 
     virtual void close();
+
+    /// Record why this socket is being closed.
+    ///
+    /// The first cause recorded wins: a path that closes a socket after an
+    /// earlier one has already settled the reason (a late
+    /// on_connect(UV_ECANCELED) after a connect timeout, for instance) must not
+    /// overwrite it. Call it before close(), on the reactor thread; the layer
+    /// above reads it in on_close().
+    void set_close_cause(CloseCause cause, int error = 0);
+
+    /// Why this socket was closed; NONE until it is.
+    CloseCause close_cause() const { return close_cause_; }
+
+    /// The libuv error code behind close_cause(), 0 when there is none.
+    int close_error() const { return close_error_; }
 
     virtual int write(zce::RefBlock& dblock_ptr, ERV_ISTREAM_WRITEOPT opt);
 
