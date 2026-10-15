@@ -280,8 +280,75 @@ class ZCE_API HttpStream : public IStream {
 
     virtual void on_prepare_nextreq();
 
+    /**
+     * @brief Answer a request with a complete response.
+     *
+     * Writes the status line, the headers in `paramdict`, a Content-Length and
+     * the body. The Content-Length counts the body bytes sent: `length`, or the
+     * encoded size when the body is gzip-encoded (see `paramdict`). A
+     * Content-Length in `paramdict` is sent instead, as given: it is not
+     * adjusted for gzip, so a caller that names one should also set
+     * "Force-Raw".
+     *
+     * Called from within on_http_request(), it answers the request being
+     * dispatched. Called later — from a task posted for the purpose, or from
+     * another thread — it answers the oldest request this stream has dispatched
+     * and not yet given a final answer through either overload, the order
+     * HTTP/1.1 answers in. That holds only while every request on the stream
+     * is answered through write_ack(): a stream that answers some with its own
+     * write()s cannot be followed, so its later answers must name their request
+     * with the overload below. An interim 1xx response answers no request yet.
+     *
+     * The connection ends with this response (RFC 9112 §9.3, §9.6) when the
+     * request carries the "close" connection option, when it is HTTP/1.0
+     * without "keep-alive", or when `paramdict` itself sets
+     * "Connection: close". The response then says "Connection: close",
+     * whatever `paramdict` put there, no further request on the connection is
+     * parsed, and the connection is closed as soon as the response has been
+     * sent. An interim 1xx response leaves the connection as it is. An
+     * HTTP/1.0 request that asked for "keep-alive" is answered with
+     * "Connection: keep-alive" unless `paramdict` sets the header.
+     *
+     * A caller that declares a Content-Length beyond `length`, or
+     * "Transfer-Encoding: chunked", and writes the rest of the body itself
+     * must also close the connection itself when the connection ends: this
+     * call cannot tell when that body is complete.
+     *
+     * @param code HTTP status code.
+     * @param buf the body, `length` bytes; may be null when `length` is 0.
+     * @param length body length in bytes.
+     * @param paramdict response headers. A body over 1 KB is gzip-encoded
+     *        when the request accepts gzip and that makes it smaller, unless
+     *        `paramdict` has a "Force-Raw" entry; "Content-Encoding: gzip" is
+     *        then added here.
+     * @return what the stream's write() returned for the response: >= 0 once
+     *         it is on its way, < 0 if it could not be written, including when
+     *         status line and headers exceed 1 KB.
+     */
     int write_ack(unsigned code, const zce_byte* buf, size_t length,
                   std::map<std::string, std::string>& paramdict);
+
+    /**
+     * @brief Answer `request` with a complete response.
+     *
+     * The same as the overload above, but for the request named rather than
+     * the one it would infer: whether the connection ends, whether to confirm
+     * an HTTP/1.0 keep-alive and whether gzip is accepted are read from
+     * `request`. Use it for an answer given after on_http_request() has
+     * returned on a stream that also answers requests some other way, such as
+     * with its own write()s. May be called from any thread; `request` is the
+     * one on_http_request() was given, and is not changed by the stream once
+     * dispatched. Non-virtual, like refuseRequest(), for the same reason.
+     *
+     * A final answer by name counts towards the order the overload above
+     * follows just as one without the name does, so the two may take turns on
+     * one stream.
+     *
+     * @param request the request answered; null to answer as if none were
+     *        known — only `paramdict` then decides whether the connection ends.
+     */
+    int write_ack(const SmartPtr<ZCE_HTTP_REQUEST>& request, unsigned code, const zce_byte* buf,
+                  size_t length, std::map<std::string, std::string>& paramdict);
 
     int write_continue(const zce_byte* buf, size_t length);
 };
