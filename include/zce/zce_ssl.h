@@ -49,6 +49,13 @@ struct TlsClientOptions {
     /// The DNS name or IP address the server's certificate must be issued to. A DNS name is also
     /// sent as SNI. Empty: the host the client dialed.
     std::string server_name;
+
+    /// The client's own certificate, for a server that asks for one (mutual TLS): a PEM file with
+    /// the certificate, followed by any intermediate CA certificates it needs, and the PEM file of
+    /// its private key. Both or neither; a pair that cannot be loaded fails the connection, under
+    /// any verify. Read once per process, as ca_file is.
+    std::string cert_file;
+    std::string key_file;
 };
 
 }  // namespace zce
