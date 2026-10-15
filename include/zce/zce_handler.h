@@ -16,6 +16,7 @@
 #include <zce/zce_any.h>
 #include <zce/zce_timer.h>
 #include <string>
+#include <chrono>
 #include <deque>
 #include <map>
 
@@ -329,6 +330,16 @@ class ZCE_API Tcp : public Socket {
     /// answers is about two minutes on Linux.
     int connect(const char* addr, unsigned short port, unsigned short timeout_sec);
 
+    /// Connect to addr:port, giving up after timeout milliseconds.
+    ///
+    /// Identical to the timeout_sec overload in every other respect; it exists
+    /// because a site that wants a 1.5 s verdict cannot ask for it in whole
+    /// seconds. std::chrono::milliseconds is a distinct type on purpose, so
+    /// connect(addr, port, 3) still means three seconds and is not read as
+    /// three milliseconds. 0 waits for the operating system to give up, as the
+    /// timeout_sec overload's 0 does.
+    int connect(const char* addr, unsigned short port, std::chrono::milliseconds timeout);
+
     virtual void on_written(void* req, int status);
 
     virtual void on_read_data(zce_byte*, zce_uint32);
@@ -427,6 +438,14 @@ class ZCE_API Connector : public zce::Object {
     /// 0 sets no bound of its own.
     Connector(const zce::SmartPtr<zce::Tcp>& tcp_ptr, const std::string& ip, unsigned short port,
               unsigned short timeoutsec = 0);
+
+    /// Bound this connection attempt by timeout milliseconds, replacing any
+    /// bound the constructor or an earlier call set. 0 removes the bound.
+    ///
+    /// Call it before start_connect(); the deadline it sets runs from there and
+    /// covers resolving the address as well as the handshake, exactly as the
+    /// constructor's timeoutsec does.
+    void set_timeout(std::chrono::milliseconds timeout);
 
     ~Connector();
 
