@@ -72,8 +72,10 @@ inline long AtomicLong::operator--() noexcept {
 // close_refcnt_, the ObjectMonitor counts), so the read has to be atomic as well: a plain read of
 // value_ is a data race, and ThreadSanitizer reports it against the increments. It is ordered like
 // them: ReadAcquire is the same instruction as a sequentially consistent load on x86/x64 and ARM64.
+// ReadAcquire comes with the Windows SDK's winnt.h (MSVC and clang-cl); MinGW's headers lack it, so
+// MinGW takes the GCC/Clang builtin below.
 inline long AtomicLong::value() const noexcept {
-#ifdef _WIN32
+#ifdef _MSC_VER
     return ReadAcquire(&this->value_);
 #elif defined(ATOMIC_USE_MUTEX) || defined(ATOMIC_USE_ARMSPIN)
     return ext_atomic_add(const_cast<volatile long*>(&this->value_), 0);
