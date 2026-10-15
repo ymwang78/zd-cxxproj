@@ -337,7 +337,9 @@ class ZCE_API Tcp : public Socket {
     /// seconds. std::chrono::milliseconds is a distinct type on purpose, so
     /// connect(addr, port, 3) still means three seconds and is not read as
     /// three milliseconds. 0 waits for the operating system to give up, as the
-    /// timeout_sec overload's 0 does.
+    /// timeout_sec overload's 0 does; a negative value is read as 0, and one
+    /// beyond UINT_MAX milliseconds saturates there rather than wrapping into a
+    /// short deadline.
     int connect(const char* addr, unsigned short port, std::chrono::milliseconds timeout);
 
     virtual void on_written(void* req, int status);
@@ -440,7 +442,9 @@ class ZCE_API Connector : public zce::Object {
               unsigned short timeoutsec = 0);
 
     /// Bound this connection attempt by timeout milliseconds, replacing any
-    /// bound the constructor or an earlier call set. 0 removes the bound.
+    /// bound the constructor or an earlier call set. 0 removes the bound; a
+    /// negative value is read as 0, and one beyond UINT_MAX milliseconds (about
+    /// 49.7 days) saturates there rather than wrapping into a short deadline.
     ///
     /// Call it before start_connect(); the deadline it sets runs from there and
     /// covers resolving the address as well as the handshake, exactly as the
