@@ -360,6 +360,25 @@ class ZCE_API Tcp : public Socket {
     /// paused handle keeps exactly the same lifetime as a reading one.
     int  pause_read();
     int  resume_read();
+
+    /// How long a connection may go without receiving anything before it is
+    /// closed as idle, in milliseconds; 0 turns the check off. Defaults to
+    /// 300000, the 300 s the receive timer has always used.
+    ///
+    /// Call it on the reactor thread, before or after connect(). Setting it on
+    /// a connected stream restarts the deadline from the last packet received.
+    /// The close it causes reports CloseCause::IDLE_TIMEOUT, which tells it
+    /// apart from the peer hanging up.
+    ///
+    /// The stream is closed within one timer tick after "last packet +
+    /// timeout", not at the next multiple of the timeout: a packet received
+    /// just after a check makes the next one due timeout milliseconds later,
+    /// not up to one whole period later. While reading is paused the clock does
+    /// not run, and resume_read() starts it again.
+    void set_recv_idle_timeout(unsigned msec);
+
+    /// The receive idle timeout in milliseconds; 0 when the check is off.
+    unsigned recv_idle_timeout() const;
     bool read_paused() const { return read_paused_; }
 
     virtual int get_local_addr(zce_sockaddr_t& addr) const;
