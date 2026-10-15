@@ -44,11 +44,13 @@ class ZCE_API AtomicLong {
 
 inline AtomicLong::AtomicLong(long c) noexcept : value_(c) {}
 
+// GCC and Clang, Apple's included, use the compiler builtins on the whole long. Apple used to go
+// through OSAtomicIncrement32/Decrement32 on a cast int*, but long is 64-bit on every Apple target
+// (LP64), so only its low half moved: counting 0 down to -1 left value() reading 4294967295, and
+// past INT_MAX ++ returned a negative int.
 inline long AtomicLong::operator++() noexcept {
 #ifdef _WIN32
     return InterlockedIncrement((long*)(&this->value_));
-#elif defined(__APPLE__)
-    return OSAtomicIncrement32((int*)&this->value_);
 #elif defined(ATOMIC_USE_MUTEX) || defined(ATOMIC_USE_ARMSPIN)
     return ext_atomic_add(&this->value_, 1);
 #else
@@ -59,8 +61,6 @@ inline long AtomicLong::operator++() noexcept {
 inline long AtomicLong::operator--() noexcept {
 #ifdef _WIN32
     return InterlockedDecrement((long*)(&this->value_));
-#elif defined(__APPLE__)
-    return OSAtomicDecrement32((int*)&this->value_);
 #elif defined(ATOMIC_USE_MUTEX) || defined(ATOMIC_USE_ARMSPIN)
     return ext_atomic_add(&this->value_, -1);
 #else
@@ -68,7 +68,21 @@ inline long AtomicLong::operator--() noexcept {
 #endif
 }
 
-inline long AtomicLong::value() const noexcept { return this->value_; }
+// Other threads may be counting while this one reads (Object::__get_ref_count(), a Socket's
+// close_refcnt_, the ObjectMonitor counts), so the read has to be atomic as well: a plain read of
+// value_ is a data race, and ThreadSanitizer reports it against the increments. It is ordered like
+// them: ReadAcquire is the same instruction as a sequentially consistent load on x86/x64 and ARM64.
+// ReadAcquire comes with the Windows SDK's winnt.h (MSVC and clang-cl); MinGW's headers lack it, so
+// MinGW takes the GCC/Clang builtin below.
+inline long AtomicLong::value() const noexcept {
+#ifdef _MSC_VER
+    return ReadAcquire(&this->value_);
+#elif defined(ATOMIC_USE_MUTEX) || defined(ATOMIC_USE_ARMSPIN)
+    return ext_atomic_add(const_cast<volatile long*>(&this->value_), 0);
+#else
+    return __atomic_load_n(&this->value_, __ATOMIC_SEQ_CST);
+#endif
+}
 
 class ZCE_API AtomicLongGuard {
     AtomicLong& atomic_;
