@@ -281,12 +281,19 @@ class ZCE_API HttpStream : public IStream {
     virtual void on_prepare_nextreq();
 
     /**
-     * @brief Answer the request with a complete response.
+     * @brief Answer a request with a complete response.
      *
      * Writes the status line, the headers in `paramdict`, a Content-Length
-     * (`length`, unless `paramdict` names one) and the body. Call it from
-     * within on_http_request(), or later once on_http_request() has returned;
-     * either way it answers the request most recently dispatched.
+     * (`length`, unless `paramdict` names one) and the body.
+     *
+     * Called from within on_http_request(), it answers the request being
+     * dispatched. Called later — from a task posted for the purpose, or from
+     * another thread — it answers the oldest request this stream has dispatched
+     * and not yet answered through write_ack(), the order HTTP/1.1 answers in.
+     * That holds only while every request on the stream is answered through
+     * write_ack(): a stream that answers some with its own write()s cannot be
+     * followed, so its later answers must name their request with the overload
+     * below. An interim 1xx response answers no request yet.
      *
      * The connection ends with this response (RFC 9112 §9.3, §9.6) when the
      * request carries the "close" connection option, when it is HTTP/1.0
@@ -316,6 +323,24 @@ class ZCE_API HttpStream : public IStream {
      */
     int write_ack(unsigned code, const zce_byte* buf, size_t length,
                   std::map<std::string, std::string>& paramdict);
+
+    /**
+     * @brief Answer `request` with a complete response.
+     *
+     * The same as the overload above, but for the request named rather than
+     * the one it would infer: whether the connection ends, whether to confirm
+     * an HTTP/1.0 keep-alive and whether gzip is accepted are read from
+     * `request`. Use it for an answer given after on_http_request() has
+     * returned on a stream that also answers requests some other way, such as
+     * with its own write()s. May be called from any thread; `request` is the
+     * one on_http_request() was given, and is not changed by the stream once
+     * dispatched. Non-virtual, like refuseRequest(), for the same reason.
+     *
+     * @param request the request answered; null to answer as if none were
+     *        known — only `paramdict` then decides whether the connection ends.
+     */
+    int write_ack(const SmartPtr<ZCE_HTTP_REQUEST>& request, unsigned code, const zce_byte* buf,
+                  size_t length, std::map<std::string, std::string>& paramdict);
 
     int write_continue(const zce_byte* buf, size_t length);
 };
