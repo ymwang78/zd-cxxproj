@@ -301,7 +301,7 @@ class ZCE_API Tcp : public Socket {
     ///
     /// Call it on the reactor thread; it may be called before connect(), with
     /// the same deferral and guarantee as set_nodelay(). interval_sec and count
-    /// need uv_tcp_keepalive_ex (libuv >= 1.48): with an older libuv this
+    /// need uv_tcp_keepalive_ex (libuv >= 1.52.0): with an older libuv this
     /// degrades to uv_tcp_keepalive(idle_sec) and returns UV_ENOTSUP when
     /// either is non-zero, so the caller learns it did not take effect.
     /// Returns 0 on success, or the libuv error code.
