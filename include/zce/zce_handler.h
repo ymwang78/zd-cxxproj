@@ -285,6 +285,30 @@ class ZCE_API Tcp : public Socket {
 
     //////////////////////////////////////////////////////////////////////////
 
+    /// Turn TCP_NODELAY (Nagle's algorithm) on or off.
+    ///
+    /// Call it on the reactor thread. It may be called before connect(): the
+    /// setting is kept and applied to the socket before on_open() is
+    /// dispatched, so a connection observed in on_open() already carries it.
+    /// Returns 0 on success, or the libuv error code.
+    int set_nodelay(bool enable);
+
+    /// Turn TCP keepalive on or off, and set how it probes.
+    ///
+    /// idle_sec is how long the connection must be idle before the first probe;
+    /// interval_sec and count are the probe interval and the number of unacked
+    /// probes that end the connection. 0 means "leave the system default".
+    ///
+    /// Call it on the reactor thread; it may be called before connect(), with
+    /// the same deferral and guarantee as set_nodelay(). interval_sec and count
+    /// need uv_tcp_keepalive_ex (libuv >= 1.48): with an older libuv this
+    /// degrades to uv_tcp_keepalive(idle_sec) and returns UV_ENOTSUP when
+    /// either is non-zero, so the caller learns it did not take effect.
+    /// Returns 0 on success, or the libuv error code.
+    int set_keepalive(bool enable, unsigned idle_sec, unsigned interval_sec = 0, unsigned count = 0);
+
+    //////////////////////////////////////////////////////////////////////////
+
     /// How long connect(addr, port) waits for the connection to be established.
     static const unsigned short DEFAULT_CONNECT_TIMEOUT_SEC = 10;
 
