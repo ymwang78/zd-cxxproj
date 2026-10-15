@@ -283,8 +283,12 @@ class ZCE_API HttpStream : public IStream {
     /**
      * @brief Answer a request with a complete response.
      *
-     * Writes the status line, the headers in `paramdict`, a Content-Length
-     * (`length`, unless `paramdict` names one) and the body.
+     * Writes the status line, the headers in `paramdict`, a Content-Length and
+     * the body. The Content-Length counts the body bytes sent: `length`, or the
+     * encoded size when the body is gzip-encoded (see `paramdict`). A
+     * Content-Length in `paramdict` is sent instead, as given: it is not
+     * adjusted for gzip, so a caller that names one should also set
+     * "Force-Raw".
      *
      * Called from within on_http_request(), it answers the request being
      * dispatched. Called later — from a task posted for the purpose, or from
