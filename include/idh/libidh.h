@@ -9,6 +9,11 @@
  *    as good, its quality becomes IDH_HIGH_UNCERTAIN | IDH_LOW_UNCERTAIN_ESTIMATED.
  * 2. Minimal support OPC DA 2.0.
  * 3. DA Schema: opc.da://{hostname}/{ProgID}?ds_device=1 opc.da://{hostname}/{CLSID}?ds_device=0
+ * 4. Modbus TCP Schema: modbus.tcp://{host}[:{port}][?key=value&...], port 502 by default.
+ *    A tag's namespace_index is the unit id (0..255) and its tag_name is
+ *    <co|di|ir|hr><address>[.<bit>][:<type>][@<word order>], with a 0-based address, e.g.
+ *    hr100:f32@cdab or hr10.3. Types: bool i16 u16 i32 u32 i64 u64 f32 f64; word orders: abcd
+ *    cdab badc dcba.
  */
 
 #ifdef _WIN32
@@ -200,6 +205,7 @@ typedef enum _IDH_RTSOURCE  {
     IDH_RTSOURCE_UA,
     IDH_RTSOURCE_DA,
     IDH_RTSOURCE_CSV,
+    IDH_RTSOURCE_MODBUS,  // Modbus TCP, see note 4 at the top
     IDH_RTSOURCE_COUNT
 } IDH_RTSOURCE;
 
