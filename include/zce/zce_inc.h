@@ -200,10 +200,30 @@ enum ERV_ZCE_ERROR {
     ZVM_ERROR_DISCONNECT,
     ZVM_ERROR_INCONNECT,
 
-    ZAP_ERROR_BASE = 0x83000000,  // ZAP ERROR
-    ZAP_ERROR_COIN = 0x83010000,  // COIN ERROR
-    ZAP_ERROR_ZMPC = 0x83020000,  // ZMPC ERROR
-    ZAP_ERROR_ZIDENT = 0x83030000,  // ZIDENT ERROR
+    // ZAP application-module error segments: 0x83<module><code>, one 64K segment
+    // per module. The module owns everything inside its segment and declares its
+    // own sub-codes in its own header; this table only registers who holds which
+    // segment, so that a new module can pick a free one. Each error segment has a
+    // matching success segment at 0x03<module>xxxx.
+    //
+    // 0x01 reads "ZMPC", not "COIN", because that is where libmpc's codes have
+    // always been: zmpc.h hard-codes 0x83010000 and has shipped 31 sub-codes from
+    // it, over the wire, to every xOptCon in the field. libcoin never defined a
+    // single sub-code here, so correcting the table costs nothing while
+    // renumbering libmpc would break mixed-version client/server pairs. libident
+    // did vacate this segment (its online codes moved to 0x83030800), because
+    // nothing outside libident referenced those two values.
+    //
+    // libcoin is parked at 0x81, away from the run of control-stack modules, so
+    // that the low ids stay contiguous for them and nobody has to remember that
+    // 0x02 is spoken for by a module that emits nothing.
+    ZAP_ERROR_BASE = 0x83000000,    // ZAP ERROR
+    ZAP_ERROR_ZMPC = 0x83010000,    // libmpc       (zmpc.h,         ZMPC_ERRCODE_*)
+    ZAP_ERROR_ZIDENT = 0x83030000,  // libident     (zident_error.h, ZIDENT_ERRCODE_*)
+    ZAP_ERROR_ZFGW = 0x83040000,    // libfgw       (zfgw.h,         ZFGW_ERRCODE_*)
+    ZAP_ERROR_ZSSM = 0x83050000,    // libsoftsensor(zssm.h,         ZSSM_ERRCODE_*)
+    ZAP_ERROR_ZRTO = 0x83060000,    // xRto backend (reserved, not implemented yet)
+    ZAP_ERROR_COIN = 0x83810000,    // libcoin      (no sub-codes defined yet)
 };
 
 #include <zce/zce_types.h>
