@@ -42,6 +42,9 @@ class zdl_enum : public zdl_type {
     //   -2  the value does not fit in val_ (0 .. 0xFFFFFFFF): an explicit val above
     //       0xFFFFFFFF, or an implicit value after 0xFFFFFFFF. Nothing is added and
     //       the value is neither truncated nor wrapped to 0.
+    // A negative literal is folded to its 32-bit two's complement first, so -1
+    // arrives as 0xFFFFFFFF and is a legal value; only the folded result is range
+    // checked.
     // Where unsigned long is 32 bits (Windows) val cannot exceed 0xFFFFFFFF, so a
     // caller that parsed a wider literal must range-check it before narrowing.
     int add_enumerator(unsigned long val, const std::string& emname, const std::string& comment);
@@ -55,8 +58,10 @@ class zdl_enum : public zdl_type {
 
   private:
     std::vector<zdl_enumerator_ptr> enumerators_;
-    // Holds the value the last added enumerator took (0 before the first
-    // one). The implicit overload adds one to it, so:
+    // Holds the value the last added enumerator took. The implicit overload
+    // uses 0 when no enumerator has been added yet (the first one starts at 0)
+    // and current + 1 afterwards, so:
+    //   - 0xFFFFFFFF itself can be added; only what follows it is refused;
     //   - while it is below 0xFFFFFFFF the next value is current + 1;
     //   - when it is already 0xFFFFFFFF there is no representable next
     //     value, so the call returns -2, adds nothing and leaves this
