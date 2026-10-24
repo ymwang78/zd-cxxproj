@@ -38,7 +38,9 @@ protected:
 public:
     // zdl_module::visit() calls these once around the loop over its types, with
     // the same veto rule: a false from visit_module_start skips the types and
-    // visit_module_end.
+    // visit_module_end. The handle is a refcounted SmartPtr, so the callbacks
+    // are only reported for a module that a SmartPtr actually owns; a module
+    // with a zero reference count is still walked, without them.
     virtual bool visit_module_start(const zdl_module_ptr& module){ return true; };
     virtual bool visit_module_end(const zdl_module_ptr& module) { return true; };
 
