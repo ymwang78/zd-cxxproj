@@ -64,6 +64,20 @@ class meta_base : public zce::Object {
         return vec_metas_;
     }
 
+    // Returns whether key is present and copies its value into out when it is.
+    // Prefer this: it tells "missing" apart from "present with an empty value"
+    // without a sentinel, and the caller owns the text it gets.
+    bool fetch_meta(const std::string& key, std::string& out) const {
+        std::vector<std::pair<std::string, std::string> >::const_iterator iter = std::find_if(
+            vec_metas_.begin(), vec_metas_.end(), [&key](const auto& kv) { return kv.first == key; });
+        if (iter == vec_metas_.end()) return false;
+        out = iter->second;
+        return true;
+    }
+
+    // Deprecated: the pointer points into vec_metas_ and dangles as soon as that
+    // vector is replaced (vec_metas(const vector&), or any reallocation). Kept for
+    // existing callers; new code should use the overload above.
     const char* fetch_meta(const std::string& key, const char* def = NULL) const {
         std::vector<std::pair<std::string, std::string> >::const_iterator iter = std::find_if(
             vec_metas_.begin(), vec_metas_.end(), [key](auto iter) { return iter.first == key; });
