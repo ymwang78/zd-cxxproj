@@ -55,8 +55,11 @@ class zdl_enum : public zdl_type {
 
   private:
     std::vector<zdl_enumerator_ptr> enumerators_;
-    // Wider than val_ so that the value after 0xFFFFFFFF is 0x100000000, not 0.
-    unsigned long long current_enumerator_val_;
+    // Holds the value the next implicit enumerator would take. It is 32-bit on
+    // purpose: the representable range is 0 .. 0xFFFFFFFF, so an implementation
+    // must refuse to advance past 0xFFFFFFFF (return -2) instead of trusting a
+    // wider counter, which would only move the truncation to the call boundary.
+    unsigned current_enumerator_val_;
 };
 typedef zce::SmartPtr<zdl_enum> zdl_enum_ptr;
 
