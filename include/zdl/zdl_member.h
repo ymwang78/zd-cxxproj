@@ -90,7 +90,7 @@ class zdl_member : public meta_base {
     virtual void vec_metas_added() {
         long max = calc_max_size();
         long min = calc_min_size();
-        if (is_array() && min == 0) vec_metas_.push_back(std::make_pair("o", ""));
+        if (is_array() && min == 0) append_meta_once("o", "");
     }
 
     std::string max_size() const {
