@@ -106,9 +106,11 @@ class zdl_struct : public zdl_type {
 
     const std::vector<zdl_member_ptr>& member_vec() const { return members_; }
 
+    // An explicit msg entry with another value stays ahead of the implicit
+    // ("msg", "1"), so fetch_meta("msg") keeps returning the explicit value.
     virtual void vec_metas_added() {
         if (name().substr(0, 3) == "MSG") {
-            vec_metas_.push_back(std::make_pair("msg", "1"));
+            append_meta_once("msg", "1");
         }
     }
 

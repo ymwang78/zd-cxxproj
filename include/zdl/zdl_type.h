@@ -92,9 +92,22 @@ class meta_base : public zce::Object {
 
     const std::vector<std::pair<std::string, std::string> >& vec_metas() { return vec_metas_; }
 
+    // Runs after every vec_metas(const vector&). Callers write back what
+    // vec_metas() returned, so an override must not append an entry that is
+    // already there: use append_meta_once().
     virtual void vec_metas_added(){};
 
   protected:
+    // Appends key/val unless that exact pair is already present. Matching the
+    // value too keeps an earlier entry under the same key with another value,
+    // and fetch_meta() goes on returning that one.
+    void append_meta_once(const std::string& key, const std::string& val) {
+        const std::pair<std::string, std::string> kv(key, val);
+        if (std::find(vec_metas_.begin(), vec_metas_.end(), kv) == vec_metas_.end()) {
+            vec_metas_.push_back(kv);
+        }
+    }
+
     std::vector<std::pair<std::string, std::string> > vec_metas_;
 };
 
