@@ -55,10 +55,17 @@ class zdl_enum : public zdl_type {
 
   private:
     std::vector<zdl_enumerator_ptr> enumerators_;
-    // Holds the value the next implicit enumerator would take. It is 32-bit on
-    // purpose: the representable range is 0 .. 0xFFFFFFFF, so an implementation
-    // must refuse to advance past 0xFFFFFFFF (return -2) instead of trusting a
-    // wider counter, which would only move the truncation to the call boundary.
+    // Holds the value the last added enumerator took (0 before the first
+    // one). The implicit overload adds one to it, so:
+    //   - while it is below 0xFFFFFFFF the next value is current + 1;
+    //   - when it is already 0xFFFFFFFF there is no representable next
+    //     value, so the call returns -2, adds nothing and leaves this
+    //     member unchanged;
+    //   - a later explicit value below 0xFFFFFFFF restores implicit
+    //     incrementing from that value.
+    // 32 bits is deliberate: the representable range is 0 .. 0xFFFFFFFF,
+    // so the boundary is refused instead of being modelled in a wider
+    // counter, which would only move the truncation to the call boundary.
     unsigned current_enumerator_val_;
 };
 typedef zce::SmartPtr<zdl_enum> zdl_enum_ptr;
