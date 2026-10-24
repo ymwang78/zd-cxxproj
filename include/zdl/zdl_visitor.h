@@ -36,12 +36,16 @@ protected:
     typedef zce::SmartPtr<zdl_member>  zdl_member_ptr;
 
 public:
-    // zdl_module::visit() calls these once around the loop over its types.
+    // zdl_module::visit() calls these once around the loop over its types, with
+    // the same veto rule: a false from visit_module_start skips the types and
+    // visit_module_end.
     virtual bool visit_module_start(const zdl_module_ptr& module){ return true; };
     virtual bool visit_module_end(const zdl_module_ptr& module) { return true; };
 
-    // Traversal contract: visit_enum_start, then visit_enumerator once per
-    // enumerator in declaration order, then visit_enum_end. zdl_enum::visit()
+    // Traversal contract, the same as zdl_struct::visit(): visit_enum_start,
+    // then visit_enumerator once per enumerator in declaration order, then
+    // visit_enum_end. A false from visit_enum_start vetoes the walk: neither
+    // the enumerators nor visit_enum_end are reported. zdl_enum::visit()
     // drives that order; see libzdl.
     virtual bool visit_enum_start(const zdl_enum* t_enum) { return true; };
     virtual bool visit_enumerator(const zdl_enumerator* enumerator) { return true; };
