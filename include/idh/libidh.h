@@ -435,6 +435,25 @@ int idh_group_readvalues(idh_group_t batch_id, idh_real_t* values_ptr, const lon
 LIBIDH_API int idh_group_writevalues(idh_group_t batch_id, int* results, const double* values_ptr,
                                      const long long* tag_handles, unsigned tags_size);
 
+/* Array read and write for subscribed tags (handles from idh_group_subscribe), OPC UA only for
+ * now. They work as idh_source_readarrays / idh_source_writearrays without index ranges, which
+ * a group does not keep; use the source calls for part of an array.
+ * - Reads come from the group's cache, as idh_group_readvalues: the subscription, or with
+ *   sample_timespan_msec == 0 a synchronous read throttled by the sync cache window.
+ * - An invalid handle is IDH_ERRCODE_INVALIDHANDLE for that entry, with time_quality
+ *   INVALID|HANDLE; a tag without a monitored item is IDH_ERRCODE_UNSUBSCRIBED. When no handle
+ *   is valid the call returns IDH_ERRCODE_UNSUBSCRIBED.
+ * - A write reads the node first for its element type and shape, as the source call does. A
+ *   handle given more than once is written once with its last array; earlier entries with the
+ *   same elements share its result, the others are IDH_ERROR_DUPLICATED, as in
+ *   idh_group_writevalues. The next group read returns the written value. */
+LIBIDH_API int idh_group_readarrays(idh_group_t batch_id, idh_array_t* arrays,
+                                    const long long* tag_handles, unsigned tags_size);
+
+LIBIDH_API int idh_group_writearrays(idh_group_t batch_id, int* results,
+                                     const idh_array_value_t* values, const long long* tag_handles,
+                                     unsigned tags_size);
+
 LIBIDH_API void idh_group_destroy(idh_group_t batch_id);
 
 #ifdef __cplusplus
