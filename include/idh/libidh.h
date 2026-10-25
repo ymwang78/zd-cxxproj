@@ -107,6 +107,22 @@ typedef enum _IDH_DATATYPE {
     IDH_DATATYPE_STRING = 3,
 } IDH_DATATYPE;
 
+/* Element type of an array value, see idh_array_t::element_type. */
+typedef enum _IDH_ELEMTYPE {
+    IDH_ELEMTYPE_UNKNOWN = 0,
+    IDH_ELEMTYPE_BOOLEAN = 1,
+    IDH_ELEMTYPE_SBYTE = 2,
+    IDH_ELEMTYPE_BYTE = 3,
+    IDH_ELEMTYPE_INT16 = 4,
+    IDH_ELEMTYPE_UINT16 = 5,
+    IDH_ELEMTYPE_INT32 = 6,
+    IDH_ELEMTYPE_UINT32 = 7,
+    IDH_ELEMTYPE_INT64 = 8,
+    IDH_ELEMTYPE_UINT64 = 9,
+    IDH_ELEMTYPE_FLOAT = 10,
+    IDH_ELEMTYPE_DOUBLE = 11,
+} IDH_ELEMTYPE;
+
 typedef enum _IDH_QUALITY {
     /* ---------------- High 2-bit Quality Class ---------------- */
     IDH_HIGH_INVALID = 0x00,    // 00xxxxxx
@@ -235,6 +251,29 @@ typedef struct _idh_real {
 #define IDH_TQ_QUALITY_SHIFT 48
 #define IDH_TQ_TIME_MASK 0x0000FFFFFFFFFFFFULL
 
+/* Arrays (idh_source_readarrays / idh_source_writearrays). Elements are passed as double, as
+ * scalars are, and a multi-dimensional array is flattened row-major (the last index varies
+ * fastest). One quality and one timestamp cover the whole array. */
+#define IDH_ARRAY_MAX_RANK 4
+
+typedef struct _idh_array {
+    double* values;         // in: buffer for the elements, or NULL to report only the metadata
+    uint32_t capacity;      // in: number of elements values can hold
+    uint32_t length;        // out: number of elements (the product of the dimensions)
+    uint64_t time_quality;  // out: same encoding as idh_real_t
+    int32_t result;         // out: 0, or a negative error code for this entry
+    uint16_t element_type;  // out: IDH_ELEMTYPE
+    uint8_t rank;           // out: number of dimensions; 0 for a scalar, read as one element
+    uint8_t reserved;
+    uint32_t dimensions[IDH_ARRAY_MAX_RANK];  // out: dimension lengths, outermost first; ranks
+                                              //      above IDH_ARRAY_MAX_RANK report only these
+} idh_array_t;
+
+typedef struct _idh_array_value {
+    const double* values;  // elements, row-major; may be NULL when length is 0
+    uint32_t length;       // number of elements
+} idh_array_value_t;
+
 static inline uint8_t idh_get_quality(uint64_t tq) {
     return (uint8_t)(tq >> IDH_TQ_QUALITY_SHIFT);
 }
@@ -332,6 +371,50 @@ LIBIDH_API int idh_source_readvalues(idh_source_t source_id, idh_real_t* values,
 
 LIBIDH_API int idh_source_writevalues(idh_source_t source_id, int* results, const double* values,
                                       const idh_tag_t* tags_ptr, int tags_size);
+
+/* Array read and write, OPC UA only for now: other sources return IDH_ERROR_UNSUPPORT. The scalar
+ * APIs above keep rejecting arrays.
+ * index_ranges: NULL, or one entry per tag. An entry that is NULL or "" means the whole array;
+ * otherwise it is an OPC UA NumericRange such as "3", "2:5" or "0:1,2:3". A single element is
+ * written "2", not "2:2".
+ * Both return a negative error code when the whole call fails: IDH_ERRCODE_INVALIDHANDLE,
+ * IDH_ERROR_INVALID (arrays/results, values or tags NULL, or tags_size <= 0), IDH_ERROR_UNSUPPORT,
+ * or a connection failure. Once the arguments are valid, every entry's result is first set to
+ * IDH_ERRCODE_FAILED, so a call that fails later still leaves defined entries. */
+
+/* Returns the number of entries whose result is 0. Per entry:
+ * - the elements fit: they are copied to values and result is 0;
+ * - values is NULL: only length, element_type, rank, dimensions and time_quality are set;
+ * - capacity is too small: result IDH_ERROR_SHRTLEN, length is the number needed and values is
+ *   left untouched;
+ * - Bad or Uncertain values are copied and counted; time_quality says what they are worth.
+ *   Int64 and UInt64 elements beyond 2^53 turn GOOD into UNCERTAIN|ESTIMATED, as for scalars;
+ * - IDH_ERRCODE_UNSUPPORTTYPE: the elements are not numbers or Booleans (strings, DateTime, ...);
+ * - IDH_ERRCODE_NOVALUE: no value, or no element in the index range (a lower bound past the end,
+ *   or more dimensions than the value). An upper bound past the end reads up to the end;
+ * - IDH_ERROR_SYNTAX: a malformed index range, which is not sent, or one with fewer dimensions
+ *   than the value;
+ * - IDH_ERRCODE_INVALIDTAG: the node does not exist. */
+LIBIDH_API int idh_source_readarrays(idh_source_t source_id, idh_array_t* arrays,
+                                     const idh_tag_t* tags_ptr, const char* const* index_ranges,
+                                     int tags_size);
+
+/* Returns the number of entries written; for a single entry that failed, its error code. The node
+ * is read first to learn its element type and shape, so a node that cannot be read is
+ * IDH_ERRCODE_UNSUPPORTTYPE. Per entry, nothing is sent when:
+ * - any element cannot be represented in the element type (out of range, NaN or +-inf for an
+ *   integer or Boolean, a finite value that would become +-inf in a Float): IDH_ERROR_OVERFLOW;
+ * - an index range reaches past the end of the array (reads stop at the end, writes do not) or
+ *   holds no element: IDH_ERROR_OVERFLOW;
+ * - a scalar node (exactly one element), a multi-dimensional node or an index range gets a
+ *   different number of elements than it holds: IDH_ERROR_SHRTLEN or IDH_ERROR_EXCDLEN. The
+ *   length of a one-dimensional whole-array write is left to the server.
+ * Server rejections: IDH_ERRCODE_UNSUPPORTTYPE (BadTypeMismatch, for example a fixed-length
+ * array of another length), IDH_ERROR_OVERFLOW (BadOutOfRange, BadIndexRangeNoData),
+ * IDH_ERRCODE_INVALIDTAG (unknown node), otherwise IDH_ERRCODE_FAILED. */
+LIBIDH_API int idh_source_writearrays(idh_source_t source_id, int* results,
+                                      const idh_array_value_t* values, const idh_tag_t* tags_ptr,
+                                      const char* const* index_ranges, int tags_size);
 
 /* batch operators. speed up for high frequency read/write */
 
