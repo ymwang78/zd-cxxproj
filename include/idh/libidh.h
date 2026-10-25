@@ -372,11 +372,13 @@ LIBIDH_API int idh_source_readvalues(idh_source_t source_id, idh_real_t* values,
 LIBIDH_API int idh_source_writevalues(idh_source_t source_id, int* results, const double* values,
                                       const idh_tag_t* tags_ptr, int tags_size);
 
-/* Array read and write, OPC UA only for now: other sources return IDH_ERROR_UNSUPPORT. The scalar
+/* Array read and write, OPC UA and OPC DA: other sources return IDH_ERROR_UNSUPPORT. The scalar
  * APIs above keep rejecting arrays.
  * index_ranges: NULL, or one entry per tag. An entry that is NULL or "" means the whole array;
  * otherwise it is an OPC UA NumericRange such as "3", "2:5" or "0:1,2:3". A single element is
- * written "2", not "2:2".
+ * written "2", not "2:2". OPC DA has no index ranges: a read applies the range locally, with the
+ * same results as an OPC UA server; a write with a range is IDH_ERROR_UNSUPPORT for that entry.
+ * OPC DA arrays are one-dimensional SAFEARRAYs.
  * Both return a negative error code when the whole call fails: IDH_ERRCODE_INVALIDHANDLE,
  * IDH_ERROR_INVALID (arrays/results, values or tags NULL, or tags_size <= 0), IDH_ERROR_UNSUPPORT,
  * or a connection failure. Once the arguments are valid, every entry's result is first set to
@@ -401,7 +403,8 @@ LIBIDH_API int idh_source_readarrays(idh_source_t source_id, idh_array_t* arrays
 
 /* Returns the number of entries written; for a single entry that failed, its error code. The node
  * is read first to learn its element type and shape, so a node that cannot be read is
- * IDH_ERRCODE_UNSUPPORTTYPE. Per entry, nothing is sent when:
+ * IDH_ERRCODE_UNSUPPORTTYPE; OPC DA then uses the item's canonical type instead. Per entry,
+ * nothing is sent when:
  * - any element cannot be represented in the element type (out of range, NaN or +-inf for an
  *   integer or Boolean, a finite value that would become +-inf in a Float): IDH_ERROR_OVERFLOW;
  * - an index range reaches past the end of the array (reads stop at the end, writes do not) or
@@ -434,6 +437,26 @@ int idh_group_readvalues(idh_group_t batch_id, idh_real_t* values_ptr, const lon
 
 LIBIDH_API int idh_group_writevalues(idh_group_t batch_id, int* results, const double* values_ptr,
                                      const long long* tag_handles, unsigned tags_size);
+
+/* Array read and write for subscribed tags (handles from idh_group_subscribe), OPC UA and OPC
+ * DA. They work as idh_source_readarrays / idh_source_writearrays without index ranges, which
+ * a group does not keep; use the source calls for part of an array.
+ * - Reads come from the group's cache, as idh_group_readvalues: the subscription, or with
+ *   sample_timespan_msec == 0 a synchronous read throttled by the sync cache window.
+ * - An invalid handle is IDH_ERRCODE_INVALIDHANDLE for that entry, with time_quality
+ *   INVALID|HANDLE; a tag without a monitored item (OPC DA: an item not added to the group yet)
+ *   is IDH_ERRCODE_UNSUBSCRIBED. When no handle is valid the call returns
+ *   IDH_ERRCODE_UNSUBSCRIBED.
+ * - A write reads the node first for its element type and shape, as the source call does. A
+ *   handle given more than once is written once with its last array; earlier entries with the
+ *   same elements share its result, the others are IDH_ERROR_DUPLICATED, as in
+ *   idh_group_writevalues. The next group read returns the written value. */
+LIBIDH_API int idh_group_readarrays(idh_group_t batch_id, idh_array_t* arrays,
+                                    const long long* tag_handles, unsigned tags_size);
+
+LIBIDH_API int idh_group_writearrays(idh_group_t batch_id, int* results,
+                                     const idh_array_value_t* values, const long long* tag_handles,
+                                     unsigned tags_size);
 
 LIBIDH_API void idh_group_destroy(idh_group_t batch_id);
 
