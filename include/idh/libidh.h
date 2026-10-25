@@ -265,16 +265,28 @@ typedef enum _IDH_NODETYPE {
     IDH_NODETYPE_VIEW = 8
 } IDH_NODETYPE;
 
+/* idh_browse_item_t::value_rank, the same values as the OPC UA ValueRank attribute. Any n >= 1 is
+ * an array with exactly n dimensions; only 1 has a name below, and fixed ranks above 127 are
+ * reported as 127. Only variables carry one; every other node reports IDH_VALUERANK_SCALAR. A
+ * variable whose rank could not be read reports IDH_VALUERANK_ANY. */
+#define IDH_VALUERANK_SCALAR_OR_ONE_DIMENSION (-3)
+#define IDH_VALUERANK_ANY (-2)  // scalar or array of any rank, or unknown
+#define IDH_VALUERANK_SCALAR (-1)
+#define IDH_VALUERANK_ONE_OR_MORE_DIMENSIONS 0  // array, rank not fixed (OPC DA arrays)
+#define IDH_VALUERANK_ONE_DIMENSION 1           // array with exactly one dimension
+
 typedef struct _idh_browse_item {
     uint16_t namespace_index;
     char node_name[256];         // 节点名称
     char display_name[256];      // 显示名称
     char description[512];       // 节点描述
     IDH_NODETYPE node_type;      // 节点类型
-    IDH_DATATYPE data_type;      // 数据类型（仅变量节点有效）
+    IDH_DATATYPE data_type;      // 数据类型（仅变量节点有效）; 数组节点为元素的类型
     uint8_t is_readable;   // 是否可读
     uint8_t is_writable;   // 是否可写
     uint8_t has_children;  // 是否有子节点
+    int8_t value_rank;     // 标量还是数组, 见 IDH_VALUERANK_*. 占用原来的结构体尾部填充,
+                           // sizeof 和其它字段的偏移都不变
 } idh_browse_item_t;
 
 LIBIDH_API idh_handle_t idh_instance_create();
