@@ -265,14 +265,15 @@ typedef enum _IDH_NODETYPE {
     IDH_NODETYPE_VIEW = 8
 } IDH_NODETYPE;
 
-/* idh_browse_item_t::value_rank, the same values as the OPC UA ValueRank attribute. Fixed ranks
- * above 127 are reported as 127. Only variables carry one; every other node reports
- * IDH_VALUERANK_SCALAR. A variable whose rank could not be read reports IDH_VALUERANK_ANY. */
+/* idh_browse_item_t::value_rank, the same values as the OPC UA ValueRank attribute. Any n >= 1 is
+ * an array with exactly n dimensions; only 1 has a name below, and fixed ranks above 127 are
+ * reported as 127. Only variables carry one; every other node reports IDH_VALUERANK_SCALAR. A
+ * variable whose rank could not be read reports IDH_VALUERANK_ANY. */
 #define IDH_VALUERANK_SCALAR_OR_ONE_DIMENSION (-3)
 #define IDH_VALUERANK_ANY (-2)  // scalar or array of any rank, or unknown
 #define IDH_VALUERANK_SCALAR (-1)
 #define IDH_VALUERANK_ONE_OR_MORE_DIMENSIONS 0  // array, rank not fixed (OPC DA arrays)
-#define IDH_VALUERANK_ONE_DIMENSION 1           // n > 1: array with exactly n dimensions
+#define IDH_VALUERANK_ONE_DIMENSION 1           // array with exactly one dimension
 
 typedef struct _idh_browse_item {
     uint16_t namespace_index;
