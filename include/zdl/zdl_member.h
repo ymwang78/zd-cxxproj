@@ -93,28 +93,40 @@ class zdl_member : public meta_base {
         if (is_array() && min == 0) append_meta_once("o", "");
     }
 
+    /// A bound as generated code reads it: a literal as written, a template
+    /// parameter as the member of the template struct _t that holds it.
     std::string max_size() const {
-        if (max_size_[0] <= '9' && max_size_[0] >= '0') return max_size_;
+        if (is_literal_bound(max_size_)) return max_size_;
         return std::string("_t.") + max_size_;
     };
 
     std::string min_size() const {
-        if (min_size_[0] <= '9' && min_size_[0] >= '0') return min_size_;
+        if (is_literal_bound(min_size_)) return min_size_;
         return std::string("_t.") + min_size_;
     };
 
+    /// The bound as a count, or -1 when it is not one an int holds: a template
+    /// parameter, or a literal the parser reported, which a rejected member
+    /// still carries. This reads a bound as add_member_start() checks it, so
+    /// it never returns what strtol saturated (2147483647 for 2147483648 where
+    /// long is 32 bits) or the narrowing to int truncated (-2147483648 for it
+    /// where long is 64 bits).
     int calc_max_size() const {
-        char* endp = 0;
-        long val = strtol(max_size_.c_str(), &endp, 0);
-        if (endp != 0 && *endp == 0) return val;
-        return -1;
+        int val = 0;
+        return parse_str_len_bound(max_size_, val) ? val : -1;
     }
 
     int calc_min_size() const {
-        char* endp = 0;
-        long val = strtol(min_size_.c_str(), &endp, 0);
-        if (endp != 0 && *endp == 0) return val;
-        return -1;
+        int val = 0;
+        return parse_str_len_bound(min_size_, val) ? val : -1;
+    }
+
+    /// Whether a bound is an integer literal rather than a template parameter
+    /// name: it starts with a digit, or with a sign and a digit (+5).
+    static bool is_literal_bound(const std::string& bound) {
+        std::string::size_type digit =
+            (!bound.empty() && (bound[0] == '+' || bound[0] == '-')) ? 1 : 0;
+        return digit < bound.size() && bound[digit] >= '0' && bound[digit] <= '9';
     }
 
     // String-family length constraint: string(min~max). Independent of the
