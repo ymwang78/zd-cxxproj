@@ -237,6 +237,11 @@ mpcctrl <instance> model autotune start
 
 # Apply auto-tuned values
 mpcctrl <instance> model autotune apply
+
+# Enable / disable one control-model cell (isEnabledControl). apply-ident keeps the
+# cell's previous flag, and a new project starts with every cell disabled, so a
+# command-line "identify -> apply -> control" run needs this step.
+mpcctrl <instance> model enable <wp> <cv> <mvdv> 1
 ```
 
 #### 4.5 Project Commands

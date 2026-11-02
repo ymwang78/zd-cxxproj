@@ -34,7 +34,7 @@ Based on Google C++ Style Guide with modifications:
 
 The canonical rules live in [docs/.ai/cxx-testing-policy.md](docs/.ai/cxx-testing-policy.md); a project `AGENTS.md` may override them for that project. The summary below is what day-to-day work needs. If it ever disagrees with the policy, the policy wins: update the policy first, then this summary.
 
-- **Framework**: C++ tests use Google Test by default. Where a project `AGENTS.md` names another framework (e.g. xOptCon uses Qt Test), use that one; the GTest rules below then do not apply.
+- **Framework**: C++ tests use Google Test by default. Where a project `AGENTS.md` names another framework (e.g. KeelDeck uses Qt Test), use that one; the GTest rules below then do not apply.
 - **Location**: `tests/` or `gtest/` (libzce uses `gtest/`). Put new tests in the directory the project already uses.
 - **Files**: `test_*.cpp`, one component or feature per file.
 - **Cases**: `TEST_F()` for fixture-based tests, `TEST()` for simple ones. Name the suite after the component and the case after the behavior and expected outcome, PascalCase without underscores: `TEST_F(HttpRequestLimitsFixture, ContentLengthOverCeilingIsRefusedWith413)`.
