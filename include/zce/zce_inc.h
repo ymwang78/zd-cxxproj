@@ -223,6 +223,7 @@ enum ERV_ZCE_ERROR {
     ZAP_ERROR_ZFGW = 0x83040000,    // libfgw       (zfgw.h,         ZFGW_ERRCODE_*)
     ZAP_ERROR_ZSSM = 0x83050000,    // libsoftsensor(zssm.h,         ZSSM_ERRCODE_*)
     ZAP_ERROR_ZRTO = 0x83060000,    // xRto backend (reserved, not implemented yet)
+    ZAP_ERROR_ZKTRACE = 0x83070000, // libkeeltrace (ktrace.h,       KTRACE_ERRCODE_*)
     ZAP_ERROR_COIN = 0x83810000,    // libcoin      (no sub-codes defined yet)
 };
 
