@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Builds a HostVM (KeelHost) module plugin with MSBuild, the Windows counterpart of
+  keelhost_add_module() in cmake/KeelHostModule.cmake (ymwang78/HostVM#43).
+
+  A module's *_module.vcxproj
+  - sets, in a PropertyGroup before it imports Microsoft.Cpp.Default.props:
+      KeelHostModuleName        fgw: the module's name, and its directory under modules\
+      KeelHostModuleVersion     0.1
+      KeelHostModuleVmTypes     fgw: the vmtypes it provides, ;-separated
+    and optionally KeelHostModuleRequires, KeelHostModuleExtends (;-separated),
+    KeelHostModulePathAppend (;-separated) and KeelHostModuleMinHost (a.b.c.d), and
+    KeelHostModuleFiles: files that go with the module (its own subprocess, a private DLL ...),
+    ;-separated, copied next to the DLL; one that does not exist gives a warning;
+  - is a DynamicLibrary only where the solution is built against zce.dll, and a Utility (builds
+    nothing) elsewhere: a plugin linked with the static libzce would carry a libzce of its own.
+      <ConfigurationType Condition="$(ForceImportAfterCppTargets.Contains('zce_dll.props'))">DynamicLibrary</ConfigurationType>
+      <ConfigurationType Condition="!$(ForceImportAfterCppTargets.Contains('zce_dll.props'))">Utility</ConfigurationType>
+  - imports this file after Microsoft.Cpp.targets.
+
+  This file
+  - names the DLL kh_<name>.dll (<name> in lower case) and builds it into
+    bin\<Platform>\<Configuration>\modules\<Name>\ of the solution;
+  - writes module.xml next to it from the same properties, so that the two cannot disagree;
+  - in Release, copies them, and KeelHostModuleFiles, into bin\<Platform>\HostVM\modules\<Name>\,
+    where the HostVM.exe that hostvm.vcxproj stages there looks for them; other configurations
+    stay in their own bin\<Platform>\<Configuration>\modules\, next to their own HostVM.exe and
+    zce.dll, since a plugin must use the CRT of the zce.dll it is loaded with.
+  The plugin links zce.lib and defines ZCE_DLL through zce_dll.props, as every project does there.
+-->
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <KeelHostModuleDllName>kh_$(KeelHostModuleName.ToLowerInvariant())</KeelHostModuleDllName>
+    <KeelHostModuleHostDir>$(SolutionDir)bin\$(Platform)\HostVM\modules\$(KeelHostModuleName)\</KeelHostModuleHostDir>
+  </PropertyGroup>
+
+  <Target Name="KeelHostModuleCheck" BeforeTargets="PrepareForBuild">
+    <Error Condition="'$(KeelHostModuleName)'=='' or '$(KeelHostModuleVersion)'==''"
+           Text="$(ProjectName): set KeelHostModuleName and KeelHostModuleVersion (msbuild\keelhost_module.targets)" />
+    <Error Condition="'$(ConfigurationType)'=='DynamicLibrary' and '$(TargetName)'!='$(KeelHostModuleDllName)'"
+           Text="$(ProjectName): TargetName must be $(KeelHostModuleDllName)" />
+  </Target>
+
+  <Target Name="KeelHostModuleManifest" AfterTargets="Build" Condition="'$(ConfigurationType)'=='DynamicLibrary'">
+    <PropertyGroup>
+      <_KhMinHost Condition="'$(KeelHostModuleMinHost)'!=''"> min_host="$(KeelHostModuleMinHost)"</_KhMinHost>
+    </PropertyGroup>
+    <ItemGroup>
+      <_KhVmType Include="$(KeelHostModuleVmTypes)" />
+      <_KhRequires Include="$(KeelHostModuleRequires)" />
+      <_KhExtends Include="$(KeelHostModuleExtends)" />
+      <_KhPath Include="$(KeelHostModulePathAppend)" />
+      <_KhFile Include="$(KeelHostModuleFiles)" />
+      <_KhLine Include="&lt;module name=&quot;$(KeelHostModuleName)&quot; version=&quot;$(KeelHostModuleVersion)&quot;$(_KhMinHost)&gt;" />
+      <_KhLine Include="    &lt;library linux=&quot;lib$(KeelHostModuleDllName).so&quot; windows=&quot;$(KeelHostModuleDllName).dll&quot; /&gt;" />
+      <_KhLine Include="@(_KhVmType->'    &lt;vmtype name=&quot;%(Identity)&quot; /&gt;')" />
+      <_KhLine Include="@(_KhRequires->'    &lt;requires name=&quot;%(Identity)&quot; /&gt;')" />
+      <_KhLine Include="@(_KhExtends->'    &lt;extends vmtype=&quot;%(Identity)&quot; /&gt;')" />
+      <_KhLine Include="@(_KhPath->'    &lt;path append=&quot;%(Identity)&quot; /&gt;')" />
+      <_KhLine Include="&lt;/module&gt;" />
+    </ItemGroup>
+    <WriteLinesToFile File="$(OutDir)module.xml" Lines="@(_KhLine)" Overwrite="true" WriteOnlyWhenDifferent="true" />
+    <Warning Condition="'@(_KhFile)'!='' and !Exists('%(_KhFile.FullPath)')"
+             Text="$(KeelHostModuleName): %(_KhFile.FullPath) does not exist, so modules\$(KeelHostModuleName) goes without it" />
+    <Copy SourceFiles="@(_KhFile)" Condition="'@(_KhFile)'!='' and Exists('%(_KhFile.FullPath)')"
+          DestinationFolder="$(OutDir)" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(_KhFile->'$(OutDir)%(Filename)%(Extension)')"
+          Condition="'$(Configuration)'=='Release' and '@(_KhFile)'!='' and Exists('%(_KhFile.FullPath)')"
+          DestinationFolder="$(KeelHostModuleHostDir)" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="$(OutDir)$(TargetName)$(TargetExt);$(OutDir)module.xml"
+          Condition="'$(Configuration)'=='Release'"
+          DestinationFolder="$(KeelHostModuleHostDir)" SkipUnchangedFiles="true" />
+    <Message Importance="high" Condition="'$(Configuration)'=='Release'"
+             Text="$(KeelHostModuleName) $(KeelHostModuleVersion): $(KeelHostModuleHostDir)$(TargetName)$(TargetExt)" />
+    <Message Importance="high" Condition="'$(Configuration)'!='Release'"
+             Text="$(KeelHostModuleName) $(KeelHostModuleVersion): $(OutDir)$(TargetName)$(TargetExt)" />
+  </Target>
+</Project>
