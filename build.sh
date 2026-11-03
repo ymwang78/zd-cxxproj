@@ -20,6 +20,10 @@ fi
 # build_module_dir <path> <build dir> [cmake args...]: configure, build and install a module
 # in the given build directory under it.
 build_module_dir() {
+    if [[ $# -lt 2 ]]; then
+        echo "build_module_dir: usage: build_module_dir <path> <build dir> [cmake args...]" >&2
+        return 1
+    fi
     local path="$1"
     local build_dir="$2"
     shift 2
