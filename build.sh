@@ -89,6 +89,10 @@ build_module libsrc/libzce -DBUILD_TESTS=ON
 # libzce.so / libzcepy.so (ymwang78/HostVM#42), which HostVM links; libzce.a stays for the
 # programs that link it statically
 build_module_dir libsrc/libzce .build-shared -DBUILD_SHARED_LIBS=ON
+# HostVM needs the shared libzce alone (ymwang78/HostVM#47): hostvm.bin is the core, and every
+# module below is a plugin of its own in bin/<arch>/modules/<Name>. Neither waits for the other; a
+# module built later is loaded by the next instance that starts.
+build_module hosts/HostVM
 build_module libsrc/libzdl -DBUILD_TESTS=ON
 build_module libsrc/libidh -DUSE_CUSTOM_STATIC_LIBS=OFF -DBUILD_TESTS=ON
 build_module modules/ident
@@ -107,7 +111,6 @@ build_module modules/softsensor
 build_module modules/KeelTrace -DKEELTRACE_BUILD_PLUGIN=OFF
 build_module modules/KeelSim -DKEELSIM_BUILD_PLUGIN=OFF
 build_module tools/zGen
-build_module hosts/HostVM
 
 #cd hosts/HostVM/dist/debian
 #./x_package.sh hostvm
