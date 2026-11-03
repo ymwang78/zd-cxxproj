@@ -127,6 +127,13 @@ See `ZDL_PROTOCOL.md` for the complete syntax reference, type mappings, code gen
 - Data structures (zce::Array, zce::Hash, zce::SafeMap)
 - Serialization (BSON, ZDS)
 
+### Lua and Python
+Lua 5.4.9 is compiled into libzce and exported from it: use the headers in `include/zce/lua/`
+(put that directory before any system Lua include path) and do not link another Lua. The
+embedded Python runtime (`include/zce/zce_py_api.h`) is inside a static `libzce.a`; when libzce
+is built as a shared library it is a shared library of its own, libzcepy, which code calling
+`zce_init_pyenv()`, running a Python VM or using `zce_pybind11.h` links as well.
+
 ### ABI version
 A change to a header in `include/zce/` that breaks modules built against the old one (class
 layout, virtual functions, exported signatures, types packed across modules, state an inline

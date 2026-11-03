@@ -34,8 +34,11 @@
  * History:
  * - 1: first version (ymwang78/libzce#214), with zce::Singleton keeping its instances in
  *      libzce (ymwang78/libzce#212).
+ * - 2: (ymwang78/libzce#215) the Lua 5.4.9 core is compiled into libzce and exported from it,
+ *      where Windows used to link vcpkg's Lua 5.5.0, whose API differs; a shared libzce no
+ *      longer contains the Python API (zce_init_pyenv and the rest), libzcepy does.
  */
-#define ZCE_ABI_VERSION 1
+#define ZCE_ABI_VERSION 2
 
 #define ZCE_ABI_STR_(x) #x
 #define ZCE_ABI_STR(x) ZCE_ABI_STR_(x)
