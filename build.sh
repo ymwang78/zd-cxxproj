@@ -88,7 +88,7 @@ build_module() {
 build_module libsrc/libzce -DBUILD_TESTS=ON
 # libzce.so / libzcepy.so (ymwang78/HostVM#42), which HostVM links; libzce.a stays for the
 # programs that link it statically
-build_module_dir libsrc/libzce build-shared -DBUILD_SHARED_LIBS=ON
+build_module_dir libsrc/libzce .build-shared -DBUILD_SHARED_LIBS=ON
 build_module libsrc/libzdl -DBUILD_TESTS=ON
 build_module libsrc/libidh -DUSE_CUSTOM_STATIC_LIBS=OFF -DBUILD_TESTS=ON
 build_module modules/ident
