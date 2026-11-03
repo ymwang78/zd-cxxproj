@@ -37,8 +37,11 @@
  * - 2: (ymwang78/libzce#215) the Lua 5.4.9 core is compiled into libzce and exported from it,
  *      where Windows used to link vcpkg's Lua 5.5.0, whose API differs; a shared libzce no
  *      longer contains the Python API (zce_init_pyenv and the rest), libzcepy does.
+ * - 3: (ymwang78/libzce#213) libzce builds as a shared library: ZCE_API exports and imports,
+ *      Socket and DnsResolve have destructors in libzce, and the classes zce.dll exports with a
+ *      pimpl delete their copy operations.
  */
-#define ZCE_ABI_VERSION 2
+#define ZCE_ABI_VERSION 3
 
 #define ZCE_ABI_STR_(x) #x
 #define ZCE_ABI_STR(x) ZCE_ABI_STR_(x)

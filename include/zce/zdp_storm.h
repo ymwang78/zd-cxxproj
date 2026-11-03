@@ -34,7 +34,7 @@ typedef int (*set_callback)(const ::zce::Any& ctx, zce_int64 topic, const zce_st
                             zce_int64 seq, zce_int64 tick, zce_int64 uid, zce_int64 flag,
                             const std::vector<zce_byte>& data);
 
-char* ZCE_API zdp_printable_topic(char buffer[32], zce_int64 topic);
+ZCE_API char* zdp_printable_topic(char buffer[32], zce_int64 topic);
 
 zce_int64 ZCE_API zdp_create_topic(const char svrname[4], const char siteid[4]);
 
@@ -77,6 +77,11 @@ class ZCE_API Storm : public ::zce::Object {
           set_callback set_cb);
 
     ~Storm();
+
+    // Not copyable. Deleted rather than left implicit: a class exported from zce.dll has its
+    // implicit copy operations generated in every user, where the pimpl is an incomplete type.
+    Storm(const Storm&) = delete;
+    Storm& operator=(const Storm&) = delete;
 
     /**
      * @brief Listen for clients on localip:localport (all addresses when localip is null or
@@ -128,6 +133,11 @@ class ZCE_API StormClient : public ::zce::Object {
 
     /// Calls stop(); see there for what that means on a zce::Scheduler worker thread.
     ~StormClient();
+
+    // Not copyable. Deleted rather than left implicit: a class exported from zce.dll has its
+    // implicit copy operations generated in every user, where the pimpl is an incomplete type.
+    StormClient(const StormClient&) = delete;
+    StormClient& operator=(const StormClient&) = delete;
 
     const std::string getClientIdent() const noexcept;
 

@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <zce/zce_config.h>
 
 #ifdef __cplusplus
@@ -44,7 +44,7 @@ void ZCE_API zce_sha1_final(zce_byte digest[20], zce_sha1_ctx* context);
 
 void ZCE_API zce_sha1(zce_byte hash_out[20], const zce_byte* str, size_t len);
 
-zce_byte* ZCE_API zce_hmac_sha1(zce_byte out[20], const zce_byte* msg, size_t msglen,
+ZCE_API zce_byte* zce_hmac_sha1(zce_byte out[20], const zce_byte* msg, size_t msglen,
                                 const zce_byte* secret, size_t secretlen);
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -65,7 +65,7 @@ void ZCE_API zce_sha256_final(zce_sha256_ctx* ctx, zce_byte hash[]);
 
 void ZCE_API zce_sha256(zce_byte hash_out[32], const zce_byte* str, zce_uint32 len);
 
-zce_byte* ZCE_API zce_hmac_sha256(zce_byte out[32], const zce_byte* msg, size_t msglen,
+ZCE_API zce_byte* zce_hmac_sha256(zce_byte out[32], const zce_byte* msg, size_t msglen,
                                   const zce_byte* secret, size_t secretlen);
 
 #ifdef __cplusplus

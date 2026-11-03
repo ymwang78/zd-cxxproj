@@ -29,7 +29,7 @@ extern "C"
 
     void ZCE_API zce_fini();
 
-    struct tm * ZCE_API zce_localtime_r(const time_t *t, struct tm *res);
+    ZCE_API struct tm* zce_localtime_r(const time_t *t, struct tm *res);
 
     zce_uint64 ZCE_API zce_tick();
 
@@ -157,7 +157,7 @@ extern "C"
      */
     zce_timestamp ZCE_API zce_timestamp_from_asc(const char* timestr);
 
-    char* ZCE_API zce_strptime(const char* buf, const char* fmt, struct tm* tm, int* tz_offset);
+    ZCE_API char* zce_strptime(const char* buf, const char* fmt, struct tm* tm, int* tz_offset);
 
     unsigned ZCE_API zce_thread_id();
 
@@ -208,7 +208,7 @@ extern "C"
 
     int ZCE_API zce_inet_ntop4(const unsigned char* src, char* dst, size_t size);
     int ZCE_API zce_inet_ntop6(const unsigned char* src, char* dst, size_t size);
-    const char* ZCE_API zce_inet_ntop(int af, const void* src, char* dst, size_t size);
+    ZCE_API const char* zce_inet_ntop(int af, const void* src, char* dst, size_t size);
 
     int ZCE_API zce_inet_pton4(const char* src, unsigned char* dst);
     int ZCE_API zce_inet_pton6(const char* src, unsigned char* dst);

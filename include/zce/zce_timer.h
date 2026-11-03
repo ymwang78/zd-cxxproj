@@ -36,6 +36,11 @@ public:
 
     ~Timer();
 
+    // Not copyable. Deleted rather than left implicit: a class exported from zce.dll has its
+    // implicit copy operations generated in every user, where the pimpl is an incomplete type.
+    Timer(const Timer&) = delete;
+    Timer& operator=(const Timer&) = delete;
+
     int getMilliSecondSpan() const;
 
     int start(const zce::SmartPtr<TimerDoozer>& doozer_ptr);

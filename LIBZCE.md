@@ -152,6 +152,7 @@ doc.append("key", value);  // 支持 int32, int64, double, bool, string
 
 - `zce_py_api.h` / libzcepy - 嵌入式 Python（`zce_init_pyenv()`、Python VM、`zce_pybind11.h`）：libzce 是共享库时单独成库 libzcepy，用到它们的程序要同时链 libzcepy；静态的 libzce.a 照旧包含它们
 - `zce/lua/*.h` - Lua 5.4.9 编在 libzce 里并从它导出；模块用这里的头文件、链 libzce，不再自己链 Lua
+- 共享库 - `cmake -DBUILD_SHARED_LIBS=ON` 出 `libzce.so.<ABI>` / `zce.dll`（libzdl 编在里面）与 `libzcepy.so.<ABI>` / `zcepy.dll`；按路径链 `zce.lib` 的代码自己定义 `ZCE_DLL`（同时链 `zcepy.lib` 的再定义 `ZCEPY_DLL`）并关掉 C4251（`/wd4251`）
 - `zce_abi.h` - `ZCE_ABI_VERSION` / `ZCE_BUILD_ID` 与 `zce_abi_check()`：插件加载时核对它与宿主进程里的 libzce 是否用兼容的头文件、同一套编译器 / 标准库 / 配置编出来
 - `zce::Process` - 进程管理
 - `zce::Filesystem` - 文件 I/O 辅助

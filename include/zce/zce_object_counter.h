@@ -17,7 +17,7 @@
 
 namespace zce {
 
-class ZCE_API AtomicLong;
+class AtomicLong;
 
 class ZCE_API ObjectMonitor {
     class Pimpl;

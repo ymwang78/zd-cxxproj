@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #ifndef ZCE_ZDB_MYSQL
 #    define ZCE_ZDB_MYSQL 0
 #endif
@@ -113,8 +113,26 @@
 #    include <gsl/gsl>
 #endif  //__cpluscplus
 
+// ZCE_API marks what libzce exports (ymwang78/libzce#213). On Windows it is dllexport while
+// zce.dll is built (ZCE_EXPORTS), dllimport in code that uses zce.dll (ZCE_DLL, which the CMake
+// target zce passes on to its users), and nothing for the static libzce.lib, which is what the
+// MSBuild projects and their users build. On ELF / Mach-O it is default visibility, so that a
+// libzce.so built with -fvisibility=hidden exports exactly what is marked; a static libzce.a is
+// not affected by it.
 #ifndef ZCE_API
-#    define ZCE_API
+#    if defined(_WIN32)
+#        if defined(ZCE_EXPORTS)
+#            define ZCE_API __declspec(dllexport)
+#        elif defined(ZCE_DLL)
+#            define ZCE_API __declspec(dllimport)
+#        else
+#            define ZCE_API
+#        endif
+#    elif defined(__GNUC__)
+#        define ZCE_API __attribute__((visibility("default")))
+#    else
+#        define ZCE_API
+#    endif
 #endif
 
 #ifndef ZCE_OBJECT_NO_MONITOR

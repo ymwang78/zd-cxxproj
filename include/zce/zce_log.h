@@ -330,7 +330,7 @@ struct ParsedPacket {
     uint32_t content_len = 0;
 };
 
-ParseStatus parseLogPacket(const uint8_t* buf, size_t len, ParsedPacket& out);
+ZCE_API ParseStatus parseLogPacket(const uint8_t* buf, size_t len, ParsedPacket& out);
 
 }  // namespace logcollector
 

@@ -132,6 +132,18 @@ See `ZDL_PROTOCOL.md` for the complete syntax reference, type mappings, code gen
 - Data structures (zce::Array, zce::Hash, zce::SafeMap)
 - Serialization (BSON, ZDS)
 
+### Shared libzce
+`cmake -DBUILD_SHARED_LIBS=ON` builds `libzce.so.<ABI>` / `zce.dll` (with libzdl's objects inside)
+and `libzcepy.so.<ABI>` / `zcepy.dll` (libzce#213). Linux exports only what `ZCE_API` marks
+(`-fvisibility=hidden`); Windows also exports every other function through a generated .def. Code
+that links the CMake target `zce` gets `ZCE_DLL` and `ZCEPY_DLL` from it; code that links
+`zce.lib` by path defines `ZCE_DLL` itself (and `ZCEPY_DLL` with `zcepy.lib`), so that `ZCE_API`
+becomes dllimport, and turns off warning C4251 as the target does (`/wd4251`: the std members of
+exported classes are safe across the DLL boundary, since `ZCE_BUILD_ID` already requires one
+compiler, CRT and configuration). Such code links no static libzce, libzdl or Lua next to it. A
+class exported with a pimpl declares its destructor out of line and deletes its copy operations,
+since MSVC generates the implicit ones in every user of a dllexport class.
+
 ### Lua and Python
 Lua 5.4.9 is compiled into libzce and exported from it: use the headers in `include/zce/lua/`
 (put that directory before any system Lua include path) and do not link another Lua. The

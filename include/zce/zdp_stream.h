@@ -76,6 +76,12 @@ class ZCE_API zdp_stream : public zce::IStream {
 
     ~zdp_stream();
 
+    // Not copyable. Deleted rather than left implicit: a class exported from zce.dll has its
+    // implicit copy operations generated in every user, where zce::Reactor may be an incomplete
+    // type.
+    zdp_stream(const zdp_stream&) = delete;
+    zdp_stream& operator=(const zdp_stream&) = delete;
+
     unsigned last_recv_tick() const { return last_recv_tick_; }
 
     zce_uint32 next_seq();
