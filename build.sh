@@ -17,10 +17,16 @@ if [[ "$1" == "--clean" ]]; then
 fi
 
 # 封装成函数，避免重复
-build_module() {
+# build_module_dir <path> <build dir> [cmake args...]: configure, build and install a module
+# in the given build directory under it.
+build_module_dir() {
+    if [[ $# -lt 2 ]]; then
+        echo "build_module_dir: usage: build_module_dir <path> <build dir> [cmake args...]" >&2
+        return 1
+    fi
     local path="$1"
-    shift
-    local build_dir="build"
+    local build_dir="$2"
+    shift 2
     local module_dir="$CXXPROJ_PATH/$path"
 
     if [[ ! -d "$module_dir" ]]; then
@@ -38,8 +44,8 @@ build_module() {
     cd "$module_dir"
 
     if [[ -d "$build_dir" && ! -w "$build_dir" ]]; then
-        echo "WARN: $path/$build_dir is not writable, fallback to build_user"
-        build_dir="build_user"
+        echo "WARN: $path/$build_dir is not writable, fallback to ${build_dir}_user"
+        build_dir="${build_dir}_user"
     fi
 
     if $CLEAN_BUILD; then
@@ -69,25 +75,46 @@ build_module() {
     cd "$CXXPROJ_PATH"
 }
 
+# build_module <path> [cmake args...]: the same in the module's build/ directory
+build_module() {
+    local path="$1"
+    shift
+    build_module_dir "$path" build "$@"
+}
+
 # -----------------------------------------
 # 按顺序构建
 # -----------------------------------------
 build_module libsrc/libzce -DBUILD_TESTS=ON
+# libzce.so / libzcepy.so (ymwang78/HostVM#42), which HostVM links; libzce.a stays for the
+# programs that link it statically
+build_module_dir libsrc/libzce .build-shared -DBUILD_SHARED_LIBS=ON
+# KeelHost needs the shared libzce alone (ymwang78/KeelHost#47): keelhost.bin is the core, and every
+# module below is a plugin of its own in bin/<arch>/modules/<Name>. Neither waits for the other; a
+# module built later is loaded by the next instance that starts.
+# KeelHost (HostVM until ymwang78/KeelHost#48) is hosts/KeelHost; a workspace that has not been moved
+# yet still has hosts/HostVM (migrate_keelhost_dir.sh moves it and leaves hosts/HostVM as a link).
+KEELHOST_DIR=hosts/KeelHost
+[[ -d "$CXXPROJ_PATH/$KEELHOST_DIR" ]] || KEELHOST_DIR=hosts/HostVM
+build_module "$KEELHOST_DIR"
 build_module libsrc/libzdl -DBUILD_TESTS=ON
 build_module libsrc/libidh -DUSE_CUSTOM_STATIC_LIBS=OFF -DBUILD_TESTS=ON
 build_module modules/ident
 build_module modules/coin
 build_module modules/mpc -DBUILD_TESTS=ON -DENABLE_PYTHON_BINDING=ON
 build_module modules/fgw -DFGW_BUILD_TESTS=OFF
+# KeelTdb on the shared libzce (ymwang78/HostVM#45): its plugin modules/KeelTdb, which carries
+# libxds_client.so for SoftSensor and KeelTrace, so it comes before them. HostVM no longer builds it.
+ZCE_SHARED_LIB="$CXXPROJ_PATH/lib/linux_$(uname -m)/libzce.so"
+# Its own install rules (libktdb.a, ktdb_api.h) go to a private prefix; the plugin installs into
+# bin/<arch>/modules/KeelTdb by itself.
+KTDB_ARGS=(-DBUILD_TESTS=OFF -DBUILD_EXAMPLES=OFF -DBUILD_BENCH=OFF -DKTDB_ZDL_LIBRARY=
+           -DCMAKE_INSTALL_PREFIX="$CXXPROJ_PATH/modules/tdb/build/install")
+build_module modules/tdb "${KTDB_ARGS[@]}" -DKTDB_ZCE_LIBRARY="$ZCE_SHARED_LIB" -DZCE_LIBRARY="$ZCE_SHARED_LIB"
 build_module modules/softsensor
 build_module modules/KeelTrace -DKEELTRACE_BUILD_PLUGIN=OFF
 build_module modules/KeelSim -DKEELSIM_BUILD_PLUGIN=OFF
 build_module tools/zGen
-# KeelHost (HostVM until ymwang78/KeelHost#48) is hosts/KeelHost; a workspace that has not been moved
-# yet still has hosts/HostVM (migrate_keelhost_dir.sh moves it and leaves hosts/HostVM as a link).
-KEELHOST_DIR=hosts/KeelHost
-[[ -d "$CXXPROJ_PATH/$KEELHOST_DIR" ]] || KEELHOST_DIR=hosts/HostVM
-build_module "$KEELHOST_DIR"
 
 #cd $KEELHOST_DIR/dist/debian
 #./x_package.sh hostvm

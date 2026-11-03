@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Imported by MSBuild into every project under this directory (Microsoft.Common.props), for every
+  solution that builds them. It only acts for HostVM.sln.
+
+  HostVM.sln builds against the shared libzce, zce.dll (ymwang78/HostVM#47): HostVM.exe is the core
+  and every module a plugin, kh_<name>.dll in modules\<Name>\, which only exists where the process
+  has one libzce to share. msbuild\zce_dll.props does the switch without changing the projects;
+  setting it here makes HostVM.sln take it on the command line (HostVM's build.bat) and in Visual
+  Studio alike. Every other solution keeps the static libzce.
+
+  build_zce_dll.bat (Release) and build_zce_dll.bat Debug build the DLLs the solution links.
+-->
+<Project>
+  <PropertyGroup Condition="'$(SolutionName)'=='HostVM' and '$(ForceImportAfterCppTargets)'==''">
+    <ForceImportAfterCppTargets>$(MSBuildThisFileDirectory)msbuild\zce_dll.props</ForceImportAfterCppTargets>
+  </PropertyGroup>
+</Project>
