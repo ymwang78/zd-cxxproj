@@ -24,6 +24,10 @@
 # in libzce. A test, <target>_symbols, checks that on Linux (KeelHostModuleCheck.cmake).
 # Symbols are hidden by default, those of the static libraries it links included; the plugin
 # exports khost_module_entry only (KHOST_MODULE_DEFINE).
+# On Linux it finds the shared libraries it needs (libidh, libzcepy ...) by its own RUNPATH, since
+# hostvm.bin's does not apply to what a worker loads with dlopen: its own directory, the host's
+# directory two levels up (bin/<arch>/, where Docker and the Debian package put them) and
+# lib/<arch>/ of the workspace, relative to the installed plugin and absolute in the build tree.
 # ***************************************************************
 include_guard(GLOBAL)
 
@@ -77,6 +81,9 @@ function(keelhost_add_module target)
     else()
         set(_zce "${PLATFORM_SOLUTION_DIR}/${PLATFORM_LIB_DIR}/libzce.so")
         set(_zcepy "${PLATFORM_SOLUTION_DIR}/${PLATFORM_LIB_DIR}/libzcepy.so")
+        set_target_properties(${target} PROPERTIES
+            BUILD_RPATH "$ORIGIN;${PLATFORM_SOLUTION_DIR}/${PLATFORM_LIB_DIR}"
+            INSTALL_RPATH "$ORIGIN;$ORIGIN/../..;$ORIGIN/../../../../${PLATFORM_LIB_DIR}")
         if(NOT APPLE)
             # a dependency the plugin forgot to link fails here, not when a worker loads it
             target_link_options(${target} PRIVATE "LINKER:--no-undefined")
