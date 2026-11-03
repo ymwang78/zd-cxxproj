@@ -52,7 +52,30 @@
  *   mode of the library (_GLIBCXX_DEBUG), which changes the layout of its containers; NDEBUG
  *   changes nothing that crosses the boundary.
  * - libc++: "libcxx-<_LIBCPP_VERSION>-abi<_LIBCPP_ABI_VERSION>".
+ *
+ * Each ends in "-om<0|1>-vm<0|1>-ssl<0|1>", the libzce options that change the layout of public
+ * types: om0 when ZCE_OBJECT_NO_MONITOR drops object_proxy_ from the classes that count their
+ * objects, vm0 when ZCE_SUPPORT_LUAVM / PYVM / CCVM are all off and zvm::Machine has no
+ * modules_, ssl0 when ZCE_SUPPORT_SSL is undefined and the zce_md5 / sha1 / sha256 contexts are
+ * arrays instead of an EVP_MD_CTX pointer. A new option of that kind gets a field here.
  */
+#if defined(ZCE_OBJECT_NO_MONITOR)
+#    define ZCE_BUILD_ID_OM_ "om0"
+#else
+#    define ZCE_BUILD_ID_OM_ "om1"
+#endif
+#if ZCE_SUPPORT_LUAVM || ZCE_SUPPORT_PYVM || ZCE_SUPPORT_CCVM
+#    define ZCE_BUILD_ID_VM_ "vm1"
+#else
+#    define ZCE_BUILD_ID_VM_ "vm0"
+#endif
+#if defined(ZCE_SUPPORT_SSL)
+#    define ZCE_BUILD_ID_SSL_ "ssl1"
+#else
+#    define ZCE_BUILD_ID_SSL_ "ssl0"
+#endif
+#define ZCE_BUILD_ID_LIB_ "-" ZCE_BUILD_ID_OM_ "-" ZCE_BUILD_ID_VM_ "-" ZCE_BUILD_ID_SSL_
+
 #if defined(_MSC_VER)
 #    if defined(_DLL)
 #        define ZCE_BUILD_ID_CRT_ "md"
@@ -66,10 +89,11 @@
 #    endif
 #    define ZCE_BUILD_ID                                  \
         "msvc-" ZCE_ABI_STR(_MSC_VER) "-idl" ZCE_ABI_STR( \
-            _ITERATOR_DEBUG_LEVEL) "-" ZCE_BUILD_ID_CRT_ "-" ZCE_BUILD_ID_CFG_
+            _ITERATOR_DEBUG_LEVEL) "-" ZCE_BUILD_ID_CRT_ "-" ZCE_BUILD_ID_CFG_ ZCE_BUILD_ID_LIB_
 #elif defined(_LIBCPP_VERSION)
-#    define ZCE_BUILD_ID \
-        "libcxx-" ZCE_ABI_STR(_LIBCPP_VERSION) "-abi" ZCE_ABI_STR(_LIBCPP_ABI_VERSION)
+#    define ZCE_BUILD_ID                                                               \
+        "libcxx-" ZCE_ABI_STR(_LIBCPP_VERSION) "-abi" ZCE_ABI_STR(_LIBCPP_ABI_VERSION) \
+            ZCE_BUILD_ID_LIB_
 #elif defined(__GLIBCXX__)
 #    if defined(_GLIBCXX_DEBUG)
 #        define ZCE_BUILD_ID_CFG_ "dbg"
@@ -78,7 +102,7 @@
 #    endif
 #    define ZCE_BUILD_ID                                         \
         "gnu-" ZCE_ABI_STR(__GLIBCXX__) "-cxx11abi" ZCE_ABI_STR( \
-            _GLIBCXX_USE_CXX11_ABI) "-" ZCE_BUILD_ID_CFG_
+            _GLIBCXX_USE_CXX11_ABI) "-" ZCE_BUILD_ID_CFG_ ZCE_BUILD_ID_LIB_
 #else
 #    error "zce_abi.h: unknown C++ standard library, give it a ZCE_BUILD_ID"
 #endif
@@ -96,7 +120,8 @@ ZCE_API const char* zce_build_id(void);
  * @param reason Where to write what differs and both values, for the host to log; may be null.
  * @param reason_size Size of @p reason in bytes; the text is cut to fit and always terminated.
  * @return 0 when both match, with @p reason empty; ZCE_ERROR_VERSION otherwise, for instance
- *         "build id: module msvc-1951-idl2-md-dbg, libzce msvc-1951-idl0-md-rel".
+ *         "build id: module msvc-1951-idl2-md-dbg-om1-vm1-ssl1,
+ *         libzce msvc-1951-idl0-md-rel-om1-vm1-ssl1".
  */
 ZCE_API int zce_abi_check(unsigned abi_version, const char* build_id, char* reason,
                           size_t reason_size);
