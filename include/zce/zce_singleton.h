@@ -10,8 +10,8 @@
 //
 // ***************************************************************
 
-// zce_sync.h brings <windows.h> through zce_inc.h, after <winsock2.h> as Windows requires; including
-// <windows.h> here first made this header fail on its own with winsock redefinitions.
+// zce_sync.h brings <windows.h> through zce_inc.h, after <winsock2.h> as Windows requires;
+// including <windows.h> here first made this header fail on its own with winsock redefinitions.
 #include <zce/zce_sync.h>
 #include <atomic>
 #include <type_traits>
@@ -25,11 +25,24 @@
  * code using a singleton sits in plugins of its own, each module would hold its own instance and
  * its own lock: SchedulerSigt::instance() would be one Scheduler in zce.dll and another in each
  * plugin. Asking libzce for the slot makes every module of the process share one.
+ *
+ * Every module reads instance directly, so that instance() stays one acquire load on hot paths
+ * such as BlockPoolSigt::instance(), which each data block allocation goes through. That ties the
+ * slot's layout to the toolchain, as the rest of the module boundary already is (std::function,
+ * std::string and zce::SmartPtr cross it in zvm_module.h): libzce and the modules using it are
+ * built with the same compiler and standard library, which ZCE_BUILD_ID is there to check. The
+ * assertions below pin what the direct read relies on, a lock-free atomic the size of a pointer.
  */
 struct zce_singleton_slot_t {
     std::atomic<void*> instance{nullptr};
 };
+static_assert(std::atomic<void*>::is_always_lock_free,
+              "zce_singleton_slot_t::instance must be a lock-free atomic");
+static_assert(sizeof(std::atomic<void*>) == sizeof(void*),
+              "zce_singleton_slot_t::instance must be pointer-sized");
 
+// extern "C" gives these functions plain symbol names, for .def files and dynamic lists; it does
+// not make zce_singleton_slot_t a C type (see above).
 extern "C" {
 /**
  * @brief The slot of the type @p type, made on first request and never freed.
