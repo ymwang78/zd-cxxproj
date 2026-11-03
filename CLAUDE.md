@@ -127,6 +127,12 @@ See `ZDL_PROTOCOL.md` for the complete syntax reference, type mappings, code gen
 - Data structures (zce::Array, zce::Hash, zce::SafeMap)
 - Serialization (BSON, ZDS)
 
+### ABI version
+A change to a header in `include/zce/` that breaks modules built against the old one (class
+layout, virtual functions, exported signatures, types packed across modules, state an inline
+function or template reads) must bump `ZCE_ABI_VERSION` in `include/zce/zce_abi.h` in the same
+PR and add a line to its history. Hosts refuse modules built for another version.
+
 ### Documentation
 See `LIBZCE.md` for complete API reference and usage examples.
 

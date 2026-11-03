@@ -150,6 +150,7 @@ doc.append("key", value);  // 支持 int32, int64, double, bool, string
 
 ### 系统功能
 
+- `zce_abi.h` - `ZCE_ABI_VERSION` / `ZCE_BUILD_ID` 与 `zce_abi_check()`：插件加载时核对它与宿主进程里的 libzce 是否用兼容的头文件、同一套编译器 / 标准库 / 配置编出来
 - `zce::Process` - 进程管理
 - `zce::Filesystem` - 文件 I/O 辅助
 - `zce::CtrlCHandler` - 信号处理
