@@ -22,7 +22,8 @@
 # lib/win_amd64/ with ZCE_DLL / ZCEPY_DLL defined. It must not carry a copy of a library that has
 # global state (libzce itself, libuv, OpenSSL, libpq, hiredis, Lua): the process has one of each,
 # in libzce. A test, <target>_symbols, checks that on Linux (KeelHostModuleCheck.cmake).
-# Symbols are hidden by default; the plugin exports khost_module_entry only (KHOST_MODULE_DEFINE).
+# Symbols are hidden by default, those of the static libraries it links included; the plugin
+# exports khost_module_entry only (KHOST_MODULE_DEFINE).
 # ***************************************************************
 include_guard(GLOBAL)
 
@@ -79,6 +80,9 @@ function(keelhost_add_module target)
         if(NOT APPLE)
             # a dependency the plugin forgot to link fails here, not when a worker loads it
             target_link_options(${target} PRIVATE "LINKER:--no-undefined")
+            # the module's own static libraries are compiled with default visibility: keep their
+            # symbols out of the plugin's dynamic symbol table too
+            target_link_options(${target} PRIVATE "LINKER:--exclude-libs,ALL")
         endif()
     endif()
     if(NOT EXISTS "${_zce}")
