@@ -168,6 +168,13 @@ class ZCE_API SubProcessHost : public ::zce::zvm::Machine {
         // away, so a list known up front belongs here rather than in addAutoCreateProcess()
         // calls made after the boot.
         std::vector<zdp_base::zvm_t> auto_create_processes;
+        // Whether this host can start workers of a vmtype (HostVM: whether a module provides it,
+        // ymwang78/HostVM#44). newVM() and uploadVM() refuse a vmtype it returns < 0 for, with
+        // that error, before anything is written. Null: every vmtype is accepted.
+        std::function<int(const std::string& vmtype)> vmtype_check_cb = nullptr;
+        // listVM()'s protocol bit 1, host-managed Python projects (py_project.ptl): whether this
+        // host runs py workers. HostVM clears it when no module provides vmtype py.
+        bool python_projects = true;
     };
 
     SubProcessHost(const zce::SmartPtr<zce::zvm::VirtualMachineStub>& stub_ptr,
