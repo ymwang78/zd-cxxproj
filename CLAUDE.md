@@ -22,6 +22,11 @@ This directory contains all C++ projects with a shared structure for common depe
 
 **Mandatory**: All C/C++ header files (`.h`, `.hpp`) and source files (`.c`, `.cpp`) MUST be saved in **UTF-8 with BOM** encoding.
 
+Exception: vendored third-party code keeps its upstream bytes, so that it can be compared with and
+upgraded from upstream; it gets no BOM. That covers the Lua headers in `include/zce/lua/` (the
+only local change is the `LUA_API` block of `luaconf.h`), `include/pybind11`, `include/Eigen`,
+`include/sol` and the like, as libzce's `scripts/check_encoding.py` exempts its vendor trees.
+
 ## Coding Standards
 
 Based on Google C++ Style Guide with modifications:
