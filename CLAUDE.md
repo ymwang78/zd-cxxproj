@@ -101,6 +101,24 @@ See `CTL_CLI_GUIDE.md` for the complete guide (bilingual EN/ZH), including:
 - Exit codes: 0=ok, 1=usage, 2=conn-failed, 3=rpc-error, 4=timeout
 - Output flags: `--json` for machine-readable, `-q` quiet, `-v` verbose
 
+## HostVM Module Plugins
+
+**IMPORTANT**: A backend module hosted by HostVM (a `modules/*` repository providing a vmtype) is a
+**module plugin**: a `libkh_<name>.so` / `kh_<name>.dll` in `modules/<Name>/` with a `module.xml`,
+loaded by the worker of its vmtype. HostVM itself never links or includes a module.
+
+### Key Rule
+Follow `docs/.ai/keelhost-module-policy.md`: a `<x>_module.cpp` wrapping the existing `xxx_init()`
+(`include/keelhost/keelhost_module.h`, `KHOST_MODULE_DEFINE`), `keelhost_add_module()` from
+`cmake/KeelHostModule.cmake` on Linux, a `lib<x>_module.vcxproj` importing
+`msbuild/keelhost_module.targets` on Windows. A plugin links the shared libzce and carries no copy of
+libzce, libuv, OpenSSL, libpq, hiredis or Lua; Python users declare `requires py`.
+
+### Quick Reference
+- Check a module without starting HostVM: `hostvm.bin module check <Name>`; through a daemon:
+  `hostctrl module check <Name>`
+- Reference plugin: `hosts/HostVM/sdk/SampleModule`
+
 ## RPC Protocol Definition (ZDL / zGen)
 
 **IMPORTANT**: When defining remote communication protocols (messages, requests, responses, data structures for network transmission), use the **ZDL (Zce Definition Language)** with the **zGen** code generator.
