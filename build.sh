@@ -17,10 +17,12 @@ if [[ "$1" == "--clean" ]]; then
 fi
 
 # 封装成函数，避免重复
-build_module() {
+# build_module_dir <path> <build dir> [cmake args...]: configure, build and install a module
+# in the given build directory under it.
+build_module_dir() {
     local path="$1"
-    shift
-    local build_dir="build"
+    local build_dir="$2"
+    shift 2
     local module_dir="$CXXPROJ_PATH/$path"
 
     if [[ ! -d "$module_dir" ]]; then
@@ -38,8 +40,8 @@ build_module() {
     cd "$module_dir"
 
     if [[ -d "$build_dir" && ! -w "$build_dir" ]]; then
-        echo "WARN: $path/$build_dir is not writable, fallback to build_user"
-        build_dir="build_user"
+        echo "WARN: $path/$build_dir is not writable, fallback to ${build_dir}_user"
+        build_dir="${build_dir}_user"
     fi
 
     if $CLEAN_BUILD; then
@@ -69,10 +71,20 @@ build_module() {
     cd "$CXXPROJ_PATH"
 }
 
+# build_module <path> [cmake args...]: the same in the module's build/ directory
+build_module() {
+    local path="$1"
+    shift
+    build_module_dir "$path" build "$@"
+}
+
 # -----------------------------------------
 # 按顺序构建
 # -----------------------------------------
 build_module libsrc/libzce -DBUILD_TESTS=ON
+# libzce.so / libzcepy.so (ymwang78/HostVM#42), which HostVM links; libzce.a stays for the
+# programs that link it statically
+build_module_dir libsrc/libzce build-shared -DBUILD_SHARED_LIBS=ON
 build_module libsrc/libzdl -DBUILD_TESTS=ON
 build_module libsrc/libidh -DUSE_CUSTOM_STATIC_LIBS=OFF -DBUILD_TESTS=ON
 build_module modules/ident
