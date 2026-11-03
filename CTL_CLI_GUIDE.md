@@ -18,10 +18,10 @@ All `*ctl` command-line tools in this project follow a **two-layer CLI design**:
 
 Both layers communicate via the **ZCE ZVM RPC** framework (`zce::zvm::VirtualMachineStub`). The host is addressed through the `KEELHOST` environment variable (`HOSTVM` is still accepted) or the `--host` flag.
 
-> HostVM is now **KeelHost** (ymwang78/KeelHost#48). The Layer 1 tool becomes `keelhostctl` and the
-> address variable `KEELHOST`; both land with ymwang78/KeelHost#49. Until then the Layer 1 binary is
-> `hostctrl` and every tool reads `HOSTVM` only. Afterwards `hostctrl` stays as an alias of
-> `keelhostctl`, and `HOSTVM` is still read when `KEELHOST` is not set.
+> HostVM is now **KeelHost** (ymwang78/KeelHost#48). The Layer 1 tool is `keelhostctl` and the address
+> variable `KEELHOST` (ymwang78/KeelHost#49: KeelHost#57, and the PRs of the Layer 2 tools).
+> `hostctrl` stays as the same program under its old name, and every tool still reads `HOSTVM`
+> when `KEELHOST` is not set. A tool built before those PRs is `hostctrl` and reads `HOSTVM` only.
 
 ---
 
@@ -694,9 +694,9 @@ namespace ctl_output {
 
 两层均通过 **ZCE ZVM RPC** 框架（`zce::zvm::VirtualMachineStub`）通信。主机地址通过环境变量 `KEELHOST`（`HOSTVM` 继续认）或 `--host` 参数指定。
 
-> HostVM 已改名 **KeelHost**（ymwang78/KeelHost#48）。第一层工具改叫 `keelhostctl`、地址变量改叫 `KEELHOST`，
-> 二者随 ymwang78/KeelHost#49 落地；在那之前第一层的可执行文件仍是 `hostctrl`，各工具只认 `HOSTVM`。
-> 落地之后 `hostctrl` 作为 `keelhostctl` 的别名保留，没设 `KEELHOST` 时仍读 `HOSTVM`。
+> HostVM 已改名 **KeelHost**（ymwang78/KeelHost#48）。第一层工具叫 `keelhostctl`、地址变量叫 `KEELHOST`
+> （ymwang78/KeelHost#49：KeelHost#57 与各第二层工具的 PR）。`hostctrl` 作为同一个程序的旧名保留，
+> 没设 `KEELHOST` 时各工具仍读 `HOSTVM`。这些 PR 之前编出来的工具是 `hostctrl`，只认 `HOSTVM`。
 
 ---
 
