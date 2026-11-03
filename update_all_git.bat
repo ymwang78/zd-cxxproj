@@ -36,8 +36,11 @@ for %%D in (%DIRS%) do (
     )
 
     rem ---- 更新一级子目录 ----
+    rem A link to another checkout, hosts\HostVM pointing at hosts\KeelHost for one major version
+    rem after ymwang78/KeelHost#48, is skipped: its target is pulled as itself.
     for /d %%S in ("%%D\*") do (
-        if exist "%%S\.git" (
+        set "ATTR=%%~aS"
+        if "!ATTR:l=!"=="!ATTR!" if exist "%%S\.git" (
             echo.
             echo [Subdir] Updating repo: %%S
             pushd "%%S"

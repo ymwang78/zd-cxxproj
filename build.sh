@@ -83,7 +83,11 @@ build_module modules/softsensor
 build_module modules/KeelTrace -DKEELTRACE_BUILD_PLUGIN=OFF
 build_module modules/KeelSim -DKEELSIM_BUILD_PLUGIN=OFF
 build_module tools/zGen
-build_module hosts/HostVM
+# KeelHost (HostVM until ymwang78/KeelHost#48) is hosts/KeelHost; a workspace that has not been moved
+# yet still has hosts/HostVM (migrate_keelhost_dir.sh moves it and leaves hosts/HostVM as a link).
+KEELHOST_DIR=hosts/KeelHost
+[[ -d "$CXXPROJ_PATH/$KEELHOST_DIR" ]] || KEELHOST_DIR=hosts/HostVM
+build_module "$KEELHOST_DIR"
 
-#cd hosts/HostVM/dist/debian
+#cd $KEELHOST_DIR/dist/debian
 #./x_package.sh hostvm

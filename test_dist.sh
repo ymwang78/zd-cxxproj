@@ -45,7 +45,11 @@ else
     exit 1
 fi
 
-cp hosts/HostVM/dist/docker/*.xml /opt/hostvm/ || true   
-cp hosts/HostVM/dist/docker/*.ptl /opt/hostvm/ || true
-cp hosts/HostVM/dist/docker/*.lua /opt/hostvm/ || true
-cp hosts/HostVM/dist/docker/*.py  /opt/hostvm/ || true
+# KeelHost (HostVM until ymwang78/KeelHost#48) is hosts/KeelHost; a workspace that has not been moved
+# yet still has hosts/HostVM (migrate_keelhost_dir.sh moves it and leaves hosts/HostVM as a link).
+KEELHOST_DIR=hosts/KeelHost
+[[ -d "$CXXPROJ_PATH/$KEELHOST_DIR" ]] || KEELHOST_DIR=hosts/HostVM
+cp $KEELHOST_DIR/dist/docker/*.xml /opt/hostvm/ || true   
+cp $KEELHOST_DIR/dist/docker/*.ptl /opt/hostvm/ || true
+cp $KEELHOST_DIR/dist/docker/*.lua /opt/hostvm/ || true
+cp $KEELHOST_DIR/dist/docker/*.py  /opt/hostvm/ || true

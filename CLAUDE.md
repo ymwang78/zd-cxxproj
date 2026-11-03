@@ -88,13 +88,14 @@ When building a CTL tool for any library (`libxxx` → `xxxctrl`), follow the co
 
 ### Documentation
 See `CTL_CLI_GUIDE.md` for the complete guide (bilingual EN/ZH), including:
-- Layer 1 (`hostvmctl`): host-level VM enumeration and lifecycle management
+- Layer 1 (`keelhostctl`, today's `hostctrl`): host-level VM enumeration, lifecycle and modules
 - Layer 2 (`xxxctrl`): instance-level service control, noun/verb command matrix
 - `mpcctrl` full command reference and RPC method mapping
 - Implementation skeleton for new CTL tools
 
 ### Quick Reference
-- Host address: `HOSTVM=ip:port` env var (default port 22500) or `--host ip:port`
+- Host address: `KEELHOST=ip:port` env var (default port 22500; `HOSTVM` still read, and the only one
+  read until ymwang78/KeelHost#49) or `--host ip:port`
 - Command structure: `<toolname> <instance> <noun> <verb> [args...] [--flags]`
 - Common verbs: `list`, `get`, `add`, `set`, `del`, `swap`, `clear`, `start`, `stop`, `status`, `exec`
 - Tool binary naming: `<libname>ctl` (drop "lib" prefix) — e.g. `mpcctrl`, `pbcctrl`
