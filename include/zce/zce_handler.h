@@ -150,6 +150,12 @@ class ZCE_API Socket : public IStream {
   protected:
     Socket(const zce::SmartPtr<zce::Reactor>& reactor_ptr, int preserved_size);
 
+    // Defined in zce_handler.cpp, where zce::Reactor is complete: a class exported from zce.dll has
+    // its implicit destructor and copy operations generated in every user, where it may not be.
+    ~Socket() override;
+    Socket(const Socket&) = delete;
+    Socket& operator=(const Socket&) = delete;
+
     void do_close();
 
     void do_close_delegate();
@@ -408,6 +414,12 @@ class ZCE_API DnsResolve : virtual public zce::Object {
   public:
     DnsResolve(const zce::SmartPtr<zce::Reactor>& reactor, const char* domain);
 
+    // Defined in zce_handler.cpp, where zce::Reactor is complete: a class exported from zce.dll has
+    // its implicit destructor and copy operations generated in every user, where it may not be.
+    ~DnsResolve() override;
+    DnsResolve(const DnsResolve&) = delete;
+    DnsResolve& operator=(const DnsResolve&) = delete;
+
     const zce::SmartPtr<zce::Reactor>& reactor() { return reactor_ptr_; }
 
     int start_resolve();
@@ -642,6 +654,11 @@ class ZCE_API SyncStream : public IStream {
                const zce::SmartPtr<zce::Reactor>& reactor);
 
     ~SyncStream();
+
+    // Not copyable. Deleted rather than left implicit: a class exported from zce.dll has its
+    // implicit copy operations generated in every user, where zce::TaskQueue is an incomplete type.
+    SyncStream(const SyncStream&) = delete;
+    SyncStream& operator=(const SyncStream&) = delete;
 
     const zce::SmartPtr<zce::TaskQueue>& queue_ptr() const { return taskdeque_ptr_; }
 

@@ -131,8 +131,8 @@ class Singleton {
     }
 
   private:
-    Singleton(const Singleton&) {}
-    Singleton& operator=(const Singleton&) {}
+    Singleton(const Singleton&) = delete;
+    Singleton& operator=(const Singleton&) = delete;
 
   private:
     static constexpr bool kSerialised = !std::is_same<L, zce::MutexNull>::value;

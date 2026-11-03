@@ -14,6 +14,7 @@
 #include <pybind11/embed.h>
 #include <zce/zce_object.h>
 #include <zce/zce_any.h>
+#include <zce/zce_py_api.h>
 
 PYBIND11_DECLARE_HOLDER_TYPE(T, zce::SmartPtr<T>, true);
 
@@ -109,7 +110,7 @@ struct type_caster<zce::Any> {
 }  // namespace pybind11
 
 namespace zce {
-extern pybind11::object any_to_pyobject(const zce::Any& v);
+ZCEPY_API pybind11::object any_to_pyobject(const zce::Any& v);
 
 inline pybind11::array_t<double> toNumpyArray(zce_dblmat& mat,
                                               pybind11::handle owner = pybind11::none()) {

@@ -8,7 +8,7 @@ extern "C" {
 
 int ZCE_API zce_android_init(JavaVM* jvm, jobject jAssetManager);
 
-JNIEnv* ZCE_API zce_android_getenv();
+ZCE_API JNIEnv* zce_android_getenv();
 
 #ifdef __cplusplus
 };

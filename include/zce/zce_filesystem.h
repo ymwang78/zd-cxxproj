@@ -90,7 +90,7 @@ bool ZCE_API makeDir(const char* dir);
 
 bool ZCE_API isFilePathExists(const char* path);
 
-const char* ZCE_API getFileName(const char* str);
+ZCE_API const char* getFileName(const char* str);
 
 zce_int64 ZCE_API getFileSize(const char* path);
 

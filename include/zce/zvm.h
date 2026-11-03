@@ -47,7 +47,7 @@ namespace zvm {
 
 class VirtualMachineStubPimpl;
 
-class VirtualMachineStub : public zce::Object {
+class ZCE_API VirtualMachineStub : public zce::Object {
     zce::SmartPtr<VirtualMachineStubPimpl> pimpl_ptr_;
 
   public:
@@ -56,6 +56,11 @@ class VirtualMachineStub : public zce::Object {
     VirtualMachineStub();
 
     ~VirtualMachineStub();
+
+    // Not copyable. Deleted rather than left implicit: a class exported from zce.dll has its
+    // implicit copy operations generated in every user, where the pimpl is an incomplete type.
+    VirtualMachineStub(const VirtualMachineStub&) = delete;
+    VirtualMachineStub& operator=(const VirtualMachineStub&) = delete;
 
     const std::string& hostDir() const noexcept;
 
@@ -207,7 +212,7 @@ class RpcServant;
 class RpcStream;
 class VirtualMachineStubPimpl;
 
-class Machine : public zce::TaskQueue {
+class ZCE_API Machine : public zce::TaskQueue {
     ZCE_OBJECT_DECLARE;
 
   protected:
