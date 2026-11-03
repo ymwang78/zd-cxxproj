@@ -146,7 +146,7 @@ doc.append("key", value);  // 支持 int32, int64, double, bool, string
 ### 对象管理
 
 - `zce::Object` - 引用计数基类
-- `zce::Singleton<T, Mutex>` - 线程安全单例模式
+- `zce::Singleton<T, Mutex>` - 线程安全单例模式；实例放在 libzce 的槽位表里（`zce_singleton_slot`），进程内所有模块（DLL、插件）共用同一份
 
 ### 系统功能
 
