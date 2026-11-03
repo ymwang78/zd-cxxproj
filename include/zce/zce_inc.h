@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #ifndef ZCE_ZDB_MYSQL
 #    define ZCE_ZDB_MYSQL 0
 #endif
