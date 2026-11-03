@@ -2,11 +2,13 @@
 <!--
   Builds an MSBuild solution against the shared libzce: zce.dll / zcepy.dll instead of the static
   libzce.lib (ymwang78/HostVM#42, ymwang78/libzce#213). Not imported by any project: a build opts in
-  with  msbuild X.sln -p:ForceImportAfterCppTargets=<this file>  (HostVM's build.bat does), so the
-  projects stay unchanged and every other solution keeps the static libzce.
+  with ForceImportAfterCppTargets=<this file>, so the projects stay unchanged and every other
+  solution keeps the static libzce. HostVM.sln always does (ymwang78/HostVM#47): Directory.Build.props
+  sets it for that solution, on the command line and in Visual Studio alike.
 
   build_zce_dll.bat builds and installs the DLLs first: zce.lib / zcepy.lib into lib\win_amd64,
-  zce.dll / zcepy.dll into bin\win_amd64. Release only; the DLLs are built with the release CRT.
+  zce.dll / zcepy.dll into bin\win_amd64; build_zce_dll.bat Debug a build with the debug CRT into
+  lib\win_amd64\debug and bin\win_amd64\debug, which the Debug configurations take.
 
   For each project but the ones listed in ZceDllApply below, it
   - defines ZCE_DLL and ZCEPY_DLL, so that ZCE_API and ZCEPY_API become dllimport;
@@ -14,13 +16,19 @@
   - turns off C4251, as the CMake target zce does (std members of exported classes);
   - links zce.lib and zcepy.lib instead of libzce.lib / libzdl.lib / lua.lib, also where a
     #pragma comment(lib, ...) asks for those;
-  - copies zce.dll and zcepy.dll next to an executable it builds.
+  - copies zce.dll and zcepy.dll (with their .pdb, where there are) next to an executable it builds.
 -->
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <ZceDllRoot>$([MSBuild]::NormalizeDirectory('$(MSBuildThisFileDirectory)', '..'))</ZceDllRoot>
     <ZceDllLibDir>$(ZceDllRoot)lib\win_amd64\</ZceDllLibDir>
     <ZceDllBinDir>$(ZceDllRoot)bin\win_amd64\</ZceDllBinDir>
+    <!-- The CRT of zce.dll must be the project's. Not every project sets UseDebugLibraries; some
+         name the debug CRT in ClCompile's RuntimeLibrary alone, which a property cannot see. -->
+    <ZceDllDebugCrt>false</ZceDllDebugCrt>
+    <ZceDllDebugCrt Condition="'$(UseDebugLibraries)'=='true' or $(Configuration.Contains('Debug'))">true</ZceDllDebugCrt>
+    <ZceDllLibDir Condition="'$(ZceDllDebugCrt)'=='true'">$(ZceDllLibDir)debug\</ZceDllLibDir>
+    <ZceDllBinDir Condition="'$(ZceDllDebugCrt)'=='true'">$(ZceDllBinDir)debug\</ZceDllBinDir>
     <ZceDllApply>true</ZceDllApply>
     <!-- Projects that keep the static libzce:
          - libzce, libzdl, libzce_test: the static libzce itself and its tests;
@@ -53,7 +61,11 @@
 
   <Target Name="ZceDllCopyRuntime" AfterTargets="Build"
           Condition="'$(ZceDllApply)'=='true' and '$(ConfigurationType)'=='Application'">
-    <Copy SourceFiles="$(ZceDllBinDir)zce.dll;$(ZceDllBinDir)zcepy.dll" DestinationFolder="$(OutDir)"
-          SkipUnchangedFiles="true" />
+    <ItemGroup>
+      <_ZceDllRuntime Include="$(ZceDllBinDir)zce.dll;$(ZceDllBinDir)zcepy.dll" />
+      <_ZceDllRuntime Include="$(ZceDllBinDir)zce.pdb;$(ZceDllBinDir)zcepy.pdb"
+                      Condition="Exists('$(ZceDllBinDir)zce.pdb')" />
+    </ItemGroup>
+    <Copy SourceFiles="@(_ZceDllRuntime)" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true" />
   </Target>
 </Project>
