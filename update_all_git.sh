@@ -309,7 +309,9 @@ visit_repo() {
     local tag="$1"
     local repo="$2"
     local key
-    key=$(cd "$repo" && pwd) || {
+    # The physical path: a link to another checkout (hosts/HostVM -> hosts/KeelHost, kept for one
+    # major version after ymwang78/KeelHost#48) is the same repository.
+    key=$(cd "$repo" && pwd -P) || {
         record_failure "$repo" "cannot access repository"
         return 1
     }

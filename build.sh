@@ -89,10 +89,14 @@ build_module libsrc/libzce -DBUILD_TESTS=ON
 # libzce.so / libzcepy.so (ymwang78/HostVM#42), which HostVM links; libzce.a stays for the
 # programs that link it statically
 build_module_dir libsrc/libzce .build-shared -DBUILD_SHARED_LIBS=ON
-# HostVM needs the shared libzce alone (ymwang78/HostVM#47): hostvm.bin is the core, and every
+# KeelHost needs the shared libzce alone (ymwang78/KeelHost#47): keelhost.bin is the core, and every
 # module below is a plugin of its own in bin/<arch>/modules/<Name>. Neither waits for the other; a
 # module built later is loaded by the next instance that starts.
-build_module hosts/HostVM
+# KeelHost (HostVM until ymwang78/KeelHost#48) is hosts/KeelHost; a workspace that has not been moved
+# yet still has hosts/HostVM (migrate_keelhost_dir.sh moves it and leaves hosts/HostVM as a link).
+KEELHOST_DIR=hosts/KeelHost
+[[ -d "$CXXPROJ_PATH/$KEELHOST_DIR" ]] || KEELHOST_DIR=hosts/HostVM
+build_module "$KEELHOST_DIR"
 build_module libsrc/libzdl -DBUILD_TESTS=ON
 build_module libsrc/libidh -DUSE_CUSTOM_STATIC_LIBS=OFF -DBUILD_TESTS=ON
 build_module modules/ident
@@ -112,5 +116,5 @@ build_module modules/KeelTrace -DKEELTRACE_BUILD_PLUGIN=OFF
 build_module modules/KeelSim -DKEELSIM_BUILD_PLUGIN=OFF
 build_module tools/zGen
 
-#cd hosts/HostVM/dist/debian
+#cd $KEELHOST_DIR/dist/debian
 #./x_package.sh hostvm

@@ -88,24 +88,25 @@ When building a CTL tool for any library (`libxxx` → `xxxctrl`), follow the co
 
 ### Documentation
 See `CTL_CLI_GUIDE.md` for the complete guide (bilingual EN/ZH), including:
-- Layer 1 (`hostvmctl`): host-level VM enumeration and lifecycle management
+- Layer 1 (`keelhostctl`, today's `hostctrl`): host-level VM enumeration, lifecycle and modules
 - Layer 2 (`xxxctrl`): instance-level service control, noun/verb command matrix
 - `mpcctrl` full command reference and RPC method mapping
 - Implementation skeleton for new CTL tools
 
 ### Quick Reference
-- Host address: `HOSTVM=ip:port` env var (default port 22500) or `--host ip:port`
+- Host address: `KEELHOST=ip:port` env var (default port 22500; `HOSTVM` still read, and the only one
+  read until ymwang78/KeelHost#49) or `--host ip:port`
 - Command structure: `<toolname> <instance> <noun> <verb> [args...] [--flags]`
 - Common verbs: `list`, `get`, `add`, `set`, `del`, `swap`, `clear`, `start`, `stop`, `status`, `exec`
 - Tool binary naming: `<libname>ctl` (drop "lib" prefix) — e.g. `mpcctrl`, `pbcctrl`
 - Exit codes: 0=ok, 1=usage, 2=conn-failed, 3=rpc-error, 4=timeout
 - Output flags: `--json` for machine-readable, `-q` quiet, `-v` verbose
 
-## HostVM Module Plugins
+## KeelHost Module Plugins
 
-**IMPORTANT**: A backend module hosted by HostVM (a `modules/*` repository providing a vmtype) is a
+**IMPORTANT**: A backend module hosted by KeelHost (a `modules/*` repository providing a vmtype) is a
 **module plugin**: a `libkh_<name>.so` / `kh_<name>.dll` in `modules/<Name>/` with a `module.xml`,
-loaded by the worker of its vmtype. HostVM itself never links or includes a module.
+loaded by the worker of its vmtype. KeelHost itself never links or includes a module.
 
 ### Key Rule
 Follow `docs/.ai/keelhost-module-policy.md`: a `<x>_module.cpp` wrapping the existing `xxx_init()`
@@ -115,9 +116,9 @@ Follow `docs/.ai/keelhost-module-policy.md`: a `<x>_module.cpp` wrapping the exi
 libzce, libuv, OpenSSL, libpq, hiredis or Lua; Python users declare `requires py`.
 
 ### Quick Reference
-- Check a module without starting HostVM: `hostvm.bin module check <Name>`; through a daemon:
-  `hostctrl module check <Name>`
-- Reference plugin: `hosts/HostVM/sdk/SampleModule`
+- Check a module without starting KeelHost: `keelhost.bin module check <Name>`; through a daemon:
+  `keelhostctl module check <Name>`
+- Reference plugin: `hosts/KeelHost/sdk/SampleModule`
 
 ## RPC Protocol Definition (ZDL / zGen)
 

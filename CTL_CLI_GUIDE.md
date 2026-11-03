@@ -13,10 +13,15 @@ All `*ctl` command-line tools in this project follow a **two-layer CLI design**:
 
 | Layer | Tool | Scope |
 |-------|------|-------|
-| **Layer 1** | `hostvmctl` | Host-level: enumerate and manage all VM instances running on a remote host |
+| **Layer 1** | `keelhostctl` | Host-level: enumerate and manage all VM instances running on a remote host |
 | **Layer 2** | `mpcctrl`, `softsensorctrl`, `pbcctrl`, … | Service-level: operate one specific VM instance of that service type |
 
-Both layers communicate via the **ZCE ZVM RPC** framework (`zce::zvm::VirtualMachineStub`). The host is addressed through the `HOSTVM` environment variable or the `--host` flag.
+Both layers communicate via the **ZCE ZVM RPC** framework (`zce::zvm::VirtualMachineStub`). The host is addressed through the `KEELHOST` environment variable (`HOSTVM` is still accepted) or the `--host` flag.
+
+> HostVM is now **KeelHost** (ymwang78/KeelHost#48). The Layer 1 tool is `keelhostctl` and the address
+> variable `KEELHOST` (ymwang78/KeelHost#49: KeelHost#57, and the PRs of the Layer 2 tools).
+> `hostctrl` stays as the same program under its old name, and every tool still reads `HOSTVM`
+> when `KEELHOST` is not set. A tool built before those PRs is `hostctrl` and reads `HOSTVM` only.
 
 ---
 
@@ -25,7 +30,7 @@ Both layers communicate via the **ZCE ZVM RPC** framework (`zce::zvm::VirtualMac
 #### 1.1 Host Address
 
 ```
-HOSTVM=<ip>:<port>          # Environment variable (preferred)
+KEELHOST=<ip>:<port>        # Environment variable (preferred); HOSTVM=<ip>:<port> is still read
 --host <ip>:<port>           # CLI flag (overrides env)
 ```
 
@@ -55,7 +60,7 @@ HOSTVM=<ip>:<port>          # Environment variable (preferred)
 #### 1.4 Shared Flags (every tool, every command)
 
 ```
---host <ip:port>      Host address (overrides HOSTVM env)
+--host <ip:port>      Host address (overrides KEELHOST / HOSTVM env)
 --timeout <ms>        RPC timeout in milliseconds (default: 5000)
 --json                Machine-readable JSON output
 -q, --quiet           Suppress normal output
@@ -66,14 +71,14 @@ HOSTVM=<ip>:<port>          # Environment variable (preferred)
 
 ---
 
-### 2. Layer 1 — `hostvmctl`
+### 2. Layer 1 — `keelhostctl`
 
-`hostvmctl` connects to the ZVM host service and manages VM instances at the process level.
+`keelhostctl` connects to the ZVM host service and manages VM instances at the process level.
 
 #### 2.1 Synopsis
 
 ```
-hostvmctl [--host ip:port] <command> [args...]
+keelhostctl [--host ip:port] <command> [args...]
 ```
 
 #### 2.2 Commands
@@ -86,24 +91,27 @@ hostvmctl [--host ip:port] <command> [args...]
 | `stop <name>` | `[--force]` | Gracefully stop (or force-kill) a VM |
 | `restart <name>` | | Stop then boot with the same parameters |
 | `logs <name>` | `[-n <lines>] [--follow]` | Tail the VM's log output |
+| `module list` | | The modules the host has: built in or plugin, version, the directory it comes from |
+| `module info <name>` | | One module, with the vmtypes it provides and the modules it requires or extends |
+| `module check [<name>]` | `[--json]` | Load each plugin in a throwaway process and check it against its `module.xml` and the host's libzce, without calling its `init`; exit code 3 when something is wrong |
 
 #### 2.3 Examples
 
 ```bash
 # List all VMs on default host
-HOSTVM=192.168.1.100:22500 hostvmctl list
+HOSTVM=192.168.1.100:22500 keelhostctl list
 
 # List only MPC-type VMs
-HOSTVM=192.168.1.100:22500 hostvmctl list --type TaijiMPC
+HOSTVM=192.168.1.100:22500 keelhostctl list --type TaijiMPC
 
 # Boot an MPC instance named "project1"
-HOSTVM=192.168.1.100:22500 hostvmctl boot TaijiMPC project1 --path /data/mpc/project1
+HOSTVM=192.168.1.100:22500 keelhostctl boot TaijiMPC project1 --path /data/mpc/project1
 
 # Stop instance "project1" gracefully
-HOSTVM=192.168.1.100:22500 hostvmctl stop project1
+HOSTVM=192.168.1.100:22500 keelhostctl stop project1
 
 # Follow logs in real time
-HOSTVM=192.168.1.100:22500 hostvmctl logs project1 --follow
+HOSTVM=192.168.1.100:22500 keelhostctl logs project1 --follow
 ```
 
 #### 2.4 `list` Output Format
@@ -125,7 +133,7 @@ ident_svc     ZIdent      running     192.168.1.100:22502   10m 5s
 [HOSTVM=ip:port] <toolname> <instance> <noun> <verb> [positional-args...] [flags...]
 ```
 
-- **`<instance>`**: VM instance name or ID (as shown in `hostvmctl list`)
+- **`<instance>`**: VM instance name or ID (as shown in `keelhostctl list`)
 - **`<noun>`**: The resource category (variable group, model, project, …)
 - **`<verb>`**: The action (get, set, add, del, list, start, stop, …)
 
@@ -320,7 +328,7 @@ mpcctrl <instance> script exec <script-name> --dry-run
 # Run online identification (timeout 60 s)
 mpcctrl <instance> ident online --timeout 60000
 
-# Ask the Python identification algorithm to export files (ignored by older HostVM)
+# Ask the Python identification algorithm to export files (ignored by older KeelHost / HostVM)
 mpcctrl <instance> ident online --export-file --timeout 60000
 
 # Estimate delays
@@ -510,7 +518,7 @@ on failure, the traceback, exiting `3`.
 #### 5.9 Companion Tool: `softsensor_paracmp`
 
 Shipped alongside `softsensorctrl`, but **not** a CTL tool — it never connects to a
-HostVM. It compares two prediction series (VB6 legacy vs. the new system) offline:
+KeelHost. It compares two prediction series (VB6 legacy vs. the new system) offline:
 
 ```bash
 softsensor_paracmp vb.csv new.csv --ref-time "时间" --ref-value "预估值" \
@@ -656,7 +664,7 @@ namespace ctl_output {
 | Noun names | lowercase, no hyphens | `mv`, `cv`, `model`, `project` |
 | Verb names | lowercase, no hyphens | `list`, `add`, `set`, `del`, `start`, `stop` |
 | Flag names | `--kebab-case` | `--dry-run`, `--follow` |
-| Env variable | `HOSTVM` (shared across all tools) | `HOSTVM=10.0.0.1:22500` |
+| Env variable | `KEELHOST` (shared across all tools; `HOSTVM` still read) | `KEELHOST=10.0.0.1:22500` |
 
 ---
 
@@ -681,10 +689,14 @@ namespace ctl_output {
 
 | 层级 | 工具 | 职责 |
 |------|------|------|
-| **第一层** | `hostvmctl` | 主机层：枚举和管理远程主机上运行的所有 VM 实例 |
+| **第一层** | `keelhostctl` | 主机层：枚举和管理远程主机上运行的所有 VM 实例 |
 | **第二层** | `mpcctrl`、`softsensorctrl`、`pbcctrl` 等 | 服务层：对该服务类型的某个具体 VM 实例进行操作 |
 
-两层均通过 **ZCE ZVM RPC** 框架（`zce::zvm::VirtualMachineStub`）通信。主机地址通过环境变量 `HOSTVM` 或 `--host` 参数指定。
+两层均通过 **ZCE ZVM RPC** 框架（`zce::zvm::VirtualMachineStub`）通信。主机地址通过环境变量 `KEELHOST`（`HOSTVM` 继续认）或 `--host` 参数指定。
+
+> HostVM 已改名 **KeelHost**（ymwang78/KeelHost#48）。第一层工具叫 `keelhostctl`、地址变量叫 `KEELHOST`
+> （ymwang78/KeelHost#49：KeelHost#57 与各第二层工具的 PR）。`hostctrl` 作为同一个程序的旧名保留，
+> 没设 `KEELHOST` 时各工具仍读 `HOSTVM`。这些 PR 之前编出来的工具是 `hostctrl`，只认 `HOSTVM`。
 
 ---
 
@@ -693,7 +705,7 @@ namespace ctl_output {
 #### 1.1 主机地址
 
 ```
-HOSTVM=<ip>:<port>          # 环境变量（推荐方式）
+KEELHOST=<ip>:<port>        # 环境变量（推荐方式）；HOSTVM=<ip>:<port> 继续认
 --host <ip>:<port>           # CLI 参数（覆盖环境变量）
 ```
 
@@ -723,7 +735,7 @@ HOSTVM=<ip>:<port>          # 环境变量（推荐方式）
 #### 1.4 所有工具通用参数
 
 ```
---host <ip:port>      主机地址（覆盖 HOSTVM 环境变量）
+--host <ip:port>      主机地址（覆盖 KEELHOST / HOSTVM 环境变量）
 --timeout <ms>        RPC 超时时间，单位毫秒（默认 5000）
 --json                机器可读的 JSON 输出
 -q, --quiet           抑制正常输出
@@ -734,14 +746,14 @@ HOSTVM=<ip>:<port>          # 环境变量（推荐方式）
 
 ---
 
-### 2. 第一层 — `hostvmctl`
+### 2. 第一层 — `keelhostctl`
 
-`hostvmctl` 连接 ZVM 宿主服务，在进程级别管理 VM 实例。
+`keelhostctl` 连接 ZVM 宿主服务，在进程级别管理 VM 实例。
 
 #### 2.1 语法
 
 ```
-hostvmctl [--host ip:port] <command> [args...]
+keelhostctl [--host ip:port] <command> [args...]
 ```
 
 #### 2.2 命令列表
@@ -754,24 +766,27 @@ hostvmctl [--host ip:port] <command> [args...]
 | `stop <name>` | `[--force]` | 优雅停止（或强制终止）VM |
 | `restart <name>` | | 停止后以相同参数重新启动 |
 | `logs <name>` | `[-n <lines>] [--follow]` | 追踪 VM 日志输出 |
+| `module list` | | 主机上的模块：内置还是插件、版本、来自哪个目录 |
+| `module info <name>` | | 单个模块，含它提供的 vmtype、requires 与 extends |
+| `module check [<name>]` | `[--json]` | 起一个临时进程逐个加载插件，与 `module.xml` 和主机的 libzce 核对，不调 `init`；有问题时退出码为 3 |
 
 #### 2.3 示例
 
 ```bash
 # 列出默认主机上的所有 VM
-HOSTVM=192.168.1.100:22500 hostvmctl list
+HOSTVM=192.168.1.100:22500 keelhostctl list
 
 # 只列出 MPC 类型的 VM
-HOSTVM=192.168.1.100:22500 hostvmctl list --type TaijiMPC
+HOSTVM=192.168.1.100:22500 keelhostctl list --type TaijiMPC
 
 # 启动名为 "project1" 的 MPC 实例
-HOSTVM=192.168.1.100:22500 hostvmctl boot TaijiMPC project1 --path /data/mpc/project1
+HOSTVM=192.168.1.100:22500 keelhostctl boot TaijiMPC project1 --path /data/mpc/project1
 
 # 优雅停止 "project1"
-HOSTVM=192.168.1.100:22500 hostvmctl stop project1
+HOSTVM=192.168.1.100:22500 keelhostctl stop project1
 
 # 实时跟踪日志
-HOSTVM=192.168.1.100:22500 hostvmctl logs project1 --follow
+HOSTVM=192.168.1.100:22500 keelhostctl logs project1 --follow
 ```
 
 ---
@@ -784,7 +799,7 @@ HOSTVM=192.168.1.100:22500 hostvmctl logs project1 --follow
 [HOSTVM=ip:port] <工具名> <实例> <名词> <动词> [位置参数...] [选项...]
 ```
 
-- **`<实例>`**：VM 实例名称或 ID（见 `hostvmctl list` 输出）
+- **`<实例>`**：VM 实例名称或 ID（见 `keelhostctl list` 输出）
 - **`<名词>`**：资源分类（变量组、模型、项目等）
 - **`<动词>`**：操作类型（get、set、add、del、list、start、stop 等）
 
@@ -974,7 +989,7 @@ mpcctrl <实例> script exec <脚本名> --dry-run
 # 在线辨识（超时 60 秒）
 mpcctrl <实例> ident online --timeout 60000
 
-# 让 Python 辨识算法导出文件（旧 HostVM 会忽略该尾参）
+# 让 Python 辨识算法导出文件（旧 KeelHost / HostVM 会忽略该尾参）
 mpcctrl <实例> ident online --export-file --timeout 60000
 
 # 估算延迟
@@ -1156,7 +1171,7 @@ traceback 并以退出码 `3` 结束。
 
 #### 5.9 配套工具：`softsensor_paracmp`
 
-与 `softsensorctrl` 一起随包，但**不是** CTL 工具——它一次都不连 HostVM。它离线比对
+与 `softsensorctrl` 一起随包，但**不是** CTL 工具——它一次都不连 KeelHost。它离线比对
 两条预测序列（VB6 存量系统 vs 新系统）：
 
 ```bash
@@ -1238,7 +1253,7 @@ int cmdMv(XxxCtlClient& client, const std::string& verb,
 | 名词 | 全小写，无连字符 | `mv`、`cv`、`model`、`project` |
 | 动词 | 全小写，无连字符 | `list`、`add`、`set`、`del`、`start`、`stop` |
 | 选项 | `--kebab-case` | `--dry-run`、`--follow` |
-| 环境变量 | `HOSTVM`（所有工具共用） | `HOSTVM=10.0.0.1:22500` |
+| 环境变量 | `KEELHOST`（所有工具共用；`HOSTVM` 继续认） | `KEELHOST=10.0.0.1:22500` |
 
 ---
 
