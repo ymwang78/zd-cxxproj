@@ -22,8 +22,10 @@
   - names the DLL kh_<name>.dll (<name> in lower case) and builds it into
     bin\<Platform>\<Configuration>\modules\<Name>\ of the solution;
   - writes module.xml next to it from the same properties, so that the two cannot disagree;
-  - copies them, and KeelHostModuleFiles, into bin\<Platform>\HostVM\modules\<Name>\, where
-    HostVM.exe looks for them.
+  - in Release, copies them, and KeelHostModuleFiles, into bin\<Platform>\HostVM\modules\<Name>\,
+    where the HostVM.exe that hostvm.vcxproj stages there looks for them; other configurations
+    stay in their own bin\<Platform>\<Configuration>\modules\, next to their own HostVM.exe and
+    zce.dll, since a plugin must use the CRT of the zce.dll it is loaded with.
   The plugin links zce.lib and defines ZCE_DLL through zce_dll.props, as every project does there.
 -->
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
@@ -63,10 +65,14 @@
     <Copy SourceFiles="@(_KhFile)" Condition="'@(_KhFile)'!='' and Exists('%(_KhFile.FullPath)')"
           DestinationFolder="$(OutDir)" SkipUnchangedFiles="true" />
     <Copy SourceFiles="@(_KhFile->'$(OutDir)%(Filename)%(Extension)')"
-          Condition="'@(_KhFile)'!='' and Exists('%(_KhFile.FullPath)')"
+          Condition="'$(Configuration)'=='Release' and '@(_KhFile)'!='' and Exists('%(_KhFile.FullPath)')"
           DestinationFolder="$(KeelHostModuleHostDir)" SkipUnchangedFiles="true" />
     <Copy SourceFiles="$(OutDir)$(TargetName)$(TargetExt);$(OutDir)module.xml"
+          Condition="'$(Configuration)'=='Release'"
           DestinationFolder="$(KeelHostModuleHostDir)" SkipUnchangedFiles="true" />
-    <Message Importance="high" Text="$(KeelHostModuleName) $(KeelHostModuleVersion): $(KeelHostModuleHostDir)$(TargetName)$(TargetExt)" />
+    <Message Importance="high" Condition="'$(Configuration)'=='Release'"
+             Text="$(KeelHostModuleName) $(KeelHostModuleVersion): $(KeelHostModuleHostDir)$(TargetName)$(TargetExt)" />
+    <Message Importance="high" Condition="'$(Configuration)'!='Release'"
+             Text="$(KeelHostModuleName) $(KeelHostModuleVersion): $(OutDir)$(TargetName)$(TargetExt)" />
   </Target>
 </Project>
