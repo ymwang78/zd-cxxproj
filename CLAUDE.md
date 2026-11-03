@@ -22,6 +22,11 @@ This directory contains all C++ projects with a shared structure for common depe
 
 **Mandatory**: All C/C++ header files (`.h`, `.hpp`) and source files (`.c`, `.cpp`) MUST be saved in **UTF-8 with BOM** encoding.
 
+Exception: vendored third-party code keeps its upstream bytes, so that it can be compared with and
+upgraded from upstream; it gets no BOM. That covers the Lua headers in `include/zce/lua/` (the
+only local change is the `LUA_API` block of `luaconf.h`), `include/pybind11`, `include/Eigen`,
+`include/sol` and the like, as libzce's `scripts/check_encoding.py` exempts its vendor trees.
+
 ## Coding Standards
 
 Based on Google C++ Style Guide with modifications:
@@ -126,6 +131,13 @@ See `ZDL_PROTOCOL.md` for the complete syntax reference, type mappings, code gen
 - Timers (zce::Timer, not sleep loops)
 - Data structures (zce::Array, zce::Hash, zce::SafeMap)
 - Serialization (BSON, ZDS)
+
+### Lua and Python
+Lua 5.4.9 is compiled into libzce and exported from it: use the headers in `include/zce/lua/`
+(put that directory before any system Lua include path) and do not link another Lua. The
+embedded Python runtime (`include/zce/zce_py_api.h`) is inside a static `libzce.a`; when libzce
+is built as a shared library it is a shared library of its own, libzcepy, which code calling
+`zce_init_pyenv()`, running a Python VM or using `zce_pybind11.h` links as well.
 
 ### ABI version
 A change to a header in `include/zce/` that breaks modules built against the old one (class
