@@ -101,7 +101,7 @@ build_module libsrc/libzdl -DBUILD_TESTS=ON
 build_module libsrc/libidh -DUSE_CUSTOM_STATIC_LIBS=OFF -DBUILD_TESTS=ON
 build_module modules/ident
 build_module modules/coin
-build_module modules/mpc -DBUILD_TESTS=ON -DENABLE_PYTHON_BINDING=ON
+build_module modules/TaijiMPC -DBUILD_TESTS=ON -DENABLE_PYTHON_BINDING=ON
 build_module modules/fgw -DFGW_BUILD_TESTS=OFF
 # KeelBase on the shared libzce (ymwang78/HostVM#45): its plugin modules/KeelBase, which carries
 # libxds_client.so for SoftSensor and KeelTrace, so it comes before them. HostVM no longer builds it.
