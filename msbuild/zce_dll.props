@@ -53,7 +53,7 @@
        whole list would reach the linker as one file name.
        The static libzce also arrives as a link input of its own: VC++ links the outputs of what a
        referenced static library depends on, and a solution makes such libraries depend on the
-       libzce project for the build order (HostVM.sln's libktdb_vm does). A project linking zce.dll
+       libzce project for the build order (HostVM.sln's libkbase_vm does). A project linking zce.dll
        drops those inputs, or the first symbol zce.dll does not export pulls a second libzce in. -->
   <Target Name="ZceDllSwapLibs" BeforeTargets="Link" Condition="'$(ZceDllApply)'=='true'">
     <ItemGroup>
