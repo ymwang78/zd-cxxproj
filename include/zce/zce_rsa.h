@@ -105,6 +105,18 @@ int ZCE_API zce_rsa_private_decrypt(zce::RefBlock& dblock,
     const char* key,
     size_t keylen);
 
+/**
+ * @brief Encrypts input with AES, PKCS#7 padded.
+ * @param dblock Receives the ciphertext. What it held before is not used. On failure it is left
+ *        empty.
+ * @param iv_dblock For "aes_256_cbc", the 16-byte IV. When it is shorter, a random IV replaces
+ *        it, which the caller has to keep for decrypting. Not used for "aes_128_ecb".
+ * @param key The key, exactly 16 bytes for "aes_128_ecb" and 32 for "aes_256_cbc".
+ * @param mode "aes_128_ecb" or "aes_256_cbc", in any case.
+ * @return The ciphertext length, or -1 for an unknown mode, a key whose length does not match
+ *         the mode (ymwang78/libzce#232: it used to be read past its end or cut), or a failure
+ *         in OpenSSL.
+ */
 int ZCE_API zce_aes_encrypt(zce::RefBlock& dblock,
     zce::RefBlock& iv_dblock,
     const zce_byte* input,
@@ -113,6 +125,19 @@ int ZCE_API zce_aes_encrypt(zce::RefBlock& dblock,
     size_t keylen,
     const char* mode);
 
+/**
+ * @brief Decrypts what zce_aes_encrypt() made.
+ * @param dblock Receives the plaintext. What it held before is not used. On failure it is left
+ *        empty.
+ * @param iv_dblock For "aes_256_cbc", the IV the ciphertext was made with: at least 16 bytes, of
+ *        which the first 16 are used. Not used for "aes_128_ecb".
+ * @param key The key, exactly 16 bytes for "aes_128_ecb" and 32 for "aes_256_cbc".
+ * @param mode "aes_128_ecb" or "aes_256_cbc", in any case.
+ * @return The plaintext length, or -1 for an unknown mode, a key whose length does not match the
+ *         mode, a CBC IV shorter than 16 bytes, or a ciphertext that does not decrypt: bad
+ *         padding, which is how a wrong key usually shows, or a length that is not a whole
+ *         number of blocks.
+ */
 int ZCE_API zce_aes_decrypt(zce::RefBlock& dblock,
     const zce::RefBlock& iv_dblock,
     const zce_byte* input,
