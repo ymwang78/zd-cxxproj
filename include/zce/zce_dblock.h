@@ -54,10 +54,14 @@ class ZCE_API RefBlock {
   public:
     RefBlock() : rd_pos_(0), wr_pos_(0) {}
 
+    // Leaves rhs equal to RefBlock(), as the move assignment does. wr_pos_ used to be kept, so a
+    // moved-from block given a new buffer by resize() had that many uninitialized bytes of
+    // length (ymwang78/libzce#235).
     RefBlock(RefBlock&& rhs) noexcept
         : dt_ptr_(std::move(rhs.dt_ptr_)), rd_pos_(rhs.rd_pos_), wr_pos_(rhs.wr_pos_) {
         rhs.dt_ptr_ = 0;
         rhs.rd_pos_ = 0;
+        rhs.wr_pos_ = 0;
     };
 
     RefBlock(const RefBlock& rhs) noexcept
