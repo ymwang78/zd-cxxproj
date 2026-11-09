@@ -1,18 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
   Imported by MSBuild into every project under this directory (Microsoft.Common.props), for every
-  solution that builds them. Its own setting only acts for HostVM.sln.
+  solution that builds them. Its own setting only acts for KeelHost.sln.
 
   MSBuild stops at the first Directory.Build.props above a project, so this file first imports the
   next one further up, if there is one. Without that, adding this file hid every such file above
   the workspace from the projects here, such as a machine-wide one setting PlatformToolset for the
   projects that do not name their own: those fell back to v100 and failed with MSB8020.
 
-  HostVM.sln builds against the shared libzce, zce.dll (ymwang78/HostVM#47): HostVM.exe is the core
-  and every module a plugin, kh_<name>.dll in modules\<Name>\, which only exists where the process
-  has one libzce to share. msbuild\zce_dll.props does the switch without changing the projects;
-  setting it here makes HostVM.sln take it on the command line (HostVM's build.bat) and in Visual
-  Studio alike. Every other solution keeps the static libzce.
+  KeelHost.sln builds against the shared libzce, zce.dll (ymwang78/KeelHost#47): KeelHost.exe is the
+  core and every module a plugin, kh_<name>.dll in modules\<Name>\, which only exists where the
+  process has one libzce to share. msbuild\zce_dll.props does the switch without changing the
+  projects; setting it here makes KeelHost.sln take it on the command line (KeelHost's build.bat)
+  and in Visual Studio alike. Every other solution keeps the static libzce.
+
+  The test is on $(SolutionName), so renaming the solution turns the switch off: the projects then
+  link the static libzce and HostVM stops on its HostVMNeedsZceDll check. HostVM.sln, the name
+  before KeelHost (ymwang78/KeelHost#49), is still taken, for older checkouts and branches.
 
   build_zce_dll.bat (Release) and build_zce_dll.bat Debug build the DLLs the solution links.
 -->
@@ -22,7 +26,7 @@
   </PropertyGroup>
   <Import Project="$(_CxxprojParentBuildProps)" Condition="Exists('$(_CxxprojParentBuildProps)')" />
 
-  <PropertyGroup Condition="'$(SolutionName)'=='HostVM' and '$(ForceImportAfterCppTargets)'==''">
+  <PropertyGroup Condition="('$(SolutionName)'=='KeelHost' or '$(SolutionName)'=='HostVM') and '$(ForceImportAfterCppTargets)'==''">
     <ForceImportAfterCppTargets>$(MSBuildThisFileDirectory)msbuild\zce_dll.props</ForceImportAfterCppTargets>
   </PropertyGroup>
 </Project>
