@@ -3,7 +3,7 @@
   Builds an MSBuild solution against the shared libzce: zce.dll / zcepy.dll instead of the static
   libzce.lib (ymwang78/HostVM#42, ymwang78/libzce#213). Not imported by any project: a build opts in
   with ForceImportAfterCppTargets=<this file>, so the projects stay unchanged and every other
-  solution keeps the static libzce. KeelHost.sln always does (ymwang78/HostVM#47): Directory.Build.props
+  solution keeps the static libzce. KeelHost.sln always does (ymwang78/KeelHost#47): Directory.Build.props
   sets it for that solution (and for HostVM.sln, its name before ymwang78/KeelHost#49), on the
   command line and in Visual Studio alike.
 
