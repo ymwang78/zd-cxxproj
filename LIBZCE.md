@@ -166,6 +166,14 @@ doc.append("key", value);  // 支持 int32, int64, double, bool, string
 - `zce::SHA1` - SHA-1 哈希
 - `zce::Base64` - base64 编码/解码
 
+### 数据库（zdb）
+
+- `zce::zdb::Database` - SQLite / PostgreSQL 关系库的统一接口（`zdb_rdb.h`）
+- SQLite 来自 libzsql（`libsrc/libzsql`，SQLite3 Multiple Ciphers），已编进 libzce，不要再链别的
+  SQLite。加密由连接串决定：`app.db?keymode=default`（内置默认密钥）、`keymode=passphrase;dbkey=...`、
+  `keymode=keellock;keylabel=main`（KeelLock 软件狗，程序先用 `zsql/zsql_klock.h` 装好提供器）；
+  明文旧库加 `migrate=1` 就地加密。直接用 SQLite API 时包含 `zsql/sqlite3.h` 与 `zsql/zsql.h`。
+
 ## 9. 协议支持
 
 - **HTTP** - `http_stream.h`
