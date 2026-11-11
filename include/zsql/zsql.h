@@ -106,8 +106,14 @@ typedef struct zsql_key {
     int passphrase_len;
     /** ZSQL_KEY_KEELLOCK: which database key the provider derives. NULL or "" means "main". */
     const char* label;
-    /** Non-zero: a plaintext database is encrypted in place with this key while it is opened.
-     *  Zero: opening a plaintext database with a key fails with ZSQL_E_PLAINTEXT. */
+    /** Non-zero: a plaintext database is encrypted in place with this key while it is opened,
+     *  keeping its rows, rowids and schema. No other connection may have the file open.
+     *  Zero: opening a plaintext database with a key fails with ZSQL_E_PLAINTEXT.
+     *
+     *  If the migration fails because the key cannot be had, the file is not touched. If it
+     *  fails later (an I/O error, say), the file is still a valid plaintext database with the
+     *  same rows, rowids, schema and journal mode, possibly vacuumed to 4096-byte pages: each
+     *  step is one SQLite transaction. */
     int migrate_plaintext;
 } zsql_key;
 
@@ -135,9 +141,11 @@ ZSQL_API void zsql_set_keellock_provider(zsql_key_provider provider, void* ctx);
 /**
  * Open a database and key it.
  *
- * Works like sqlite3_open_v2(), then keys the "main" database with zsql_key_db() when @p key
- * asks for one. Unlike sqlite3_open_v2(), on failure the connection is closed and *@p db is
- * NULL; use zsql_errstr() for the message.
+ * Works like sqlite3_open_v2(), then keys the "main" database as zsql_key_db() does when @p key
+ * asks for one. The key is produced once, before the file is opened, so a key that cannot be
+ * had leaves the file as it was and a KeelLock provider is called once per open, migration
+ * included. Unlike sqlite3_open_v2(), on failure the connection is closed and *@p db is NULL;
+ * use zsql_errstr() for the message.
  *
  * @param key NULL or ZSQL_KEY_NONE opens without a key, exactly as sqlite3_open_v2() does.
  */
