@@ -24,8 +24,10 @@ This directory contains all C++ projects with a shared structure for common depe
 
 Exception: vendored third-party code keeps its upstream bytes, so that it can be compared with and
 upgraded from upstream; it gets no BOM. That covers the Lua headers in `include/zce/lua/` (the
-only local change is the `LUA_API` block of `luaconf.h`), `include/pybind11`, `include/Eigen`,
-`include/sol` and the like, as libzce's `scripts/check_encoding.py` exempts its vendor trees.
+only local change is the `LUA_API` block of `luaconf.h`), `include/zsql/sqlite3mc_amalgamation.h`
+(SQLite3 Multiple Ciphers, the header of libzsql's vendored amalgamation), `include/pybind11`,
+`include/Eigen`, `include/sol` and the like, as libzce's `scripts/check_encoding.py` exempts its
+vendor trees.
 
 ## Coding Standards
 
@@ -169,6 +171,15 @@ Lua 5.4.9 is compiled into libzce and exported from it: use the headers in `incl
 embedded Python runtime (`include/zce/zce_py_api.h`) is inside a static `libzce.a`; when libzce
 is built as a shared library it is a shared library of its own, libzcepy, which code calling
 `zce_init_pyenv()`, running a Python VM or using `zce_pybind11.h` links as well.
+
+### SQLite
+SQLite is libzsql (`libsrc/libzsql`): SQLite3 Multiple Ciphers with the key modes of
+`include/zsql/zsql.h` (none, default secret, passphrase, KeelLock). libzce compiles its objects
+into `libzce.a` / `libzce.so` / `zce.dll` / `libzce.lib`, so code that links libzce uses
+`zsql/sqlite3.h` and links no other SQLite (not vcpkg's sqlite3): two SQLites in one process
+break each other's POSIX locks on a shared file. zdb picks the key from the connection string
+(`path?keymode=default`, `keymode=keellock;keylabel=main`, `dbkey=<passphrase>`, `migrate=1`);
+see `Database(ERV_DATABASE, const zce_astring&)` in `include/zce/zdb_rdb.h`.
 
 ### ABI version
 A change to a header in `include/zce/` that breaks modules built against the old one (class

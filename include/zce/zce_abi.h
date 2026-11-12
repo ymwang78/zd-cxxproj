@@ -40,8 +40,12 @@
  * - 3: (ymwang78/libzce#213) libzce builds as a shared library: ZCE_API exports and imports,
  *      Socket and DnsResolve have destructors in libzce, and the classes zce.dll exports with a
  *      pimpl delete their copy operations.
+ * - 4: (ymwang78/libzce#265) SQLite comes from libzsql, SQLite3 Multiple Ciphers 2.6.1 on
+ *      SQLite 3.54.0 where libzce had SQLite 3.12.2, and a shared libzce exports the sqlite3_*,
+ *      sqlite3mc_* and zsql_* functions (zsql/zsql.h) for modules to use instead of a SQLite
+ *      of their own.
  */
-#define ZCE_ABI_VERSION 3
+#define ZCE_ABI_VERSION 4
 
 #define ZCE_ABI_STR_(x) #x
 #define ZCE_ABI_STR(x) ZCE_ABI_STR_(x)

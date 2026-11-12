@@ -25,8 +25,8 @@ namespace zdb {
  * hold one; zdb_connstr_parser() states the exact contract.
  *
  * For Database::ERV_DATABASE_SQLITE only @a dbname is used, as the database file path
- * (its "path?threadsafe=..;dbkey=.." suffix is still honoured); the other fields are
- * ignored.
+ * (its "path?setting;..." suffix is honoured, see Database(ERV_DATABASE, const zce_astring&));
+ * the other fields are ignored.
  */
 struct ConnectionParams {
     std::string host;      ///< Host name or address; backend default is used when empty.
@@ -334,8 +334,22 @@ class ZCE_API Database : public zce::Object {
      * a credential holding '/' is rejected; and a ':' in the user name is read as
      * "user:password" with no way to tell. A string the parser rejects makes the
      * connection fail to open rather than reach an unintended target. Reach for the
-     * ConnectionParams overload when a field may hold one of those characters. SQLite
-     * takes the whole string as its database file path.
+     * ConnectionParams overload when a field may hold one of those characters.
+     *
+     * SQLite (libzsql) takes "path[?setting;setting;...]" instead, with these settings:
+     * - threadsafe=1|2|3: the sqlite3_config() threading mode, the same for every database
+     *   of the process (default 2, SQLITE_CONFIG_MULTITHREAD);
+     * - keymode=none|default|passphrase|keellock: how the file is encrypted (zsql/zsql.h);
+     *   none, the default, is a plaintext database;
+     * - dbkey=<passphrase>: the passphrase of keymode=passphrase; on its own it means
+     *   keymode=passphrase;
+     * - keylabel=<label>: which key the KeelLock provider derives (default "main");
+     * - migrate=1: encrypt a plaintext database in place when it is opened with a key; without
+     *   it such a database is refused and left as it is;
+     * - anything else runs as SQL right after the open, such as "PRAGMA journal_mode=WAL".
+     * A key that does not open the file, or a keymode that cannot produce one, makes
+     * getConnection() return null; the connection never falls back to plaintext. Backups
+     * (Connection::backup()) are keyed like their source.
      */
     Database(ERV_DATABASE e, const zce_astring& connection_str);
 
