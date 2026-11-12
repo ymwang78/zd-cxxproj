@@ -107,14 +107,17 @@ build_module modules/TaijiMPC -DBUILD_TESTS=ON -DENABLE_PYTHON_BINDING=ON
 build_module modules/fgw -DFGW_BUILD_TESTS=OFF
 # KeelBase (checked out as modules/KeelBase; named modules/tdb before 2026-11-09) on the shared
 # libzce (ymwang78/HostVM#45): its plugin bin/<arch>/modules/KeelBase, which carries
-# libxds_client.so for SoftSensor and KeelTrace, so it comes before them. HostVM no longer builds it.
+# libxds_client.so for FrontSensor and KeelTrace, so it comes before them. HostVM no longer builds it.
 ZCE_SHARED_LIB="$CXXPROJ_PATH/lib/linux_$(uname -m)/libzce.so"
 # Its own install rules (libtdb.a, kbase_api.h) go to a private prefix; the plugin installs into
 # bin/<arch>/modules/KeelBase by itself.
 KBASE_ARGS=(-DBUILD_TESTS=OFF -DBUILD_EXAMPLES=OFF -DBUILD_BENCH=OFF -DKBASE_ZDL_LIBRARY=
            -DCMAKE_INSTALL_PREFIX="$CXXPROJ_PATH/modules/KeelBase/build/install")
 build_module modules/KeelBase "${KBASE_ARGS[@]}" -DKBASE_ZCE_LIBRARY="$ZCE_SHARED_LIB" -DZCE_LIBRARY="$ZCE_SHARED_LIB"
-build_module modules/softsensor
+# FrontSensor (checked out as modules/FrontSensor; ymwang78/libsoftsensor in modules/softsensor before
+# 2026-11): its root CMakeLists builds backend/, whose module plugin is bin/<arch>/modules/FrontSensor
+# (vmtype FrontSensor; modules/SoftSensor before, removed by its install step).
+build_module modules/FrontSensor
 build_module modules/KeelTrace -DKEELTRACE_BUILD_PLUGIN=OFF
 build_module modules/KeelSim -DKEELSIM_BUILD_PLUGIN=OFF
 build_module tools/zGen
