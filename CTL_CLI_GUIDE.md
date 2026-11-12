@@ -14,7 +14,7 @@ All `*ctl` command-line tools in this project follow a **two-layer CLI design**:
 | Layer | Tool | Scope |
 |-------|------|-------|
 | **Layer 1** | `keelhostctl` | Host-level: enumerate and manage all VM instances running on a remote host |
-| **Layer 2** | `mpcctrl`, `softsensorctrl`, `pbcctrl`, … | Service-level: operate one specific VM instance of that service type |
+| **Layer 2** | `mpcctrl`, `frontsensorctrl`, `pbcctrl`, … | Service-level: operate one specific VM instance of that service type |
 
 Both layers communicate via the **ZCE ZVM RPC** framework (`zce::zvm::VirtualMachineStub`). The host is addressed through the `KEELHOST` environment variable (`HOSTVM` is still accepted) or the `--host` flag.
 
@@ -382,21 +382,21 @@ re-pull the whole round when it changes — incremental top-ups no longer line u
 
 ---
 
-### 5. `softsensorctrl` — SoftSensor Instance Control
+### 5. `frontsensorctrl` — FrontSensor Instance Control
 
-`softsensorctrl` is the Layer 2 CTL tool for the `libsoftsensor` / `SoftSensor` service
-(module `modules/softsensor`). It drives the online end of a FrontSensor soft sensor:
+`frontsensorctrl` is the Layer 2 CTL tool for the `FrontSensor` service (vmtype `FrontSensor`, the online
+engine in `modules/FrontSensor/backend`; `softsensorctrl` / vmtype `SoftSensor` before 2026-11). It drives the online end of a FrontSensor soft sensor:
 configuration, tag binding, the estimation loop, closed-loop lab calibration, prediction
 history export, and the three Python script hooks.
 
-> **Naming.** The §7 rule would spell it `softsensorctl`. This tool follows the migration
-> plan and the existing `mpcctrl` instead — `softsensorctrl`. It is the one documented
+> **Naming.** The §7 rule would spell it `frontsensorctl`. This tool follows the migration
+> plan and the existing `mpcctrl` instead — `frontsensorctrl`. It is the one documented
 > exception; new tools should follow §7.
 
 #### 5.1 Synopsis
 
 ```
-[HOSTVM=ip:port] softsensorctrl <instance> <noun> <verb> [args...] [flags...]
+[HOSTVM=ip:port] frontsensorctrl <instance> <noun> <verb> [args...] [flags...]
 ```
 
 `<instance>` is the `vmname` from `hostvm.xml`. Instance ports live in **22610–22699**
@@ -420,37 +420,37 @@ history export, and the three Python script hooks.
 
 ```bash
 # Summary, or the full config file with --file
-softsensorctrl ss1 project download [--file p.zssm]
-softsensorctrl ss1 project upload --file p.zssm     # whole-config replace
-softsensorctrl ss1 project reload                   # re-read from disk
-softsensorctrl ss1 project status                   # instance / runtime state
+frontsensorctrl ss1 project download [--file p.zssm]
+frontsensorctrl ss1 project upload --file p.zssm     # whole-config replace
+frontsensorctrl ss1 project reload                   # re-read from disk
+frontsensorctrl ss1 project status                   # instance / runtime state
 
 # Single-field edits. The trailing index is the sensor index for sensor-scoped fields.
-softsensorctrl ss1 project set sample-period 60
-softsensorctrl ss1 project set correction-coef 0.5 0
-softsensorctrl ss1 project str datasource-uri "opc.da://10.0.0.5/OPC.Server.1"
+frontsensorctrl ss1 project set sample-period 60
+frontsensorctrl ss1 project set correction-coef 0.5 0
+frontsensorctrl ss1 project str datasource-uri "opc.da://10.0.0.5/OPC.Server.1"
 ```
 
-Field names are listed by `softsensorctrl --help`.
+Field names are listed by `frontsensorctrl --help`.
 
 #### 5.4 Sensor, Model and Tag Commands
 
 ```bash
-softsensorctrl ss1 sensor list
-softsensorctrl ss1 sensor add "TC-101" .        # "." = append
-softsensorctrl ss1 sensor del 2
-softsensorctrl ss1 model import 0 --file TC101.ssmdl
+frontsensorctrl ss1 sensor list
+frontsensorctrl ss1 sensor add "TC-101" .        # "." = append
+frontsensorctrl ss1 sensor del 2
+frontsensorctrl ss1 model import 0 --file TC101.ssmdl
 
 # tag set <scope> <sensor-idx> <var-idx> <tag> [rw] [type]
 #   scope: input | output | lab-value | lab-time | lab-ack | custom
 #   rw:    local | read | write | rdwrt     (default read)
 #   type:  long | double | bool             (default double)
-softsensorctrl ss1 tag set input  0 0 TI101 read
-softsensorctrl ss1 tag set output 0 0 AI_TC101 write
-softsensorctrl ss1 tag set lab-ack 0 0 LAB_ACK rdwrt    # must be writable
+frontsensorctrl ss1 tag set input  0 0 TI101 read
+frontsensorctrl ss1 tag set output 0 0 AI_TC101 write
+frontsensorctrl ss1 tag set lab-ack 0 0 LAB_ACK rdwrt    # must be writable
 
-softsensorctrl ss1 tag verify                   # read every bound tag once
-softsensorctrl ss1 tag list
+frontsensorctrl ss1 tag verify                   # read every bound tag once
+frontsensorctrl ss1 tag list
 ```
 
 `lab-time` takes `<var-idx>` 0..5 for the year/month/day/hour/minute/second tags.
@@ -458,24 +458,24 @@ softsensorctrl ss1 tag list
 #### 5.5 Run and Lab Commands
 
 ```bash
-softsensorctrl ss1 run start
-softsensorctrl ss1 run status
-softsensorctrl ss1 run stop                     # runtime state is flushed to disk
+frontsensorctrl ss1 run start
+frontsensorctrl ss1 run status
+frontsensorctrl ss1 run stop                     # runtime state is flushed to disk
 
 # <time>: omitted or '.' = now, digits = UTC unix seconds,
 #         "YYYY-MM-DD HH:MM:SS" = LOCAL wall clock (same as the DCS lab-time tags)
-softsensorctrl ss1 lab submit 0 128.5 "2026-08-27 13:45:30"
-softsensorctrl ss1 lab history 0
+frontsensorctrl ss1 lab submit 0 128.5 "2026-08-27 13:45:30"
+frontsensorctrl ss1 lab history 0
 ```
 
 #### 5.6 History Export
 
 ```bash
 # By global index: start='.' means oldest, count=0 means all
-softsensorctrl ss1 his export 0 [<start>] [<count>]
+frontsensorctrl ss1 his export 0 [<start>] [<count>]
 
 # By TIME RANGE (either form, not both); '.' on one side leaves it open
-softsensorctrl ss1 his export 0 --from "2026-08-27 08:00:00" --to .                                 --local-time --file new.csv
+frontsensorctrl ss1 his export 0 --from "2026-08-27 08:00:00" --to .                                 --local-time --file new.csv
 ```
 
 CSV columns: `index,timestamp_utc[,timestamp_local],predicted,y_model,bias,calc_status`.
@@ -485,10 +485,10 @@ a mis-converted timezone is visible on the spot.
 #### 5.7 Script and OPC Commands
 
 ```bash
-softsensorctrl ss1 script get [<kind>] [--file p.py]   # kind: init|input|output
-softsensorctrl ss1 script set <kind> --file p.py       # rejected while estimating
-softsensorctrl ss1 script exec <kind>                  # dry-run on a snapshot
-softsensorctrl ss1 opc servers 10.0.0.5
+frontsensorctrl ss1 script get [<kind>] [--file p.py]   # kind: init|input|output
+frontsensorctrl ss1 script set <kind> --file p.py       # rejected while estimating
+frontsensorctrl ss1 script exec <kind>                  # dry-run on a snapshot
+frontsensorctrl ss1 opc servers 10.0.0.5
 ```
 
 `script exec` runs on a snapshot: no DCS write, no runtime change. It prints stdout and,
@@ -515,13 +515,13 @@ on failure, the traceback, exiting `3`.
 | `script set` / `script exec` | `setScript` / `executeScript` |
 | `opc servers` | `enumOpcServers` |
 
-#### 5.9 Companion Tool: `softsensor_paracmp`
+#### 5.9 Companion Tool: `frontsensor_paracmp`
 
-Shipped alongside `softsensorctrl`, but **not** a CTL tool — it never connects to a
+Shipped alongside `frontsensorctrl`, but **not** a CTL tool — it never connects to a
 KeelHost. It compares two prediction series (VB6 legacy vs. the new system) offline:
 
 ```bash
-softsensor_paracmp vb.csv new.csv --ref-time "时间" --ref-value "预估值" \
+frontsensor_paracmp vb.csv new.csv --ref-time "时间" --ref-value "预估值" \
                                   --tol 0.05 --align-tol 30 --warmup 25
 ```
 
@@ -535,7 +535,7 @@ every single point inside tolerance while still meaning a constant term is wrong
 
 Its exit codes are therefore **different** from the CTL set (§8): `0` all criteria passed,
 `1` usage/file error, `2` a criterion failed, `3` nothing comparable lined up.
-Full usage in `modules/softsensor/manual/PARALLEL_RUN.md`.
+Full usage in `modules/FrontSensor/backend/manual/PARALLEL_RUN.md`.
 
 #### 5.10 Config Edits Are Rejected While Estimating
 
@@ -690,7 +690,7 @@ namespace ctl_output {
 | 层级 | 工具 | 职责 |
 |------|------|------|
 | **第一层** | `keelhostctl` | 主机层：枚举和管理远程主机上运行的所有 VM 实例 |
-| **第二层** | `mpcctrl`、`softsensorctrl`、`pbcctrl` 等 | 服务层：对该服务类型的某个具体 VM 实例进行操作 |
+| **第二层** | `mpcctrl`、`frontsensorctrl`、`pbcctrl` 等 | 服务层：对该服务类型的某个具体 VM 实例进行操作 |
 
 两层均通过 **ZCE ZVM RPC** 框架（`zce::zvm::VirtualMachineStub`）通信。主机地址通过环境变量 `KEELHOST`（`HOSTVM` 继续认）或 `--host` 参数指定。
 
@@ -1038,19 +1038,20 @@ NaN 或占位点来表示间隔——隔了多久由两侧真实时间戳说了�
 
 ---
 
-### 5. `softsensorctrl` — SoftSensor 实例控制
+### 5. `frontsensorctrl` — FrontSensor 实例控制
 
-`softsensorctrl` 是 `libsoftsensor` / `SoftSensor` 服务（模块 `modules/softsensor`）的
+`frontsensorctrl` 是 `FrontSensor` 服务（vmtype `FrontSensor`，在线引擎在 `modules/FrontSensor/backend`；
+2026-11 前叫 `softsensorctrl` / vmtype `SoftSensor`）的
 第二层 CTL 工具。它管的是 FrontSensor 软测量的**在线端**：组态、位号绑定、周期估计、
 化验闭环校正、预测历史导出，以及三个 Python 脚本挂点。
 
-> **命名。** 按 §7 的通则应该叫 `softsensorctl`。这个工具跟随迁移计划与既有的
-> `mpcctrl`，用 **`softsensorctrl`**。这是唯一一个成文的例外，新工具请按 §7 命名。
+> **命名。** 按 §7 的通则应该叫 `frontsensorctl`。这个工具跟随迁移计划与既有的
+> `mpcctrl`，用 **`frontsensorctrl`**。这是唯一一个成文的例外，新工具请按 §7 命名。
 
 #### 5.1 语法
 
 ```
-[HOSTVM=ip:port] softsensorctrl <实例名> <名词> <动词> [参数...] [选项...]
+[HOSTVM=ip:port] frontsensorctrl <实例名> <名词> <动词> [参数...] [选项...]
 ```
 
 `<实例名>` 就是 `hostvm.xml` 里的 `vmname`。实例端口在 **22610–22699**（避开 MPC 的
@@ -1074,37 +1075,37 @@ NaN 或占位点来表示间隔——隔了多久由两侧真实时间戳说了�
 
 ```bash
 # 不带 --file 打摘要，带 --file 写出与服务端落盘同格式的完整组态
-softsensorctrl ss1 project download [--file p.zssm]
-softsensorctrl ss1 project upload --file p.zssm     # 整份替换
-softsensorctrl ss1 project reload                   # 从磁盘重新载入
-softsensorctrl ss1 project status                   # 实例 / 运行态状态
+frontsensorctrl ss1 project download [--file p.zssm]
+frontsensorctrl ss1 project upload --file p.zssm     # 整份替换
+frontsensorctrl ss1 project reload                   # 从磁盘重新载入
+frontsensorctrl ss1 project status                   # 实例 / 运行态状态
 
 # 单字段编辑。末尾那个下标是软测量下标（仅软测量级字段需要）
-softsensorctrl ss1 project set sample-period 60
-softsensorctrl ss1 project set correction-coef 0.5 0
-softsensorctrl ss1 project str datasource-uri "opc.da://10.0.0.5/OPC.Server.1"
+frontsensorctrl ss1 project set sample-period 60
+frontsensorctrl ss1 project set correction-coef 0.5 0
+frontsensorctrl ss1 project str datasource-uri "opc.da://10.0.0.5/OPC.Server.1"
 ```
 
-字段名清单见 `softsensorctrl --help`。
+字段名清单见 `frontsensorctrl --help`。
 
 #### 5.4 软测量、模型与位号命令
 
 ```bash
-softsensorctrl ss1 sensor list
-softsensorctrl ss1 sensor add "TC-101" .        # "." = 追加到末尾
-softsensorctrl ss1 sensor del 2
-softsensorctrl ss1 model import 0 --file TC101.ssmdl
+frontsensorctrl ss1 sensor list
+frontsensorctrl ss1 sensor add "TC-101" .        # "." = 追加到末尾
+frontsensorctrl ss1 sensor del 2
+frontsensorctrl ss1 model import 0 --file TC101.ssmdl
 
 # tag set <作用域> <软测量下标> <变量下标> <位号> [读写] [类型]
 #   作用域: input | output | lab-value | lab-time | lab-ack | custom
 #   读写:   local | read | write | rdwrt     (默认 read)
 #   类型:   long | double | bool             (默认 double)
-softsensorctrl ss1 tag set input  0 0 TI101 read
-softsensorctrl ss1 tag set output 0 0 AI_TC101 write
-softsensorctrl ss1 tag set lab-ack 0 0 LAB_ACK rdwrt    # 必须可写: 结算完要写回 0
+frontsensorctrl ss1 tag set input  0 0 TI101 read
+frontsensorctrl ss1 tag set output 0 0 AI_TC101 write
+frontsensorctrl ss1 tag set lab-ack 0 0 LAB_ACK rdwrt    # 必须可写: 结算完要写回 0
 
-softsensorctrl ss1 tag verify                   # 每个绑定的位号读一次，报坏的
-softsensorctrl ss1 tag list
+frontsensorctrl ss1 tag verify                   # 每个绑定的位号读一次，报坏的
+frontsensorctrl ss1 tag list
 ```
 
 `lab-time` 的 `<变量下标>` 是 0..5，对应 年/月/日/时/分/秒 六个位号。
@@ -1112,24 +1113,24 @@ softsensorctrl ss1 tag list
 #### 5.5 运行与化验命令
 
 ```bash
-softsensorctrl ss1 run start
-softsensorctrl ss1 run status
-softsensorctrl ss1 run stop                     # 运行态落盘
+frontsensorctrl ss1 run start
+frontsensorctrl ss1 run status
+frontsensorctrl ss1 run stop                     # 运行态落盘
 
 # <时刻>: 省略或 '.' = 现在；纯数字 = UTC unix 秒；
 #         "YYYY-MM-DD HH:MM:SS" = **本地墙钟**（与 DCS 那 6 个化验时刻位号同一口径）
-softsensorctrl ss1 lab submit 0 128.5 "2026-08-27 13:45:30"
-softsensorctrl ss1 lab history 0
+frontsensorctrl ss1 lab submit 0 128.5 "2026-08-27 13:45:30"
+frontsensorctrl ss1 lab history 0
 ```
 
 #### 5.6 历史导出
 
 ```bash
 # 按全局序号: start 写 '.' 表示从最早那一点开始，count 写 0 表示到最新
-softsensorctrl ss1 his export 0 [<start>] [<count>]
+frontsensorctrl ss1 his export 0 [<start>] [<count>]
 
 # 按**时间段**（与上面二选一，不能同时给）；一侧写 '.' 表示这一头不限
-softsensorctrl ss1 his export 0 --from "2026-08-27 08:00:00" --to .                                 --local-time --file new.csv
+frontsensorctrl ss1 his export 0 --from "2026-08-27 08:00:00" --to .                                 --local-time --file new.csv
 ```
 
 CSV 列：`index,timestamp_utc[,timestamp_local],predicted,y_model,bias,calc_status`。
@@ -1139,10 +1140,10 @@ CSV 列：`index,timestamp_utc[,timestamp_local],predicted,y_model,bias,calc_sta
 #### 5.7 脚本与 OPC 命令
 
 ```bash
-softsensorctrl ss1 script get [<段>] [--file p.py]   # 段: init|input|output
-softsensorctrl ss1 script set <段> --file p.py       # 估计运行中会被拒
-softsensorctrl ss1 script exec <段>                  # 在快照上试运行
-softsensorctrl ss1 opc servers 10.0.0.5
+frontsensorctrl ss1 script get [<段>] [--file p.py]   # 段: init|input|output
+frontsensorctrl ss1 script set <段> --file p.py       # 估计运行中会被拒
+frontsensorctrl ss1 script exec <段>                  # 在快照上试运行
+frontsensorctrl ss1 opc servers 10.0.0.5
 ```
 
 `script exec` 跑在**快照**上：不写 DCS、不改运行态。它把 stdout 打出来，失败时打完整
@@ -1169,13 +1170,13 @@ traceback 并以退出码 `3` 结束。
 | `script set` / `script exec` | `setScript` / `executeScript` |
 | `opc servers` | `enumOpcServers` |
 
-#### 5.9 配套工具：`softsensor_paracmp`
+#### 5.9 配套工具：`frontsensor_paracmp`
 
-与 `softsensorctrl` 一起随包，但**不是** CTL 工具——它一次都不连 KeelHost。它离线比对
+与 `frontsensorctrl` 一起随包，但**不是** CTL 工具——它一次都不连 KeelHost。它离线比对
 两条预测序列（VB6 存量系统 vs 新系统）：
 
 ```bash
-softsensor_paracmp vb.csv new.csv --ref-time "时间" --ref-value "预估值" \
+frontsensor_paracmp vb.csv new.csv --ref-time "时间" --ref-value "预估值" \
                                   --tol 0.05 --align-tol 30 --warmup 25
 ```
 
@@ -1186,7 +1187,7 @@ softsensor_paracmp vb.csv new.csv --ref-time "时间" --ref-value "预估值" \
 
 所以它的退出码与 CTL 那一套（§8）**刻意不同**：`0` 全部判据通过，`1` 用法/文件错误，
 `2` 有判据没过，`3` 对齐不上（没有可比的点）。完整用法见
-`modules/softsensor/manual/PARALLEL_RUN.md`。
+`modules/FrontSensor/backend/manual/PARALLEL_RUN.md`。
 
 #### 5.10 估计运行中，组态类命令一律被拒
 
