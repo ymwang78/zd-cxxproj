@@ -99,7 +99,9 @@ KEELHOST_DIR=hosts/KeelHost
 build_module "$KEELHOST_DIR"
 build_module libsrc/libzdl -DBUILD_TESTS=ON
 build_module libsrc/libidh -DUSE_CUSTOM_STATIC_LIBS=OFF -DBUILD_TESTS=ON
-build_module modules/ident
+# TaijiIdent (checked out as modules/TaijiIdent; libident in modules/ident before 2026-11-12): its
+# root CMakeLists builds backend/, whose module plugin is still bin/<arch>/modules/ident (vmtype ident).
+build_module modules/TaijiIdent
 build_module modules/SailCoin
 build_module modules/TaijiMPC -DBUILD_TESTS=ON -DENABLE_PYTHON_BINDING=ON
 build_module modules/fgw -DFGW_BUILD_TESTS=OFF
