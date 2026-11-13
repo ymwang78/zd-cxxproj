@@ -48,9 +48,9 @@ class TaskQueue;
  *   in the order they come. The exit callback is the last one. Dropping the last reference to the
  *   ChildProcess kills the tree, and no callback starts after that.
  *
- * Each method may be called from any thread. Called from another thread, it runs on the Reactor's
- * thread and waits for it there, so it must not be called from a thread the Reactor's thread waits
- * for.
+ * start() and kill() may be called from any thread. Called from another thread, they run on the
+ * Reactor's thread and wait for it there, so they must not be called from a thread the Reactor's
+ * thread waits for. The destructor does not wait.
  */
 class ZCE_API ChildProcess : public zce::Object {
     ZCE_OBJECT_DECLARE;
@@ -86,17 +86,20 @@ class ZCE_API ChildProcess : public zce::Object {
     explicit ChildProcess(const zce::SmartPtr<Reactor>& reactor,
                           const zce::SmartPtr<TaskQueue>& syncque = zce::SmartPtr<TaskQueue>());
 
-    /// Kills the tree if the child still runs. No callback starts after it.
+    /// Kills the tree if the child still runs, without waiting for the Reactor's thread, even past
+    /// its delegate cap. No callback starts after it. When the Reactor has stopped, the handles
+    /// are closed here and the Reactor is not held any more; a POSIX child is also reaped.
     ~ChildProcess();
 
     ChildProcess(const ChildProcess&) = delete;
     ChildProcess& operator=(const ChildProcess&) = delete;
 
     /**
-     * @brief Starts the program. A ChildProcess starts once.
+     * @brief Starts the program. A ChildProcess starts once: any later call returns -1, after a
+     * failed one too. To try another program, use another ChildProcess.
      * @return 0, or a negative error: libuv's (UV_ENOENT when there is no such program, UV_EINVAL
-     * for an empty argv or a bad variable name), or -1 when it was started before, or the Reactor
-     * does not run or refused the call.
+     * for an empty argv or a bad variable name), or -1 when start() was called before, or the
+     * Reactor does not run or refused the call.
      */
     int start(const Options& options, const OutputCallback& on_output, const ExitCallback& on_exit);
 
