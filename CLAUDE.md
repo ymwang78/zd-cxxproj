@@ -150,6 +150,8 @@ See `ZDL_PROTOCOL.md` for the complete syntax reference, type mappings, code gen
 - Logging (ZLOG macros)
 - Thread management (zce::Thread, zce::Task)
 - Timers (zce::Timer, not sleep loops)
+- Child processes (zce::ChildProcess: argv without a shell, output through pipes, the whole
+  process tree killed; not fork, CreateProcess or uv_spawn)
 - Data structures (zce::Array, zce::Hash, zce::SafeMap)
 - Serialization (BSON, ZDS)
 
