@@ -44,8 +44,11 @@
  *      SQLite 3.54.0 where libzce had SQLite 3.12.2, and a shared libzce exports the sqlite3_*,
  *      sqlite3mc_* and zsql_* functions (zsql/zsql.h) for modules to use instead of a SQLite
  *      of their own.
+ * - 5: (ymwang78/libzce#268) zce::ChildProcess (zce/zce_child_process.h): modules start
+ *      programs of their own, with their process trees, through libzce, which a libzce of
+ *      version 4 does not export (ymwang78/KeelTask runs each task that way).
  */
-#define ZCE_ABI_VERSION 4
+#define ZCE_ABI_VERSION 5
 
 #define ZCE_ABI_STR_(x) #x
 #define ZCE_ABI_STR(x) ZCE_ABI_STR_(x)

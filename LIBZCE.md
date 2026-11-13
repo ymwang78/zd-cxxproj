@@ -154,7 +154,10 @@ doc.append("key", value);  // 支持 int32, int64, double, bool, string
 - `zce/lua/*.h` - Lua 5.4.9 编在 libzce 里并从它导出；模块用这里的头文件、链 libzce，不再自己链 Lua
 - 共享库 - `cmake -DBUILD_SHARED_LIBS=ON` 出 `libzce.so.<ABI>` / `zce.dll`（libzdl 编在里面）与 `libzcepy.so.<ABI>` / `zcepy.dll`；按路径链 `zce.lib` 的代码自己定义 `ZCE_DLL`（同时链 `zcepy.lib` 的再定义 `ZCEPY_DLL`）并关掉 C4251（`/wd4251`）
 - `zce_abi.h` - `ZCE_ABI_VERSION` / `ZCE_BUILD_ID` 与 `zce_abi_check()`：插件加载时核对它与宿主进程里的 libzce 是否用兼容的头文件、同一套编译器 / 标准库 / 配置编出来
-- `zce::Process` - 进程管理
+- `zce::Process` - 进程管理（HostVM worker：宿主自己的程序，经 zdp 管道和宿主通信）
+- `zce::ChildProcess`（`zce_child_process.h`）- 启动别的程序并等它结束：argv 不经 shell、环境变量叠加在继承的环境上、
+  stdout/stderr 经管道回调、退出在输出之后送达；`kill()` 连它启动的进程一起杀（POSIX 进程组 / Windows 作业对象），
+  子进程退出时它留下的进程也杀掉。模块要起子进程就用它，不要直接用 libuv、fork 或 CreateProcess
 - `zce::Filesystem` - 文件 I/O 辅助
 - `zce::CtrlCHandler` - 信号处理
 - `zce::Random` - 随机数生成
@@ -208,8 +211,9 @@ doc.append("key", value);  // 支持 int32, int64, double, bool, string
 2. **日志** - 使用 ZLOG 宏，不要自己实现日志系统
 3. **线程池** - 使用 zce::Task + TaskQueue，不要自己实现线程池
 4. **定时器** - 使用 zce::Timer，不要用 sleep 循环
-5. **数据结构** - 优先使用 zce::Array/Hash/SafeMap
-6. **序列化** - 使用 BSON 或 ZDS，不要自己实现二进制协议
+5. **子进程** - 使用 zce::ChildProcess，不要自己 fork / CreateProcess / uv_spawn
+6. **数据结构** - 优先使用 zce::Array/Hash/SafeMap
+7. **序列化** - 使用 BSON 或 ZDS，不要自己实现二进制协议
 
 ## CMake 集成示例
 
