@@ -87,8 +87,10 @@ class ZCE_API ChildProcess : public zce::Object {
                           const zce::SmartPtr<TaskQueue>& syncque = zce::SmartPtr<TaskQueue>());
 
     /// Kills the tree if the child still runs, without waiting for the Reactor's thread, even past
-    /// its delegate cap. No callback starts after it. When the Reactor has stopped, the handles
-    /// are closed here and the Reactor is not held any more; a POSIX child is also reaped.
+    /// its delegate cap. No callback starts after it. The handles are closed without waiting for
+    /// the exit, and a POSIX child is reaped: a Reactor that is stopping, or that is destroyed
+    /// after it stopped, finishes closing them without a restart. Called after the Reactor has
+    /// stopped, it does that work here and does not hold the Reactor any more.
     ~ChildProcess();
 
     ChildProcess(const ChildProcess&) = delete;
