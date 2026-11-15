@@ -55,11 +55,21 @@
        The static libzce also arrives as a link input of its own: VC++ links the outputs of what a
        referenced static library depends on, and a solution makes such libraries depend on the
        libzce project for the build order (KeelHost.sln's libkbase_vm does). A project linking zce.dll
-       drops those inputs, or the first symbol zce.dll does not export pulls a second libzce in. -->
+       drops those inputs, or the first symbol zce.dll does not export pulls a second libzce in.
+       Where a project names libzce.lib, zce.lib and zcepy.lib take its place in the list; only where
+       it does not do they go in front. The linker searches libraries in order and keeps the first
+       position of a library named twice, so a static library listed before libzce.lib
+       (libkbase_test: libkbase.lib;libzce.lib) must find zce.lib after it: that is where it gets its
+       SQLite references resolved before the linker reaches vcpkg's sqlite3.lib, which VcpkgAutoLink
+       adds later and which would otherwise bring a second SQLite in (LNK2005 against zce.lib). -->
   <Target Name="ZceDllSwapLibs" BeforeTargets="Link" Condition="'$(ZceDllApply)'=='true'">
     <ItemGroup>
       <Link>
-        <AdditionalDependencies>zce.lib;zcepy.lib;$([MSBuild]::Unescape($([System.String]::Copy('%(Link.AdditionalDependencies)').Replace('libzce.lib;','').Replace('libzdl.lib;','').Replace('lua.lib;',''))))</AdditionalDependencies>
+        <_ZceDllInPlace>$([System.String]::Copy('%(Link.AdditionalDependencies)').Contains('libzce.lib;'))</_ZceDllInPlace>
+      </Link>
+      <Link>
+        <AdditionalDependencies Condition="'%(Link._ZceDllInPlace)'=='True'">$([MSBuild]::Unescape($([System.String]::Copy('%(Link.AdditionalDependencies)').Replace('libzce.lib;','zce.lib;zcepy.lib;').Replace('libzdl.lib;','').Replace('lua.lib;',''))))</AdditionalDependencies>
+        <AdditionalDependencies Condition="'%(Link._ZceDllInPlace)'!='True'">zce.lib;zcepy.lib;$([MSBuild]::Unescape($([System.String]::Copy('%(Link.AdditionalDependencies)').Replace('libzdl.lib;','').Replace('lua.lib;',''))))</AdditionalDependencies>
       </Link>
       <Link Remove="@(Link)" Condition="'%(Filename)%(Extension)'=='libzce.lib' or '%(Filename)%(Extension)'=='libzdl.lib'" />
     </ItemGroup>
