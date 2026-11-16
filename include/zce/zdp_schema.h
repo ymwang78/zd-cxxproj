@@ -474,15 +474,22 @@ int unpack_array(std::vector<T>& val, const zce_byte* buf, zce_int32 size, int f
     int err = zdp_detail::check_array_count(alen);
     if (err < 0) return err;
 
-    // The count comes from the peer. Grow the vector one decoded element at a time, so that
-    // memory follows the bytes actually read rather than the claimed count, and decode into
-    // fresh elements, so that nothing left in val from an earlier decode survives. val is
-    // replaced only once every element has been read.
+    // The count comes from the peer. Every element takes at least one byte on the wire, so a
+    // count larger than the bytes left cannot be right; refusing it here costs no allocation.
+    // An element that reads no bytes is refused for the same reason: otherwise the loop would
+    // spin through the whole count without moving. Arrays of zero-byte elements (empty
+    // structs) are therefore not decodable, as in zds_unpack_array().
+    if (alen > size) return ZCE_ERROR_SHRTLEN;
+
+    // Grow the vector one decoded element at a time, so that memory follows the bytes actually
+    // read, and decode into fresh elements, so that nothing left in val from an earlier decode
+    // survives. val is replaced only once every element has been read.
     std::vector<T> decoded;
     try {
         for (int i = 0; i < alen; ++i) {
             decoded.emplace_back();
             len = zdp_unpack(decoded.back(), buf, size, version);
+            if (len == 0) return ZCE_ERROR_CORRUPT;
             CHECKLEN_MOVEBUF_ADDRET_DECSIZE;
         }
     } catch (const std::bad_alloc&) {
@@ -509,13 +516,23 @@ template <typename T>
 int unpack_ie_array(std::vector<T>& val, const zce_byte* buf, zce_int32 size, int /*fixed_len*/,
                     unsigned char version) {
     int len = 0, ret = 0;
-    do {
-        T tempval;
-        len = zdp_unpack(tempval, buf, size, version);
-        if (len == 0) break;
-        CHECKLEN_MOVEBUF_ADDRET_DECSIZE;
-        val.push_back(tempval);
-    } while (true);
+    // Decode into a local vector and replace val at the end, so that elements left in val from
+    // an earlier decode do not stay in front of the new ones, and val is unchanged on failure.
+    std::vector<T> decoded;
+    try {
+        do {
+            T tempval;
+            len = zdp_unpack(tempval, buf, size, version);
+            if (len == 0) break;
+            CHECKLEN_MOVEBUF_ADDRET_DECSIZE;
+            decoded.push_back(std::move(tempval));
+        } while (true);
+    } catch (const std::bad_alloc&) {
+        return ZCE_ERROR_MALLOC;
+    } catch (const std::length_error&) {
+        return ZCE_ERROR_MALLOC;
+    }
+    val.swap(decoded);
     return ret;
 }
 
