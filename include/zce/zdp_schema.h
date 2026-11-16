@@ -288,7 +288,10 @@ static inline int unpack_builtin_array(std::vector<T>& val, const zce_byte* buf,
         alen = fixed_len;
     }
 
-    if (alen == 0) return ret;
+    if (alen == 0) {
+        val.clear();
+        return ret;
+    }
 
     int err = zdp_detail::check_byte_count(alen, sizeof(T), len);
     if (err < 0) return err;
@@ -471,14 +474,23 @@ int unpack_array(std::vector<T>& val, const zce_byte* buf, zce_int32 size, int f
     int err = zdp_detail::check_array_count(alen);
     if (err < 0) return err;
 
-    err = zdp_detail::resize_vector(val, alen);
-    if (err < 0) return err;
-
-    typename std::vector<T>::iterator iter;
-    for (iter = val.begin(); iter != val.end(); ++iter) {
-        len = zdp_unpack(*iter, buf, size, version);
-        CHECKLEN_MOVEBUF_ADDRET_DECSIZE;
-    };
+    // The count comes from the peer. Grow the vector one decoded element at a time, so that
+    // memory follows the bytes actually read rather than the claimed count, and decode into
+    // fresh elements, so that nothing left in val from an earlier decode survives. val is
+    // replaced only once every element has been read.
+    std::vector<T> decoded;
+    try {
+        for (int i = 0; i < alen; ++i) {
+            decoded.emplace_back();
+            len = zdp_unpack(decoded.back(), buf, size, version);
+            CHECKLEN_MOVEBUF_ADDRET_DECSIZE;
+        }
+    } catch (const std::bad_alloc&) {
+        return ZCE_ERROR_MALLOC;
+    } catch (const std::length_error&) {
+        return ZCE_ERROR_MALLOC;
+    }
+    val.swap(decoded);
     return ret;
 }
 
