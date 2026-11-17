@@ -99,7 +99,7 @@ bool ZCE_API writeFile(const char* u8path, const void* buf, size_t len);
 class ZCE_API File : public zce::Object {
     handle_t handle_;
 
-    zce_byte block_size_;
+    unsigned block_size_;
 
     unsigned reserved_blocks_;
 
