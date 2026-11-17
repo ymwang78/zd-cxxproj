@@ -118,9 +118,11 @@ class BsonView {
 
     template<typename T>
     T as_type(const T& default_val = T()) const {
-        if constexpr(std::is_same_v<T, int8_t> || std::is_same_v<T, uint8_t> ||
+        if constexpr (std::is_same_v<T, int32_t>) {
+            return as_int32(default_val);
+        } else if constexpr (std::is_same_v<T, int8_t> || std::is_same_v<T, uint8_t> ||
             std::is_same_v<T, int16_t> || std::is_same_v<T, uint16_t> ||
-            std::is_same_v<T, int32_t> || std::is_same_v<T, uint32_t> ||
+            std::is_same_v<T, uint32_t> ||
             std::is_same_v<T, int64_t> || std::is_same_v<T, uint64_t>) {
             return (T)as_int64(default_val);
         } else if constexpr(std::is_same_v<T, double> || std::is_same_v<T, float>) {
@@ -139,7 +141,7 @@ class BsonView {
     template <typename T>
     std::vector<T> as_vector() const {
         std::vector<T> result;
-        if (!_valid || !BSON_ITER_HOLDS_ARRAY(&_iter)) return result;
+        if (!_valid || is_root() || !BSON_ITER_HOLDS_ARRAY(&_iter)) return result;
 
         bson_iter_t child;
         if (bson_iter_recurse(&_iter, &child)) {
@@ -164,7 +166,7 @@ class BsonView {
     template <typename T>
     std::vector<T> as_vector_from_binary() const {
         std::vector<T> result;
-        if (!_valid || !BSON_ITER_HOLDS_BINARY(&_iter)) return result;
+        if (!_valid || is_root() || !BSON_ITER_HOLDS_BINARY(&_iter)) return result;
 
         bson_subtype_t subtype;
         uint32_t len;
@@ -174,7 +176,9 @@ class BsonView {
 
         if (len % sizeof(T) == 0) {
             result.resize(len / sizeof(T));
-            std::memcpy(result.data(), data, len);
+            if (len > 0) {
+                std::memcpy(result.data(), data, len);
+            }
         }
         return result;
     }
@@ -182,7 +186,7 @@ class BsonView {
     template <typename T>
     std::vector<T> as_object_vector(std::function<T(const BsonView&)> deserializer) const {
         std::vector<T> result;
-        if (!_valid || !BSON_ITER_HOLDS_ARRAY(&_iter)) return result;
+        if (!_valid || is_root() || !BSON_ITER_HOLDS_ARRAY(&_iter)) return result;
 
         bson_iter_t child;
         if (bson_iter_recurse(&_iter, &child)) {
@@ -199,6 +203,10 @@ class BsonView {
     void for_each(std::function<void(const BsonView&)> callback) const;
 
   private:
+    inline bool is_root() const noexcept {
+        return _valid && _iter.off == 0 && _iter.type == 0;
+    }
+
     bson_iter_t _iter;
     bool _valid = false;
 };
