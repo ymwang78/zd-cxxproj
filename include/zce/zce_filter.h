@@ -59,7 +59,8 @@ class ZCE_API WordFilter : public zce::FileMonitor {
 
     int add(const wchar_t* str, unsigned size, ERV_FILTER level);
 
-    // if have block, return 1; normal ,return 0; err < 0;
+    /// @brief Filter/replace matched words in @p str in place.
+    /// @return Number of replaced characters (>= 0) on normal/mask, -2 if blocked (ERV_FILTER_BLOCK), -1 on error.
     int replace(wchar_t* str, unsigned size, wchar_t c);
 
     const std::set<std::wstring>& str_set() { return str_set_; }
