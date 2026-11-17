@@ -312,15 +312,20 @@ class ZCE_API HttpStream : public IStream {
      * A caller that declares a Content-Length beyond `length`, or
      * "Transfer-Encoding: chunked", and writes the rest of the body itself
      * must also close the connection itself when the connection ends: this
-     * call cannot tell when that body is complete.
+     * call cannot tell when that body is complete. Transfer codings other than
+     * "chunked" are not applied by write_ack().
      *
      * @param code HTTP status code.
      * @param buf the body, `length` bytes; may be null when `length` is 0.
      * @param length body length in bytes.
      * @param paramdict response headers. A body over 1 KB is gzip-encoded
      *        when the request accepts gzip and that makes it smaller, unless
-     *        `paramdict` has a "Force-Raw" entry; "Content-Encoding: gzip" is
-     *        then added here.
+     *        `paramdict` already specifies a non-empty "Content-Encoding"
+     *        (meaning `buf` is already encoded as declared, e.g. pre-compressed
+     *        with http_gzip() on a worker thread) or has a "Force-Raw" entry;
+     *        when write_ack() compresses the body itself,
+     *        "Content-Encoding: gzip" is added here. "Force-Raw" is consumed as
+     *        a control flag and not emitted as a response header.
      * @return what the stream's write() returned for the response: >= 0 once
      *         it is on its way, < 0 if it could not be written, including when
      *         status line and headers exceed 1 KB.
