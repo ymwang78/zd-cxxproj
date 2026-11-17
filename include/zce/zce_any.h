@@ -17,6 +17,7 @@
 #include <map>
 #include <vector>
 #include <limits>
+#include <utility>
 
 namespace zce {
 
@@ -129,8 +130,12 @@ class ZCE_API Any {
 
     Any& operator=(const Any& rhs) {
         if (this != &rhs) {
+            // Copy first, then destroy: rhs may live inside *this, as an element of
+            // its vector or dict (`node = node.dict().at(key)`), and ~Any() would
+            // free it before it was read (ymwang78/libzce#276).
+            Any copy(rhs);
             this->~Any();
-            new (this) Any(rhs);
+            new (this) Any(std::move(copy));
         }
         return *this;
     }
@@ -413,9 +418,9 @@ class ZCE_API Any {
         } else if constexpr (std::is_same<T, char>::value) {
             return (T*)str();
         } else if constexpr (std::is_integral<T>::value) {
-            return (T*)array<zce_byte>();
-        } else if constexpr (std::is_same<T, zce_byte>::value) {
-            return (T*)array<zce_byte>();
+            // array<T>(), not array<zce_byte>(): the latter only accepts 1-byte
+            // elements, so an int32 array came back as nullptr (ymwang78/libzce#276).
+            return (T*)array<T>();
         } else {
             if (is_object()) {
                 return dynamic_cast<T*>(object());
