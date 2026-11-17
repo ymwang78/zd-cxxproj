@@ -189,8 +189,9 @@ class StormRequester_impl : public StormRequester {
             }
 
             msgres = new RES;
-            ret = zdp::zdp_unpack(*msgres, dblockptr.rd_ptr() + head.len(),
-                                  dblockptr.length() - head.len(), head.rev());
+            // Bodies are ZDS, as zdp_serialize() writes them.
+            ret = zdp::zds_unpack(*msgres, dblockptr.rd_ptr() + head.len(),
+                                  (int)(dblockptr.length() - head.len()), nullptr, true);
             if (ret < 0) {
                 msgres = 0;
                 break;
