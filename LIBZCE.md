@@ -181,7 +181,6 @@ doc.append("key", value);  // 支持 int32, int64, double, bool, string
 
 - **HTTP** - `http_stream.h`
 - **WebSocket** - `webs.h`, `whp_stream.h`
-- **PTP** (专有传输协议) - `ptp_node.h`, `ptp_stream.h`
 - **RTP** (实时传输协议) - `rtp.h`, `rtp_stream.h`
 - **RTMP** (实时消息协议) - `rtmp_stream.h`
 
