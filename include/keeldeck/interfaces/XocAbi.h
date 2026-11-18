@@ -43,7 +43,9 @@
 //      LoadLibrary 阶段就解不出符号。既有虚表一格没动，老插件配新核心照常。
 // 7: IRemoteProject adds requiresInstanceEndpoint for host-managed projects.
 // 8: IProject adds canRenameProject() and renameProject() virtual slots (issue #462).
-#define XOC_PLUGIN_ABI_VERSION 8
+// 9: XocHost.h adds xocMarkWorkspaceModified() and xocPluginDisplayName(); ProjectFactory adds
+//    translateTypeName() and translateTypeDescription().
+#define XOC_PLUGIN_ABI_VERSION 9
 
 /**
  * @brief IXocPlugin 的 Qt 接口标识

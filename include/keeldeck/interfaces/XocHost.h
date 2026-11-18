@@ -50,9 +50,9 @@ XOC_API void xocMarkWorkspaceModified();
 XOC_API void xocMarkSolutionModified();
 
 /**
- * @brief 取插件在 branding.ini 的 [Plugins] 段中配置的 OEM 显示名
+ * @brief 取插件/工程类型在 branding.ini 的 [ProjectTypeNames] 段中配置的 OEM 显示名
  *
- * 例如 `[Plugins] KeelTask=TaijiTask` 时，传入 `"KeelTask"` 返回 `"TaijiTask"`；
+ * 例如 `[ProjectTypeNames] KeelTask=TaijiTask` 时，传入 `"KeelTask"` 返回 `"TaijiTask"`；
  * 未配置时返回 defaultName（若 defaultName 为空则返回去空白后的 pluginId）。
  */
 XOC_API QString xocPluginDisplayName(const QString& pluginId,

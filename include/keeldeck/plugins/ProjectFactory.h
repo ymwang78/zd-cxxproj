@@ -187,6 +187,16 @@ class XOC_API ProjectFactory : public QObject {
     static QString translateTypeText(const ProjectTypeInfo& typeInfo, const QString& source);
 
     /**
+     * @brief 取类型的本地化/OEM 显示名（优先读 branding.ini 的 [ProjectTypeNames]，再走翻译上下文）
+     */
+    static QString translateTypeName(const ProjectTypeInfo& typeInfo);
+
+    /**
+     * @brief 取类型的本地化描述文本
+     */
+    static QString translateTypeDescription(const ProjectTypeInfo& typeInfo);
+
+    /**
      * @brief Get project type names for UI display
      * @return List of display names
      */
