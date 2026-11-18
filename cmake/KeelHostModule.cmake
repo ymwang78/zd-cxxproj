@@ -94,7 +94,8 @@ function(keelhost_add_module target)
     endif()
     if(NOT EXISTS "${_zce}")
         message(FATAL_ERROR "keelhost_add_module(${target}): ${_zce} not found; build and install "
-                            "the shared libzce first (build.sh / build_zce_dll.bat)")
+                            "the shared libzce first (build.sh; on Windows libzce's CMake build with "
+                            "-DBUILD_SHARED_LIBS=ON and cmake --install)")
     endif()
     target_link_libraries(${target} PRIVATE ${KM_LINK} "${_zce}")
     # a module that uses the embedded Python (requires py) links libzcepy too
