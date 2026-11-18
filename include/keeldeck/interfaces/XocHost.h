@@ -38,10 +38,22 @@ XOC_API QIcon xocColorizedIcon(const QString& svgPath, const QSize& size = QSize
 XOC_API void xocRefreshHostUi();
 
 /**
- * @brief 把当前 Solution 标记为已修改，并刷新动作状态与窗口标题
+ * @brief 把当前 Workspace 标记为已修改，并刷新动作状态与窗口标题
  *
- * 视图级 UI 设置属于 Solution 级编辑：Host/Solution 的信号通常已经刷过一遍动作状态，
- * 这里补最后一手，覆盖"动作在第一次 dirty 之后才重新绑定"以及"Solution 早就是 dirty"
- * 这两种漏刷的情形。主窗口或当前 Solution 不存在时只做能做的部分。
+ * 视图级 UI 设置属于 Workspace 级编辑：Host/Workspace 的信号通常已经刷过一遍动作状态，
+ * 这里补最后一手，覆盖"动作在第一次 dirty 之后才重新绑定"以及"Workspace 早就是 dirty"
+ * 这两种漏刷的情形。主窗口或当前 Workspace 不存在时只做能做的部分。
  */
+XOC_API void xocMarkWorkspaceModified();
+
+/// 兼容旧插件调用点，等价于 xocMarkWorkspaceModified()
 XOC_API void xocMarkSolutionModified();
+
+/**
+ * @brief 取插件/工程类型在 branding.ini 的 [ProjectTypeNames] 段中配置的 OEM 显示名
+ *
+ * 例如 `[ProjectTypeNames] KeelTask=TaijiTask` 时，传入 `"KeelTask"` 返回 `"TaijiTask"`；
+ * 未配置时返回 defaultName（若 defaultName 为空则返回去空白后的 pluginId）。
+ */
+XOC_API QString xocPluginDisplayName(const QString& pluginId,
+                                     const QString& defaultName = QString());
