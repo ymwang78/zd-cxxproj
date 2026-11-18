@@ -18,7 +18,8 @@
   link the static libzce and HostVM stops on its HostVMNeedsZceDll check. HostVM.sln, the name
   before KeelHost (ymwang78/KeelHost#49), is still taken, for older checkouts and branches.
 
-  build_zce_dll.bat (Release) and build_zce_dll.bat Debug build the DLLs the solution links.
+  The solution builds the DLLs it links itself: libzce's libzce-dll.vcxproj (zce.dll) and
+  libzcepy-dll.vcxproj (zcepy.dll), into its bin\<Platform>\<Configuration>\.
 -->
 <Project>
   <PropertyGroup>
