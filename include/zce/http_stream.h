@@ -286,9 +286,11 @@ class ZCE_API HttpStream : public IStream {
      * Writes the status line, the headers in `paramdict`, a Content-Length and
      * the body. The Content-Length counts the body bytes sent: `length`, or the
      * encoded size when the body is gzip-encoded (see `paramdict`). A
-     * Content-Length in `paramdict` is sent instead, as given: it is not
-     * adjusted for gzip, so a caller that names one should also set
-     * "Force-Raw".
+     * Content-Length in `paramdict` is sent instead. One equal to `length`
+     * declares the whole body, which may still be gzip-encoded; the length
+     * sent is then the encoded size. One beyond `length` declares a body
+     * streamed in parts, and this part is sent as given, never gzip-encoded,
+     * since write_ack() does not encode the parts written after it.
      *
      * Called from within on_http_request(), it answers the request being
      * dispatched. Called later — from a task posted for the purpose, or from
@@ -322,8 +324,9 @@ class ZCE_API HttpStream : public IStream {
      *        when the request accepts gzip and that makes it smaller, unless
      *        `paramdict` already specifies a non-empty "Content-Encoding"
      *        (meaning `buf` is already encoded as declared, e.g. pre-compressed
-     *        with http_gzip() on a worker thread) or has a "Force-Raw" entry;
-     *        when write_ack() compresses the body itself,
+     *        with http_gzip() on a worker thread), has a "Force-Raw" entry, or
+     *        declares a Content-Length other than `length`; when write_ack()
+     *        compresses the body itself,
      *        "Content-Encoding: gzip" is added here. "Force-Raw" is consumed as
      *        a control flag and not emitted as a response header.
      * @return what the stream's write() returned for the response: >= 0 once
