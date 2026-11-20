@@ -47,8 +47,11 @@
  * - 5: (ymwang78/libzce#268) zce::ChildProcess (zce/zce_child_process.h): modules start
  *      programs of their own, with their process trees, through libzce, which a libzce of
  *      version 4 does not export (ymwang78/KeelTask runs each task that way).
+ * - 6: (ymwang78/libzce#303) zce::IStream gains the virtual functions pending_write_bytes() and
+ *      on_write_drained(), the write side of backpressure, which moves the vtable of every
+ *      stream (Tcp, HttpStream, zce_ssl, ...); SyncStream overrides on_write_drained().
  */
-#define ZCE_ABI_VERSION 5
+#define ZCE_ABI_VERSION 6
 
 #define ZCE_ABI_STR_(x) #x
 #define ZCE_ABI_STR(x) ZCE_ABI_STR_(x)

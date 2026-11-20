@@ -83,6 +83,52 @@ class ZCE_API IStream : virtual public zce::Object {
 
     virtual void close();
 
+    /// Bytes written down this stack that the socket at its bottom has not yet handed to the
+    /// operating system.
+    ///
+    /// With on_write_drained() this is the write side of backpressure, the other half of
+    /// Tcp::pause_read(): a stream that answers a peer which does not read can stop reading
+    /// once this passes a bound of its own, and read again when it is told of the drain.
+    ///
+    /// The default asks the stream below. A zce::Tcp answers for itself: the bytes in its
+    /// write queue and in the write it has in flight. Udp, Pipe and Tty, and a stream with
+    /// nothing below it, answer 0 and never call on_write_drained(). So a stream that waits
+    /// for a drain because this was above 0 gets either the drain or on_close().
+    ///
+    /// The count is of the bytes the socket writes, after every layer in between has done its
+    /// work: TLS records (zce_ssl), gzip-encoded bodies (HttpStream), WebSocket frames
+    /// (WebSocketStream), and what those layers write of their own, such as handshakes. None
+    /// of the layers in libzce keeps back data it has been given, so none adds to the count.
+    ///
+    /// A write() made on another thread is handed to the reactor (Socket::write(), zce_ssl,
+    /// SyncStream) and counted only once the reactor has run it. So the count is exact on the
+    /// reactor thread, where a stream that bounds it should write and read it. That is also
+    /// the thread to call this on: the links between the streams change there. Tcp's own count
+    /// can be read from any thread.
+    ///
+    /// Once the socket is closing the count stops changing: what it has not written by then it
+    /// never will.
+    virtual size_t pending_write_bytes() const;
+
+    /// pending_write_bytes() has just dropped to 0: the socket below has handed the operating
+    /// system everything written down this stack so far.
+    ///
+    /// A zce::Tcp calls it on itself, on its reactor thread, when the write that empties its
+    /// queue completes, and the default passes it on to the stream above. A SyncStream passes
+    /// it on through its task queue, as it does on_read(). It comes once each time the count
+    /// drops to 0, so on a peer that keeps up it comes once for every write.
+    ///
+    /// It does not come once the socket is closing, nor for a write that fails: the stream
+    /// above gets on_close() then, with the same CloseCause as before. A zero-length write,
+    /// the stack's flush-then-close request, ends in that close and not in a drain. The stream
+    /// above may write(), close(), or pause or resume reading from inside it.
+    ///
+    /// The drain is the socket's, not one stream's. The handshake a layer below writes
+    /// (zce_ssl, SocksStream) or the 101 response WebSocketStream writes drains as well,
+    /// before the stream above has written anything and even before its on_open(). So take
+    /// it as a cue to look at pending_write_bytes() and at what the stream was waiting for.
+    virtual void on_write_drained();
+
     const zce_sockaddr_t& get_remote_addr() const;
 };
 
@@ -348,6 +394,14 @@ class ZCE_API Tcp : public Socket {
     /// short deadline.
     int connect(const char* addr, unsigned short port, std::chrono::milliseconds timeout);
 
+    /// The bytes in the write queue and in the write in flight, as IStream::pending_write_bytes()
+    /// describes. Safe on any thread; exact on the reactor thread.
+    size_t pending_write_bytes() const override;
+
+    /// Where a write completes: it starts the next one queued, or, when the queue is empty, calls
+    /// on_write_drained() on this Tcp (see IStream::on_write_drained()), so a subclass at the top
+    /// of its stack can override that as well. An override of on_written() has to chain to this
+    /// one, or the queue stops and the drain is never told.
     virtual void on_written(void* req, int status);
 
     virtual void on_read_data(zce_byte*, zce_uint32);
@@ -674,6 +728,11 @@ class ZCE_API SyncStream : public IStream {
     virtual void on_read(zce::RefBlock& dblock, const zce::Any&);
 
     virtual void on_close();
+
+    /// Passed to the stream above on the task queue, behind the reads queued before it, so the
+    /// stream above gets all its calls on one thread. Its write()s are handed to the reactor
+    /// and are not in pending_write_bytes() until the reactor has run them.
+    void on_write_drained() override;
 
     virtual int write(zce::RefBlock& dblock, IStream::ERV_ISTREAM_WRITEOPT opt);
 

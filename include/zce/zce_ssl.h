@@ -77,6 +77,10 @@ struct TlsClientOptions {
 /// a middlebox holding the connection) is then hung up on as for a failed handshake: the stream
 /// above gets on_close() and never on_open(). A server has no such deadline for its client's
 /// hello; only Tcp's receive timeout ends that wait.
+///
+/// pending_write_bytes() and on_write_drained() pass through, as IStream describes: this layer
+/// keeps no plaintext back (a write before the handshake is done fails), so the count is the
+/// socket's, of TLS records, and the handshake's records drain like any others.
 class zce_ssl : public zce::IStream
 {
     enum _tls_state {
