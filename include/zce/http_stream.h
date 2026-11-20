@@ -128,6 +128,13 @@ struct ZCE_API ZCE_HTTP_RESPONSE : public ZCE_HTTP_HEADER {
 
 ///////////////////////////////////////////////////////////////////////////////
 
+/// The server side of HTTP/1.1 over the stream below it.
+///
+/// pending_write_bytes() and on_write_drained() pass through, as IStream describes: write_ack()
+/// writes a response as soon as it has encoded it and keeps nothing back, so what is counted is
+/// the response as it goes out, gzip-encoded when write_ack() compressed it, and the chunks a
+/// caller writes itself as it framed them. A stream that answers a pipelining peer can bound
+/// that count and stop reading until the drain.
 class ZCE_API HttpStream : public IStream {
   public:
     /**
