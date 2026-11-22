@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 // ***************************************************************
 //  zce::Matrix_csv   version:  1.0   -  date:  2024/01/01
 //  -------------------------------------------------------------
@@ -36,7 +36,12 @@ double mat_norm1(const matrix_t& A);
 
 matrix_t mat_inv(matrix_t A);
 
-// 矩阵指数：Pade(6) + scaling-squaring（双精度下对 4x4 以内足够稳健）
+/**
+ * @brief Matrix exponential exp(A), by scaling and squaring with Pade approximants
+ *        (Higham 2005): degree 3, 5, 7 or 9 when the 1-norm of A is small enough for it,
+ *        otherwise degree 13 on A / 2^s, squared s times.
+ * @throws std::runtime_error if A is not square.
+ */
 matrix_t mat_expm(const matrix_t& A);
 
 /**
@@ -75,7 +80,19 @@ zce_dblmat import_matrix_from_csv(const std::string& filename, char delimiter = 
 void c2d_zoh(const zce::matrix_t& A, const zce::matrix_t& B, double Ts, zce::matrix_t& Ad,
              zce::matrix_t& Bd);
 
-// 计算 ZOH 离散单位阶跃响应（含延迟，按最接近的整采样数处理）
+/**
+ * @brief Unit step response of the transfer function num(s)/den(s), discretised by
+ *        zero-order hold, with the delay rounded to the nearest whole sample.
+ * @param num Numerator coefficients, highest power first. Its order must not exceed the
+ *            order of den; leading zeros do not count.
+ * @param den Denominator coefficients, highest power first, of order 1 to 3, den[0] != 0.
+ * @param Ts Sampling period in seconds.
+ * @param delay_sec Dead time in seconds.
+ * @param N Number of samples, > 0.
+ * @param t_out Sample times k * Ts.
+ * @param y_out Response at those times.
+ * @throws std::runtime_error if Ts < 0, or if N, den or num is invalid as described above.
+ */
 void zoh_step_response(const std::vector<double>& num, const std::vector<double>& den, double Ts,
                        double delay_sec, int N, std::vector<double>& t_out,
                        std::vector<double>& y_out);
