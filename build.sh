@@ -120,6 +120,11 @@ build_module modules/KeelBase "${KBASE_ARGS[@]}" -DKBASE_ZCE_LIBRARY="$ZCE_SHARE
 build_module modules/FrontSensor
 build_module modules/KeelTrace -DKEELTRACE_BUILD_PLUGIN=OFF
 build_module modules/KeelSim -DKEELSIM_BUILD_PLUGIN=OFF
+# KeelTask (modules/KeelTask): its root CMakeLists builds backend/ only (plugin/ is KeelDeck's), whose
+# module plugin is bin/<arch>/modules/KeelTask (vmtype KeelTask), with keeltask-run and ktask_runner.py
+# next to it; keeltaskctl goes into bin/<arch>/. It needs the static libzce and libzdl and the shared
+# libzce from above.
+build_module modules/KeelTask
 build_module tools/zGen
 
 #cd $KEELHOST_DIR/dist/debian
