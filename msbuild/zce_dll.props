@@ -31,11 +31,12 @@
     <ZceDllApply>true</ZceDllApply>
     <!-- Projects that keep the static libzce:
          - libzce, libzdl, libzce_test: the static libzce itself and its tests;
-         - libidh, libxds_client (and libidh_test): DLLs that carry a private libzce of their own,
-           so that other programs can load them.
+         - libidh, libkbase_client (and libidh_test): DLLs that carry a private libzce of their own,
+           so that other programs can load them. libkbase_client was libxds_client before
+           ymwang78/KeelBase#244 renamed it; the old name stays listed for checkouts from before.
          And the projects that build the shared libzce, which set up their own macros and links:
          libzce-dll (zce.dll) and libzcepy-dll (zcepy.dll). -->
-    <ZceDllApply Condition="'$(ProjectName)'=='libzce' or '$(ProjectName)'=='libzdl' or '$(ProjectName)'=='libzce_test' or '$(ProjectName)'=='libidh' or '$(ProjectName)'=='libidh_test' or '$(ProjectName)'=='libxds_client' or '$(ProjectName)'=='libzce-dll' or '$(ProjectName)'=='libzcepy-dll'">false</ZceDllApply>
+    <ZceDllApply Condition="'$(ProjectName)'=='libzce' or '$(ProjectName)'=='libzdl' or '$(ProjectName)'=='libzce_test' or '$(ProjectName)'=='libidh' or '$(ProjectName)'=='libidh_test' or '$(ProjectName)'=='libkbase_client' or '$(ProjectName)'=='libxds_client' or '$(ProjectName)'=='libzce-dll' or '$(ProjectName)'=='libzcepy-dll'">false</ZceDllApply>
   </PropertyGroup>
 
   <ItemDefinitionGroup Condition="'$(ZceDllApply)'=='true'">
